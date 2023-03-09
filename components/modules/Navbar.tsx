@@ -1,8 +1,14 @@
 import { Button, Tabs, Text, useTheme } from "@geist-ui/core";
 import Logo from "@/public/logo.svg"
 import { useRouter } from "next/router";
+import { MoonIcon } from "@heroicons/react/24/outline";
+import { SunIcon } from "@heroicons/react/24/solid";
 
-const Navbar = () => {
+interface Props {
+  handleThemeSwitch: () => void
+}
+
+const Navbar: React.FC<Props> = ({ handleThemeSwitch }) => {
   const router = useRouter();
   const theme = useTheme();
 
@@ -28,7 +34,29 @@ const Navbar = () => {
             <Tabs.Item label="Lock" value="/lock" />
             <Tabs.Item label="Multisender" value="/multisender" />
           </Tabs>
-          <Button>Connect Wallet</Button>
+          <div className="flex space-x-2">
+            <Button
+              auto
+              onClick={handleThemeSwitch}
+              scale={2 / 3}
+              px={0.6}
+            >
+              Connect Wallet
+            </Button>
+            <Button
+              auto
+              onClick={handleThemeSwitch}
+              icon={(
+                <>
+                  {theme.type === "dark" && <MoonIcon className="w-4 h-4" />}
+                  {theme.type === "light" && <SunIcon className="w-4 h-4" />}
+                </>
+              )}
+              scale={2 / 3}
+              px={0.6}
+            >
+            </Button>
+          </div>
         </div>
       </div>
       <style jsx>{`

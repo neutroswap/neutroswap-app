@@ -4,13 +4,41 @@ import '@/styles/quill.css'
 import type { AppProps } from 'next/app'
 import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core'
 import Navbar from '@/components/modules/Navbar'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { PrefersContext, themes, ThemeType } from '@/shared/hooks/usePrefers';
 
 export default function App({ Component, pageProps }: AppProps) {
-  // const [themeType, setThemeType] = useState('light')
+  const [themeType, setThemeType] = useState<"dark" | "light">('light')
+
   // const switchThemes = () => {
-  //   setThemeType(last => (last === 'dark' ? 'light' : 'dark'))
+  //   setThemeType((last) => (last === 'dark' ? 'light' : 'dark'))
+  //   if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+  //     document.documentElement.classList.add('dark')
+  //   } else {
+  //     document.documentElement.classList.remove('dark')
+  //   }
   // }
+  //
+  const switchTheme = useCallback((theme: ThemeType) => {
+    setThemeType(theme);
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem('theme', theme);
+      if (theme === 'dark') {
+        document.documentElement.classList.add('dark')
+      } else {
+        document.documentElement.classList.remove('dark')
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.removeAttribute('style');
+    document.body.removeAttribute('style');
+
+    const theme = window.localStorage.getItem('theme') as ThemeType;
+    if (themes.includes(theme)) setThemeType(theme);
+  }, []);
+
   const myTheme1 = Themes.createFromDark({
     type: 'coolTheme',
     palette: {
@@ -29,10 +57,12 @@ export default function App({ Component, pageProps }: AppProps) {
   })
   return (
     // <GeistProvider themes={[myTheme1]} themeType={'coolTheme'}>
-    <GeistProvider themeType={'dark'}>
+    <GeistProvider themeType={themeType}>
       <CssBaseline />
-      <Navbar />
-      <Component {...pageProps} />
+      <PrefersContext.Provider value={{ themeType, switchTheme }}>
+        <Navbar handleThemeSwitch={() => switchTheme(themeType === 'dark' ? 'light' : 'dark')} />
+        <Component {...pageProps} />
+      </PrefersContext.Provider>
     </GeistProvider>
   )
 }
