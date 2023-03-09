@@ -1,6 +1,6 @@
 import { Button, Fieldset, Input, Link, Note, Radio, Text, Textarea } from "@geist-ui/core";
 
-export default function Mint() {
+export default function Multisender() {
   return (
     <div className="bg-neutral-900 min-h-screen">
       <div className="py-10 bg-black pb-40 border-b-[0.5px] border-white/25">

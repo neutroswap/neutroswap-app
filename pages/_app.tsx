@@ -1,8 +1,10 @@
 import '@/styles/globals.css'
+import '@/styles/quill.css'
+
 import type { AppProps } from 'next/app'
 import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core'
-import { useState } from 'react'
 import Navbar from '@/components/modules/Navbar'
+import { useState } from 'react'
 
 export default function App({ Component, pageProps }: AppProps) {
   // const [themeType, setThemeType] = useState('light')

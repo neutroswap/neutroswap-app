@@ -1,14 +1,21 @@
-import { Button, Tabs, Text } from "@geist-ui/core";
+import { Button, Tabs, Text, useTheme } from "@geist-ui/core";
 import Logo from "@/public/logo.svg"
 import { useRouter } from "next/router";
 
 const Navbar = () => {
   const router = useRouter();
+  const theme = useTheme();
+
   return (
     <>
-      <div className="w-full border-b-[0.5px] border-white/25 py-3">
-        <div className="flex justify-between max-w-7xl mx-auto  submenu__inner">
-          <Logo className="h-12" />
+      <div
+        className="w-full border-b-[0.5px] border-white/25 py-3"
+        style={{
+          borderColor: theme.palette.border
+        }}
+      >
+        <div className="flex items-center justify-between max-w-7xl mx-auto  submenu__inner">
+          <Logo className="h-16 -my-4" />
           <Tabs
             hideDivider
             hideBorder

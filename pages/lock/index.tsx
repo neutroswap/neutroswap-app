@@ -1,7 +1,7 @@
 import { Button, Collapse, Fieldset, Input, Link, Note, Radio, Text, Toggle } from "@geist-ui/core";
 import { useState } from "react";
 
-export default function Mint() {
+export default function Lock() {
   const [isReceiverNotOwner, setReceiverNotOwner] = useState(false);
   const [isVesting, setVesting] = useState(false);
 
