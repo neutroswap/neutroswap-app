@@ -58,8 +58,8 @@ const RichText: React.FC<Props> = ({
       theme="bubble"
       modules={modules}
       className={classNames(
-        "w-full h-full border border-transparent rounded-md",
-        focus && "!border-neutral-400 dark:!border-white"
+        "w-full h-full border border-dashed border-transparent rounded-md",
+        focus && "!border-neutral-200 dark:!border-neutral-800"
       )}
       // style={{ borderColor: theme.palette.border }}
       // className={cx(

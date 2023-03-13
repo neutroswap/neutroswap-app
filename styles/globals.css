@@ -8,3 +8,44 @@
 .collapse > .view > .subtitle {
   @apply hidden !important
 }
+
+body {
+  overflow: visible !important;
+}
+
+#__next{
+  overflow: visible !important;
+}
+
+.two-column-table tbody tr td:nth-child(2) .cell {
+  @apply flex justify-end
+}
+.two-column-table thead tr th:nth-child(2) .thead-box {
+  @apply flex justify-end
+}
+
+.tr-border {
+  @apply border-neutral-200/75 dark:border-neutral-800 !important;
+}
+.tr-bg-white {
+  @apply bg-white dark:bg-neutral-900 !important;
+}
+.tr-text-gray-500 {
+  @apply text-gray-500 dark:text-gray-400 !important;
+}
+.tr-text-gray-500 {
+  @apply text-gray-500 dark:text-gray-400 !important;
+}
+.tr-text-gray-700 {
+  @apply text-gray-700 dark:text-gray-300 !important;
+}
+.tr-border-white {
+  @apply border-white dark:border-black/50 !important;
+}
+
+.recharts-sector {
+  @apply stroke-white dark:stroke-neutral-800 stroke-2 !important;
+}
+.recharts-surface > text {
+  @apply fill-neutral-500 dark:fill-neutral-200
+}
