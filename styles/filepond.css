@@ -1,0 +1,102 @@
+.filepond--credits {
+  display: none;
+}
+
+/* use a hand cursor intead of arrow for the action buttons */
+.filepond--file-action-button {
+  cursor: pointer;
+}
+
+/* the text color of the drop label*/
+.filepond--root .filepond--drop-label {
+  /* min-height: 6rem !important; */
+  /* min-height: 6em !important; */
+  height: 100% !important;
+  @apply text-neutral-400;
+}
+
+.filepond--wrapper {
+  height: 100% !important;
+}
+
+.filepond--root {
+  height: 100% !important;
+  @apply font-sans;
+}
+
+/* underline color for "Browse" button */
+.filepond--label-action {
+  text-decoration-color: #aaa;
+}
+
+.filepond--panel-root {
+  /* the border radius of the drop area */
+  @apply border-2 dark:border border-neutral-300 dark:border-neutral-700 border-dashed;
+  @apply rounded-md;
+
+  /* the background of the drop area  */
+  @apply bg-neutral-50 dark:bg-neutral-900/50 !important;
+}
+
+.filepond--item {
+  bottom: 0;
+}
+.filepond--item:before{
+  color: transparent;
+}
+.filepond--panel-top:after {
+  display: none;
+}
+.filepond--panel-bottom:before {
+  display: none;
+}
+
+/* the border radius of the file item */
+.filepond--item-panel {
+  border-radius: 0.5em;
+}
+
+/* the background color of the file and file panel (used when dropping an image) */
+.filepond--item-panel {
+  /* background-color: #555; */
+  @apply bg-neutral-600;
+}
+
+/* the background color of the drop circle */
+.filepond--drip-blob {
+  background-color: #999;
+}
+
+/* the background color of the black action buttons */
+.filepond--file-action-button {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* the icon color of the black action buttons */
+.filepond--file-action-button {
+  color: white;
+}
+
+/* the color of the focus ring */
+.filepond--file-action-button:hover,
+.filepond--file-action-button:focus {
+  box-shadow: 0 0 0 0.125em rgba(255, 255, 255, 0.9);
+}
+
+.filepond--image-preview {
+  @apply bg-neutral-700;
+}
+
+/* the text color of the file status and info labels */
+.filepond--file {
+  @apply text-white;
+}
+
+/* error state color */
+.filepond--image-preview-overlay-success {
+  @apply text-green-600 text-opacity-70;
+}
+
+.filepond--image-preview-overlay-failure {
+  @apply text-red-600 text-opacity-50;
+}

@@ -1,5 +1,6 @@
 import '@/styles/globals.css'
 import '@/styles/quill.css'
+import '@/styles/filepond.css'
 
 import type { AppProps } from 'next/app'
 import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core'

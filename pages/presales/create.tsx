@@ -1,18 +1,21 @@
 import { Button, Drawer, Input, Table, Tabs, Text, useTheme } from "@geist-ui/core";
 import { TableColumnRender } from "@geist-ui/core/dist/table";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ArrowLeftIcon, LockClosedIcon, PlusIcon } from '@heroicons/react/24/solid'
 import { useRouter } from "next/router";
 import Browser from "@/components/modules/Browser";
 import CreatePoolDrawer from "@/components/templates/Drawer/CreatePoolDrawer";
 // import RichText from "@/components/modules/RichText";
 import dynamic from "next/dynamic";
-import { GlobeAltIcon, PencilIcon } from "@heroicons/react/24/outline";
+import { GlobeAltIcon, PencilIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import DiscordIcon from '@/public/icons/discord.svg'
 import InstagramIcon from '@/public/icons/instagram.svg'
 import TwitterIcon from '@/public/icons/twitter.svg'
 import YoutubeIcon from '@/public/icons/youtube.svg'
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import ImageUpload from "@/components/elements/ImageUpload";
+import { FilePond } from "filepond";
+import { renderToString } from "react-dom/server";
 // import { DonutChart } from "@tremor/react";
 
 const DynamicDonutChart = dynamic(() =>
@@ -34,9 +37,13 @@ type TokenDistributions = {
 }
 
 export default function Lock() {
+  let pond = useRef<FilePond>(null);
+
   const router = useRouter();
   const theme = useTheme()
 
+
+  const [image, setImage] = useState<string>("");
   const [isModalOpen, setModalOpen] = useState(false)
   const [tokenDistributionsData, setTokenDistributionsData] = useState<TokenDistributions[]>([
     { key: 'Public Sale', value: 0 },
@@ -173,14 +180,40 @@ export default function Lock() {
       </div>
       <div className="space-y-8 max-w-7xl mx-auto -translate-y-10">
         <Browser>
-          <div className="flex items-center space-x-4">
-            <div
-              className="flex items-center justify-center p-8 border rounded-lg border-dashed"
-              style={{ borderColor: theme.palette.accents_3 }}
-            >
-              <PlusIcon
-                className="w-8 h-8"
-                style={{ color: theme.palette.accents_3 }}
+          <div className="flex items-center space-x-6">
+            <div className="relative w-28 h-28">
+              <ImageUpload
+                ref={pond}
+                name="cover-upload"
+                bucket={""}
+                setPublicUrl={setImage}
+                stylePanelLayout="compact"
+                styleLoadIndicatorPosition="center bottom"
+                styleProgressIndicatorPosition="right bottom"
+                styleButtonRemoveItemPosition="left bottom"
+                styleButtonProcessItemPosition="right bottom"
+                labelIdle={(() => {
+                  return renderToString(
+                    <div className="mt-2 text-neutral-400">
+                      <svg
+                        className="w-10 h-10 mx-auto text-neutral-500 hover:cursor-pointer"
+                        stroke="currentColor"
+                        fill="none"
+                        viewBox="0 0 48 48"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <p className="mt-1 w-[80%] !text-xs mx-auto">Upload your logo here</p>
+                    </div>
+                  );
+                })()}
+              // setTouched={setTouched}
               />
             </div>
             <div className="flex flex-col">
@@ -202,27 +235,45 @@ export default function Lock() {
               />
             </div>
           </div>
-          <div className="flex items-center space-x-4 mt-8">
-            <div
-              className="flex items-center justify-center p-8 h-80 w-full border rounded-lg border-dashed"
-              style={{ borderColor: theme.palette.accents_3 }}
-            >
-              <PlusIcon
-                className="w-8 h-8"
-                style={{ color: theme.palette.accents_3 }}
-              />
-            </div>
+          <div className="relative w-full h-80 mt-8">
+            <ImageUpload
+              ref={pond}
+              name="cover-upload"
+              bucket={""}
+              setPublicUrl={setImage}
+              imagePreviewMaxHeight={285}
+              labelIdle={(() => {
+                return renderToString(
+                  <div className="text-sm text-neutral-400">
+                    <div className="space-y-1 text-center">
+                      <svg
+                        className="w-12 h-12 mx-auto text-neutral-500"
+                        stroke="currentColor"
+                        fill="none"
+                        viewBox="0 0 48 48"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                          strokeWidth={2}
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                    </div>
+                    <span className="font-medium text-primary-600 hover:underline hover:cursor-pointer">
+                      Drag and drop
+                    </span>
+                    <span className="pl-1">or click to upload a banner</span>
+                    <p className="mt-1 !text-xs">PNG, JPG, or GIF up to 10MB</p>
+                  </div>
+                );
+              })()}
+            // setTouched={setTouched}
+            />
           </div>
+          <p className="text-xs">* We recommend images that are at least 1600px wide and 400px tall</p>
           <div className="grid grid-cols-1 md:grid-cols-10 gap-8 mt-10">
-            {/* <div */}
-            {/*   className="flex items-center justify-center p-8 w-7/12 h-[1090px] border rounded-lg border-dashed" */}
-            {/*   style={{ borderColor: theme.palette.accents_3 }} */}
-            {/* > */}
-            {/*   <PlusIcon */}
-            {/*     className="w-8 h-8" */}
-            {/*     style={{ color: theme.palette.accents_3 }} */}
-            {/*   /> */}
-            {/* </div> */}
             <div className="flex flex-col min-h-min col-span-6">
               <RichText
                 value={`
@@ -330,10 +381,10 @@ export default function Lock() {
             </div>
           </div>
         </Browser>
-      </div>
+      </div >
       <Drawer visible={isModalOpen} onClose={closeHandler} placement="bottom" padding={0} style={{ background: theme.palette.accents_1 }}>
         <CreatePoolDrawer close={() => setModalOpen(false)} />
       </Drawer>
-    </div>
+    </div >
   )
 }
