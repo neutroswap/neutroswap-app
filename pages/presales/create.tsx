@@ -18,10 +18,11 @@ import { FilePond } from "filepond";
 import { renderToString } from "react-dom/server";
 // import { DonutChart } from "@tremor/react";
 
-const DynamicDonutChart = dynamic(() =>
+const DonutChart = dynamic(() =>
   import("@tremor/react").then((mod) => mod.DonutChart),
   { loading: () => <p>Loading...</p> }
 );
+
 const RichText = dynamic(() => import("@/components/modules/RichText"), {
   ssr: false
 });
@@ -313,17 +314,19 @@ export default function Lock() {
                     </Table>
                   </Tabs.Item>
                   <Tabs.Item label="Token Distribution" value="2">
-                    {tokenDistributionsData.reduce((acc, currentValue) => acc + currentValue.value, 0) !== 0 && (
-                      <DynamicDonutChart
-                        data={tokenDistributionsData}
-                        category="value"
-                        dataKey="key"
-                        valueFormatter={currencyFormat}
-                        height="h-60"
-                        marginTop="mt-6"
-                        colors={["slate", "violet", "indigo", "rose", "cyan", "amber"]}
-                      />
-                    )}
+                    <div>
+                      {tokenDistributionsData.reduce((acc, currentValue) => acc + currentValue.value, 0)}
+                      {tokenDistributionsData.reduce((acc, currentValue) => acc + currentValue.value, 0) !== 0 && (
+                        <DonutChart
+                          data={tokenDistributionsData}
+                          category="value"
+                          index="key"
+                          valueFormatter={currencyFormat}
+                          className="h-60 mt-6"
+                        // colors={["slate", "violet", "indigo", "rose", "cyan", "amber"]}
+                        />
+                      )}
+                    </div>
                     <Table data={tokenDistributionsData} className="!mt-8 two-column-table">
                       <Table.Column prop="key" label="Property" />
                       <Table.Column prop="value" label="Value" render={useTokenDistributionsRowUpdate} />
