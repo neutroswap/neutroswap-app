@@ -1,4 +1,4 @@
-import { Button, Drawer, Input, Table, Tabs, Text, useTheme } from "@geist-ui/core";
+import { Button, Drawer, Input, Loading, Table, Tabs, Text, useTheme } from "@geist-ui/core";
 import { TableColumnRender } from "@geist-ui/core/dist/table";
 import { useRef, useState } from "react";
 import { ArrowLeftIcon, LockClosedIcon, PlusIcon } from '@heroicons/react/24/solid'
@@ -20,7 +20,7 @@ import { renderToString } from "react-dom/server";
 
 const DonutChart = dynamic(() =>
   import("@tremor/react").then((mod) => mod.DonutChart),
-  { loading: () => <p>Loading...</p> }
+  { loading: () => <Loading className="!my-8" spaceRatio={2.5} /> }
 );
 
 const RichText = dynamic(() => import("@/components/modules/RichText"), {
@@ -315,7 +315,6 @@ export default function Lock() {
                   </Tabs.Item>
                   <Tabs.Item label="Token Distribution" value="2">
                     <div>
-                      {tokenDistributionsData.reduce((acc, currentValue) => acc + currentValue.value, 0)}
                       {tokenDistributionsData.reduce((acc, currentValue) => acc + currentValue.value, 0) !== 0 && (
                         <DonutChart
                           data={tokenDistributionsData}
