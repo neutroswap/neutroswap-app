@@ -63,7 +63,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <PrefersContext.Provider value={{ themeType, switchTheme }}>
         <Navbar handleThemeSwitch={() => switchTheme(themeType === 'dark' ? 'light' : 'dark')} />
         <div className="bg-neutral-50 dark:bg-neutral-900/50 min-h-screen">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl px-6 mx-auto">
             <Component {...pageProps} />
           </div>
         </div>

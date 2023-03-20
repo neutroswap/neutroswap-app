@@ -41,7 +41,6 @@ const Navbar: React.FC<Props> = ({ handleThemeSwitch }) => {
           <div className="flex space-x-2">
             <Button
               auto
-              onClick={handleThemeSwitch}
               scale={2 / 3}
               px={0.6}
             >
