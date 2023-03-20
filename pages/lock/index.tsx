@@ -2,7 +2,7 @@ import { Button, Collapse, Fieldset, Input, Link, Note, Radio, Text, Toggle } fr
 import { useState } from "react";
 
 export default function Lock() {
-  const [isReceiverNotOwner, setReceiverNotOwner] = useState(false);
+  const [isOwnerAsReceiver, setOwnerAsReceiver] = useState(true);
   const [isVesting, setVesting] = useState(false);
 
   return (
@@ -40,12 +40,12 @@ export default function Lock() {
                   <Text small type="secondary">Set owner as receiver</Text>
                   <Toggle
                     scale={2}
-                    onChange={(value) => setReceiverNotOwner(value.target.checked)}
-                    initialChecked={isReceiverNotOwner}
+                    onChange={(value) => setOwnerAsReceiver(value.target.checked)}
+                    initialChecked={isOwnerAsReceiver}
                   />
                 </div>
               </div>
-              {isReceiverNotOwner && (
+              {!isOwnerAsReceiver && (
                 <div className="flex space-x-4 col-span-4">
                   <Input placeholder="0x00...000" width="100%">
                     Lock Receiver
