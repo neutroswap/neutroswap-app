@@ -1,12 +1,42 @@
 import '@/styles/globals.css'
 import '@/styles/quill.css'
 import '@/styles/filepond.css'
+import '@rainbow-me/rainbowkit/styles.css';
 
 import type { AppProps } from 'next/app'
 import { GeistProvider, CssBaseline, Themes } from '@geist-ui/core'
 import Navbar from '@/components/modules/Navbar'
 import { useCallback, useEffect, useState } from 'react'
 import { PrefersContext, themes, ThemeType } from '@/shared/hooks/usePrefers';
+
+import {
+  getDefaultWallets,
+  lightTheme,
+  midnightTheme,
+  RainbowKitProvider,
+} from '@rainbow-me/rainbowkit';
+import { configureChains, createClient, WagmiConfig } from 'wagmi';
+import { mainnet, polygon, optimism, arbitrum } from 'wagmi/chains';
+import { publicProvider } from 'wagmi/providers/public';
+
+const { chains, provider } = configureChains(
+  [mainnet, polygon, optimism, arbitrum],
+  [
+    // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
+    publicProvider()
+  ]
+);
+
+const { connectors } = getDefaultWallets({
+  appName: 'Protostar App',
+  chains
+});
+
+const wagmiClient = createClient({
+  autoConnect: true,
+  connectors,
+  provider
+})
 
 export default function App({ Component, pageProps }: AppProps) {
   const [themeType, setThemeType] = useState<"dark" | "light">('light')
@@ -58,16 +88,20 @@ export default function App({ Component, pageProps }: AppProps) {
   // })
   return (
     // <GeistProvider themes={[myTheme1]} themeType={'coolTheme'}>
-    <GeistProvider themeType={themeType}>
-      <CssBaseline />
-      <PrefersContext.Provider value={{ themeType, switchTheme }}>
-        <Navbar handleThemeSwitch={() => switchTheme(themeType === 'dark' ? 'light' : 'dark')} />
-        <div className="bg-neutral-50 dark:bg-neutral-900/50 min-h-screen">
-          <div className="max-w-7xl px-6 mx-auto">
-            <Component {...pageProps} />
-          </div>
-        </div>
-      </PrefersContext.Provider>
-    </GeistProvider>
+    <WagmiConfig client={wagmiClient}>
+      <RainbowKitProvider chains={chains} theme={midnightTheme()}>
+        <GeistProvider themeType={themeType}>
+          <CssBaseline />
+          <PrefersContext.Provider value={{ themeType, switchTheme }}>
+            <Navbar handleThemeSwitch={() => switchTheme(themeType === 'dark' ? 'light' : 'dark')} />
+            <div className="bg-neutral-50 dark:bg-neutral-900/50 min-h-screen">
+              <div className="max-w-7xl px-6 mx-auto">
+                <Component {...pageProps} />
+              </div>
+            </div>
+          </PrefersContext.Provider>
+        </GeistProvider>
+      </RainbowKitProvider>
+    </WagmiConfig>
   )
 }
