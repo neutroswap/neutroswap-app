@@ -76,7 +76,7 @@ const Navbar: React.FC<Props> = () => {
                         return (
                           <Button
                             auto
-                            scale={2 / 3}
+                            scale={3 / 4}
                             px={0.6}
                             onClick={openConnectModal}
                           >
@@ -89,7 +89,7 @@ const Navbar: React.FC<Props> = () => {
                         return (
                           <Button
                             auto
-                            scale={2 / 3}
+                            scale={3 / 4}
                             px={0.6}
                             onClick={openChainModal}
                           >
