@@ -3,22 +3,20 @@ import { Button, Fieldset, Input, Link, Radio, Text } from "@geist-ui/core";
 export default function Mint() {
   const handler = (val: string | string[]) => console.log(val)
   return (
-    <div className="bg-neutral-900 min-h-screen">
-      <div className="py-10 bg-black pb-40 border-b-[0.5px] border-white/25">
-        <div className="max-w-7xl mx-auto">
-          <Text h2 height={3}>Generate your token</Text>
-          <Text type="secondary" p>Create a fully-audited ERC20 token and deploy it automatically</Text>
-          <Radio.Group value="1" useRow>
-            <Radio value="1">
-              Standard
-              <Radio.Desc>Description for Option1</Radio.Desc>
-            </Radio>
-            {/* <Radio value="2"> */}
-            {/*   Liquidity Generator */}
-            {/*   <Radio.Desc>Description for Option2</Radio.Desc> */}
-            {/* </Radio> */}
-          </Radio.Group>
-        </div>
+    <div>
+      <div className="py-10 pb-40 border-b-[0.5px] border-white/25">
+        <Text h2 height={3}>Generate your token</Text>
+        <Text type="secondary" p>Create a fully-audited ERC20 token and deploy it automatically</Text>
+        <Radio.Group value="1" useRow>
+          <Radio value="1">
+            Standard
+            <Radio.Desc>Description for Option1</Radio.Desc>
+          </Radio>
+          {/* <Radio value="2"> */}
+          {/*   Liquidity Generator */}
+          {/*   <Radio.Desc>Description for Option2</Radio.Desc> */}
+          {/* </Radio> */}
+        </Radio.Group>
       </div>
       <div className="space-y-8 max-w-7xl mx-auto">
         <Fieldset className="-translate-y-32">

@@ -1,8 +1,10 @@
 import { Button, Tabs, Text, useTheme } from "@geist-ui/core";
 import Logo from "@/public/logo.svg"
+import AltLogo from "@/public/alt_logo.svg"
 import { useRouter } from "next/router";
 import { MoonIcon } from "@heroicons/react/24/outline";
 import { SunIcon } from "@heroicons/react/24/solid";
+import Link from "next/link";
 
 interface Props {
   handleThemeSwitch: () => void
@@ -15,18 +17,20 @@ const Navbar: React.FC<Props> = ({ handleThemeSwitch }) => {
   return (
     <>
       <div
-        className="w-full border-b-[0.5px] border-white/25 py-3"
+        className="border-b-[0.5px] border-white/25 p-3 lg:px-0"
         style={{
           borderColor: theme.palette.border
         }}
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto  submenu__inner">
-          <Logo className="h-16 -my-4" />
+          <Link href="/">
+            <Logo className="h-10 lg:h-12 text-black dark:text-white" />
+          </Link>
           <Tabs
             hideDivider
             hideBorder
             onChange={(route) => router.push(route)}
-            className="!w-full"
+            className="hidden lg:block !w-full"
           >
             <Tabs.Item label="Home" value="/" />
             <Tabs.Item label="Mint" value="/mint" />
@@ -46,6 +50,7 @@ const Navbar: React.FC<Props> = ({ handleThemeSwitch }) => {
             <Button
               auto
               onClick={handleThemeSwitch}
+              className="!hidden lg:!block"
               icon={(
                 <>
                   {theme.type === "dark" && <MoonIcon className="w-4 h-4" />}

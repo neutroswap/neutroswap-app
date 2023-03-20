@@ -62,7 +62,11 @@ export default function App({ Component, pageProps }: AppProps) {
       <CssBaseline />
       <PrefersContext.Provider value={{ themeType, switchTheme }}>
         <Navbar handleThemeSwitch={() => switchTheme(themeType === 'dark' ? 'light' : 'dark')} />
-        <Component {...pageProps} />
+        <div className="bg-neutral-50 dark:bg-neutral-900/50 min-h-screen">
+          <div className="max-w-7xl mx-auto">
+            <Component {...pageProps} />
+          </div>
+        </div>
       </PrefersContext.Provider>
     </GeistProvider>
   )

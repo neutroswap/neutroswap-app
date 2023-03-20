@@ -6,8 +6,8 @@ export default function Lock() {
   const [isVesting, setVesting] = useState(false);
 
   return (
-    <div className="bg-neutral-900 min-h-screen">
-      <div className="py-10 bg-black pb-40 border-b-[0.5px] border-white/25">
+    <div>
+      <div className="py-10 pb-40 border-b-[0.5px] border-white/25">
         <div className="max-w-7xl mx-auto">
           <Text h2 height={3}>Lock Token</Text>
           <Text type="secondary" p>Lock your token</Text>

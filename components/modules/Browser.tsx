@@ -13,14 +13,11 @@ const Browser: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
             <div className="w-3 h-3 rounded-[50%] bg-green-500" />
           </div>
           <div
-            className="relative flex items-center w-full max-w-lg rounded-md py-1.5 px-3 bg-neutral-200 dark:bg-neutral-800/60"
-            style={{
-              border: theme.palette.border,
-            }}
+            className="relative flex items-center w-full max-w-lg rounded-md py-1.5 px-3 bg-neutral-100 dark:bg-neutral-800/60 border border-neutral-200/50 dark:border-transparent"
           >
-            <LockClosedIcon className="w-4 h-4 text-green-500" />
+            <LockClosedIcon className="w-4 h-4 text-emerald-500 dark:text-green-500" />
             <input
-              className="text-sm w-full text-center text-green-600 dark:text-green-500 bg-transparent"
+              className="text-sm w-full text-center text-emerald-500 dark:text-green-500 bg-transparent"
               value={`https://www.protostar.finance/`}
             />
           </div>
