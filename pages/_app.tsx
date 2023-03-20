@@ -18,6 +18,7 @@ import {
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { mainnet, polygon, optimism, arbitrum } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
+import Footer from '@/components/modules/Footer';
 
 const { chains, provider } = configureChains(
   [mainnet, polygon, optimism, arbitrum],
@@ -89,16 +90,17 @@ export default function App({ Component, pageProps }: AppProps) {
   return (
     // <GeistProvider themes={[myTheme1]} themeType={'coolTheme'}>
     <WagmiConfig client={wagmiClient}>
-      <RainbowKitProvider chains={chains} theme={midnightTheme()}>
+      <RainbowKitProvider chains={chains} theme={themeType === "dark" ? midnightTheme() : lightTheme()}>
         <GeistProvider themeType={themeType}>
           <CssBaseline />
           <PrefersContext.Provider value={{ themeType, switchTheme }}>
-            <Navbar handleThemeSwitch={() => switchTheme(themeType === 'dark' ? 'light' : 'dark')} />
-            <div className="bg-neutral-50 dark:bg-neutral-900/50 min-h-screen">
+            <Navbar />
+            <div className="bg-neutral-50 dark:bg-neutral-900/50 min-h-[85.5vh]">
               <div className="max-w-7xl px-6 mx-auto">
                 <Component {...pageProps} />
               </div>
             </div>
+            <Footer handleThemeSwitch={() => switchTheme(themeType === 'dark' ? 'light' : 'dark')} />
           </PrefersContext.Provider>
         </GeistProvider>
       </RainbowKitProvider>

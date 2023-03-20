@@ -9,10 +9,9 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classnames";
 
 interface Props {
-  handleThemeSwitch: () => void
 }
 
-const Navbar: React.FC<Props> = ({ handleThemeSwitch }) => {
+const Navbar: React.FC<Props> = () => {
   const router = useRouter();
   const theme = useTheme();
 
@@ -157,20 +156,6 @@ const Navbar: React.FC<Props> = ({ handleThemeSwitch }) => {
                 );
               }}
             </ConnectButton.Custom>
-            {/* <Button */}
-            {/*   auto */}
-            {/*   onClick={handleThemeSwitch} */}
-            {/*   className="!hidden lg:!block" */}
-            {/*   icon={( */}
-            {/*     <> */}
-            {/*       {theme.type === "dark" && <MoonIcon className="w-4 h-4" />} */}
-            {/*       {theme.type === "light" && <SunIcon className="w-4 h-4" />} */}
-            {/*     </> */}
-            {/*   )} */}
-            {/*   scale={2 / 3} */}
-            {/*   px={0.6} */}
-            {/* > */}
-            {/* </Button> */}
           </div>
         </div>
       </div>
