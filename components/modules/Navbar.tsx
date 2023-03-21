@@ -18,14 +18,14 @@ const Navbar: React.FC<Props> = () => {
   return (
     <>
       <div
-        className="border-b-[0.5px] border-white/25 p-3 lg:px-0"
+        className="fixed top-0 w-full border-b-[0.5px] border-white/25 bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-md z-10 p-0"
         style={{
           borderColor: theme.palette.border
         }}
       >
-        <div className="flex items-center justify-between max-w-7xl mx-auto  submenu__inner">
+        <div className="flex items-center justify-between max-w-7xl mx-auto py-3 px-4 lg:px-0  submenu__inner">
           <Link href="/">
-            <Logo className="h-10 lg:h-12 text-black dark:text-white" />
+            <Logo className="h-10 lg:h-12 text-black dark:text-white -ml-3" />
           </Link>
           <Tabs
             hideDivider
@@ -100,23 +100,6 @@ const Navbar: React.FC<Props> = () => {
 
                       return (
                         <div className="flex items-center space-x-1">
-                          <div className="flex h-8 items-center dark:bg-neutral-900 p-0.5 rounded-md min-w-max shadow">
-                            <span className="text-sm font-bold mx-1.5">
-                              {account.displayBalance
-                                ? `${account.displayBalance}`
-                                : ''}
-                            </span>
-                            <button
-                              onClick={openAccountModal}
-                              type="button"
-                              className={classNames(
-                                "flex h-full items-center text-sm px-2 border border-transparent dark:border-white/5 rounded-md font-bold bg-neutral-100 dark:bg-neutral-800",
-                                "hover:border-black/15 hover:bg-neutral-200/50 dark:hover:border-white/15 dark:hover:bg-neutral-700/50"
-                              )}
-                            >
-                              {account.displayName} <ChevronDownIcon className="ml-0.5 w-4 h-4" />
-                            </button>
-                          </div>
                           <button
                             onClick={openChainModal}
                             type="button"
@@ -148,6 +131,26 @@ const Navbar: React.FC<Props> = () => {
                             {!chain.hasIcon && (
                               <QuestionMarkCircleIcon className="h-5 w-5 text-white/50" />
                             )}
+                          </button>
+
+                          <button
+                            onClick={openAccountModal}
+                            className="flex h-8 items-center dark:bg-neutral-900 lg:p-0.5 rounded-md min-w-max shadow border lg:border-0 border-white/5"
+                          >
+                            <span className="text-sm font-bold mx-1.5">
+                              {account.displayBalance
+                                ? `${account.displayBalance}`
+                                : ''}
+                            </span>
+                            <button
+                              type="button"
+                              className={classNames(
+                                "hidden lg:flex h-full items-center text-sm px-2 border border-transparent dark:border-white/5 rounded-md font-bold bg-neutral-100 dark:bg-neutral-800",
+                                "hover:border-black/15 hover:bg-neutral-200/50 dark:hover:border-white/15 dark:hover:bg-neutral-700/50"
+                              )}
+                            >
+                              {account.displayName} <ChevronDownIcon className="ml-0.5 w-4 h-4" />
+                            </button>
                           </button>
                         </div>
                       );

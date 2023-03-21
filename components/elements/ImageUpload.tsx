@@ -1,8 +1,6 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 // import { supabase } from "shared/helpers/supabaseClient";
 import {
-  FilePondFile,
-  FilePondServerConfigProps,
   registerPlugin,
 } from "filepond";
 import { FilePond, FilePondProps } from "react-filepond";
@@ -10,7 +8,6 @@ import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orien
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "filepond/dist/filepond.min.css";
-import { renderToString } from "react-dom/server";
 
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
@@ -24,6 +21,7 @@ const ImageUploadRender: React.ForwardRefRenderFunction<
   FilePond | any,
   ImageUploadProps
 > = (props, ref) => {
+
   // const serverOptions: FilePondServerConfigProps = {
   //   server: {
   //     process: async (
@@ -128,6 +126,7 @@ const ImageUploadRender: React.ForwardRefRenderFunction<
       <FilePond
         ref={ref}
         allowMultiple={false}
+        onupdatefiles={(files) => props.setPublicUrl(files[0].source as string)}
         // server={serverOptions.server}
         {...props}
       />
