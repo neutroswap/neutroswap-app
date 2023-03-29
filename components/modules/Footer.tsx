@@ -1,15 +1,15 @@
 import { Button, Tabs, Text, useTheme } from "@geist-ui/core";
-import Logo from "@/public/logo.svg"
-import AltLogo from "@/public/alt_logo.svg"
+import Logo from "@/public/logo.svg";
+import AltLogo from "@/public/alt_logo.svg";
 import { useRouter } from "next/router";
 import { MoonIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { classNames } from "@/shared/helpers/classnames";
+import { classNames } from "@/shared/helpers/classNames";
 
 interface Props {
-  handleThemeSwitch: () => void
+  handleThemeSwitch: () => void;
 }
 
 const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
@@ -21,7 +21,7 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
       <div
         className="border-t-[0.5px] border-white/25 p-3 lg:px-0"
         style={{
-          borderColor: theme.palette.border
+          borderColor: theme.palette.border,
         }}
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto  submenu__inner">
@@ -29,34 +29,33 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
             Copyright &copy; {new Date().getFullYear()} Nava Labs, LLC. All
             rights reserved.
           </p>
-          <div>
-          </div>
+          <div></div>
           <div className="flex space-x-2">
             <Button
               auto
               onClick={handleThemeSwitch}
               className="!hidden lg:!block"
-              icon={(
+              icon={
                 <>
                   {theme.type === "dark" && <MoonIcon className="w-4 h-4" />}
                   {theme.type === "light" && <SunIcon className="w-4 h-4" />}
                 </>
-              )}
+              }
               scale={2 / 3}
               px={0.6}
-            >
-            </Button>
+            ></Button>
           </div>
         </div>
       </div>
-      <style jsx>{`
-      .submenu__inner :global(.content) {
-          display: none;
-        }
-      `}
+      <style jsx>
+        {`
+          .submenu__inner :global(.content) {
+            display: none;
+          }
+        `}
       </style>
     </>
-  )
-}
+  );
+};
 
 export default Footer;

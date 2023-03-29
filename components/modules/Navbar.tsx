@@ -1,15 +1,14 @@
 import { Button, Tabs, Text, useTheme } from "@geist-ui/core";
-import Logo from "@/public/logo.svg"
-import AltLogo from "@/public/alt_logo.svg"
+import Logo from "@/public/logo.svg";
+import AltLogo from "@/public/alt_logo.svg";
 import { useRouter } from "next/router";
 import { MoonIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { classNames } from "@/shared/helpers/classnames";
+import { classNames } from "@/shared/helpers/classNames";
 
-interface Props {
-}
+interface Props {}
 
 const Navbar: React.FC<Props> = () => {
   const router = useRouter();
@@ -20,7 +19,7 @@ const Navbar: React.FC<Props> = () => {
       <div
         className="fixed top-0 w-full border-b-[0.5px] border-white/25 bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-md z-10 p-0"
         style={{
-          borderColor: theme.palette.border
+          borderColor: theme.palette.border,
         }}
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto py-3 px-4 lg:px-0  submenu__inner">
@@ -52,22 +51,22 @@ const Navbar: React.FC<Props> = () => {
               }) => {
                 // Note: If your app doesn't use authentication, you
                 // can remove all 'authenticationStatus' checks
-                const ready = mounted && authenticationStatus !== 'loading';
+                const ready = mounted && authenticationStatus !== "loading";
                 const connected =
                   ready &&
                   account &&
                   chain &&
                   (!authenticationStatus ||
-                    authenticationStatus === 'authenticated');
+                    authenticationStatus === "authenticated");
 
                 return (
                   <div
                     {...(!ready && {
-                      'aria-hidden': true,
-                      'style': {
+                      "aria-hidden": true,
+                      style: {
                         opacity: 0,
-                        pointerEvents: 'none',
-                        userSelect: 'none',
+                        pointerEvents: "none",
+                        userSelect: "none",
                       },
                     })}
                   >
@@ -116,12 +115,12 @@ const Navbar: React.FC<Props> = () => {
                                   width: 18,
                                   height: 18,
                                   borderRadius: 999,
-                                  overflow: 'hidden',
+                                  overflow: "hidden",
                                 }}
                               >
                                 {chain.iconUrl && (
                                   <img
-                                    alt={chain.name ?? 'Chain icon'}
+                                    alt={chain.name ?? "Chain icon"}
                                     src={chain.iconUrl}
                                     style={{ width: 18, height: 18 }}
                                   />
@@ -140,7 +139,7 @@ const Navbar: React.FC<Props> = () => {
                             <span className="text-sm font-bold mx-1.5">
                               {account.displayBalance
                                 ? `${account.displayBalance}`
-                                : ''}
+                                : ""}
                             </span>
                             <button
                               type="button"
@@ -149,7 +148,8 @@ const Navbar: React.FC<Props> = () => {
                                 "hover:border-black/15 hover:bg-neutral-200/50 dark:hover:border-white/15 dark:hover:bg-neutral-700/50"
                               )}
                             >
-                              {account.displayName} <ChevronDownIcon className="ml-0.5 w-4 h-4" />
+                              {account.displayName}{" "}
+                              <ChevronDownIcon className="ml-0.5 w-4 h-4" />
                             </button>
                           </button>
                         </div>
@@ -162,14 +162,15 @@ const Navbar: React.FC<Props> = () => {
           </div>
         </div>
       </div>
-      <style jsx>{`
-      .submenu__inner :global(.content) {
-          display: none;
-        }
-      `}
+      <style jsx>
+        {`
+          .submenu__inner :global(.content) {
+            display: none;
+          }
+        `}
       </style>
     </>
-  )
-}
+  );
+};
 
 export default Navbar;

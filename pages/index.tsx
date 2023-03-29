@@ -11,5 +11,5 @@ export default function Home() {
       <Text h1>Home Page</Text>
       <Button>Submit</Button>
     </>
-  )
+  );
 }

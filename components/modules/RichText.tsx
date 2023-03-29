@@ -1,18 +1,16 @@
-import { classNames } from "@/shared/helpers/classnames";
+import { classNames } from "@/shared/helpers/classNames";
 import useUpdateEffect from "@/shared/hooks/useUpdateEffect";
 import { useTheme } from "@geist-ui/core";
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactQuill from "react-quill"
+import ReactQuill from "react-quill";
 
 interface Props {
-  value?: string,
-  onChange?: () => void,
+  value?: string;
+  onChange?: () => void;
 }
 
-const RichText: React.FC<Props> = ({
-  value, onChange
-}) => {
-  let quillObj = useRef<any>()
+const RichText: React.FC<Props> = ({ value, onChange }) => {
+  let quillObj = useRef<any>();
   const theme = useTheme();
 
   const [focus, setFocus] = useState(false);
@@ -33,27 +31,27 @@ const RichText: React.FC<Props> = ({
           ["clean"],
         ],
       },
-    }
-  }, [])
+    };
+  }, []);
 
   useUpdateEffect(() => {
     const handleContextMenu = (event: any) => {
-      event.preventDefault()
+      event.preventDefault();
       const range = quillObj.current?.getEditor().getSelection(true);
       const bounds = quillObj.current?.getEditor().getBounds(range.index);
       (quillObj.current?.getEditor() as any).theme.tooltip.show();
       (quillObj.current?.getEditor() as any).theme.tooltip.position(bounds);
-    }
+    };
 
-    if (focus) window.addEventListener('contextmenu', handleContextMenu);
-    return () => window.removeEventListener('contextmenu', handleContextMenu);
-  }, [focus])
+    if (focus) window.addEventListener("contextmenu", handleContextMenu);
+    return () => window.removeEventListener("contextmenu", handleContextMenu);
+  }, [focus]);
 
   return (
     <ReactQuill
       ref={(el) => {
         if (!quillObj.current) return;
-        quillObj.current = el
+        quillObj.current = el;
       }}
       theme="bubble"
       modules={modules}
@@ -81,7 +79,7 @@ const RichText: React.FC<Props> = ({
       }}
       bounds="#form"
     />
-  )
-}
+  );
+};
 
 export default RichText;
