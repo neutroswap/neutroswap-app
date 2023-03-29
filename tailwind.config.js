@@ -9,6 +9,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        'dark': '0px 4px 32px rgba(0, 0, 0, 0.25)',
+        'dark-lg': '0px 4px 32px rgba(0, 0, 0, 0.5)',
+      },
       backgroundImage: {
         'hard-gradient-to-r': "linear-gradient(to right, var(--tw-gradient-from), var(--tw-gradient-from) 50%, var(--tw-gradient-to) 50%, var(--tw-gradient-to))"
       },

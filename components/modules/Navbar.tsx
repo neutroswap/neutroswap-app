@@ -34,7 +34,7 @@ const Navbar: React.FC<Props> = () => {
             className="hidden lg:block !w-full"
           >
             <Tabs.Item label="Home" value="/" />
-            <Tabs.Item label="Mint" value="/mint" />
+            <Tabs.Item label="Swap" value="/swap" />
             <Tabs.Item label="Presales" value="/presales" />
             <Tabs.Item label="Lock" value="/lock" />
             <Tabs.Item label="Multisender" value="/multisender" />
