@@ -1,5 +1,5 @@
 import React from "react";
-import { Spinner } from "components/elements/Spinner";
+import { Spinner } from "../elements/Spinner";
 import { classNames } from "../../shared/helpers/classnames";
 
 interface IButtonProps {
