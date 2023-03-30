@@ -23,7 +23,7 @@ export default function Swap() {
             Trade your token
           </Text>
         </div>
-        <div className="mt-8 rounded-lg border border-neutral-800/50 shadow-dark-lg p-4 space-y-2">
+        <div className="mt-8 rounded-lg border border-neutral-800/50 shadow-dark-lg p-4">
           <div className="flex justify-between items-center ">
             <Text h3 height={2} className="text-center">
               Swap
