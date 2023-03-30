@@ -26,8 +26,15 @@ export const TokenPicker: FC = () => {
         <ModalContents>
           {/* {({ close }) => <WalletGroupForm handleClose={close} />} */}
           {({ close }) => (
-            <div>
-              <button onClick={() => close}></button>
+            <div className="flex">
+              <button onClick={() => close} className="flex justify-end">
+                <input
+                  type="text"
+                  placeholder="Contract Address"
+                  className="bg-white text-black p-2 rounded-md"
+                />
+                <button className="border p-2 rounded-md">Submit</button>
+              </button>
             </div>
           )}
         </ModalContents>
