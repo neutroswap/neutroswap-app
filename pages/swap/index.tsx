@@ -8,6 +8,7 @@ import { CheckIcon } from "@heroicons/react/20/solid";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
 import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
+import { SwapButton } from "@/components/modules/swap/SwapButton";
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -15,7 +16,7 @@ export default function Swap() {
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-[80%] py-10">
-        <div className="">
+        <div>
           <Text h2 height={3} className="text-center">
             Trade
           </Text>
@@ -23,6 +24,7 @@ export default function Swap() {
             Trade your token
           </Text>
         </div>
+
         <div className="mt-8 rounded-lg border border-neutral-800/50 shadow-dark-lg p-4">
           <div className="flex justify-between items-center ">
             <Text h3 height={2} className="text-center">
@@ -52,6 +54,8 @@ export default function Swap() {
             </div>
           </div>
         </div>
+
+        <SwapButton />
       </div>
     </>
   );
