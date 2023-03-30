@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { classNames } from "../../shared/helpers/classnames";
+import { classNames } from "../../shared/helpers/classNames";
 
 const callAll =
   (...fns: any) =>

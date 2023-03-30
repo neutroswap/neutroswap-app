@@ -10,7 +10,7 @@ export default function SettingsPopover() {
     <Popover className="relative">
       <>
         <Popover.Button>
-          <AdjustmentsHorizontalIcon className="h-5 cursor-pointer " />
+          <AdjustmentsHorizontalIcon className="h-5 cursor-pointer dark:hover:text-[#2D3036]/50" />
         </Popover.Button>
         <Transition
           as={Fragment}

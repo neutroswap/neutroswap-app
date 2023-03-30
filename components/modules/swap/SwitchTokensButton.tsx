@@ -10,7 +10,7 @@ export const SwitchTokensButton: FC = () => {
       <button
         // onClick={switchTokens}
         type="button"
-        className="z-10 group bg-gray-100 hover:bg-gray-200 hover:dark:bg-slate-700 dark:bg-slate-900 p-2 border-white transition-all rounded-full cursor-pointer"
+        className="z-10 group bg-gray-100 hover:bg-gray-200 hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-full cursor-pointer"
       >
         <div className="transition-transform rotate-0 group-hover:rotate-180">
           <ArrowDownIcon strokeWidth={3} className="w-4 h-4 text-blue" />

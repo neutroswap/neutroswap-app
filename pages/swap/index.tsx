@@ -7,6 +7,7 @@ import { LockClosedIcon } from "@heroicons/react/24/solid";
 import { CheckIcon } from "@heroicons/react/20/solid";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
+import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -39,6 +40,7 @@ export default function Swap() {
               <TokenPicker />
             </div>
           </div>
+          <SwitchTokensButton />
           <div className="p-4 bg-black/50 rounded-lg">
             <p className="text-sm text-neutral-400">You Buy</p>
             <div className="flex justify-between">
