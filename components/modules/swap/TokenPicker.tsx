@@ -2,7 +2,7 @@ import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import React, { FC } from "react";
 import ETH from "../../public/logo/eth.svg";
 
-export const SwitchTokenButton: FC = () => {
+export const TokenPicker: FC = () => {
   return (
     <div className="left-0 right-0 mt-[-9px] mb-[-9px] flex items-center justify-center">
       <button
