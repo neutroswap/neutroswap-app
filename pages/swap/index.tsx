@@ -17,8 +17,10 @@ import NumberInput from "@/components/elements/NumberInput";
 export default function Swap() {
   const { isConnected } = useAccount();
   const [tokenOneAmount, setTokenOneAmount] = useState("");
-  const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
+  const [tokenTwoAmount, setTokenTwoAmount] = useState("");
   const [prices, setPrices] = useState(null);
+  const [tokenOne, setTokenOne] = useState("");
+  const [tokenTwo, setTokenTwo] = useState("");
 
   return (
     <>
@@ -42,30 +44,26 @@ export default function Swap() {
           <div className="p-4 bg-black/50 rounded-lg">
             <p className="text-sm text-neutral-400">You Sell</p>
             <div className="flex justify-between">
-              {/* <input
-                className="text-2xl bg-transparent focus:outline-none"
-                placeholder="0.0"
-                value={tokenOneAmount}
-                onChange={changeAmount}
-              /> */}
               <NumberInput
                 className="text-2xl bg-transparent focus:outline-none"
                 placeholder="0.0"
                 value={tokenOneAmount}
                 onChange={setTokenOneAmount}
               />
-              <TokenPicker />
+              <TokenPicker setToken={setTokenOne} />
             </div>
           </div>
           <SwitchTokensButton />
           <div className="p-4 bg-black/50 rounded-lg">
             <p className="text-sm text-neutral-400">You Buy</p>
             <div className="flex justify-between">
-              <input
+              <NumberInput
                 className="text-2xl bg-transparent focus:outline-none"
                 placeholder="0.0"
+                value={tokenTwoAmount}
+                onChange={setTokenTwoAmount}
               />
-              <TokenPicker />
+              <TokenPicker setToken={setTokenTwo} />
             </div>
           </div>
         </div>

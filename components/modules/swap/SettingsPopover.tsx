@@ -2,10 +2,13 @@ import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/20/solid";
 import { Fragment, useState, useCallback, useEffect } from "react";
 import { classNames } from "@/shared/helpers/classNames";
+import NumberInput from "@/components/elements/NumberInput";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
 export default function SettingsPopover() {
+  const [slippage, setSlippage] = useState("0.5");
+
   return (
     <Popover className="relative">
       <>
@@ -27,8 +30,11 @@ export default function SettingsPopover() {
                 Settings
               </div>
               <div className="bg-[#060606] py-4 px-3 rounded-lg space-y-3">
-                <div className="text-neutral-400">Slippage</div>
-                <RadioGroup>
+                <div className="flex justify-between">
+                  <span className="text-neutral-400">Slippage</span>
+                  <span className="text-neutral-400">{slippage}%</span>
+                </div>
+                <RadioGroup onChange={setSlippage}>
                   <div className="items-center relative bg-black/[0.08] dark:bg-white/[0.04] ring-4 ring-black/[0.08] dark:ring-white/[0.04] rounded-lg overflow-hidden flex gap-1">
                     <>
                       {TABS.map((tab, i) => (
@@ -48,10 +54,12 @@ export default function SettingsPopover() {
                         </RadioGroup.Option>
                       ))}
 
-                      <div className="h-[28px] w-0.5 bg-gray-900/5 dark:bg-slate-200/5" />
-                      <input
-                        placeholder="Custom"
-                        className="focus:dark:bg-[#2D3036] dark:text-neutral-400 focus:dark:text-white relative rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px]"
+                      {/* <div className="h-[28px] w-0.5 bg-gray-900/5 dark:bg-slate-200/5" /> */}
+                      <NumberInput
+                        className="focus:dark:bg-[#2D3036] dark:placeholder:text-neutral-400 focus:dark:text-white rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px]"
+                        placeholder="custom"
+                        value={slippage}
+                        onChange={setSlippage}
                       />
                     </>
                   </div>

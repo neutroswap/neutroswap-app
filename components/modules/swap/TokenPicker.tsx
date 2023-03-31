@@ -12,6 +12,7 @@ import React, { FC, useState } from "react";
 import { Text } from "@geist-ui/core";
 import tokenList from "../../../pages/swap/tokenList.json";
 import { RadioGroup } from "@headlessui/react";
+import { type } from "os";
 
 const tokens = [
   {
@@ -51,11 +52,27 @@ const tokens = [
   },
 ];
 
-export const TokenPicker: FC = () => {
+type TokenPickerProps = {
+  setToken?: React.Dispatch<React.SetStateAction<string>>;
+  setTicker?: React.Dispatch<React.SetStateAction<string>>;
+  setImg?: React.Dispatch<React.SetStateAction<string>>;
+  setName?: React.Dispatch<React.SetStateAction<string>>;
+  setAddress?: React.Dispatch<React.SetStateAction<string>>;
+  setDecimals?: React.Dispatch<React.SetStateAction<number>>;
+};
+
+export const TokenPicker: FC<TokenPickerProps> = (props) => {
   const [selected, setSelected] = useState(tokens[0]);
   const [tokenOne, setTokenOne] = useState(null);
   const [tokenTwo, setTokenTwo] = useState(null);
   const [changeToken, setChangeToken] = useState(1);
+
+  const { setToken } = props;
+
+  const handleChange = (value: any) => {
+    setSelected(value);
+    setToken(value.address);
+  };
 
   return (
     <div className="left-0 right-0 mt-[-9px] mb-[-9px] flex items-center justify-center">
@@ -94,7 +111,11 @@ export const TokenPicker: FC = () => {
                 </div>
                 <div className="w-full py-2">
                   <div className="w-full ">
-                    <RadioGroup value={selected} onChange={setSelected}>
+                    <RadioGroup
+                      value={selected}
+                      onChange={handleChange}
+                      onClick={close}
+                    >
                       <RadioGroup.Label className="sr-only">
                         Server size
                       </RadioGroup.Label>

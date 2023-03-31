@@ -109,8 +109,6 @@ const NumberInput: React.FC<Props> = ({
         onChange={onChangeLocal}
         onFocus={onFocusLocal}
         onBlur={onBlurLocal}
-        placeholder="0"
-        className={classNames("bg-transparent focus:outline-none focus:ring-0")}
       />
       {error && (
         <span className="text-xs text-red-400">
