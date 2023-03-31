@@ -4,7 +4,6 @@ import React, { FC } from "react";
 // import { useSwapActions } from '../trade/TradeProvider'
 
 export const SwitchTokensButton: FC = () => {
-  // const { switchTokens } = useSwapActions()
   return (
     <div className="left-0 right-0 -mt-3 -mb-3 flex items-center justify-center">
       <button

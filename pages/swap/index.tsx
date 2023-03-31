@@ -1,5 +1,5 @@
 // import { Inter } from 'next/font/google'
-import React, { useState, useEffect, Fragment } from "react";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
 import { Popover, Transition } from "@headlessui/react";
@@ -9,10 +9,17 @@ import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
 import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 import { SwapButton } from "@/components/modules/swap/SwapButton";
+import { useAccount } from "wagmi";
+import NumberInput from "@/components/elements/NumberInput";
 
 // const inter = Inter({ subsets: ['latin'] })
 
 export default function Swap() {
+  const { isConnected } = useAccount();
+  const [tokenOneAmount, setTokenOneAmount] = useState("");
+  const [tokenTwoAmount, setTokenTwoAmount] = useState(null);
+  const [prices, setPrices] = useState(null);
+
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-[80%] py-10">
@@ -35,9 +42,17 @@ export default function Swap() {
           <div className="p-4 bg-black/50 rounded-lg">
             <p className="text-sm text-neutral-400">You Sell</p>
             <div className="flex justify-between">
-              <input
+              {/* <input
                 className="text-2xl bg-transparent focus:outline-none"
                 placeholder="0.0"
+                value={tokenOneAmount}
+                onChange={changeAmount}
+              /> */}
+              <NumberInput
+                className="text-2xl bg-transparent focus:outline-none"
+                placeholder="0.0"
+                value={tokenOneAmount}
+                onChange={setTokenOneAmount}
               />
               <TokenPicker />
             </div>
@@ -54,9 +69,8 @@ export default function Swap() {
             </div>
           </div>
         </div>
-
         <div className="left-0 right-0 my-3 flex items-center justify-center">
-          <SwapButton />
+          {isConnected && <SwapButton />}
         </div>
       </div>
     </>

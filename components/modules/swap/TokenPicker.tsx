@@ -18,27 +18,45 @@ const tokens = [
     ticker: "USDT",
     img: "https://cdn.moralis.io/eth/0xdac17f958d2ee523a2206206994597c13d831ec7.png",
     name: "Tether USD",
-    address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+    address: "0x56b2b8007594260B443B6e906b5374dFf107132d",
     decimals: 6,
+  },
+  {
+    ticker: "DAI",
+    img: "https://cdn.moralis.io/eth/0x6b175474e89094c44da98b954eedeac495271d0f.png",
+    name: "Dai Stablecoin",
+    address: "0x35c83c149fB3C15138f4B4a1A541529D26f10F6a",
+    decimals: 18,
   },
   {
     ticker: "WETH",
     img: "https://cdn.moralis.io/eth/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png",
     name: "Wrapped Ethereum",
-    address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+    address: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
     decimals: 18,
   },
   {
     ticker: "WBTC",
     img: "https://cdn.moralis.io/eth/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png",
     name: "Wrapped Bitcoin",
-    address: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+    address: "0x8d34DaA036AD8359987e51dD522e8406909a5C2b",
     decimals: 8,
+  },
+  {
+    ticker: "DONI",
+    img: "https://cdn.moralis.io/eth/0x6b175474e89094c44da98b954eedeac495271d0f.png",
+    name: "Doni Token",
+    address: "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
+    decimals: 18,
   },
 ];
 
 export const TokenPicker: FC = () => {
   const [selected, setSelected] = useState(tokens[0]);
+  const [tokenOne, setTokenOne] = useState(null);
+  const [tokenTwo, setTokenTwo] = useState(null);
+  const [changeToken, setChangeToken] = useState(1);
+
   return (
     <div className="left-0 right-0 mt-[-9px] mb-[-9px] flex items-center justify-center">
       <Modal>
@@ -58,10 +76,13 @@ export const TokenPicker: FC = () => {
           {/* {({ close }) => <WalletGroupForm handleClose={close} />} */}
           {({ close }) => (
             <div className="flex">
-              <div onClick={() => close} className="flex flex-col w-screen">
+              <div className="flex flex-col w-screen">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xl font-bold">Select a token</span>
-                  <XMarkIcon className="h-8" />
+                  <XMarkIcon
+                    onClick={() => close()}
+                    className="h-8 cursor-pointer"
+                  />
                 </div>
                 <div className="flex  items-center px-2 bg-white rounded-lg z-0">
                   <MagnifyingGlassIcon className="flex inset-0 h-6  text-neutral-400" />
