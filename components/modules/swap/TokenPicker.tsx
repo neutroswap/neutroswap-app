@@ -53,7 +53,7 @@ const tokens = [
 ];
 
 type TokenPickerProps = {
-  setToken?: React.Dispatch<React.SetStateAction<string>>;
+  setToken: React.Dispatch<React.SetStateAction<string>>;
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
   setName?: React.Dispatch<React.SetStateAction<string>>;
