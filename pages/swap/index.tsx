@@ -37,7 +37,7 @@ export default function Swap() {
             <div className="flex justify-between">
               <input
                 className="text-2xl bg-transparent focus:outline-none"
-                placeholder="0"
+                placeholder="0.0"
               />
               <TokenPicker />
             </div>
@@ -48,7 +48,7 @@ export default function Swap() {
             <div className="flex justify-between">
               <input
                 className="text-2xl bg-transparent focus:outline-none"
-                placeholder="0"
+                placeholder="0.0"
               />
               <TokenPicker />
             </div>
