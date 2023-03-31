@@ -3,8 +3,13 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import {
+  ChevronDownIcon,
+  MagnifyingGlassIcon,
+  XMarkIcon,
+} from "@heroicons/react/20/solid";
 import React, { FC } from "react";
+import { Text } from "@geist-ui/core";
 
 export const TokenPicker: FC = () => {
   return (
@@ -27,13 +32,19 @@ export const TokenPicker: FC = () => {
           {/* {({ close }) => <WalletGroupForm handleClose={close} />} */}
           {({ close }) => (
             <div className="flex">
-              <div onClick={() => close} className="flex justify-end">
-                <input
-                  type="text"
-                  placeholder="Contract Address"
-                  className="bg-white text-black p-2 rounded-md"
-                />
-                <button className="border p-2 rounded-md">Submit</button>
+              <div onClick={() => close} className="flex flex-col w-screen">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xl font-bold">Select a token</span>
+                  <XMarkIcon className="h-8" />
+                </div>
+                <div className="flex  items-center px-2 bg-white rounded-lg z-0">
+                  <MagnifyingGlassIcon className="flex inset-0 h-6  text-neutral-400" />
+                  <input
+                    type="text"
+                    placeholder="Search by name, symbol or address"
+                    className="bg-white  p-2 rounded-md dark:text-neutral-600 w-full"
+                  />
+                </div>
               </div>
             </div>
           )}
