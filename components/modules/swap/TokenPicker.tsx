@@ -13,6 +13,7 @@ import { Text } from "@geist-ui/core";
 import tokenList from "../../../pages/swap/tokenList.json";
 import { RadioGroup } from "@headlessui/react";
 import { type } from "os";
+// import EOSLogo from "@/logo/eos-eos-logo.png";
 
 const tokens = [
   {
@@ -50,6 +51,13 @@ const tokens = [
     address: "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
     decimals: 18,
   },
+  // {
+  //   ticker: "EOS",
+  //   img: "EOSLogo",
+  //   name: "EOS",
+  //   address: "",
+  //   decimals: 18,
+  // },
 ];
 
 type TokenPickerProps = {
