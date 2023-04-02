@@ -53,16 +53,23 @@ const tokens = [
 ];
 
 type TokenPickerProps = {
-  setToken: React.Dispatch<React.SetStateAction<string>>;
+  ticker?: string;
+  img?: string;
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
-  setName?: React.Dispatch<React.SetStateAction<string>>;
-  setAddress?: React.Dispatch<React.SetStateAction<string>>;
-  setDecimals?: React.Dispatch<React.SetStateAction<number>>;
+  setToken: React.Dispatch<React.SetStateAction<string>>;
+  // setTicker?: React.Dispatch<React.SetStateAction<string>>;
+  // setImg?: React.Dispatch<React.SetStateAction<string>>;
+  // setName?: React.Dispatch<React.SetStateAction<string>>;
+  // setAddress?: React.Dispatch<React.SetStateAction<string>>;
+  // setDecimals?: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export const TokenPicker: FC<TokenPickerProps> = (props) => {
   const [selected, setSelected] = useState(tokens[0]);
+  const [ticker, setTicker] = useState("Select a Token");
+  const [img, setImg] = useState("");
+  // const [token, setToken] = useState("");
   const [tokenOne, setTokenOne] = useState(null);
   const [tokenTwo, setTokenTwo] = useState(null);
   const [changeToken, setChangeToken] = useState(1);
@@ -71,7 +78,9 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
 
   const handleChange = (value: any) => {
     setSelected(value);
+    setTicker(value.ticker);
     setToken(value.address);
+    setImg(value.img);
   };
 
   return (
@@ -83,9 +92,12 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
             type="button"
             className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer"
           >
-            <span>ETH</span>
+            <div className="flex items-center">
+              <img src={img} alt="" className="h-6 mr-2" />
+              <span className="text-md">{ticker}</span>
+            </div>
             <div>
-              <ChevronDownIcon strokeWidth={3} className="w-4 h-4 " />
+              <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
             </div>
           </button>
         </ModalOpenButton>
