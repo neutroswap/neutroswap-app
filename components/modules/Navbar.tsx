@@ -8,7 +8,7 @@ import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNames";
 
-interface Props {}
+interface Props { }
 
 const Navbar: React.FC<Props> = () => {
   const router = useRouter();
