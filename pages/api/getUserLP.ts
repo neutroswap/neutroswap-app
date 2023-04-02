@@ -30,13 +30,13 @@ export async function getUserLP (userAddress: string) {
   const provider = new ethers.providers.JsonRpcProvider(network.rpc)
   let promises = [];
   let userLPs = [];
-  lps.push({
-    address: '0xe2e894da2ce2abd4f69f2623092f2f8a0f3c41da',
-    decimal: 18,
-    name: 'HYDT',
-    symbol: 'HYDT',
-    logo: 'Default'
-  },)
+  // lps.push({
+  //   address: '0xe2e894da2ce2abd4f69f2623092f2f8a0f3c41da',
+  //   decimal: 18,
+  //   name: 'HYDT',
+  //   symbol: 'HYDT',
+  //   logo: 'Default'
+  // },)
   for (let i = 0; i < lps?.length; i++) {
     let lp = lps[i]
 
