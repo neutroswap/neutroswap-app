@@ -2,8 +2,8 @@ import { Button, Fieldset, Input, Link, Note, Radio, Text, Textarea } from "@gei
 
 export default function Multisender() {
   return (
-    <div className="bg-neutral-900 min-h-screen">
-      <div className="py-10 bg-black pb-40 border-b-[0.5px] border-white/25">
+    <div>
+      <div className="py-10 pb-40 border-b-[0.5px] border-white/25">
         <div className="max-w-7xl mx-auto">
           <Text h2 height={3}>Multisend</Text>
           <Text type="secondary" p>Send your token to multiple addresses with different allocations</Text>

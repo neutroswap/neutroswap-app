@@ -8,10 +8,8 @@ import { Button, Page, Text } from "@geist-ui/core";
 export default function Home() {
   return (
     <>
-      <div className="max-w-7xl mx-auto py-10">
-        <Text h1>Home Page</Text>
-        <Button>Submit</Button>
-      </div>
+      <Text h1>Home Page</Text>
+      <Button>Submit</Button>
     </>
-  )
+  );
 }
