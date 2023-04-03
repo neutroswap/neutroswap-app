@@ -33,42 +33,43 @@ export default function Swap() {
             Trade your token
           </Text>
         </div>
-
-        <div className="mt-8 rounded-lg border border-neutral-800/50 shadow-dark-lg p-4">
-          <div className="flex justify-between items-center ">
-            <Text h3 height={2} className="text-center">
-              Swap
-            </Text>
-            <SettingsPopover />
-          </div>
-          <div className="p-4 bg-black/50 rounded-lg">
-            <p className="text-sm text-neutral-400">You Sell</p>
-            <div className="flex justify-between">
-              <NumberInput
-                className="text-2xl bg-transparent focus:outline-none"
-                placeholder="0.0"
-                value={tokenOneAmount}
-                onChange={setTokenOneAmount}
-              />
-              <TokenPicker setToken={setTokenOne} />
+        <div>
+          <div className="mt-8 rounded-lg border border-neutral-800/50 shadow-dark-lg p-4">
+            <div className="flex justify-between items-center ">
+              <Text h3 height={2} className="text-center">
+                Swap
+              </Text>
+              <SettingsPopover />
+            </div>
+            <div className="p-4 bg-black/50 rounded-lg">
+              <p className="text-sm text-neutral-400">You Sell</p>
+              <div className="flex justify-between">
+                <NumberInput
+                  className="text-2xl bg-transparent focus:outline-none"
+                  placeholder="0.0"
+                  value={tokenOneAmount}
+                  onChange={setTokenOneAmount}
+                />
+                <TokenPicker setToken={setTokenOne} />
+              </div>
+            </div>
+            <SwitchTokensButton />
+            <div className="p-4 bg-black/50 rounded-lg">
+              <p className="text-sm text-neutral-400">You Buy</p>
+              <div className="flex justify-between">
+                <NumberInput
+                  className="text-2xl bg-transparent focus:outline-none"
+                  placeholder="0.0"
+                  value={tokenTwoAmount}
+                  onChange={setTokenTwoAmount}
+                />
+                <TokenPicker setToken={setTokenTwo} />
+              </div>
             </div>
           </div>
-          <SwitchTokensButton />
-          <div className="p-4 bg-black/50 rounded-lg">
-            <p className="text-sm text-neutral-400">You Buy</p>
-            <div className="flex justify-between">
-              <NumberInput
-                className="text-2xl bg-transparent focus:outline-none"
-                placeholder="0.0"
-                value={tokenTwoAmount}
-                onChange={setTokenTwoAmount}
-              />
-              <TokenPicker setToken={setTokenTwo} />
-            </div>
+          <div className="left-0 right-0 my-3 flex items-center justify-center w-full">
+            {isConnected && <SwapButton />}
           </div>
-        </div>
-        <div className="left-0 right-0 my-3 flex items-center justify-center">
-          {isConnected && <SwapButton />}
         </div>
       </div>
     </>

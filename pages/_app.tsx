@@ -21,7 +21,7 @@ import { publicProvider } from "wagmi/providers/public";
 import Footer from "@/components/modules/Footer";
 
 const { chains, provider } = configureChains(
-  [mainnet, polygon, optimism, arbitrum, goerli],
+  [goerli],
   [
     // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
     publicProvider(),
