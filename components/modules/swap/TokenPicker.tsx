@@ -12,7 +12,6 @@ import React, { cloneElement, createContext, Dispatch, FC, SetStateAction, useCo
 import { Text } from "@geist-ui/core";
 import tokenList from "../../../pages/swap/tokenList.json";
 import { RadioGroup } from "@headlessui/react";
-import { type } from "os";
 import { classNames } from "@/shared/helpers/classNames";
 // import EOSLogo from "@/logo/eos-eos-logo.png";
 
