@@ -8,11 +8,12 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import React, { FC, useState } from "react";
+import React, { cloneElement, createContext, Dispatch, FC, SetStateAction, useContext, useState } from "react";
 import { Text } from "@geist-ui/core";
 import tokenList from "../../../pages/swap/tokenList.json";
 import { RadioGroup } from "@headlessui/react";
 import { type } from "os";
+import { classNames } from "@/shared/helpers/classNames";
 // import EOSLogo from "@/logo/eos-eos-logo.png";
 
 const tokens = [
@@ -60,12 +61,23 @@ const tokens = [
   // },
 ];
 
+type TokenDetails = {
+  ticker: string,
+  img: string,
+  name: string,
+  address: string,
+  decimals: number
+}
+
 type TokenPickerProps = {
   ticker?: string;
   img?: string;
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
   setToken: React.Dispatch<React.SetStateAction<string>>;
+  children: ({ selectedToken }: {
+    selectedToken: TokenDetails
+  }) => React.ReactElement
   // setTicker?: React.Dispatch<React.SetStateAction<string>>;
   // setImg?: React.Dispatch<React.SetStateAction<string>>;
   // setName?: React.Dispatch<React.SetStateAction<string>>;
@@ -74,137 +86,92 @@ type TokenPickerProps = {
 };
 
 export const TokenPicker: FC<TokenPickerProps> = (props) => {
-  const [selected, setSelected] = useState(tokens[0]);
-  const [ticker, setTicker] = useState("Select a Token");
-  const [img, setImg] = useState("");
-  // const [token, setToken] = useState("");
-  const [tokenOne, setTokenOne] = useState(null);
-  const [tokenTwo, setTokenTwo] = useState(null);
-  const [changeToken, setChangeToken] = useState(1);
-
-  const { setToken } = props;
+  const { setToken, children } = props;
+  const [selectedToken, setSelectedToken] = useState(tokens[0]);
 
   const handleChange = (value: any) => {
-    setSelected(value);
-    setTicker(value.ticker);
+    setSelectedToken(value);
     setToken(value.address);
-    setImg(value.img);
   };
 
   return (
-    <div className="left-0 right-0 mt-[-9px] mb-[-9px] flex items-center justify-center">
-      <Modal>
-        <ModalOpenButton>
-          <button
-            // onClick={<Modal />}
-            type="button"
-            className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer"
-          >
-            <div className="flex items-center">
-              <img src={img} alt="" className="h-6 mr-2" />
-              <span className="text-md">{ticker}</span>
-            </div>
-            <div>
-              <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
-            </div>
-          </button>
-        </ModalOpenButton>
-        <ModalContents>
-          {/* {({ close }) => <WalletGroupForm handleClose={close} />} */}
-          {({ close }) => (
-            <div className="flex">
-              <div className="flex flex-col w-screen">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-xl font-bold">Select a token</span>
-                  <XMarkIcon
-                    onClick={() => close()}
-                    className="h-8 cursor-pointer"
-                  />
-                </div>
-                <div className="flex  items-center px-2 bg-white rounded-lg z-0">
-                  <MagnifyingGlassIcon className="flex inset-0 h-6  text-neutral-400" />
-                  <input
-                    type="text"
-                    placeholder="Search by name, symbol or address"
-                    className="bg-white  p-2 rounded-md dark:text-neutral-600 w-full"
-                  />
-                </div>
-                <div className="w-full py-2">
-                  <div className="w-full ">
-                    <RadioGroup
-                      value={selected}
-                      onChange={handleChange}
-                      onClick={close}
-                    >
-                      <RadioGroup.Label className="sr-only">
-                        Server size
-                      </RadioGroup.Label>
-                      <div className="space-y-2">
-                        {tokens.map((token) => (
-                          <RadioGroup.Option
-                            key={token.name}
-                            value={token}
-                            className={({ active, checked }) =>
-                              `${
-                                active
-                                  ? "ring-2 ring-white ring-opacity-60 ring-offset-2 ring-offset-sky-300"
-                                  : ""
-                              }
-                              ${
-                                checked
-                                  ? "bg-sky-900 bg-opacity-75 text-white"
-                                  : "bg-white"
-                              }
-                    relative flex cursor-pointer rounded-lg px-5 py-4 shadow-md focus:outline-none`
-                            }
-                          >
-                            {({ active, checked }) => (
-                              <>
-                                <div className="flex w-full items-center justify-between">
-                                  <div className="flex items-center w-full">
-                                    <img src={token.img} className="h-8 mr-3" />
-                                    <div className="flex flex-col">
-                                      <RadioGroup.Label
-                                        as="p"
-                                        className={`font-medium m-0 ${
-                                          checked
-                                            ? "text-white"
-                                            : "text-gray-900"
-                                        }`}
-                                      >
-                                        {token.ticker}
-                                      </RadioGroup.Label>
-                                      <RadioGroup.Description
-                                        as="span"
-                                        className={`inline ${
-                                          checked
-                                            ? "text-sky-100"
-                                            : "text-gray-500"
-                                        }`}
-                                      >
-                                        <span>{token.name}</span>{" "}
-                                      </RadioGroup.Description>
-                                    </div>
+    <Modal>
+      <ModalOpenButton>
+        {children({ selectedToken: selectedToken })}
+      </ModalOpenButton>
+      <ModalContents>
+        {({ close }) => (
+          <div className="flex">
+            <div className="flex flex-col w-screen">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xl font-bold">Select a token</span>
+                <XMarkIcon
+                  onClick={() => close()}
+                  className="h-8 cursor-pointer"
+                />
+              </div>
+              <div className="flex  items-center px-2 bg-neutral-900 rounded-lg z-0">
+                <MagnifyingGlassIcon className="flex inset-0 h-6  text-neutral-400" />
+                <input
+                  type="text"
+                  placeholder="Search by name, symbol or address"
+                  className="bg-transparent p-2 rounded-md w-full"
+                />
+              </div>
+              <div className="w-full py-2">
+                <div className="w-full ">
+                  <RadioGroup
+                    value={selectedToken}
+                    onChange={handleChange}
+                    onClick={close}
+                  >
+                    <RadioGroup.Label className="sr-only">
+                      Token Name
+                    </RadioGroup.Label>
+                    <div className="space-y-2 mt-2">
+                      {tokens.map((token) => (
+                        <RadioGroup.Option
+                          key={token.name}
+                          value={token}
+                          className={({ active, checked }) => classNames(
+                            "relative flex cursor-pointer rounded-lg px-5 py-2 shadow-md focus:outline-none transition-colors duration-300",
+                            "hover:bg-neutral-900",
+                            checked && "bg-neutral-100 dark:bg-neutral-900"
+                          )}
+                        >
+                          {({ active, checked }) => (
+                            <>
+                              <div className="flex w-full items-center justify-between">
+                                <div className="flex space-x-4 items-center w-full">
+                                  <img src={token.img} className="h-8" />
+                                  <div className="flex flex-col">
+                                    <RadioGroup.Label
+                                      as="p"
+                                      className="font-medium m-0 text-black dark:text-white"
+                                    >
+                                      {token.ticker}
+                                    </RadioGroup.Label>
+                                    <RadioGroup.Description
+                                      as="span"
+                                      className="inline !m-0 text-gray-500"
+                                    >
+                                      {token.name}
+                                    </RadioGroup.Description>
                                   </div>
-                                  {/* {checked && (
-                                  <div className="shrink-0 text-white">
-                                    <CheckIcon className="h-6 w-6" />
-                                  </div>
-                                )} */}
                                 </div>
-                              </>
-                            )}
-                          </RadioGroup.Option>
-                        ))}
-                      </div>
-                    </RadioGroup>
-                  </div>
+                              </div>
+                            </>
+                          )}
+                        </RadioGroup.Option>
+                      ))}
+                    </div>
+                  </RadioGroup>
                 </div>
               </div>
             </div>
-          )}
-        </ModalContents>
-      </Modal>
-    </div>
+          </div>
+        )}
+      </ModalContents>
+    </Modal>
   );
 };
