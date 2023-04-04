@@ -10,6 +10,7 @@ module.exports = {
   theme: {
     extend: {
       boxShadow: {
+        'dark-sm': '0px 4px 32px rgba(0, 0, 0, 0.05)',
         'dark': '0px 4px 32px rgba(0, 0, 0, 0.25)',
         'dark-lg': '0px 4px 32px rgba(0, 0, 0, 0.5)',
       },

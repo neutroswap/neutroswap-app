@@ -8,20 +8,11 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import React, {
-  FC,
-  useState,
-  cloneElement,
-  Dispatch,
-  createContext,
-  SetStateAction,
-  useContext,
-} from "react";
+import React, { cloneElement, createContext, Dispatch, FC, SetStateAction, useContext, useState } from "react";
 import { Text } from "@geist-ui/core";
 import tokenList from "../../../pages/swap/tokenList.json";
 import { RadioGroup } from "@headlessui/react";
 import { classNames } from "@/shared/helpers/classNames";
-import { type } from "os";
 // import EOSLogo from "@/logo/eos-eos-logo.png";
 
 const tokens = [
@@ -70,12 +61,12 @@ const tokens = [
 ];
 
 type TokenDetails = {
-  ticker: string;
-  img: string;
-  name: string;
-  address: string;
-  decimals: number;
-};
+  ticker: string,
+  img: string,
+  name: string,
+  address: string,
+  decimals: number
+}
 
 type TokenPickerProps = {
   ticker?: string;
@@ -83,11 +74,9 @@ type TokenPickerProps = {
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
   setToken: React.Dispatch<React.SetStateAction<string>>;
-  children: ({
-    selectedToken,
-  }: {
-    selectedToken: TokenDetails;
-  }) => React.ReactElement;
+  children: ({ selectedToken }: {
+    selectedToken: TokenDetails
+  }) => React.ReactElement
   // setTicker?: React.Dispatch<React.SetStateAction<string>>;
   // setImg?: React.Dispatch<React.SetStateAction<string>>;
   // setName?: React.Dispatch<React.SetStateAction<string>>;
@@ -98,14 +87,10 @@ type TokenPickerProps = {
 export const TokenPicker: FC<TokenPickerProps> = (props) => {
   const { setToken, children } = props;
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
-  // const [ticker, setTicker] = useState("Select a Token");
-  // const [img, setImg] = useState("");
 
   const handleChange = (value: any) => {
     setSelectedToken(value);
-    // setTicker(value.ticker);{}
     setToken(value.address);
-    // setImg(value.img);
   };
 
   return (
@@ -124,12 +109,12 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                   className="h-8 cursor-pointer"
                 />
               </div>
-              <div className="flex items-center px-2 bg-white rounded-lg z-0">
+              <div className="flex  items-center px-2 bg-neutral-900 rounded-lg z-0">
                 <MagnifyingGlassIcon className="flex inset-0 h-6  text-neutral-400" />
                 <input
                   type="text"
                   placeholder="Search by name, symbol or address"
-                  className="bg-white  p-2 rounded-md w-full"
+                  className="bg-transparent p-2 rounded-md w-full"
                 />
               </div>
               <div className="w-full py-2">
@@ -139,19 +124,19 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                     onChange={handleChange}
                     onClick={close}
                   >
-                    <RadioGroup.Label>Token Name</RadioGroup.Label>
+                    <RadioGroup.Label className="sr-only">
+                      Token Name
+                    </RadioGroup.Label>
                     <div className="space-y-2 mt-2">
                       {tokens.map((token) => (
                         <RadioGroup.Option
                           key={token.name}
                           value={token}
-                          className={({ active, checked }) =>
-                            classNames(
-                              "relative flex cursor-pointer rounded-lg px-5 py-2 shadow-md focus:outline-none transition-colors duration-300",
-                              "hover:bg-neutral-900",
-                              checked && "bg-neutral-100 dark:bg-neutral-900"
-                            )
-                          }
+                          className={({ active, checked }) => classNames(
+                            "relative flex cursor-pointer rounded-lg px-5 py-2 shadow-md focus:outline-none transition-colors duration-300",
+                            "hover:bg-neutral-900",
+                            checked && "bg-neutral-100 dark:bg-neutral-900"
+                          )}
                         >
                           {({ active, checked }) => (
                             <>

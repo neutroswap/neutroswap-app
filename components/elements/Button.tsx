@@ -1,6 +1,6 @@
 import React from "react";
 import { Spinner } from "../elements/Spinner";
-import { classNames } from "../../shared/helpers/classnames";
+import { classNames } from "../../shared/helpers/classNames";
 
 interface IButtonProps {
   /* Shows loading spinner */
@@ -28,7 +28,7 @@ interface IButtonProps {
 }
 export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
-    IButtonProps {}
+  IButtonProps { }
 
 const Button = (props: ButtonProps) => {
   const {
