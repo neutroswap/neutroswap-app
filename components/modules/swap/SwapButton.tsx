@@ -12,7 +12,8 @@ import {
   useContractRead,
 } from "wagmi";
 import { ethers } from "ethers";
-import RouterABI from "../../../shared/helpers/abis/router.json";
+import { NEUTRO_ROUTER_ABI } from "@/shared/helpers/abi/index";
+import { ROUTER_CONTRACT } from "@/shared/helpers/constants";
 
 export const SwapButton: FC = () => {
   const { address, isConnected } = useAccount();
@@ -44,9 +45,9 @@ export const SwapButton: FC = () => {
   // });
   // console.log(dataAmountsOut);
 
-  // const { config } = usePrepareContractWrite({
-  //   address: "0xC397DAD720B0b1d38Ee5e5Ab5689F88866b9f107",
-  //   abi: RouterABI,
+  // const { configETHForExactTokens } = usePrepareContractWrite({
+  //   address: ROUTER_CONTRACT,
+  //   abi: NEUTRO_ROUTER_ABI,
   //   functionName: "swapETHForExactTokens",
   //   args: [
   //     9974701255,
@@ -62,9 +63,9 @@ export const SwapButton: FC = () => {
   //   },
   // });
 
-  // const { config } = usePrepareContractWrite({
-  //   address: "0xC397DAD720B0b1d38Ee5e5Ab5689F88866b9f107",
-  //   abi: RouterABI,
+  // const { configExactTokensForETH } = usePrepareContractWrite({
+  //   address: ROUTER_CONTRACT,
+  //   abi: NEUTRO_ROUTER_ABI,
   //   functionName: "swapExactTokensForETH",
   //   args: [
   //     9974900500,
@@ -76,15 +77,34 @@ export const SwapButton: FC = () => {
   //     "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
   //     1711818405,
   //   ],
-  //    overrides: {
-  //      value: ethers.utils.parseEther("0.00000001"),
-  //    },
+  //   overrides: {
+  //     value: ethers.utils.parseEther("0.00000001"),
+  //   },
+  // });
+
+  // const { configExactTokensForTokens } = usePrepareContractWrite({
+  //   address: ROUTER_CONTRACT,
+  //   abi: NEUTRO_ROUTER_ABI,
+  //   functionName: "swapExactTokensForTokens",
+  //   args: [
+  //     9974900500,
+  //     9950062996,
+  //     [
+  //       "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
+  //       "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+  //     ],
+  //     "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
+  //     1711818405,
+  //   ],
+  //   overrides: {
+  //     value: ethers.utils.parseEther("0.00000001"),
+  //   },
   // });
 
   // const { data, write } = useContractWrite(config);
 
   // const { isLoading, isSuccess } = useWaitForTransaction({
-  //   hash: data?.hash,
+  // hash: data?.hash,
   // });
 
   return (
@@ -113,7 +133,7 @@ export const SwapButton: FC = () => {
         {/* </ModalContents>
       </Modal> */}
       </div>
-      <div>
+      {/* <div>
         <div className="flex justify-between mb-2">
           <div>Price Impact</div>
           <div>+0.15%</div>
@@ -134,7 +154,7 @@ export const SwapButton: FC = () => {
           <div>Recipient</div>
           <div>{address}</div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

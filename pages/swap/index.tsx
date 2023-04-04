@@ -1,5 +1,5 @@
 // import { Inter } from 'next/font/google'
-import React, { useState, useEffect, Fragment, useRef } from "react";
+import React, { useState, useEffect, Fragment, useRef, FC } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
 import { Popover, Transition } from "@headlessui/react";
@@ -14,13 +14,19 @@ import NumberInput from "@/components/elements/NumberInput";
 
 // const inter = Inter({ subsets: ['latin'] })
 
-export default function Swap() {
+type SwapProps = {
+  tokenOneAmount: number;
+};
+
+export const Swap: FC<SwapProps> = (props) => {
   const { isConnected } = useAccount();
   const [tokenOneAmount, setTokenOneAmount] = useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("");
   const [prices, setPrices] = useState(null);
   const [tokenOne, setTokenOne] = useState("");
   const [tokenTwo, setTokenTwo] = useState("");
+
+  const { tokenOneAmount, tokenTwoAmount } = props;
 
   return (
     <>
@@ -74,4 +80,4 @@ export default function Swap() {
       </div>
     </>
   );
-}
+};
