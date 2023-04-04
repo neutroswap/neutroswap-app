@@ -8,12 +8,20 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import React, { cloneElement, createContext, Dispatch, FC, SetStateAction, useContext, useState } from "react";
+import React, {
+  cloneElement,
+  createContext,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useContext,
+  useState,
+} from "react";
 import { Text } from "@geist-ui/core";
 import tokenList from "../../../pages/swap/tokenList.json";
 import { RadioGroup } from "@headlessui/react";
 import { classNames } from "@/shared/helpers/classNames";
-// import EOSLogo from "@/logo/eos-eos-logo.png";
+import EOS from "@/logo/eos.png";
 
 const tokens = [
   {
@@ -51,22 +59,15 @@ const tokens = [
     address: "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
     decimals: 18,
   },
-  // {
-  //   ticker: "EOS",
-  //   img: "EOSLogo",
-  //   name: "EOS",
-  //   address: "",
-  //   decimals: 18,
-  // },
 ];
 
 type TokenDetails = {
-  ticker: string,
-  img: string,
-  name: string,
-  address: string,
-  decimals: number
-}
+  ticker: string;
+  img: string;
+  name: string;
+  address: string;
+  decimals: number;
+};
 
 type TokenPickerProps = {
   ticker?: string;
@@ -74,14 +75,11 @@ type TokenPickerProps = {
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
   setToken: React.Dispatch<React.SetStateAction<string>>;
-  children: ({ selectedToken }: {
-    selectedToken: TokenDetails
-  }) => React.ReactElement
-  // setTicker?: React.Dispatch<React.SetStateAction<string>>;
-  // setImg?: React.Dispatch<React.SetStateAction<string>>;
-  // setName?: React.Dispatch<React.SetStateAction<string>>;
-  // setAddress?: React.Dispatch<React.SetStateAction<string>>;
-  // setDecimals?: React.Dispatch<React.SetStateAction<number>>;
+  children: ({
+    selectedToken,
+  }: {
+    selectedToken: TokenDetails;
+  }) => React.ReactElement;
 };
 
 export const TokenPicker: FC<TokenPickerProps> = (props) => {
@@ -132,11 +130,13 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                         <RadioGroup.Option
                           key={token.name}
                           value={token}
-                          className={({ active, checked }) => classNames(
-                            "relative flex cursor-pointer rounded-lg px-5 py-2 shadow-md focus:outline-none transition-colors duration-300",
-                            "hover:bg-neutral-900",
-                            checked && "bg-neutral-100 dark:bg-neutral-900"
-                          )}
+                          className={({ active, checked }) =>
+                            classNames(
+                              "relative flex cursor-pointer rounded-lg px-5 py-2 shadow-md focus:outline-none transition-colors duration-300",
+                              "hover:bg-neutral-900",
+                              checked && "bg-neutral-100 dark:bg-neutral-900"
+                            )
+                          }
                         >
                           {({ active, checked }) => (
                             <>
