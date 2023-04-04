@@ -34,9 +34,9 @@ const Navbar: React.FC<Props> = () => {
           >
             <Tabs.Item label="Home" value="/" />
             <Tabs.Item label="Swap" value="/swap" />
+            <Tabs.Item label="Pool" value="/pool" />
             <Tabs.Item label="Presales" value="/presales" />
             <Tabs.Item label="Lock" value="/lock" />
-            <Tabs.Item label="Multisender" value="/multisender" />
           </Tabs>
           <div className="flex space-x-2">
             <ConnectButton.Custom>
