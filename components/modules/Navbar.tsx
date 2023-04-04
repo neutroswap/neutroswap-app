@@ -24,7 +24,7 @@ const Navbar: React.FC<Props> = () => {
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto py-3 px-4 lg:px-0  submenu__inner">
           <Link href="/">
-            <Logo className="h-10 lg:h-12 text-black dark:text-white -ml-3" />
+            <Logo className="h-5 lg:h-6 text-black dark:text-white mr-4" />
           </Link>
           <Tabs
             hideDivider
