@@ -13,7 +13,8 @@ import {
 } from "wagmi";
 import { ethers } from "ethers";
 import { NEUTRO_ROUTER_ABI } from "@/shared/helpers/abi/index";
-import { ROUTER_CONTRACT } from "@/shared/helpers/constants";
+import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
+import { Fetcher, Pair, TokenAmount, Token, ChainId } from "@uniswap/sdk";
 
 export const SwapButton: FC = () => {
   const { address, isConnected } = useAccount();
@@ -45,23 +46,23 @@ export const SwapButton: FC = () => {
   // });
   // console.log(dataAmountsOut);
 
-  // const { configETHForExactTokens } = usePrepareContractWrite({
-  //   address: ROUTER_CONTRACT,
-  //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "swapETHForExactTokens",
-  //   args: [
-  //     9974701255,
-  //     [
-  //       "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-  //       "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
-  //     ],
-  //     "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
-  //     1711818405,
-  //   ],
-  //   overrides: {
-  //     value: ethers.utils.parseEther("0.00000001"),
-  //   },
-  // });
+  const { config } = usePrepareContractWrite({
+    address: ROUTER_CONTRACT,
+    abi: NEUTRO_ROUTER_ABI,
+    functionName: "swapExactETHForTokens",
+    args: [
+      9974701255,
+      [
+        "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
+        "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
+      ],
+      "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
+      1711818405,
+    ],
+    overrides: {
+      value: ethers.utils.parseEther("0.00000001"),
+    },
+  });
 
   // const { configExactTokensForETH } = usePrepareContractWrite({
   //   address: ROUTER_CONTRACT,
@@ -77,9 +78,6 @@ export const SwapButton: FC = () => {
   //     "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
   //     1711818405,
   //   ],
-  //   overrides: {
-  //     value: ethers.utils.parseEther("0.00000001"),
-  //   },
   // });
 
   // const { configExactTokensForTokens } = usePrepareContractWrite({
@@ -96,16 +94,13 @@ export const SwapButton: FC = () => {
   //     "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
   //     1711818405,
   //   ],
-  //   overrides: {
-  //     value: ethers.utils.parseEther("0.00000001"),
-  //   },
   // });
 
-  // const { data, write } = useContractWrite(config);
+  const { data, write } = useContractWrite(config);
 
-  // const { isLoading, isSuccess } = useWaitForTransaction({
-  // hash: data?.hash,
-  // });
+  const { isLoading, isSuccess } = useWaitForTransaction({
+    hash: data?.hash,
+  });
 
   return (
     <div className="flex flex-col w-full">
@@ -115,7 +110,7 @@ export const SwapButton: FC = () => {
         <button
           onClick={(e) => {
             e.preventDefault();
-            // write?.();
+            write?.();
           }}
           type="button"
           className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer w-full justify-center"
