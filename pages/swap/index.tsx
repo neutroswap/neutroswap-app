@@ -14,19 +14,13 @@ import NumberInput from "@/components/elements/NumberInput";
 
 // const inter = Inter({ subsets: ['latin'] })
 
-type SwapProps = {
-  tokenOneAmount: number;
-};
-
-export const Swap: FC<SwapProps> = (props) => {
+export default function Swap() {
   const { isConnected } = useAccount();
   const [tokenOneAmount, setTokenOneAmount] = useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("");
   const [prices, setPrices] = useState(null);
   const [tokenOne, setTokenOne] = useState("");
   const [tokenTwo, setTokenTwo] = useState("");
-
-  const { tokenOneAmount, tokenTwoAmount } = props;
 
   return (
     <>
@@ -56,7 +50,7 @@ export const Swap: FC<SwapProps> = (props) => {
                   value={tokenOneAmount}
                   onChange={setTokenOneAmount}
                 />
-                <TokenPicker setToken={setTokenOne} />
+                {/* <TokenPicker setToken={setTokenOne}></TokenPicker> */}
               </div>
             </div>
             <SwitchTokensButton />
@@ -69,7 +63,7 @@ export const Swap: FC<SwapProps> = (props) => {
                   value={tokenTwoAmount}
                   onChange={setTokenTwoAmount}
                 />
-                <TokenPicker setToken={setTokenTwo} />
+                {/* <TokenPicker setToken={setTokenTwo}></TokenPicker> */}
               </div>
             </div>
           </div>
@@ -80,4 +74,4 @@ export const Swap: FC<SwapProps> = (props) => {
       </div>
     </>
   );
-};
+}
