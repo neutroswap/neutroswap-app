@@ -103,7 +103,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
 
   const handleChange = (value: any) => {
     setSelectedToken(value);
-    // setTicker(value.ticker);
+    // setTicker(value.ticker);{}
     setToken(value.address);
     // setImg(value.img);
   };
@@ -112,19 +112,6 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
     <Modal>
       <ModalOpenButton>
         {children({ selectedToken: selectedToken })}
-        {/* <button
-          onClick={<Modal />}
-          type="button"
-          className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer"
-        >
-          <div className="flex items-center">
-            <img src={img} alt="" className="h-6 mr-2" />
-            <span className="text-md">{ticker}</span>
-          </div>
-          <div>
-            <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
-          </div>
-        </button> */}
       </ModalOpenButton>
       <ModalContents>
         {({ close }) => (

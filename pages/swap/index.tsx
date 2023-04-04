@@ -3,14 +3,14 @@ import React, { useState, useEffect, Fragment, useRef, FC } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
 import { Popover, Transition } from "@headlessui/react";
-import { LockClosedIcon } from "@heroicons/react/24/solid";
-import { CheckIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
 import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 import { SwapButton } from "@/components/modules/swap/SwapButton";
 import { useAccount } from "wagmi";
 import NumberInput from "@/components/elements/NumberInput";
+import { classNames } from "@/shared/helpers/classNames";
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -50,7 +50,27 @@ export default function Swap() {
                   value={tokenOneAmount}
                   onChange={setTokenOneAmount}
                 />
-                {/* <TokenPicker setToken={setTokenOne}></TokenPicker> */}
+                <TokenPicker setToken={setTokenOne}>
+                  {({ selectedToken }) => (
+                    <button
+                      placeholder="Select a token"
+                      type="button"
+                      className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer"
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={selectedToken.img}
+                          alt="Selected Token 0"
+                          className="h-6 mr-2"
+                        />
+                        <span className="text-md">{selectedToken.ticker}</span>
+                      </div>
+                      <div>
+                        <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
+                      </div>
+                    </button>
+                  )}
+                </TokenPicker>
               </div>
             </div>
             <SwitchTokensButton />
@@ -63,7 +83,27 @@ export default function Swap() {
                   value={tokenTwoAmount}
                   onChange={setTokenTwoAmount}
                 />
-                {/* <TokenPicker setToken={setTokenTwo}></TokenPicker> */}
+                <TokenPicker setToken={setTokenTwo}>
+                  {({ selectedToken }) => (
+                    <button
+                      placeholder="Select a token"
+                      type="button"
+                      className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer"
+                    >
+                      <div className="flex items-center">
+                        <img
+                          src={selectedToken.img}
+                          alt="Selected Token 0"
+                          className="h-6 mr-2"
+                        />
+                        <span className="text-md">{selectedToken.ticker}</span>
+                      </div>
+                      <div>
+                        <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
+                      </div>
+                    </button>
+                  )}
+                </TokenPicker>
               </div>
             </div>
           </div>
