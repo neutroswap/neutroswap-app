@@ -57,7 +57,7 @@ const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity z-20" />
+          <div className="fixed inset-0 bg-neutral-400/25 dark:bg-black/50 backdrop-blur-sm transition-opacity z-20" />
         </Transition.Child>
 
         <div className="fixed inset-0 z-20 overflow-y-auto">
@@ -73,8 +73,8 @@ const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
             >
               <Dialog.Panel
                 className={classNames(
-                  "relative transform rounded-lg bg-dark-gray-600 px-4 pt-5 pb-4 text-left text-white shadow-xl transition-all",
-                  "border border-dark-gray-500",
+                  "relative transform rounded-lg bg-white dark:bg-[#0C0C0C] px-4 pt-5 pb-4 text-left text-white transition-all",
+                  "border border-neutral-300/80 dark:border-neutral-900",
                   "sm:my-8 sm:w-full sm:max-w-xl sm:p-6"
                 )}
               >
