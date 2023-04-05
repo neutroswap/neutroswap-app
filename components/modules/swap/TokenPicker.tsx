@@ -8,20 +8,10 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import React, {
-  cloneElement,
-  createContext,
-  Dispatch,
-  FC,
-  SetStateAction,
-  useContext,
-  useState,
-} from "react";
-import { Text } from "@geist-ui/core";
-import tokenList from "../../../pages/swap/tokenList.json";
-import { RadioGroup } from "@headlessui/react";
+import React, { FC, useState } from "react";
 import { classNames } from "@/shared/helpers/classNames";
-import EOS from "@/logo/eos.png";
+import { RadioGroup } from "@headlessui/react";
+import { XCircleIcon } from "@heroicons/react/24/solid";
 
 const tokens = [
   {
@@ -74,7 +64,7 @@ type TokenPickerProps = {
   img?: string;
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
-  setToken: React.Dispatch<React.SetStateAction<string>>;
+  setToken: React.Dispatch<React.SetStateAction<`0x${string}`>>;
   children: ({
     selectedToken,
   }: {
@@ -101,13 +91,15 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
           <div className="flex">
             <div className="flex flex-col w-screen">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xl font-bold">Select a token</span>
-                <XMarkIcon
+                <span className="text-xl font-bold text-black dark:text-white">
+                  Select a token
+                </span>
+                <XCircleIcon
                   onClick={() => close()}
-                  className="h-8 cursor-pointer"
+                  className="h-6 cursor-pointer text-black dark:text-white opacity-50"
                 />
               </div>
-              <div className="flex  items-center px-2 bg-neutral-900 rounded-lg z-0">
+              <div className="flex items-center px-2 bg-neutral-100 dark:bg-neutral-900 rounded-lg z-0">
                 <MagnifyingGlassIcon className="flex inset-0 h-6  text-neutral-400" />
                 <input
                   type="text"
@@ -132,8 +124,8 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                           value={token}
                           className={({ active, checked }) =>
                             classNames(
-                              "relative flex cursor-pointer rounded-lg px-5 py-2 shadow-md focus:outline-none transition-colors duration-300",
-                              "hover:bg-neutral-900",
+                              "relative flex cursor-pointer rounded-lg px-5 py-2 focus:outline-none transition-colors duration-300",
+                              "hover:bg-neutral-100 dark:hover:bg-neutral-900",
                               checked && "bg-neutral-100 dark:bg-neutral-900"
                             )
                           }

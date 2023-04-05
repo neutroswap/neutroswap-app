@@ -3,20 +3,33 @@ import { useState } from "react";
 import NoContentDark from "@/public/states/empty/dark.svg"
 import NoContentLight from "@/public/states/empty/light.svg"
 import { Disclosure } from "@headlessui/react";
-import { ChevronDownIcon, ChevronUpIcon, QuestionMarkCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { BigNumber } from "ethers";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, QuestionMarkCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
+import { BigNumber, BigNumberish } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { classNames } from "@/shared/helpers/classNames";
-import { PlusIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { ArrowRightIcon, PlusIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Modal, ModalContents, ModalOpenButton } from "@/components/elements/Modal";
 import NumberInput from "@/components/elements/NumberInput";
 import { SwapButton } from "@/components/modules/swap/SwapButton";
 import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
+import { useContractRead } from "wagmi";
+import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
+
+type PositionsResponse = {
+  network_id: string,
+  address: `0x${string}`,
+  decimal: number,
+  name: string,
+  symbol: Array<string>,
+  logo: Array<string>,
+  balance: BigNumberish
+}
 
 export default function Pool() {
   const theme = useTheme();
-  const [positions, setPositions] = useState<any>([]);
+  const [positions, setPositions] = useState<Array<PositionsResponse>>([]);
   // const [positions, setPositions] = useState([
   //   {
   //     network_id: '36d45ac3-284b-4ad8-8262-b4980294e8e6',
@@ -145,8 +158,15 @@ export default function Pool() {
 const AddLiquidityModal: React.FC = () => {
   const [tokenOneAmount, setTokenOneAmount] = useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("");
-  const [tokenOne, setTokenOne] = useState("");
-  const [tokenTwo, setTokenTwo] = useState("");
+  const [tokenOne, setTokenOne] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+  const [tokenTwo, setTokenTwo] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+
+  const { data: existingPool, isError, isLoading: isFetchingGetPair } = useContractRead({
+    address: FACTORY_CONTRACT,
+    abi: NEUTRO_FACTORY_ABI,
+    functionName: 'getPair',
+    args: [tokenOne, tokenTwo]
+  })
 
   return (
     <div>
@@ -166,15 +186,16 @@ const AddLiquidityModal: React.FC = () => {
         {({ selectedToken }) => (
           <div className={classNames(
             "py-1 px-4 rounded-lg rounded-b-none cursor-pointer transition-colors",
-            "bg-neutral-50 dark:bg-neutral-900/40",
-            "hover:bg-neutral-100 hover:dark:bg-neutral-900/80"
+            "bg-neutral-50 dark:bg-neutral-900",
+            "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
           )}>
             <div className="flex items-center justify-between">
-              <p className="text-neutral-600 dark:text-neutral-400">Select token 0</p>
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">0</p>
                 <img src={selectedToken.img} alt="" className="h-6 mr-2" />
                 <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
+              <ChevronRightIcon className="ml-4 w-4 h-4" />
             </div>
           </div>
         )}
@@ -183,29 +204,57 @@ const AddLiquidityModal: React.FC = () => {
         {({ selectedToken }) => (
           <div className={classNames(
             "py-1 px-4 rounded-lg rounded-t-none cursor-pointer transition-colors",
-            "bg-neutral-50 dark:bg-neutral-900/40",
-            "hover:bg-neutral-100 hover:dark:bg-neutral-900/80"
+            "bg-neutral-50 dark:bg-neutral-900",
+            "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
           )}>
             <div className="flex items-center justify-between">
-              <p className="text-neutral-600 dark:text-neutral-400">Select token 1</p>
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">1</p>
                 <img src={selectedToken.img} alt="" className="h-6 mr-2" />
                 <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
+              <ChevronRightIcon className="ml-4 w-4 h-4" />
             </div>
           </div>
         )}
       </TokenPicker>
-      <Button
-        className={classNames(
-          "!w-full !mt-4 !bg-transparent !rounded-lg",
-          "hover:!border-neutral-300 dark:hover:!border-neutral-700",
-          "focus:!border-neutral-300 dark:focus:!border-neutral-700",
-          "focus:hover:!border-neutral-300 dark:focus:hover:!border-neutral-700"
-        )}
-      >
-        Add Liqudity
-      </Button>
+      {(!existingPool || existingPool !== '0x0000000000000000000000000000000000000000') && (
+        <Button
+          scale={1.25}
+          className={classNames(
+            "!w-full !mt-4 !bg-transparent !rounded-lg",
+            "!border-neutral-300 dark:!border-neutral-700",
+            "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+            "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+            "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+            "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+          )}
+          disabled={isError}
+          loading={isFetchingGetPair}
+        >
+          <span>Enter pool</span>
+          <ArrowRightIcon className="w-4 h-4 ml-2" />
+        </Button>
+      )}
+      {existingPool === '0x0000000000000000000000000000000000000000' && (
+        <div>
+          <Button
+            scale={1.25}
+            className={classNames(
+              "!w-full !mt-4 !bg-transparent !rounded-lg",
+              "!border-neutral-300 dark:!border-neutral-700",
+              "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+              "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+              "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+              "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+            )}
+          >
+            <PlusIcon className="w-4 h-4 mr-2" />
+            <span>Start adding liquidity</span>
+          </Button>
+          <p className="text-sm text-neutral-500 text-center">No pool found! But, you can create it now and start providing liquidity.</p>
+        </div>
+      )}
     </div>
   )
 }
