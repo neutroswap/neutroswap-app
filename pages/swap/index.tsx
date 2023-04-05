@@ -4,7 +4,10 @@ import Navbar from "@/components/modules/Navbar";
 import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import {
+  QuestionMarkCircleIcon,
+  ArrowDownIcon,
+} from "@heroicons/react/24/outline";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
 import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
@@ -30,6 +33,8 @@ type SwapDetails = {
   tokenTwo: string;
   tokenOneAmount: string;
   tokenTwoAmount: string;
+  amountsOut: number;
+  setAmountsOut: React.Dispatch<React.SetStateAction<number>>;
 };
 
 export default function Swap() {
@@ -37,6 +42,7 @@ export default function Swap() {
   const [tokenOneAmount, setTokenOneAmount] = useState("0");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("0");
   const [prices, setPrices] = useState(null);
+  const [amountsOut, setAmountsOut] = useState(0);
   const [tokenOne, setTokenOne] = useState<`0x${string}`>(
     "0x0000000000000000000000000000000000000000"
   );
@@ -44,39 +50,40 @@ export default function Swap() {
     "0x0000000000000000000000000000000000000000"
   );
 
-  // const { amountsOut, setAmountsOut } = useState();
+  function getTimestamp() {
+    return Math.floor(Date.now() + 3000);
+  }
 
-  // useEffect(() => {
-  //   const getAmountsOut = async () => {
-  //     try {
-  //       const amounts = await amountsOut?.toString();
-  //       setAmountsOut(amounts!);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   getAmountsOut();
-  // }, []);
+  function switchTokens() {
+    setTokenOne(tokenTwo);
+    setTokenTwo(tokenOne);
+  }
 
-  // const { dataAmountsOut } = useContractRead({
-  //   address: "0xC397DAD720B0b1d38Ee5e5Ab5689F88866b9f107",
-  //   abi: RouterABI,
-  //   functionName: "getAmountsOut",
-  //   args: [
-  //     ethers.utils.parseEther("0.00000001"),
-  //     [
-  //       "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-  //       "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
-  //     ],
-  //   ],
-  // });
-  // console.log(dataAmountsOut);
+  useEffect(() => {
+    const getAmountsOut = async () => {
+      try {
+        const amounts = await amountsOut?.toString();
+        setAmountsOut(amounts!);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getAmountsOut();
+  }, []);
+
+  const { getAmountsOut } = useContractRead({
+    address: ROUTER_CONTRACT,
+    abi: NEUTRO_ROUTER_ABI,
+    functionName: "getAmountsOut",
+    args: [ethers.utils.parseEther(tokenOneAmount), [tokenOne, tokenTwo]],
+  });
+  console.log(getAmountsOut);
 
   const { config: swapExactETHForTokensConfig } = usePrepareContractWrite({
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: "swapExactETHForTokens",
-    args: [9974701255, [tokenOne, tokenTwo], address, 1711818405],
+    args: [amountsOut, [tokenOne, tokenTwo], address, getTimestamp()],
     overrides: {
       value: ethers.utils.parseEther(tokenOneAmount),
     },
@@ -89,7 +96,13 @@ export default function Swap() {
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: "swapExactTokensForETH",
-    args: [9974900500, 9950062996, [tokenOne, tokenTwo], address, 1711818405],
+    args: [
+      9974900500,
+      9950062996,
+      [tokenOne, tokenTwo],
+      address,
+      getTimestamp(),
+    ],
   });
 
   const { data: swapExactTokensForETHData, write: swapExactTokensForETHWrite } =
@@ -99,7 +112,13 @@ export default function Swap() {
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: "swapExactTokensForTokens",
-    args: [9974900500, 9950062996, [tokenOne, tokenTwo], address, 1711818405],
+    args: [
+      9974900500,
+      9950062996,
+      [tokenOne, tokenTwo],
+      address,
+      getTimestamp(),
+    ],
   });
 
   const {
@@ -173,7 +192,20 @@ export default function Swap() {
                 </TokenPicker>
               </div>
             </div>
-            <SwitchTokensButton />
+            <div className="left-0 right-0 -mt-3 -mb-3 flex items-center justify-center">
+              <button
+                onClick={() => switchTokens}
+                type="button"
+                className="z-10 group bg-gray-100 hover:bg-gray-200 hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-md cursor-pointer"
+              >
+                <div className="transition-transform rotate-0 group-hover:rotate-180">
+                  <ArrowDownIcon
+                    strokeWidth={3}
+                    className="w-4 h-4 text-blue"
+                  />
+                </div>
+              </button>
+            </div>
             <div className="p-4 bg-black/50 rounded-lg">
               <p className="text-sm text-neutral-400">You Buy</p>
               <div className="flex justify-between">
@@ -309,6 +341,7 @@ export default function Swap() {
             {isConnected && (
               <Button
                 onClick={() => handleClick}
+                disabled={!tokenOneAmount || !isConnected}
                 className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
               >
                 Swap
