@@ -2,17 +2,11 @@
 import React, { useState, useEffect, Fragment, useRef, FC } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
-import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import {
-  QuestionMarkCircleIcon,
-  ArrowDownIcon,
-} from "@heroicons/react/24/outline";
+import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
-import { SwapButton } from "@/components/modules/swap/SwapButton";
 import NumberInput from "@/components/elements/NumberInput";
-import { classNames } from "@/shared/helpers/classNames";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { ethers } from "ethers";
 import { NEUTRO_ROUTER_ABI } from "@/shared/helpers/abi/index";
@@ -27,20 +21,20 @@ import {
 
 // const inter = Inter({ subsets: ['latin'] })
 
-type SwapDetails = {
-  tokenOne: string;
-  tokenTwo: string;
-  tokenOneAmount: string;
-  tokenTwoAmount: string;
-  amountsOut: number;
-  setAmountsOut: React.Dispatch<React.SetStateAction<number>>;
-};
+// type SwapDetails = {
+//   tokenOne: string;
+//   tokenTwo: string;
+//   tokenOneAmount: string;
+//   tokenTwoAmount: string;
+//   amountsOut: number;
+//   setAmountsOut: React.Dispatch<React.SetStateAction<number>>;
+// };
 
 export default function Swap() {
   const { address, isConnected } = useAccount();
   const [tokenOneAmount, setTokenOneAmount] = useState("0");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("0");
-  const [prices, setPrices] = useState(null);
+  // const [prices, setPrices] = useState(null);
   const [amountsOut, setAmountsOut] = useState(0);
   const [tokenOne, setTokenOne] = useState<`0x${string}`>(
     "0x0000000000000000000000000000000000000000"
@@ -53,10 +47,27 @@ export default function Swap() {
     return Math.floor(Date.now() + 3000);
   }
 
-  function switchTokens() {
-    setTokenOne(tokenTwo);
-    setTokenTwo(tokenOne);
-  }
+  // const route = new Route([pair], tokenTwo);
+  // const trade = new Trade(route, TokenAmount);
+
+  // const tokenOneBalance = await fetchBalance({
+  //   address: address,
+  //   token: tokenOne,
+  //   chainId: 5,
+  //   formatUnits: "ether",
+  // });
+
+  // const tokenTwoBalance = await fetchBalance({
+  //   address: address,
+  //   token: tokenTwo,
+  //   chainId: 5,
+  //   formatUnits: "ether",
+  // });
+
+  // function switchTokens() {
+  //   setTokenOne(tokenTwo);
+  //   setTokenTwo(tokenOne);
+  // }
 
   // useEffect(() => {
   //   const getAmountsOut = async () => {
@@ -160,7 +171,10 @@ export default function Swap() {
               <SettingsPopover />
             </div>
             <div className="p-4 bg-black/50 rounded-lg">
-              <p className="text-sm text-neutral-400">You Sell</p>
+              <div className="flex justify-between">
+                <p className="text-sm text-neutral-400">You Sell</p>
+                {/* <p className="text-sm text-neutral-400">{tokenBalance}</p> */}
+              </div>
               <div className="flex justify-between">
                 <NumberInput
                   className="text-2xl bg-transparent focus:outline-none"
@@ -193,7 +207,7 @@ export default function Swap() {
             </div>
             <div className="left-0 right-0 -mt-3 -mb-3 flex items-center justify-center">
               <button
-                onClick={() => switchTokens}
+                // onClick={() => switchTokens}
                 type="button"
                 className="z-10 group bg-gray-100 hover:bg-gray-200 hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-md cursor-pointer"
               >
@@ -206,7 +220,10 @@ export default function Swap() {
               </button>
             </div>
             <div className="p-4 bg-black/50 rounded-lg">
-              <p className="text-sm text-neutral-400">You Buy</p>
+              <div className="flex justify-between">
+                <p className="text-sm text-neutral-400">You Buy</p>
+                {/* <p className="text-sm text-neutral-400">{tokensBalance}</p> */}
+              </div>
               <div className="flex justify-between">
                 <NumberInput
                   className="text-2xl bg-transparent focus:outline-none"
