@@ -10,7 +10,6 @@ import {
 } from "@heroicons/react/24/outline";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
-import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 import { SwapButton } from "@/components/modules/swap/SwapButton";
 import NumberInput from "@/components/elements/NumberInput";
 import { classNames } from "@/shared/helpers/classNames";
@@ -59,25 +58,25 @@ export default function Swap() {
     setTokenTwo(tokenOne);
   }
 
-  useEffect(() => {
-    const getAmountsOut = async () => {
-      try {
-        const amounts = await amountsOut?.toString();
-        setAmountsOut(amounts!);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getAmountsOut();
-  }, []);
+  // useEffect(() => {
+  //   const getAmountsOut = async () => {
+  //     try {
+  //       const amounts = await amountsOut?.toString();
+  //       setAmountsOut(amounts!);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   getAmountsOut();
+  // }, []);
 
-  const { getAmountsOut } = useContractRead({
-    address: ROUTER_CONTRACT,
-    abi: NEUTRO_ROUTER_ABI,
-    functionName: "getAmountsOut",
-    args: [ethers.utils.parseEther(tokenOneAmount), [tokenOne, tokenTwo]],
-  });
-  console.log(getAmountsOut);
+  // const { getAmountsOut } = useContractRead({
+  //   address: ROUTER_CONTRACT,
+  //   abi: NEUTRO_ROUTER_ABI,
+  //   functionName: "getAmountsOut",
+  //   args: [ethers.utils.parseEther(tokenOneAmount), [tokenOne, tokenTwo]],
+  // });
+  // console.log(getAmountsOut);
 
   const { config: swapExactETHForTokensConfig } = usePrepareContractWrite({
     address: ROUTER_CONTRACT,
