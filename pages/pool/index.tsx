@@ -192,7 +192,11 @@ const AddLiquidityModal: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">0</p>
-                <img src={selectedToken.img} alt="" className="h-6 mr-2" />
+                <img
+                  alt={`${selectedToken.name} Icon`}
+                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.ticker.toLowerCase()}.svg`}
+                  className="h-7 mr-2"
+                />
                 <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
               <ChevronRightIcon className="ml-4 w-4 h-4" />
@@ -210,7 +214,11 @@ const AddLiquidityModal: React.FC = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-neutral-600 dark:text-neutral-400">1</p>
-                <img src={selectedToken.img} alt="" className="h-6 mr-2" />
+                <img
+                  alt={`${selectedToken.name} Icon`}
+                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.ticker.toLowerCase()}.svg`}
+                  className="h-7 mr-2"
+                />
                 <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
               <ChevronRightIcon className="ml-4 w-4 h-4" />

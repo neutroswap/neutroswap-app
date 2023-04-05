@@ -8,7 +8,7 @@ import {
   MagnifyingGlassIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import React, { FC, useState } from "react";
+import React, { FC, SyntheticEvent, useState } from "react";
 import { classNames } from "@/shared/helpers/classNames";
 import { RadioGroup } from "@headlessui/react";
 import { XCircleIcon } from "@heroicons/react/24/solid";
@@ -16,46 +16,39 @@ import { XCircleIcon } from "@heroicons/react/24/solid";
 const tokens = [
   {
     ticker: "USDT",
-    img: "https://cdn.moralis.io/eth/0xdac17f958d2ee523a2206206994597c13d831ec7.png",
+    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
     name: "Tether USD",
     address: "0x56b2b8007594260B443B6e906b5374dFf107132d",
     decimals: 6,
   },
   {
     ticker: "DAI",
-    img: "https://cdn.moralis.io/eth/0x6b175474e89094c44da98b954eedeac495271d0f.png",
+    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/dai.svg",
     name: "Dai Stablecoin",
     address: "0x35c83c149fB3C15138f4B4a1A541529D26f10F6a",
     decimals: 18,
   },
   {
     ticker: "WETH",
-    img: "https://cdn.moralis.io/eth/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.png",
+    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/weth.svg",
     name: "Wrapped Ethereum",
     address: "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
     decimals: 18,
   },
   {
     ticker: "WBTC",
-    img: "https://cdn.moralis.io/eth/0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.png",
+    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/wbtc.svg",
     name: "Wrapped Bitcoin",
     address: "0x8d34DaA036AD8359987e51dD522e8406909a5C2b",
     decimals: 8,
   },
   {
     ticker: "DONI",
-    img: "https://cdn.moralis.io/eth/0x6b175474e89094c44da98b954eedeac495271d0f.png",
+    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/dai.svg",
     name: "Doni Token",
     address: "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
     decimals: 18,
   },
-  // {
-  //   ticker: "EOS",
-  //   img: "EOSLogo",
-  //   name: "EOS",
-  //   address: "",
-  //   decimals: 18,
-  // },
 ];
 
 type TokenDetails = {
@@ -85,6 +78,10 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
     setSelectedToken(value);
     setToken(value.address);
   };
+
+  const handleImageFallback = (ticker: string, event: SyntheticEvent<HTMLImageElement, Event>) => {
+    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${ticker}`;
+  }
 
   return (
     <Modal>
@@ -135,7 +132,11 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                             <>
                               <div className="flex w-full items-center justify-between">
                                 <div className="flex space-x-4 items-center w-full">
-                                  <img src={token.img} className="h-8" />
+                                  <img
+                                    alt={`${token.name} Icon`}
+                                    src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${token.ticker.toLowerCase()}.svg`}
+                                    className="h-8 rounded-full" onError={(e) => { handleImageFallback(token.ticker, e) }}
+                                  />
                                   <div className="flex flex-col">
                                     <RadioGroup.Label
                                       as="p"
