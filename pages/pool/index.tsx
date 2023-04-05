@@ -7,12 +7,15 @@ import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, QuestionMarkCircleIco
 import { BigNumber, BigNumberish } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { classNames } from "@/shared/helpers/classNames";
-import { PlusIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { ArrowRightIcon, PlusIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Modal, ModalContents, ModalOpenButton } from "@/components/elements/Modal";
 import NumberInput from "@/components/elements/NumberInput";
 import { SwapButton } from "@/components/modules/swap/SwapButton";
 import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
+import { useContractRead } from "wagmi";
+import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 
 type PositionsResponse = {
   network_id: string,
@@ -155,8 +158,15 @@ export default function Pool() {
 const AddLiquidityModal: React.FC = () => {
   const [tokenOneAmount, setTokenOneAmount] = useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("");
-  const [tokenOne, setTokenOne] = useState("");
-  const [tokenTwo, setTokenTwo] = useState("");
+  const [tokenOne, setTokenOne] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+  const [tokenTwo, setTokenTwo] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+
+  const { data: existingPool, isError, isLoading: isFetchingGetPair } = useContractRead({
+    address: FACTORY_CONTRACT,
+    abi: NEUTRO_FACTORY_ABI,
+    functionName: 'getPair',
+    args: [tokenOne, tokenTwo]
+  })
 
   return (
     <div>
@@ -208,17 +218,43 @@ const AddLiquidityModal: React.FC = () => {
           </div>
         )}
       </TokenPicker>
-      <Button
-        scale={1.25}
-        className={classNames(
-          "!w-full !mt-4 !bg-transparent !rounded-lg",
-          "hover:!border-neutral-300 dark:hover:!border-neutral-700",
-          "focus:!border-neutral-300 dark:focus:!border-neutral-700",
-          "focus:hover:!border-neutral-300 dark:focus:hover:!border-neutral-700"
-        )}
-      >
-        Add Liqudity
-      </Button>
+      {(!existingPool || existingPool !== '0x0000000000000000000000000000000000000000') && (
+        <Button
+          scale={1.25}
+          className={classNames(
+            "!w-full !mt-4 !bg-transparent !rounded-lg",
+            "!border-neutral-300 dark:!border-neutral-700",
+            "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+            "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+            "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+            "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+          )}
+          disabled={isError}
+          loading={isFetchingGetPair}
+        >
+          <span>Enter pool</span>
+          <ArrowRightIcon className="w-4 h-4 ml-2" />
+        </Button>
+      )}
+      {existingPool === '0x0000000000000000000000000000000000000000' && (
+        <div>
+          <Button
+            scale={1.25}
+            className={classNames(
+              "!w-full !mt-4 !bg-transparent !rounded-lg",
+              "!border-neutral-300 dark:!border-neutral-700",
+              "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+              "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+              "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+              "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+            )}
+          >
+            <PlusIcon className="w-4 h-4 mr-2" />
+            <span>Start adding liquidity</span>
+          </Button>
+          <p className="text-sm text-neutral-500 text-center">No pool found! But, you can create it now and start providing liquidity.</p>
+        </div>
+      )}
     </div>
   )
 }
