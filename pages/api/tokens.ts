@@ -2,24 +2,28 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { ethers } from 'ethers'
 import { ERC20_ABI } from '../../shared/abi'
 import { supabaseClient } from '@/shared/helpers/supabaseClient'
-import { LiquidityToken, TokenFE, Token } from '@/shared/types/tokens.types'
+import { TokenFE, Token } from '@/shared/types/tokens.types'
 
-export async function getNetworkByName (networkName: string) {
+export async function getNetworkByName (networkName: string){
+  let currNetwork;
   let { data: network } = await supabaseClient
     .from('networks')
     .select('*')
     .eq('name', networkName)
   console.log('network ', network)
-  return (network = network[0])
+  if (network) currNetwork = network[0]
+  return currNetwork;
 }
 
-export async function getNetworkById (networkId: string) {
+export async function getNetworkById (networkId: string){
+  let currNetwork;
   let { data: network } = await supabaseClient
     .from('networks')
     .select('*')
     .eq('id', networkId)
   console.log('network ', network)
-  return (network = network[0])
+  if (network) currNetwork = network[0]
+  return currNetwork;
 }
 
 export async function createNewToken (newToken: TokenFE) {
@@ -29,10 +33,9 @@ export async function createNewToken (newToken: TokenFE) {
     console.log('Token already exist! ', existingToken)
     return existingToken
   }
-  let network = await getNetworkByName(networkName)
+  let network:any = await getNetworkByName(networkName)
   let rpc = network.rpc
   console.log('rpcc ', rpc)
-
   // console.log("wawawa ", await coingecko.contract({
   //   id: "ethereum",
   //   contract_address: tokenAddress
@@ -61,7 +64,7 @@ export async function createNewToken (newToken: TokenFE) {
     logo: 'default'
   }
 
-  let res = await supabaseClient.from<Token>('tokens').insert([token])
+  let res = await supabaseClient.from('tokens').insert([token])
   console.log('ererewr ', res)
   return token
 }
@@ -78,8 +81,8 @@ export async function getTokenDetails (data: string) {
       .eq('address', data)
 
     console.log('fdsailfjdaisj ', tokenDetail)
-    tokenDetails = tokenDetail[0]
-    return tokenDetails //return errorDetails if any
+    if (tokenDetail) tokenDetails = tokenDetail[0]
+    if (error) errorDetails = error;
   } else {
     //get by tokenid
 
@@ -89,11 +92,11 @@ export async function getTokenDetails (data: string) {
       .eq('id', data)
 
     console.log('fdsailfjdaisj ', tokenDetail)
-    tokenDetails = tokenDetail[0]
-    return tokenDetails //return errorDetails if any
+    if (tokenDetail) tokenDetails = tokenDetail[0]
+    if (error) errorDetails = error;
   }
-  if (errorDetails != null)
-    throw Error('can not get token detail', errorDetails)
+  if (errorDetails) return errorDetails;
+  return tokenDetails //return errorDetails if any
 }
 
 export default async function handler (
@@ -105,7 +108,7 @@ export default async function handler (
   switch (method) {
     case 'GET':
       const { data: liquidityTokens, error } = await supabaseClient
-        .from<LiquidityToken>('liquidity_tokens')
+        .from('liquidity_tokens')
         .select('*')
       console.log('yoooo data', liquidityTokens)
       if (error) {
@@ -117,30 +120,13 @@ export default async function handler (
 
     case 'POST':
       const { token } = body
-      let postError = { message: 'wassuuuop' },
-        newLiquidityToken
+      let postError = { message: 'wassuuuop' }, newLiquidityToken;
       await createNewToken(token)
-      // const { data: newLiquidityToken, error: postError } = await supabaseClient
-      //   .from<LiquidityToken>("liquidity_tokens")
-      //   .insert({ token0, token1 });
+
       if (postError) {
         res.status(500).json({ error: postError.message })
       } else {
         res.status(201).json({ newLiquidityToken })
-      }
-      break
-
-    case 'PUT':
-      const { id, token0: updatedToken0, token1: updatedToken1 } = body
-      const { data: updatedLiquidityToken, error: putError } =
-        await supabaseClient
-          .from<LiquidityToken>('liquidity_tokens')
-          .update({ token0: updatedToken0, token1: updatedToken1 })
-          .match({ id })
-      if (putError) {
-        res.status(500).json({ error: putError.message })
-      } else {
-        res.status(200).json({ updatedLiquidityToken })
       }
       break
 
@@ -158,7 +144,7 @@ export default async function handler (
       break
 
     default:
-      res.setHeader('Allow', ['GET', 'POST', 'PUT', 'DELETE'])
+      res.setHeader('Allow', ['GET', 'POST', 'DELETE'])
       res.status(405).end(`Method ${method} Not Allowed`)
   }
 }

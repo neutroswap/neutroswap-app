@@ -25,5 +25,12 @@ export interface LiquidityToken {
   logo: string
   token0: any
   token1: any
-  created_at: string
+}
+
+export interface Network{
+  id: string
+  name: string
+  rpc: string
+  chain_id: number
+  logo: string
 }
