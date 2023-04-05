@@ -34,11 +34,15 @@ type SwapDetails = {
 
 export default function Swap() {
   const { address, isConnected } = useAccount();
-  const [tokenOneAmount, setTokenOneAmount] = useState("");
-  const [tokenTwoAmount, setTokenTwoAmount] = useState("");
+  const [tokenOneAmount, setTokenOneAmount] = useState("0");
+  const [tokenTwoAmount, setTokenTwoAmount] = useState("0");
   const [prices, setPrices] = useState(null);
-  const [tokenOne, setTokenOne] = useState("");
-  const [tokenTwo, setTokenTwo] = useState("");
+  const [tokenOne, setTokenOne] = useState<`0x${string}`>(
+    "0x0000000000000000000000000000000000000000"
+  );
+  const [tokenTwo, setTokenTwo] = useState<`0x${string}`>(
+    "0x0000000000000000000000000000000000000000"
+  );
 
   // const { amountsOut, setAmountsOut } = useState();
 
