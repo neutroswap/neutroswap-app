@@ -42,7 +42,7 @@ async function createLPToken (
   let lpName = "vLPN-" + token0Details.symbol + "-" + token1Details.symbol; //vLPN-WETH-USDT
   let network:any = await getNetworkByName(networkName);
   const liquidityToken: LiquidityToken = {
-    address: lpToken.tokenAddress,
+    address: lpToken.createdLP,
     decimal: 18,
     name: lpName,
     symbol: lpName,

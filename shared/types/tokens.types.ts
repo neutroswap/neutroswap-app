@@ -13,7 +13,7 @@ export interface TokenFE {
 }
 
 export interface LiquidityTokenFE {
-  tokenAddress: string
+  createdLP: string
 }
 
 export interface LiquidityToken {
