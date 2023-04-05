@@ -3,6 +3,7 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
+import Button from "@/components/elements/Button";
 import React, { FC } from "react";
 
 export const SwapButton: FC = () => {
@@ -11,11 +12,8 @@ export const SwapButton: FC = () => {
       <div className="left-0 right-0 my-3 flex items-center justify-center w-full">
         {/* <Modal>
         <ModalOpenButton> */}
-        <button
-          type="button"
-          className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer w-full justify-center"
-        >
-          <span>Swap</span>
+        <button className="flex items-center space-x-2 z-10 bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 transition-all rounded-lg cursor-pointer w-full justify-center">
+          Swap
         </button>
         {/* </ModalOpenButton>
         <ModalContents> */}

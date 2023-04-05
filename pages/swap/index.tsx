@@ -25,6 +25,13 @@ import {
 
 // const inter = Inter({ subsets: ['latin'] })
 
+type SwapDetails = {
+  tokenOne: string;
+  tokenTwo: string;
+  tokenOneAmount: string;
+  tokenTwoAmount: string;
+};
+
 export default function Swap() {
   const { address, isConnected } = useAccount();
   const [tokenOneAmount, setTokenOneAmount] = useState("");
@@ -65,55 +72,51 @@ export default function Swap() {
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: "swapExactETHForTokens",
-    args: [
-      9974701255,
-      [tokenOne, tokenTwo],
-      "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
-      1711818405,
-    ],
+    args: [9974701255, [tokenOne, tokenTwo], address, 1711818405],
     overrides: {
-      value: ethers.utils.parseEther("0.00000001"),
+      value: ethers.utils.parseEther(tokenOneAmount),
     },
   });
+
+  const { data: swapExactETHForTokensData, write: swapExactETHForTokensWrite } =
+    useContractWrite(swapExactETHForTokensConfig);
 
   const { config: swapExactTokensForETHConfig } = usePrepareContractWrite({
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: "swapExactTokensForETH",
-    args: [
-      9974900500,
-      9950062996,
-      [
-        "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
-        "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-      ],
-      "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
-      1711818405,
-    ],
+    args: [9974900500, 9950062996, [tokenOne, tokenTwo], address, 1711818405],
   });
 
-  // const { configExactTokensForTokens } = usePrepareContractWrite({
-  //   address: ROUTER_CONTRACT,
-  //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "swapExactTokensForTokens",
-  //   args: [
-  //     9974900500,
-  //     9950062996,
-  //     [
-  //       "0x30Cf0E9f55Dc4Ce9C2c176D5baE85D25c0201569",
-  //       "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-  //     ],
-  //     "0x523b9D1Ae36c28d1e480c6a0494E306a250bEA26",
-  //     1711818405,
-  //   ],
-  // });
+  const { data: swapExactTokensForETHData, write: swapExactTokensForETHWrite } =
+    useContractWrite(swapExactTokensForETHConfig);
 
-  // const { data: swapExactETHForTokensData, write: swapExactETHForTokensWrite } =
-  //   useContractWrite(swapExactETHForTokensConfig);
+  const { config: swapExactTokensForTokensConfig } = usePrepareContractWrite({
+    address: ROUTER_CONTRACT,
+    abi: NEUTRO_ROUTER_ABI,
+    functionName: "swapExactTokensForTokens",
+    args: [9974900500, 9950062996, [tokenOne, tokenTwo], address, 1711818405],
+  });
+
+  const {
+    data: swapExactTokensForTokensData,
+    write: swapExactTokensForTokensWrite,
+  } = useContractWrite(swapExactTokensForTokensConfig);
 
   // const { isLoading, isSuccess } = useWaitForTransaction({
   //   hash: data?.hash,
   // });
+
+  const handleClick = () => {
+    if (tokenOne === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
+      swapExactETHForTokensWrite?.();
+    }
+    if (tokenTwo === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
+      swapExactTokensForETHWrite?.();
+    } else {
+      swapExactTokensForTokensWrite?.();
+    }
+  };
 
   return (
     <>
@@ -299,7 +302,14 @@ export default function Swap() {
                 }}
               </ConnectButton.Custom>
             )}
-            {isConnected && <SwapButton />}
+            {isConnected && (
+              <Button
+                onClick={() => handleClick}
+                className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+              >
+                Swap
+              </Button>
+            )}
           </div>
         </div>
       </div>
