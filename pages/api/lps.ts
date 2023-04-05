@@ -1,51 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { createNewToken , getNetworkByName} from './tokens'
-
-interface Token {
-  network_id: string
-  address: string
-  decimal: number
-  name: string
-  symbol: string
-  logo: string
-}
-
-interface TokenFE {
-  networkName: string
-  tokenAddress: string
-}
-
-interface LiquidityTokenFE {
-  tokenAddress: string
-}
-
-interface LiquidityToken {
-  network_id: string
-  address: string
-  decimal: number
-  name: string
-  symbol: string
-  logo: string
-  token0: any
-  token1: any
-  created_at: string
-}
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
+import {LiquidityToken, TokenFE, LiquidityTokenFE} from "@/shared/types/tokens.types";
+import { supabaseClient } from '@/shared/helpers/supabaseClient'
 
 export async function getLPDetail (liquidityTokenAddress: string) {
-  const { data: liquidityTokens, error } = await supabase
+  const { data: liquidityTokens, error } = await supabaseClient
     .from<LiquidityToken>('liquidity_tokens')
     .select('*')
     .eq('address', liquidityTokenAddress)
 }
 
 export async function getAllLPs () {
-  const { data: liquidityTokens, error } = await supabase
+  const { data: liquidityTokens, error } = await supabaseClient
     .from<LiquidityToken>('liquidity_tokens')
     .select('*')
   return liquidityTokens
@@ -61,7 +28,7 @@ async function createLPToken (
   let token1Details = await createNewToken(token1)
   let networkName = token0.networkName;
   console.log("tokeennn ", token0Details, token1Details)
-  const { data: existingLiquidityTokens } = await supabase
+  const { data: existingLiquidityTokens } = await supabaseClient
     .from<LiquidityToken>('liquidity_tokens')
     .select('*')
     .eq('token0_id', token0Details.id)
@@ -85,7 +52,7 @@ async function createLPToken (
     network_id: network.id
   }
 
-  let res = await supabase
+  let res = await supabaseClient
     .from<LiquidityToken>('liquidity_tokens')
     .insert([liquidityToken])
   console.log("Res ", res);
@@ -100,7 +67,7 @@ export default async function handler (
 
   switch (method) {
     case 'GET':
-      const { data: liquidityTokens, error } = await supabase
+      const { data: liquidityTokens, error } = await supabaseClient
         .from<LiquidityToken>('liquidity_tokens')
         .select('*')
       console.log('yoooo data', liquidityTokens)
@@ -124,7 +91,7 @@ export default async function handler (
 
     case 'PUT':
       const { id, token0: updatedToken0, token1: updatedToken1 } = body
-      const { data: updatedLiquidityToken, error: putError } = await supabase
+      const { data: updatedLiquidityToken, error: putError } = await supabaseClient
         .from<LiquidityToken>('liquidity_tokens')
         .update({ token0: updatedToken0, token1: updatedToken1 })
         .match({ id })
@@ -137,7 +104,7 @@ export default async function handler (
 
     case 'DELETE':
       const { id: deleteId } = body
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await supabaseClient
         .from<LiquidityToken>('liquidity_tokens')
         .delete()
         .match({ id: deleteId })

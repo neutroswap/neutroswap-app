@@ -1,64 +1,32 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createClient } from '@supabase/supabase-js'
 import { ethers } from 'ethers'
 import { ERC20_ABI } from '../../shared/abi'
+import { supabaseClient } from '@/shared/helpers/supabaseClient'
+import { LiquidityToken, TokenFE, Token } from '@/shared/types/tokens.types'
 
-import { CoinGeckoClient } from 'coingecko-api-v3'
-
-const coingecko = new CoinGeckoClient({
-  timeout: 10000,
-  autoRetry: true
-})
-
-interface Token {
-  network_id: string
-  address: string
-  decimal: number
-  name: string
-  symbol: string
-  logo: string
-}
-
-interface TokenFE {
-  tokenAddress: string
-  networkName: string
-}
-
-interface LiquidityToken {
-  id: string
-  token0: string
-  token1: string
-  created_at: string
-}
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
-
-export async function getNetworkByName(networkName: string){
-  let { data: network } = await supabase
+export async function getNetworkByName (networkName: string) {
+  let { data: network } = await supabaseClient
     .from('networks')
     .select('*')
     .eq('name', networkName)
   console.log('network ', network)
-  return network = network[0]
+  return (network = network[0])
 }
 
-export async function getNetworkById(networkId: string){
-  let { data: network } = await supabase
+export async function getNetworkById (networkId: string) {
+  let { data: network } = await supabaseClient
     .from('networks')
     .select('*')
     .eq('id', networkId)
   console.log('network ', network)
-  return network = network[0]
+  return (network = network[0])
 }
 
 export async function createNewToken (newToken: TokenFE) {
   let { tokenAddress, networkName } = newToken
   let existingToken = await getTokenDetails(tokenAddress)
   if (existingToken) {
-    console.log("Token already exist! ", existingToken)
+    console.log('Token already exist! ', existingToken)
     return existingToken
   }
   let network = await getNetworkByName(networkName)
@@ -93,36 +61,39 @@ export async function createNewToken (newToken: TokenFE) {
     logo: 'default'
   }
 
-  let res = await supabase.from<Token>('tokens').insert([token])
+  let res = await supabaseClient.from<Token>('tokens').insert([token])
   console.log('ererewr ', res)
   return token
 }
 
 export async function getTokenDetails (data: string) {
-  let tokenDetails;
-  let errorDetails=null;
-  console.log("data dulu daaahh ", data)
-  if (data.substring(0,2) == '0x') {//get by address
-    const { data: tokenDetail, error } = await supabase
+  let tokenDetails
+  let errorDetails = null
+  console.log('data dulu daaahh ', data)
+  if (data.substring(0, 2) == '0x') {
+    //get by address
+    const { data: tokenDetail, error } = await supabaseClient
       .from('tokens')
       .select('*')
       .eq('address', data)
 
-    console.log("fdsailfjdaisj ", tokenDetail);
+    console.log('fdsailfjdaisj ', tokenDetail)
     tokenDetails = tokenDetail[0]
     return tokenDetails //return errorDetails if any
-  } else { //get by tokenid
-    
-    const { data: tokenDetail, error } = await supabase
+  } else {
+    //get by tokenid
+
+    const { data: tokenDetail, error } = await supabaseClient
       .from('tokens')
       .select('*')
       .eq('id', data)
 
-    console.log("fdsailfjdaisj ", tokenDetail);
+    console.log('fdsailfjdaisj ', tokenDetail)
     tokenDetails = tokenDetail[0]
     return tokenDetails //return errorDetails if any
   }
-  if (errorDetails!=null) throw Error("can not get token detail", errorDetails);
+  if (errorDetails != null)
+    throw Error('can not get token detail', errorDetails)
 }
 
 export default async function handler (
@@ -133,7 +104,7 @@ export default async function handler (
 
   switch (method) {
     case 'GET':
-      const { data: liquidityTokens, error } = await supabase
+      const { data: liquidityTokens, error } = await supabaseClient
         .from<LiquidityToken>('liquidity_tokens')
         .select('*')
       console.log('yoooo data', liquidityTokens)
@@ -149,7 +120,7 @@ export default async function handler (
       let postError = { message: 'wassuuuop' },
         newLiquidityToken
       await createNewToken(token)
-      // const { data: newLiquidityToken, error: postError } = await supabase
+      // const { data: newLiquidityToken, error: postError } = await supabaseClient
       //   .from<LiquidityToken>("liquidity_tokens")
       //   .insert({ token0, token1 });
       if (postError) {
@@ -161,10 +132,11 @@ export default async function handler (
 
     case 'PUT':
       const { id, token0: updatedToken0, token1: updatedToken1 } = body
-      const { data: updatedLiquidityToken, error: putError } = await supabase
-        .from<LiquidityToken>('liquidity_tokens')
-        .update({ token0: updatedToken0, token1: updatedToken1 })
-        .match({ id })
+      const { data: updatedLiquidityToken, error: putError } =
+        await supabaseClient
+          .from<LiquidityToken>('liquidity_tokens')
+          .update({ token0: updatedToken0, token1: updatedToken1 })
+          .match({ id })
       if (putError) {
         res.status(500).json({ error: putError.message })
       } else {
@@ -174,7 +146,7 @@ export default async function handler (
 
     case 'DELETE':
       const { id: deleteId } = body
-      const { error: deleteError } = await supabase
+      const { error: deleteError } = await supabaseClient
         .from('tokens')
         .delete()
         .match({ id: deleteId })
