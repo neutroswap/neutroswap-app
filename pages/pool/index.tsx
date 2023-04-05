@@ -3,8 +3,8 @@ import { useState } from "react";
 import NoContentDark from "@/public/states/empty/dark.svg"
 import NoContentLight from "@/public/states/empty/light.svg"
 import { Disclosure } from "@headlessui/react";
-import { ChevronDownIcon, ChevronUpIcon, QuestionMarkCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { BigNumber } from "ethers";
+import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, QuestionMarkCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
+import { BigNumber, BigNumberish } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { classNames } from "@/shared/helpers/classNames";
 import { PlusIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/24/solid";
@@ -14,9 +14,19 @@ import { SwapButton } from "@/components/modules/swap/SwapButton";
 import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 
+type PositionsResponse = {
+  network_id: string,
+  address: `0x${string}`,
+  decimal: number,
+  name: string,
+  symbol: Array<string>,
+  logo: Array<string>,
+  balance: BigNumberish
+}
+
 export default function Pool() {
   const theme = useTheme();
-  const [positions, setPositions] = useState<any>([]);
+  const [positions, setPositions] = useState<Array<PositionsResponse>>([]);
   // const [positions, setPositions] = useState([
   //   {
   //     network_id: '36d45ac3-284b-4ad8-8262-b4980294e8e6',
@@ -166,15 +176,16 @@ const AddLiquidityModal: React.FC = () => {
         {({ selectedToken }) => (
           <div className={classNames(
             "py-1 px-4 rounded-lg rounded-b-none cursor-pointer transition-colors",
-            "bg-neutral-50 dark:bg-neutral-900/40",
-            "hover:bg-neutral-100 hover:dark:bg-neutral-900/80"
+            "bg-neutral-50 dark:bg-neutral-900",
+            "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
           )}>
             <div className="flex items-center justify-between">
-              <p className="text-neutral-600 dark:text-neutral-400">Select token 0</p>
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">0</p>
                 <img src={selectedToken.img} alt="" className="h-6 mr-2" />
                 <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
+              <ChevronRightIcon className="ml-4 w-4 h-4" />
             </div>
           </div>
         )}
@@ -183,20 +194,22 @@ const AddLiquidityModal: React.FC = () => {
         {({ selectedToken }) => (
           <div className={classNames(
             "py-1 px-4 rounded-lg rounded-t-none cursor-pointer transition-colors",
-            "bg-neutral-50 dark:bg-neutral-900/40",
-            "hover:bg-neutral-100 hover:dark:bg-neutral-900/80"
+            "bg-neutral-50 dark:bg-neutral-900",
+            "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
           )}>
             <div className="flex items-center justify-between">
-              <p className="text-neutral-600 dark:text-neutral-400">Select token 1</p>
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-neutral-600 dark:text-neutral-400">1</p>
                 <img src={selectedToken.img} alt="" className="h-6 mr-2" />
                 <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
+              <ChevronRightIcon className="ml-4 w-4 h-4" />
             </div>
           </div>
         )}
       </TokenPicker>
       <Button
+        scale={1.25}
         className={classNames(
           "!w-full !mt-4 !bg-transparent !rounded-lg",
           "hover:!border-neutral-300 dark:hover:!border-neutral-700",
