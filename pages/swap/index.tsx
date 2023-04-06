@@ -38,22 +38,15 @@ export default function Swap() {
     "0x0000000000000000000000000000000000000000"
   );
   const [uniswapFactory, setUniswapFactory] = useState();
+  const [pair, setPair] = useState("");
 
-  let connectedAddress: any = address || "";
-
-  const { data: _getPair } = useContractRead({
+  const { data: getPair } = useContractRead({
     address: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
     abi: NEUTRO_ROUTER_ABI,
     functionName: "getPair",
+    args: [tokenOne, tokenTwo],
   });
-
-  // useEffect(() => {
-  //   const getPair = async () =>
-
-  //   return () => {
-  //     second
-  //   }
-  // }, [third])
+  setPair(getPair);
 
   useEffect(() => {
     let customNetworkData = {
@@ -74,7 +67,7 @@ export default function Swap() {
     let cloneUniswapContractDetailsV2 = {
       routerAddress: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
       factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
-      pairAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
+      pairAddress: pair,
       // routerAbi: NEUTRO_ROUTER_ABI,
       // routerMethods: "",
     };
@@ -87,7 +80,7 @@ export default function Swap() {
       const uniswapPair = new UniswapPair({
         fromTokenContractAddress: tokenOne,
         toTokenContractAddress: tokenTwo,
-        ethereumAddress: connectedAddress,
+        ethereumAddress: address as string,
         chainId: 15557,
         providerUrl: "https://api-testnet2.trust.one/",
         settings: new UniswapPairSettings({
@@ -107,6 +100,21 @@ export default function Swap() {
       console.log("doneee ", uniswapPairFactory.provider, uniswapPairFactory);
     }
   }, []);
+
+  useEffect(() => {
+    const swap = async () => {
+      const uniswapPair = new UniswapPair({
+        fromTokenContractAddress: tokenOne,
+        toTokenContractAddress: tokenTwo,
+        ethereumAddress: address as string,
+        chainId: 15557,
+      });
+    };
+
+    return () => {
+      second;
+    };
+  }, [third]);
 
   // function switchTokens() {
   //   setTokenOne(tokenTwo);
