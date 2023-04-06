@@ -79,8 +79,6 @@ export async function getTokenDetails (data: string) {
       .from('tokens')
       .select('*')
       .eq('address', data)
-
-    console.log('fdsailfjdaisj ', tokenDetail)
     if (tokenDetail) tokenDetails = tokenDetail[0]
     if (error) errorDetails = error;
   } else {
@@ -90,8 +88,6 @@ export async function getTokenDetails (data: string) {
       .from('tokens')
       .select('*')
       .eq('id', data)
-
-    console.log('fdsailfjdaisj ', tokenDetail)
     if (tokenDetail) tokenDetails = tokenDetail[0]
     if (error) errorDetails = error;
   }

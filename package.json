@@ -24,6 +24,7 @@
     "coingecko-api-v3": "^0.0.23",
     "eslint": "8.35.0",
     "eslint-config-next": "13.2.3",
+    "ethereum-multicall": "^2.16.1",
     "ethers": "^5.7.2",
     "filepond": "^4.30.4",
     "filepond-plugin-image-exif-orientation": "^1.0.11",

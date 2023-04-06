@@ -39,13 +39,13 @@ async function createLPToken (
     console.log("LP Token is exist..", existingLiquidityTokens[0])
     return existingLiquidityTokens[0]
   }
-  let lpName = "vLPN-" + token0Details.symbol + "-" + token1Details.symbol; //vLPN-WETH-USDT
+  let lpName = "NeutroLP"; //vLPN-WETH-USDT
   let network:any = await getNetworkByName(networkName);
   const liquidityToken: LiquidityToken = {
     address: lpToken.createdLP,
     decimal: 18,
     name: lpName,
-    symbol: lpName,
+    symbol: "NLP",
     logo: "default",
     token0: token0Details.id,
     token1: token1Details.id,
