@@ -559,7 +559,7 @@ export const ERC721_ABI = <const>[
   },
 ];
 
-export const ERC20_ABI = [
+export const ERC20_ABI = <const>[
   {
     constant: true,
     inputs: [],
