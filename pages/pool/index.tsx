@@ -57,7 +57,7 @@ export default function Pool() {
     <div className="py-10">
       <div className="max-w-7xl mx-auto text-center">
         <Text h2 height={2.5}>Liquidity Pool</Text>
-        <Text type="secondary" p>Add or Remove liquidity to Neutroswap pool</Text>
+        <Text type="secondary">Add or Remove liquidity to Neutroswap pool</Text>
       </div>
       <div className="flex justify-center items-center">
         <div className="mt-8 flex items-center text-center rounded-lg border border-neutral-200 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg w-full max-w-lg">
@@ -73,7 +73,7 @@ export default function Pool() {
                 </ModalOpenButton>
                 <ModalContents>
                   {({ close }) => (
-                    <AddLiquidityModal />
+                    <AddLiquidityModal handleClose={close} />
                   )}
                 </ModalContents>
               </Modal>
@@ -155,7 +155,7 @@ export default function Pool() {
   )
 }
 
-const AddLiquidityModal: React.FC = () => {
+const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({ handleClose }) => {
   const [tokenOneAmount, setTokenOneAmount] = useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("");
   const [tokenOne, setTokenOne] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
@@ -172,34 +172,37 @@ const AddLiquidityModal: React.FC = () => {
     <div>
       <div className="flex items-center justify-between text-black dark:text-white mb-8">
         <div>
-          <p className="text-xl font-bold m-0 mb-1">Add Liquidity</p>
-          <p className="text-sm m-0">
-            Configure and add liquidty
+          <p className="text-xl font-semibold m-0">Add Liquidity</p>
+          <p className="text-sm m-0 opacity-50">
+            Select token pair to add liquidty
           </p>
         </div>
-        <button type="button" onClick={() => close()}>
-          <XCircleIcon className="h-6 w-6 text-cool-gray-500 hover:text-cool-gray-400" />
+        <button type="button" onClick={handleClose}>
+          <XCircleIcon className="h-6 w-6 text-cool-gray-500 hover:text-cool-gray-400 opacity-30" />
         </button>
       </div>
 
       <TokenPicker setToken={setTokenOne}>
         {({ selectedToken }) => (
           <div className={classNames(
-            "py-1 px-4 rounded-lg rounded-b-none cursor-pointer transition-colors",
+            "py-1 px-4 rounded-2xl rounded-b-none cursor-pointer transition-colors group",
             "bg-neutral-50 dark:bg-neutral-900",
             "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
           )}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">0</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-600">1</p>
                 <img
                   alt={`${selectedToken.name} Icon`}
                   src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.ticker.toLowerCase()}.svg`}
-                  className="h-7 mr-2"
+                  className="h-7 mr-2 rounded-full"
+                  onError={(event) => {
+                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.ticker}`;
+                  }}
                 />
-                <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
+                <span className="text-sm font-semibold text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
-              <ChevronRightIcon className="ml-4 w-4 h-4" />
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
             </div>
           </div>
         )}
@@ -207,21 +210,24 @@ const AddLiquidityModal: React.FC = () => {
       <TokenPicker setToken={setTokenTwo}>
         {({ selectedToken }) => (
           <div className={classNames(
-            "py-1 px-4 rounded-lg rounded-t-none cursor-pointer transition-colors",
+            "py-1 px-4 rounded-2xl rounded-t-none cursor-pointer transition-colors group",
             "bg-neutral-50 dark:bg-neutral-900",
             "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
           )}>
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-400">1</p>
+                <p className="text-sm text-neutral-600 dark:text-neutral-600">2</p>
                 <img
                   alt={`${selectedToken.name} Icon`}
                   src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.ticker.toLowerCase()}.svg`}
-                  className="h-7 mr-2"
+                  className="h-7 mr-2 rounded-full"
+                  onError={(event) => {
+                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.ticker}`;
+                  }}
                 />
-                <span className="text-sm text-black dark:text-white">{selectedToken.ticker}</span>
+                <span className="text-sm font-semibold text-black dark:text-white">{selectedToken.ticker}</span>
               </div>
-              <ChevronRightIcon className="ml-4 w-4 h-4" />
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
             </div>
           </div>
         )}
@@ -260,7 +266,7 @@ const AddLiquidityModal: React.FC = () => {
             <PlusIcon className="w-4 h-4 mr-2" />
             <span>Start adding liquidity</span>
           </Button>
-          <p className="text-sm text-neutral-500 text-center">No pool found! But, you can create it now and start providing liquidity.</p>
+          <p className="max-w-sm mx-auto text-sm text-neutral-400 dark:text-neutral-600 text-center">No pool found! But, you can create it now and start providing liquidity.</p>
         </div>
       )}
     </div>
