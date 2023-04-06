@@ -65,8 +65,6 @@ export default function Swap() {
       routerAddress: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
       factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
       pairAddress: getPair as string,
-      // routerAbi: NEUTRO_ROUTER_ABI,
-      // routerMethods: "",
     };
     console.log("Pair", getPair);
 
@@ -105,14 +103,6 @@ export default function Swap() {
   const { data: signer } = useSigner({
     chainId: 15557,
   });
-
-  const signContract = useContract({
-    address: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
-    abi: NEUTRO_ROUTER_ABI,
-    signerOrProvider: signer,
-  });
-
-  const provider = useProvider();
 
   const swap = async () => {
     if (!uniswapFactory) return;
