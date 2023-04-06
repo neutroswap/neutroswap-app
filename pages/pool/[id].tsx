@@ -8,12 +8,14 @@ import { useRouter } from "next/router";
 
 import NoContentDark from "@/public/states/empty/dark.svg"
 import NoContentLight from "@/public/states/empty/light.svg"
-import { useAccount, useContractRead, useContractReads } from "wagmi";
-import { NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
+import { useAccount, useContractRead, useContractReads, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { UniswapPair, UniswapPairFactory, UniswapPairSettings, UniswapVersion } from "simple-uniswap-sdk";
 import { FACTORY_CONTRACT, MULTICALL_CONTRACT, ROUTER_CONTRACT } from "@/shared/helpers/contract";
-import { useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import { formatEther, parseEther } from "ethers/lib/utils.js";
+import useUpdateEffect from "@/shared/hooks/useUpdateEffect";
+import debounce from "lodash/debounce";
 
 export default function PoolDetails() {
   return (
@@ -71,74 +73,13 @@ const PoolOverviewPanel = () => {
   const theme = useTheme();
   const { address } = useAccount();
 
-  // const [uniswapPairFactory, setUniswapPairFactory] = useState<UniswapPairFactory>();
-
-  // const poolContract = {
-  //   address: router.query.id as `0x${string}`,
-  //   abi: NEUTRO_POOL_ABI,
-  // }
-
-  // const { data, isError, isLoading } = useContractReads({
-  //   contracts: [
-  //     {
-  //       ...poolContract,
-  //       functionName: 'token0'
-  //     },
-  //     {
-  //       ...poolContract,
-  //       functionName: 'token1'
-  //     }
-  //   ]
-  // })
-
-  // let cloneUniswapContractDetailsV2 = useMemo(() => ({
-  //   routerAddress: ROUTER_CONTRACT,
-  //   factoryAddress: FACTORY_CONTRACT,
-  //   pairAddress: router.query.id as `0x${string}`,
-  // }), [router.query.id]);
-
-  // let customNetworkData = useMemo(() => ({
-  //   nameNetwork: "EOS EVM",
-  //   multicallContractAddress: MULTICALL_CONTRACT,
-  //   nativeCurrency: {
-  //     name: "EOS",
-  //     symbol: "EOS",
-  //   },
-  //   nativeWrappedTokenInfo: {
-  //     chainId: 15557,
-  //     contractAddress: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
-  //     decimals: 18,
-  //     symbol: "WEOS",
-  //     name: "Wrapped EOS",
-  //   },
-  // }), []);
-
-  // let customPairSettings = useMemo(() => new UniswapPairSettings({
-  //   slippage: 0.0005,
-  //   deadlineMinutes: 5,
-  //   disableMultihops: true,
-  //   cloneUniswapContractDetails: {
-  //     v2Override: cloneUniswapContractDetailsV2,
-  //   },
-  //   uniswapVersions: [UniswapVersion.v2],
-  //   customNetwork: customNetworkData,
-  // }), [cloneUniswapContractDetailsV2, customNetworkData])
-
-  // useEffect(() => {
-  //   if (!data) return;
-  //   (async () => {
-  //     const uniswapPair = new UniswapPair({
-  //       fromTokenContractAddress: data?.[0]!,
-  //       toTokenContractAddress: data?.[1]!,
-  //       ethereumAddress: address as string,
-  //       chainId: 15557,
-  //       providerUrl: "https://api-testnet2.trust.one/",
-  //       settings: customPairSettings,
-  //     })
-  //     const pairFactory = await uniswapPair.createFactory();
-  //     setUniswapPairFactory(pairFactory);
-  //   })()
-  // }, [data, address, customPairSettings])
+  useEffect(() => {
+    (async () => {
+      const req = await fetch(`/api/getUserLP?userAddress=${address}`)
+      const response = await req.json()
+      console.log(response);
+    })()
+  }, [address])
 
   return (
     <div className="">
@@ -172,6 +113,12 @@ const PoolDepositPanel = () => {
   const theme = useTheme();
   const { address } = useAccount();
 
+  const [token0Amount, setToken0Amount] = useState("");
+  const [token0Min, setToken0Min] = useState("");
+  const [token1Amount, setToken1Amount] = useState("");
+  const [token1Min, setToken1Min] = useState("");
+  const [uniswapPairFactory, setUniswapPairFactory] = useState<UniswapPairFactory>();
+
   const routerContract = {
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
@@ -187,17 +134,124 @@ const PoolDepositPanel = () => {
     functionName: 'getReserves'
   });
 
-  // const { data } = useContractRead({
-  //   ...routerContract,
-  //   functionName: 'quote',
-  //   args: [parseEther("1"), reserveData?.[0]!, reserveData?.[1]!]
-  // });
-
   const { data } = useContractRead({
-    ...poolContract,
-    functionName: 'name',
-    // args: [parseEther("1"), reserveData?.[0]!, reserveData?.[1]!]
+    ...routerContract,
+    functionName: 'quote',
+    args: [parseEther("1"), reserveData?.[0]!, reserveData?.[1]!]
   });
+
+  const { config: addLiquidityConfig } = usePrepareContractWrite({
+    address: ROUTER_CONTRACT,
+    abi: NEUTRO_ROUTER_ABI,
+    functionName: 'addLiquidity',
+  })
+
+  const { data: pairs } = useContractReads({
+    contracts: [
+      {
+        ...poolContract,
+        functionName: 'token0'
+      },
+      {
+        ...poolContract,
+        functionName: 'token1'
+      }
+    ]
+  })
+
+  const { data: balances } = useContractReads({
+    contracts: [
+      {
+        address: pairs?.[0],
+        abi: ERC20_ABI,
+        functionName: 'balanceOf'
+      },
+      {
+        address: pairs?.[1],
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+      }
+    ]
+  })
+
+  let cloneUniswapContractDetailsV2 = useMemo(() => ({
+    routerAddress: ROUTER_CONTRACT,
+    factoryAddress: FACTORY_CONTRACT,
+    pairAddress: router.query.id as `0x${string}`,
+  }), [router.query.id]);
+
+  let customNetworkData = useMemo(() => ({
+    nameNetwork: "EOS EVM Testnet",
+    multicallContractAddress: MULTICALL_CONTRACT,
+    nativeCurrency: {
+      name: "EOS",
+      symbol: "EOS",
+    },
+    nativeWrappedTokenInfo: {
+      chainId: 15557,
+      contractAddress: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
+      decimals: 18,
+      symbol: "WEOS",
+      name: "Wrapped EOS",
+    },
+  }), []);
+
+  let customPairSettings = useMemo(() => new UniswapPairSettings({
+    slippage: 0.0005,
+    deadlineMinutes: 5,
+    disableMultihops: true,
+    cloneUniswapContractDetails: {
+      v2Override: cloneUniswapContractDetailsV2,
+    },
+    uniswapVersions: [UniswapVersion.v2],
+    customNetwork: customNetworkData,
+  }), [cloneUniswapContractDetailsV2, customNetworkData])
+
+  useEffect(() => {
+    if (!pairs) return;
+    (async () => {
+      const uniswapPair = new UniswapPair({
+        fromTokenContractAddress: pairs?.[0]!,
+        toTokenContractAddress: pairs?.[1]!,
+        ethereumAddress: address as string,
+        chainId: 15557,
+        providerUrl: "https://api-testnet2.trust.one/",
+        settings: customPairSettings,
+      });
+      const pairFactory = await uniswapPair.createFactory();
+      setUniswapPairFactory(pairFactory);
+    })()
+  }, [pairs, address, customPairSettings])
+
+  const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (isNaN(+e.target.value)) return;
+    setToken0Amount(e.target.value);
+    debouncedToken0(e.target.value)
+  }
+
+  const debouncedToken0 = debounce(async (nextValue) => {
+    if (!uniswapPairFactory) return;
+    const trade = await uniswapPairFactory.trade(nextValue);
+    // console.log('token0 min convert', trade.minAmountConvertQuote);
+    // console.log('expected', trade.expectedConvertQuote);
+    setToken1Amount(trade.expectedConvertQuote);
+    if (trade.minAmountConvertQuote) setToken1Min(trade.minAmountConvertQuote);
+  }, 500)
+
+  const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
+    if (isNaN(+e.target.value)) return;
+    setToken1Amount(e.target.value);
+    debouncedToken1(e.target.value)
+  }
+
+  const debouncedToken1 = debounce(async (nextValue) => {
+    if (!uniswapPairFactory) return;
+    const trade = await uniswapPairFactory.trade(nextValue);
+    // console.log('min convert', trade.minAmountConvertQuote);
+    // console.log('expected', trade.expectedConvertQuote);
+    setToken0Amount(trade.expectedConvertQuote);
+    if (trade.minAmountConvertQuote) setToken0Min(trade.minAmountConvertQuote);
+  }, 500)
 
   return (
     <div className="">
@@ -206,13 +260,26 @@ const PoolDepositPanel = () => {
         <p className="m-0 text-2xl font-semibold">Deposit</p>
       </div>
       <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p>
-      <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">{reserveData ? formatEther(reserveData?.[0]) : 'error'}</p>
-      <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Name: {data}</p>
+      <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">{data ? formatEther(data) : 0}</p>
 
       <div className="grid grid-cols-12">
         <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg col-span-8">
           <div className="flex flex-col">
-            <Input className="w-full" />
+            <p>Balance: {balances?.[0] ? formatEther(balances[0]) : 0}</p>
+            <Input
+              className="w-full"
+              placeholder="token0"
+              value={token0Amount}
+              onChange={handleToken0Change}
+            />
+            {/* <p>Balance: {balances?.[1] ? formatEther(balances[1]) : 0}</p> */}
+            <p>Balance: {balances?.[1] ? formatEther(balances[1]) : 0}</p>
+            <Input
+              className="w-full"
+              placeholder="token1"
+              value={token1Amount}
+              onChange={handleToken1Change}
+            />
             <Button className="!mt-2">Deposit now</Button>
           </div>
         </div>
