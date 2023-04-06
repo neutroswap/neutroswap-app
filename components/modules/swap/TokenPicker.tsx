@@ -52,12 +52,12 @@ const tokens = [
 ];
 
 type TokenDetails = {
-  ticker: string,
-  img: string,
-  name: string,
-  address: string,
-  decimals: number
-}
+  ticker: string;
+  img: string;
+  name: string;
+  address: string;
+  decimals: number;
+};
 
 type TokenPickerProps = {
   ticker?: string;
@@ -65,9 +65,11 @@ type TokenPickerProps = {
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
   setToken: React.Dispatch<React.SetStateAction<`0x${string}`>>;
-  children: ({ selectedToken }: {
-    selectedToken: TokenDetails
-  }) => React.ReactElement
+  children: ({
+    selectedToken,
+  }: {
+    selectedToken: TokenDetails;
+  }) => React.ReactElement;
 };
 
 export const TokenPicker: FC<TokenPickerProps> = (props) => {
@@ -93,7 +95,9 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
           <div className="flex">
             <div className="flex flex-col w-screen">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xl font-bold text-black dark:text-white">Select a token</span>
+                <span className="text-xl font-bold text-black dark:text-white">
+                  Select a token
+                </span>
                 <XCircleIcon
                   onClick={() => close()}
                   className="h-6 cursor-pointer text-black dark:text-white opacity-50"
@@ -122,11 +126,13 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                         <RadioGroup.Option
                           key={token.name}
                           value={token}
-                          className={({ active, checked }) => classNames(
-                            "relative flex cursor-pointer rounded-lg px-5 py-2 focus:outline-none transition-colors duration-300",
-                            "hover:bg-neutral-100 dark:hover:bg-neutral-900",
-                            checked && "bg-neutral-100 dark:bg-neutral-900"
-                          )}
+                          className={({ active, checked }) =>
+                            classNames(
+                              "relative flex cursor-pointer rounded-lg px-5 py-2 focus:outline-none transition-colors duration-300",
+                              "hover:bg-neutral-100 dark:hover:bg-neutral-900",
+                              checked && "bg-neutral-100 dark:bg-neutral-900"
+                            )
+                          }
                         >
                           {({ active, checked }) => (
                             <>

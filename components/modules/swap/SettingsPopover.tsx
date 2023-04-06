@@ -1,6 +1,6 @@
 import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/20/solid";
-import { Fragment, useState, useCallback, useEffect } from "react";
+import { Fragment, useState } from "react";
 import { classNames } from "@/shared/helpers/classNames";
 import NumberInput from "@/components/elements/NumberInput";
 
