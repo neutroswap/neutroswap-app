@@ -1,4 +1,3 @@
-// import { Inter } from 'next/font/google'
 import React, { useState, useEffect, Fragment, useRef, FC } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
@@ -8,18 +7,14 @@ import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import SettingsPopover from "@/components/modules/swap/SettingsPopover";
 import NumberInput from "@/components/elements/NumberInput";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { ethers } from "ethers";
-import { NEUTRO_ROUTER_ABI } from "@/shared/helpers/abi/index";
-import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import {
-  useAccount,
-  usePrepareContractWrite,
-  useContractWrite,
-  useWaitForTransaction,
-  useContractRead,
-} from "wagmi";
-
-// const inter = Inter({ subsets: ['latin'] })
+  UniswapPair,
+  UniswapVersion,
+  UniswapPairSettings,
+} from "simple-uniswap-sdk";
+import { useAccount } from "wagmi";
+import NEUTRO_ROUTER_ABI from "@/shared/abi/NEUTRO_ROUTER_ABI.json";
+import { useContractRead } from "wagmi";
 
 // type SwapDetails = {
 //   tokenOne: string;
@@ -42,114 +37,143 @@ export default function Swap() {
   const [tokenTwo, setTokenTwo] = useState<`0x${string}`>(
     "0x0000000000000000000000000000000000000000"
   );
+  const [uniswapFactory, setUniswapFactory] = useState();
 
-  function getTimestamp() {
-    return Math.floor(Date.now() + 3000);
-  }
+  let connectedAddress: any = address || "";
 
-  // const route = new Route([pair], tokenTwo);
-  // const trade = new Trade(route, TokenAmount);
+  const { data: _getPair } = useContractRead({
+    address: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
+    abi: NEUTRO_ROUTER_ABI,
+    functionName: "getPair",
+  });
 
-  // const tokenOneBalance = await fetchBalance({
-  //   address: address,
-  //   token: tokenOne,
-  //   chainId: 5,
-  //   formatUnits: "ether",
-  // });
+  // useEffect(() => {
+  //   const getPair = async () =>
 
-  // const tokenTwoBalance = await fetchBalance({
-  //   address: address,
-  //   token: tokenTwo,
-  //   chainId: 5,
-  //   formatUnits: "ether",
-  // });
+  //   return () => {
+  //     second
+  //   }
+  // }, [third])
+
+  useEffect(() => {
+    let customNetworkData = {
+      nameNetwork: "EOS EVM",
+      multicallContractAddress: "0x294bb4c48F762DC0AFfe9DA653E9C6E1A4011452",
+      nativeCurrency: {
+        name: "EOS",
+        symbol: "EOS",
+      },
+      nativeWrappedTokenInfo: {
+        chainId: 15557,
+        contractAddress: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
+        decimals: 18,
+        symbol: "WEOS",
+        name: "Wrapped EOS",
+      },
+    };
+    let cloneUniswapContractDetailsV2 = {
+      routerAddress: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
+      factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
+      pairAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
+      // routerAbi: NEUTRO_ROUTER_ABI,
+      // routerMethods: "",
+    };
+    const fac = async (uni: any) => {
+      console.log("owowow");
+      let x = await uni.createFactory();
+      setUniswapFactory(x);
+    };
+    if (tokenOne && tokenTwo) {
+      const uniswapPair = new UniswapPair({
+        fromTokenContractAddress: tokenOne,
+        toTokenContractAddress: tokenTwo,
+        ethereumAddress: connectedAddress,
+        chainId: 15557,
+        providerUrl: "https://api-testnet2.trust.one/",
+        settings: new UniswapPairSettings({
+          slippage: 0.0005,
+          deadlineMinutes: 5,
+          disableMultihops: true,
+          cloneUniswapContractDetails: {
+            v2Override: cloneUniswapContractDetailsV2,
+          },
+          uniswapVersions: [UniswapVersion.v2],
+          customNetwork: customNetworkData,
+        }),
+      });
+      fac(uniswapPair);
+      const uniswapPairFactory: any = uniswapPair.createFactory();
+      setUniswapFactory(uniswapPairFactory);
+      console.log("doneee ", uniswapPairFactory.provider, uniswapPairFactory);
+    }
+  }, []);
 
   // function switchTokens() {
   //   setTokenOne(tokenTwo);
   //   setTokenTwo(tokenOne);
   // }
 
-  // useEffect(() => {
-  //   const getAmountsOut = async () => {
-  //     try {
-  //       const amounts = await amountsOut?.toString();
-  //       setAmountsOut(amounts!);
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   getAmountsOut();
-  // }, []);
-
-  // const { getAmountsOut } = useContractRead({
+  // const { config: swapExactETHForTokensConfig } = usePrepareContractWrite({
   //   address: ROUTER_CONTRACT,
   //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "getAmountsOut",
-  //   args: [ethers.utils.parseEther(tokenOneAmount), [tokenOne, tokenTwo]],
+  //   functionName: "swapExactETHForTokens",
+  //   args: [amountsOut, [tokenOne, tokenTwo], address, getTimestamp()],
+  //   overrides: {
+  //     value: ethers.utils.parseEther(tokenOneAmount),
+  //   },
   // });
-  // console.log(getAmountsOut);
 
-  const { config: swapExactETHForTokensConfig } = usePrepareContractWrite({
-    address: ROUTER_CONTRACT,
-    abi: NEUTRO_ROUTER_ABI,
-    functionName: "swapExactETHForTokens",
-    args: [amountsOut, [tokenOne, tokenTwo], address, getTimestamp()],
-    overrides: {
-      value: ethers.utils.parseEther(tokenOneAmount),
-    },
-  });
+  // const { data: swapExactETHForTokensData, write: swapExactETHForTokensWrite } =
+  //   useContractWrite(swapExactETHForTokensConfig);
 
-  const { data: swapExactETHForTokensData, write: swapExactETHForTokensWrite } =
-    useContractWrite(swapExactETHForTokensConfig);
+  // const { config: swapExactTokensForETHConfig } = usePrepareContractWrite({
+  //   address: ROUTER_CONTRACT,
+  //   abi: NEUTRO_ROUTER_ABI,
+  //   functionName: "swapExactTokensForETH",
+  //   args: [
+  //     9974900500,
+  //     9950062996,
+  //     [tokenOne, tokenTwo],
+  //     address,
+  //     getTimestamp(),
+  //   ],
+  // });
 
-  const { config: swapExactTokensForETHConfig } = usePrepareContractWrite({
-    address: ROUTER_CONTRACT,
-    abi: NEUTRO_ROUTER_ABI,
-    functionName: "swapExactTokensForETH",
-    args: [
-      9974900500,
-      9950062996,
-      [tokenOne, tokenTwo],
-      address,
-      getTimestamp(),
-    ],
-  });
+  // const { data: swapExactTokensForETHData, write: swapExactTokensForETHWrite } =
+  //   useContractWrite(swapExactTokensForETHConfig);
 
-  const { data: swapExactTokensForETHData, write: swapExactTokensForETHWrite } =
-    useContractWrite(swapExactTokensForETHConfig);
+  // const { config: swapExactTokensForTokensConfig } = usePrepareContractWrite({
+  //   address: ROUTER_CONTRACT,
+  //   abi: NEUTRO_ROUTER_ABI,
+  //   functionName: "swapExactTokensForTokens",
+  //   args: [
+  //     9974900500,
+  //     9950062996,
+  //     [tokenOne, tokenTwo],
+  //     address,
+  //     getTimestamp(),
+  //   ],
+  // });
 
-  const { config: swapExactTokensForTokensConfig } = usePrepareContractWrite({
-    address: ROUTER_CONTRACT,
-    abi: NEUTRO_ROUTER_ABI,
-    functionName: "swapExactTokensForTokens",
-    args: [
-      9974900500,
-      9950062996,
-      [tokenOne, tokenTwo],
-      address,
-      getTimestamp(),
-    ],
-  });
-
-  const {
-    data: swapExactTokensForTokensData,
-    write: swapExactTokensForTokensWrite,
-  } = useContractWrite(swapExactTokensForTokensConfig);
+  // const {
+  //   data: swapExactTokensForTokensData,
+  //   write: swapExactTokensForTokensWrite,
+  // } = useContractWrite(swapExactTokensForTokensConfig);
 
   // const { isLoading, isSuccess } = useWaitForTransaction({
   //   hash: data?.hash,
   // });
 
-  const handleClick = () => {
-    if (tokenOne === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
-      swapExactETHForTokensWrite?.();
-    }
-    if (tokenTwo === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
-      swapExactTokensForETHWrite?.();
-    } else {
-      swapExactTokensForTokensWrite?.();
-    }
-  };
+  // const handleClick = () => {
+  //   if (tokenOne === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
+  //     swapExactETHForTokensWrite?.();
+  //   }
+  //   if (tokenTwo === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
+  //     swapExactTokensForETHWrite?.();
+  //   } else {
+  //     swapExactTokensForTokensWrite?.();
+  //   }
+  // };
 
   return (
     <>
@@ -356,7 +380,7 @@ export default function Swap() {
             )}
             {isConnected && (
               <Button
-                onClick={() => handleClick}
+                // onClick={() => handleClick}
                 disabled={!tokenOneAmount || !isConnected}
                 className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
               >
