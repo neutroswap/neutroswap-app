@@ -39,21 +39,13 @@ export default function Swap() {
   );
   const [uniswapFactory, setUniswapFactory] = useState();
 
-  let connectedAddress: any = address || "";
-
-  const { data: _getPair } = useContractRead({
+  const { data: getPair } = useContractRead({
     address: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
     abi: NEUTRO_ROUTER_ABI,
     functionName: "getPair",
+    args: [tokenOne, tokenTwo],
   });
-
-  // useEffect(() => {
-  //   const getPair = async () =>
-
-  //   return () => {
-  //     second
-  //   }
-  // }, [third])
+  // setPair(getPair as string);
 
   useEffect(() => {
     let customNetworkData = {
@@ -74,7 +66,7 @@ export default function Swap() {
     let cloneUniswapContractDetailsV2 = {
       routerAddress: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
       factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
-      pairAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
+      pairAddress: getPair as string,
       // routerAbi: NEUTRO_ROUTER_ABI,
       // routerMethods: "",
     };
@@ -87,7 +79,7 @@ export default function Swap() {
       const uniswapPair = new UniswapPair({
         fromTokenContractAddress: tokenOne,
         toTokenContractAddress: tokenTwo,
-        ethereumAddress: connectedAddress,
+        ethereumAddress: address as string,
         chainId: 15557,
         providerUrl: "https://api-testnet2.trust.one/",
         settings: new UniswapPairSettings({
@@ -106,6 +98,29 @@ export default function Swap() {
       setUniswapFactory(uniswapPairFactory);
       console.log("doneee ", uniswapPairFactory.provider, uniswapPairFactory);
     }
+  }, []);
+
+  useEffect(() => {
+    const swap = async () => {
+      const uniswapPair = new UniswapPair({
+        fromTokenContractAddress: tokenOne,
+        toTokenContractAddress: tokenTwo,
+        ethereumAddress: address as string,
+        chainId: 15557,
+        settings: new UniswapPairSettings({
+          gasSettings: {
+            getGasPrice: async () => {
+              return "GWEI_GAS_PRICE";
+            },
+          },
+        }),
+      });
+      const uniswapPairFactory = await uniswapPair.createFactory();
+      const trade = await uniswapPairFactory.trade(tokenOneAmount);
+      if (!trade.fromBalance.hasEnough) {
+        throw new Error("You do not have enough balance to execute this swap");
+      }
+    };
   }, []);
 
   // function switchTokens() {
@@ -265,7 +280,7 @@ export default function Swap() {
                       <div className="flex items-center">
                         <img
                           src={selectedToken.img}
-                          alt="Selected Token 0"
+                          alt="Selected Token 1"
                           className="h-6 mr-2"
                         />
                         <span className="text-md">{selectedToken.ticker}</span>
