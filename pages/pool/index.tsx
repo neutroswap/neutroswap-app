@@ -16,6 +16,7 @@ import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
+import { useRouter } from "next/router";
 
 type PositionsResponse = {
   network_id: string,
@@ -156,6 +157,7 @@ export default function Pool() {
 }
 
 const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({ handleClose }) => {
+  const router = useRouter();
   const [tokenOneAmount, setTokenOneAmount] = useState("");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("");
   const [tokenOne, setTokenOne] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
@@ -245,6 +247,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({ handleClose 
           )}
           disabled={isError}
           loading={isFetchingGetPair}
+          onClick={() => router.push(`/pool/${existingPool}`)}
         >
           <span>Enter pool</span>
           <ArrowRightIcon className="w-4 h-4 ml-2" />
