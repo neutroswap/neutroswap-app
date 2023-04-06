@@ -1,5 +1,4 @@
-import React, { useState, useEffect, Fragment, useRef, FC } from "react";
-import Navbar from "@/components/modules/Navbar";
+import React, { useState, useEffect, Fragment, useRef } from "react";
 import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
@@ -11,19 +10,12 @@ import {
   UniswapPair,
   UniswapVersion,
   UniswapPairSettings,
+  UniswapPairFactory,
+  TradeContext,
 } from "simple-uniswap-sdk";
-import { useAccount } from "wagmi";
-import NEUTRO_ROUTER_ABI from "@/shared/abi/NEUTRO_ROUTER_ABI.json";
+import { useAccount, useContract, useProvider, useSigner } from "wagmi";
+import { NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
-
-// type SwapDetails = {
-//   tokenOne: string;
-//   tokenTwo: string;
-//   tokenOneAmount: string;
-//   tokenTwoAmount: string;
-//   amountsOut: number;
-//   setAmountsOut: React.Dispatch<React.SetStateAction<number>>;
-// };
 
 export default function Swap() {
   const { address, isConnected } = useAccount();
@@ -32,20 +24,25 @@ export default function Swap() {
   // const [prices, setPrices] = useState(null);
   const [amountsOut, setAmountsOut] = useState(0);
   const [tokenOne, setTokenOne] = useState<`0x${string}`>(
-    "0x0000000000000000000000000000000000000000"
+    "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6"
   );
   const [tokenTwo, setTokenTwo] = useState<`0x${string}`>(
     "0x0000000000000000000000000000000000000000"
   );
-  const [uniswapFactory, setUniswapFactory] = useState();
+  const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
+  const [trade, setTrade] = useState<TradeContext>();
+
+  useEffect(() => {
+    console.log("latest ", uniswapFactory);
+  }, [uniswapFactory]);
 
   const { data: getPair } = useContractRead({
-    address: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
-    abi: NEUTRO_ROUTER_ABI,
+    address: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a", //Use Factory
+    abi: NEUTRO_FACTORY_ABI,
     functionName: "getPair",
+    chainId: 15557,
     args: [tokenOne, tokenTwo],
   });
-  // setPair(getPair as string);
 
   useEffect(() => {
     let customNetworkData = {
@@ -63,6 +60,7 @@ export default function Swap() {
         name: "Wrapped EOS",
       },
     };
+
     let cloneUniswapContractDetailsV2 = {
       routerAddress: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
       factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
@@ -70,12 +68,12 @@ export default function Swap() {
       // routerAbi: NEUTRO_ROUTER_ABI,
       // routerMethods: "",
     };
-    const fac = async (uni: any) => {
-      console.log("owowow");
-      let x = await uni.createFactory();
-      setUniswapFactory(x);
-    };
-    if (tokenOne && tokenTwo) {
+    console.log("Pair", getPair);
+
+    if (
+      tokenOne !== "0x0000000000000000000000000000000000000000" &&
+      tokenTwo !== "0x0000000000000000000000000000000000000000"
+    ) {
       const uniswapPair = new UniswapPair({
         fromTokenContractAddress: tokenOne,
         toTokenContractAddress: tokenTwo,
@@ -93,102 +91,49 @@ export default function Swap() {
           customNetwork: customNetworkData,
         }),
       });
+
+      const fac = async (uni: any) => {
+        console.log("owowow");
+        let x = await uni.createFactory();
+        setUniswapFactory(x);
+        console.log("mmm ", uniswapFactory);
+      };
       fac(uniswapPair);
-      const uniswapPairFactory: any = uniswapPair.createFactory();
-      setUniswapFactory(uniswapPairFactory);
-      console.log("doneee ", uniswapPairFactory.provider, uniswapPairFactory);
     }
-  }, []);
+  }, [tokenOne, tokenTwo]);
 
-  useEffect(() => {
-    const swap = async () => {
-      const uniswapPair = new UniswapPair({
-        fromTokenContractAddress: tokenOne,
-        toTokenContractAddress: tokenTwo,
-        ethereumAddress: address as string,
-        chainId: 15557,
-        settings: new UniswapPairSettings({
-          gasSettings: {
-            getGasPrice: async () => {
-              return "GWEI_GAS_PRICE";
-            },
-          },
-        }),
-      });
-      const uniswapPairFactory = await uniswapPair.createFactory();
-      const trade = await uniswapPairFactory.trade(tokenOneAmount);
-      if (!trade.fromBalance.hasEnough) {
-        throw new Error("You do not have enough balance to execute this swap");
-      }
-    };
-  }, []);
+  const { data: signer } = useSigner({
+    chainId: 15557,
+  });
 
-  // function switchTokens() {
-  //   setTokenOne(tokenTwo);
-  //   setTokenTwo(tokenOne);
-  // }
+  const signContract = useContract({
+    address: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
+    abi: NEUTRO_ROUTER_ABI,
+    signerOrProvider: signer,
+  });
 
-  // const { config: swapExactETHForTokensConfig } = usePrepareContractWrite({
-  //   address: ROUTER_CONTRACT,
-  //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "swapExactETHForTokens",
-  //   args: [amountsOut, [tokenOne, tokenTwo], address, getTimestamp()],
-  //   overrides: {
-  //     value: ethers.utils.parseEther(tokenOneAmount),
-  //   },
-  // });
+  const provider = useProvider();
 
-  // const { data: swapExactETHForTokensData, write: swapExactETHForTokensWrite } =
-  //   useContractWrite(swapExactETHForTokensConfig);
+  const swap = async () => {
+    if (!uniswapFactory) return;
+    const trade = await uniswapFactory.trade(tokenOneAmount);
+    console.log("Trade info", trade);
 
-  // const { config: swapExactTokensForETHConfig } = usePrepareContractWrite({
-  //   address: ROUTER_CONTRACT,
-  //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "swapExactTokensForETH",
-  //   args: [
-  //     9974900500,
-  //     9950062996,
-  //     [tokenOne, tokenTwo],
-  //     address,
-  //     getTimestamp(),
-  //   ],
-  // });
+    if (!signer) {
+      throw new Error("No signer");
+    }
+    if (trade.approvalTransaction) {
+      const approved = await signer.sendTransaction(trade.approvalTransaction);
+      console.log("approved txHash", approved.hash);
+      const approvedReceipt = await approved.wait();
+      console.log("approved receipt", approvedReceipt);
+    }
 
-  // const { data: swapExactTokensForETHData, write: swapExactTokensForETHWrite } =
-  //   useContractWrite(swapExactTokensForETHConfig);
-
-  // const { config: swapExactTokensForTokensConfig } = usePrepareContractWrite({
-  //   address: ROUTER_CONTRACT,
-  //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "swapExactTokensForTokens",
-  //   args: [
-  //     9974900500,
-  //     9950062996,
-  //     [tokenOne, tokenTwo],
-  //     address,
-  //     getTimestamp(),
-  //   ],
-  // });
-
-  // const {
-  //   data: swapExactTokensForTokensData,
-  //   write: swapExactTokensForTokensWrite,
-  // } = useContractWrite(swapExactTokensForTokensConfig);
-
-  // const { isLoading, isSuccess } = useWaitForTransaction({
-  //   hash: data?.hash,
-  // });
-
-  // const handleClick = () => {
-  //   if (tokenOne === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
-  //     swapExactETHForTokensWrite?.();
-  //   }
-  //   if (tokenTwo === "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6") {
-  //     swapExactTokensForETHWrite?.();
-  //   } else {
-  //     swapExactTokensForTokensWrite?.();
-  //   }
-  // };
+    const tradeTransaction = await signer.sendTransaction(trade.transaction);
+    console.log("trade txHash", tradeTransaction.hash);
+    const tradeReceipt = await tradeTransaction.wait();
+    console.log("trade receipt", tradeReceipt);
+  };
 
   return (
     <>
@@ -395,7 +340,7 @@ export default function Swap() {
             )}
             {isConnected && (
               <Button
-                // onClick={() => handleClick}
+                onClick={() => swap()}
                 disabled={!tokenOneAmount || !isConnected}
                 className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
               >

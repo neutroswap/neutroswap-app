@@ -18,7 +18,7 @@ const tokens = [
     ticker: "WEOS",
     img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
     name: "Wrapped EOS",
-    address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
+    address: "0x3d7b65FB8f005a3Dd257C33A93340216dbe6F180",
     decimals: 18,
   },
   {
@@ -27,13 +27,6 @@ const tokens = [
     name: "USD Circle",
     address: "0x4ceaC0A4104D29f9d5f97F34B1060A98A5eAf21d",
     decimals: 6,
-  },
-  {
-    ticker: "WETH",
-    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/weth.svg",
-    name: "Wrapped Ethereum",
-    address: "0x3d7b65FB8f005a3Dd257C33A93340216dbe6F180",
-    decimals: 18,
   },
   {
     ticker: "NEUTRO",
@@ -74,9 +67,12 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
     setToken(value.address);
   };
 
-  const handleImageFallback = (ticker: string, event: SyntheticEvent<HTMLImageElement, Event>) => {
+  const handleImageFallback = (
+    ticker: string,
+    event: SyntheticEvent<HTMLImageElement, Event>
+  ) => {
     event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${ticker}`;
-  }
+  };
 
   return (
     <Modal>
@@ -134,7 +130,10 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                                   <img
                                     alt={`${token.name} Icon`}
                                     src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${token.ticker.toLowerCase()}.svg`}
-                                    className="h-8 rounded-full" onError={(e) => { handleImageFallback(token.ticker, e) }}
+                                    className="h-8 rounded-full"
+                                    onError={(e) => {
+                                      handleImageFallback(token.ticker, e);
+                                    }}
                                   />
                                   <div className="flex flex-col">
                                     <RadioGroup.Label
