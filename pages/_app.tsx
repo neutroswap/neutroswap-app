@@ -16,15 +16,44 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { Chain } from "wagmi/chains"
 import { mainnet, polygon, optimism, arbitrum, goerli } from "wagmi/chains";
 import { publicProvider } from "wagmi/providers/public";
 import Footer from "@/components/modules/Footer";
+import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
+
+const eosChain: any = {
+  id: 15557,
+  name: 'EOS EVM',
+  network: 'eos',
+  iconUrl: 'https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg',
+  iconBackground: '#fff',
+  nativeCurrency: {
+    decimals: 18,
+    name: 'EOS',
+    symbol: 'EOS',
+  },
+  rpcUrls: {
+    default: {
+      http: ['https://api-testnet2.trust.one/'],
+    },
+    public: {
+      http: ['https://api-testnet2.trust.one/'],
+    },
+  },
+  blockExplorers: {
+    default: { name: 'TrustOne', url: 'https://explorer-testnet2.trust.one/' },
+    etherscan: { name: 'TrustOne', url: 'https://explorer-testnet2.trust.one/' },
+  },
+  testnet: false,
+};
 
 const { chains, provider } = configureChains(
-  [goerli],
+  [eosChain],
   [
-    // alchemyProvider({ apiKey: process.env.ALCHEMY_ID }),
-    publicProvider(),
+    jsonRpcProvider({
+      rpc: chain => ({ http: chain.rpcUrls.default.http[0] }),
+    }),
   ]
 );
 
