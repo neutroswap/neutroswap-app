@@ -2,7 +2,7 @@ import { classNames } from "@/shared/helpers/classNames";
 import { Text, Button, useTheme, Input, Loading, Spinner } from "@geist-ui/core";
 import { Tab } from "@headlessui/react";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
-import { ScaleIcon } from "@heroicons/react/24/solid";
+import { ArrowDownTrayIcon, ScaleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -308,16 +308,20 @@ const PoolDepositPanel = () => {
   return (
     <div className="">
       <div className="flex items-center space-x-3">
-        <ScaleIcon className="w-5 h-5 rounded-lg border border-neutral-300 dark:border-neutral-700 p-1.5" />
-        <p className="m-0 text-2xl font-semibold">Deposit</p>
+        <ArrowDownTrayIcon className="w-6 h-6 rounded-lg border border-neutral-300 dark:border-neutral-700 p-2.5" />
+        <div>
+          <p className="m-0 text-2xl font-semibold">Deposit</p>
+          <p className="m-0 text-sm text-neutral-400 dark:text-neutral-600">
+            Deposit tokens to the pool to start earning trading fees
+          </p>
+        </div>
       </div>
-      <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p>
-      <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">{data ? formatEther(data) : 0}</p>
+      {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
 
-      <div className="grid grid-cols-12 gap-12">
+      <div className="grid grid-cols-12 gap-12 mt-8">
         <div className="w-full mt-4 col-span-7">
-          <div className="flex flex-col p-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg ">
-            <p className="mt-0 text-xl font-semibold">Select amount to deposit</p>
+          <div className="flex flex-col py-5 px-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg ">
+            <p className="mt-0 mb-8 text-xl font-semibold">Select amount to deposit</p>
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
                 <img
