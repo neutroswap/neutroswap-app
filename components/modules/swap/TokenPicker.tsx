@@ -16,7 +16,7 @@ import { XCircleIcon } from "@heroicons/react/24/solid";
 const tokens = [
   {
     ticker: "WEOS",
-    img: "@/logo/EOS.png",
+    img: "/logo/EOS.png",
     name: "Wrapped EOS",
     address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     decimals: 18,

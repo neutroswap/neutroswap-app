@@ -38,7 +38,6 @@ export default function Swap() {
     "0x0000000000000000000000000000000000000000"
   );
   const [uniswapFactory, setUniswapFactory] = useState();
-  const [pair, setPair] = useState("");
 
   const { data: getPair } = useContractRead({
     address: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
@@ -46,7 +45,7 @@ export default function Swap() {
     functionName: "getPair",
     args: [tokenOne, tokenTwo],
   });
-  setPair(getPair);
+  // setPair(getPair as string);
 
   useEffect(() => {
     let customNetworkData = {
@@ -67,7 +66,7 @@ export default function Swap() {
     let cloneUniswapContractDetailsV2 = {
       routerAddress: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
       factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
-      pairAddress: pair,
+      pairAddress: getPair as string,
       // routerAbi: NEUTRO_ROUTER_ABI,
       // routerMethods: "",
     };
@@ -108,13 +107,21 @@ export default function Swap() {
         toTokenContractAddress: tokenTwo,
         ethereumAddress: address as string,
         chainId: 15557,
+        settings: new UniswapPairSettings({
+          gasSettings: {
+            getGasPrice: async () => {
+              return "GWEI_GAS_PRICE";
+            },
+          },
+        }),
       });
+      const uniswapPairFactory = await uniswapPair.createFactory();
+      const trade = await uniswapPairFactory.trade(tokenOneAmount);
+      if (!trade.fromBalance.hasEnough) {
+        throw new Error("You do not have enough balance to execute this swap");
+      }
     };
-
-    return () => {
-      second;
-    };
-  }, [third]);
+  }, []);
 
   // function switchTokens() {
   //   setTokenOne(tokenTwo);
@@ -273,7 +280,7 @@ export default function Swap() {
                       <div className="flex items-center">
                         <img
                           src={selectedToken.img}
-                          alt="Selected Token 0"
+                          alt="Selected Token 1"
                           className="h-6 mr-2"
                         />
                         <span className="text-md">{selectedToken.ticker}</span>
