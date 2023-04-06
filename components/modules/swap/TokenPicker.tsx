@@ -16,14 +16,14 @@ import { XCircleIcon } from "@heroicons/react/24/solid";
 const tokens = [
   {
     ticker: "WEOS",
-    img: "/logo/EOS.png",
+    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
     name: "Wrapped EOS",
     address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     decimals: 18,
   },
   {
     ticker: "USDC",
-    img: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png?v=024",
+    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdc.svg",
     name: "USD Circle",
     address: "0x4ceaC0A4104D29f9d5f97F34B1060A98A5eAf21d",
     decimals: 6,
