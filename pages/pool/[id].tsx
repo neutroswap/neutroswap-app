@@ -13,7 +13,7 @@ import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { UniswapPair, UniswapPairFactory, UniswapPairSettings, UniswapVersion } from "simple-uniswap-sdk";
 import { FACTORY_CONTRACT, MULTICALL_CONTRACT, ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { formatEther, parseEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
 import useUpdateEffect from "@/shared/hooks/useUpdateEffect";
 import debounce from "lodash/debounce";
 import { BigNumber } from "ethers";
@@ -114,43 +114,28 @@ const PoolOverviewPanel = () => {
 
 const PoolDepositPanel = () => {
   const router = useRouter();
-  const theme = useTheme();
   const { address } = useAccount();
-  const { chain } = useNetwork();
 
   const [symbols, setSymbols] = useState<string[]>(["UNKNOWN", "UNKNOWN"]);
+
   const [token0Amount, setToken0Amount] = useState<string>();
   const [token1Amount, setToken1Amount] = useState<string>();
-  const [token0Min, setToken0Min] = useState("0");
   const [token1Min, setToken1Min] = useState("0");
   const [deadline, setDeadline] = useState(0);
+
   const [isToken0Approved, setIsToken0Approved] = useState(false);
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
   const [uniswapPairFactory, setUniswapPairFactory] = useState<UniswapPairFactory>();
-
-  const routerContract = {
-    address: ROUTER_CONTRACT,
-    abi: NEUTRO_ROUTER_ABI,
-  }
+  // TODO: move slippage to state or store
+  const SLIPPAGE = 0.0005;
 
   const poolContract = {
     address: router.query.id as `0x${string}`,
     abi: NEUTRO_POOL_ABI,
   }
-
-  const { data: reserveData } = useContractRead({
-    ...poolContract,
-    functionName: 'getReserves'
-  });
-
-  const { data } = useContractRead({
-    ...routerContract,
-    functionName: 'quote',
-    args: [parseEther("1"), reserveData?.[0]!, reserveData?.[1]!]
-  });
 
   const { data: pairs } = useContractReads({
     contracts: [
@@ -168,18 +153,68 @@ const PoolDepositPanel = () => {
 
   useContractReads({
     contracts: [
-      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
-      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
       { address: pairs?.[0], abi: ERC20_ABI, functionName: 'symbol' },
       { address: pairs?.[1], abi: ERC20_ABI, functionName: 'symbol' },
     ],
     onSuccess(value) {
+      setSymbols([value[0], value[1]]);
+    },
+  })
+
+  const { data: token0Min } = useContractRead({
+    address: ROUTER_CONTRACT,
+    abi: NEUTRO_ROUTER_ABI,
+    functionName: 'getAmountsOut',
+    args: [
+      !!token1Amount && parseEther(token1Amount),
+      [pairs?.[1], pairs?.[0]]
+    ] as any
+  })
+
+  const { refetch: refetchAllowance } = useContractReads({
+    contracts: [
+      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
+      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
+    ],
+    onSuccess(value) {
       setIsToken0Approved(+formatEther(value[0]) > 0);
       setIsToken1Approved(+formatEther(value[1]) > 0);
-      setSymbols([value[2], value[3]]);
     },
     onError(e) {
       console.log(e)
+    }
+  })
+
+  const { config: approveConfig0 } = usePrepareContractWrite({
+    address: pairs?.[0],
+    abi: ERC20_ABI,
+    functionName: 'approve',
+    args: [
+      ROUTER_CONTRACT,
+      BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+    ]
+  })
+  const { isLoading: isApprovingToken0, write: approveToken0 } = useContractWrite({
+    ...approveConfig0,
+    onSuccess(result) {
+      result.wait().then(() => refetchAllowance())
+    }
+  })
+
+  const { config: approveConfig1 } = usePrepareContractWrite({
+    address: pairs?.[1],
+    abi: ERC20_ABI,
+    functionName: 'approve',
+    args: [
+      ROUTER_CONTRACT,
+      BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+    ]
+  })
+  const { isLoading: isApprovingToken1, write: approveToken1 } = useContractWrite({
+    ...approveConfig1,
+    address: pairs?.[1],
+    onSuccess(result) {
+      result.wait().then(() => refetchAllowance())
     }
   })
 
@@ -188,34 +223,22 @@ const PoolDepositPanel = () => {
     pairs?.[1],
     !!token0Amount && parseEther(token0Amount),
     !!token1Amount && parseEther(token1Amount),
-    parseEther(token0Min),
+    !!token0Min && token0Min[1],
     parseEther(token1Min),
     address!,
     BigNumber.from(deadline)
-  ], [pairs, token0Amount, token1Amount, token0Min, token1Min, address, deadline]);
+  ], [pairs, token0Amount, token1Amount, token1Min, address, deadline, token0Min]);
 
-  const { config: approveConfig } = usePrepareContractWrite({
-    address: pairs?.[0],
-    abi: ERC20_ABI,
-    functionName: 'approve',
-    args: [ROUTER_CONTRACT, BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639935")]
-  })
-  const { isLoading: isApprovingToken0, write: approveToken0 } = useContractWrite({
-    ...approveConfig,
-    address: pairs?.[0]
-  })
-  const { isLoading: isApprovingToken1, write: approveToken1 } = useContractWrite({
-    ...approveConfig,
-    address: pairs?.[1]
-  })
-
-  const { isLoading: isAddingLiquidity, write: addLiquidity } = useContractWrite({
-    mode: 'recklesslyUnprepared',
+  const { config: addLiquidityConfig } = usePrepareContractWrite({
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: 'addLiquidity',
     args: addLiquidityArgs
   })
+  const {
+    isLoading: isAddingLiquidity,
+    write: addLiquidity
+  } = useContractWrite(addLiquidityConfig)
 
   let cloneUniswapContractDetailsV2: CloneUniswapContractDetailsV2 = useMemo(() => ({
     routerAddress: ROUTER_CONTRACT,
@@ -241,7 +264,7 @@ const PoolDepositPanel = () => {
   }), []);
 
   let customPairSettings = useMemo(() => new UniswapPairSettings({
-    slippage: 0.0005,
+    slippage: SLIPPAGE,
     deadlineMinutes: 5,
     disableMultihops: true,
     cloneUniswapContractDetails: {
@@ -280,7 +303,6 @@ const PoolDepositPanel = () => {
     const trade = await uniswapPairFactory.trade(nextValue);
     setToken1Amount(trade.expectedConvertQuote);
     if (!trade.minAmountConvertQuote) return;
-    setToken0Min(nextValue);
     setToken1Min(trade.minAmountConvertQuote)
     setDeadline(trade.tradeExpires);
     setIsFetchingToken1Price(false);
@@ -300,10 +322,23 @@ const PoolDepositPanel = () => {
     setToken0Amount(trade.expectedConvertQuote);
     if (!trade.minAmountConvertQuote) return;
     setToken1Min(nextValue);
-    setToken0Min(trade.minAmountConvertQuote);
     setDeadline(trade.tradeExpires);
     setIsFetchingToken0Price(false);
   }, 500)
+
+  // NOTE: Enable for debugging only
+  // useEffect(() => {
+  //   console.log([
+  //     pairs?.[0],
+  //     pairs?.[1],
+  //     !!token0Amount && parseEther(token0Amount).toString(),
+  //     !!token1Amount && parseEther(token1Amount).toString(),
+  //     !!token0Min && token0Min[1].toString(),
+  //     parseEther(token1Min).toString(),
+  //     address!,
+  //     BigNumber.from(deadline).toString()
+  //   ])
+  // }, [pairs, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
   return (
     <div className="">
@@ -407,13 +442,19 @@ const PoolDepositPanel = () => {
                     if (!isToken1Approved) return approveToken1?.();
                   }}
                 >
-                  Approve Token
+                  {!isToken0Approved
+                    ? `Approve ${symbols[0]}`
+                    : !isToken1Approved && `Approve ${symbols[1]}`
+                  }
                 </Button>
               )}
               {(isToken0Approved && isToken1Approved) && (
                 <Button
                   scale={1.25}
                   className="!mt-2"
+                  loading={isAddingLiquidity}
+                  disabled={!addLiquidity}
+                  onClick={() => addLiquidity?.()}
                 >
                   Deposit Now
                 </Button>
