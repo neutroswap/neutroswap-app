@@ -145,6 +145,7 @@ const PoolDepositPanel = () => {
   })
 
   const { data: balances } = useContractReads({
+    enabled: Boolean(pairs && address),
     contracts: [
       { address: pairs?.[0], abi: ERC20_ABI, functionName: 'balanceOf', args: [address!] },
       { address: pairs?.[1], abi: ERC20_ABI, functionName: 'balanceOf', args: [address!] },
@@ -152,6 +153,7 @@ const PoolDepositPanel = () => {
   })
 
   useContractReads({
+    enabled: Boolean(pairs && address),
     contracts: [
       { address: pairs?.[0], abi: ERC20_ABI, functionName: 'symbol' },
       { address: pairs?.[1], abi: ERC20_ABI, functionName: 'symbol' },
@@ -162,6 +164,7 @@ const PoolDepositPanel = () => {
   })
 
   const { data: token0Min } = useContractRead({
+    enabled: Boolean(token1Amount && pairs),
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: 'getAmountsOut',
@@ -172,6 +175,7 @@ const PoolDepositPanel = () => {
   })
 
   const { refetch: refetchAllowance } = useContractReads({
+    enabled: Boolean(pairs && address),
     contracts: [
       { address: pairs?.[0], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
       { address: pairs?.[1], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
@@ -180,9 +184,6 @@ const PoolDepositPanel = () => {
       setIsToken0Approved(+formatEther(value[0]) > 0);
       setIsToken1Approved(+formatEther(value[1]) > 0);
     },
-    onError(e) {
-      console.log(e)
-    }
   })
 
   const { config: approveConfig0 } = usePrepareContractWrite({
