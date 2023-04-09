@@ -13,6 +13,8 @@ import { ERC20_ABI, NEUTRO_POOL_ABI, } from "@/shared/abi";
 import PoolDepositPanel from "@/components/templates/TabPanels/PoolDeposit";
 import PoolOverviewPanel from "@/components/templates/TabPanels/PoolOverview";
 import PoolWithdrawalPanel from "@/components/templates/TabPanels/PoolWithdrawal";
+import { Currency } from "@/shared/types/currency.types";
+import { BigNumber } from "ethers";
 
 // TODO: use getServerSideProps so it will not redirected to unknown pool
 export default function PoolDetails() {
@@ -24,7 +26,18 @@ export default function PoolDetails() {
     abi: NEUTRO_POOL_ABI,
   }
 
-  const [balances, setBalances] = useState<number[]>([0, 0]);
+  const [balances, setBalances] = useState<Currency[]>([
+    {
+      decimal: 18,
+      raw: BigNumber.from(0),
+      formatted: "0.00"
+    },
+    {
+      decimal: 18,
+      raw: BigNumber.from(0),
+      formatted: "0.00"
+    },
+  ]);
   const [token0, setToken0] = useState<Token>()
   const [token1, setToken1] = useState<Token>()
 
@@ -49,8 +62,16 @@ export default function PoolDetails() {
     ],
     onSuccess(value) {
       setBalances([
-        Number(Number(formatEther(value[0])).toFixed(2)),
-        Number(Number(formatEther(value[1])).toFixed(2).toString())
+        {
+          decimal: value[7].toNumber(),
+          raw: value[0],
+          formatted: Number(Number(formatEther(value[0])).toFixed(2)).toString()
+        },
+        {
+          decimal: value[7].toNumber(),
+          raw: value[1],
+          formatted: Number(Number(formatEther(value[1])).toFixed(2)).toString()
+        }
       ])
       setToken0({
         network_id: "15557",
