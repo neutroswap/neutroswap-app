@@ -22,41 +22,41 @@ import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 
 export default function PoolDetails() {
   return (
-    <div className="flex py-10">
+    <div className="flex py-4 sm:py-10">
       <Tab.Group>
-        <div className="w-full grid grid-cols-12 gap-14">
-          <Tab.List className="w-full col-span-2">
-            <div className="flex flex-col space-y-2">
-              <Link href="/pool" className="group text-black dark:text-white">
-                <div className="flex space-x-1 items-center mb-4">
-                  <ChevronLeftIcon className="w-5 h-5 group-hover:-translate-x-0.5 transition-all" />
-                  <span>Pool</span>
-                </div>
-              </Link>
+        <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-14">
+          <Tab.List className="w-full md:col-span-2">
+            <Link href="/pool" className="group text-black dark:text-white">
+              <div className="flex space-x-1 items-center mb-4">
+                <ChevronLeftIcon className="w-5 h-5 group-hover:-translate-x-0.5 transition-all" />
+                <span>Pool</span>
+              </div>
+            </Link>
+            <div className="flex flex-row sm:flex-col gap-y-2">
               <Tab className={({ selected }) => classNames(
                 selected && "bg-neutral-200/50 dark:bg-neutral-900",
                 selected && "!text-neutral-800 dark:!text-neutral-300",
                 "flex w-full rounded-lg text-neutral-500",
               )}>
-                <span className="text-sm px-3 py-2">Overview</span>
+                <span className="text-sm w-full text-center md:text-left px-3 py-2">Overview</span>
               </Tab>
               <Tab className={({ selected }) => classNames(
                 selected && "bg-neutral-200/50 dark:bg-neutral-900",
                 selected && "!text-neutral-800 dark:!text-neutral-300",
                 "flex w-full rounded-lg text-neutral-500",
               )}>
-                <span className="text-sm px-3 py-2">Deposit</span>
+                <span className="text-sm w-full text-center md:text-left px-3 py-2">Deposit</span>
               </Tab>
               <Tab className={({ selected }) => classNames(
                 selected && "bg-neutral-200/50 dark:bg-neutral-900",
                 selected && "!text-neutral-800 dark:!text-neutral-300",
                 "flex w-full rounded-lg text-neutral-500",
               )}>
-                <span className="text-sm px-3 py-2">Withdraw</span>
+                <span className="text-sm w-full text-center md:text-left px-3 py-2">Withdraw</span>
               </Tab>
             </div>
           </Tab.List>
-          <Tab.Panels className="w-full col-span-10">
+          <Tab.Panels className="w-full md:col-span-10">
             <Tab.Panel unmount={true}>
               <PoolOverviewPanel />
             </Tab.Panel>
@@ -343,18 +343,18 @@ const PoolDepositPanel = () => {
 
   return (
     <div className="">
-      <div className="flex items-center space-x-3">
-        <ArrowDownTrayIcon className="w-6 h-6 rounded-lg border border-neutral-300 dark:border-neutral-700 p-2.5" />
-        <div>
+      <div>
+        <div className="flex items-center space-x-3">
+          <ArrowDownTrayIcon className="w-5 h-5 rounded-lg border border-neutral-300 dark:border-neutral-700 p-1.5" />
           <p className="m-0 text-2xl font-semibold">Deposit</p>
-          <p className="m-0 text-sm text-neutral-400 dark:text-neutral-600">
-            Deposit tokens to the pool to start earning trading fees
-          </p>
         </div>
+        <p className="mt-2 mb-0 text-sm text-neutral-400 dark:text-neutral-600">
+          Deposit tokens to the pool to start earning trading fees
+        </p>
       </div>
       {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
 
-      <div className="grid grid-cols-12 gap-12 mt-8">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mt-8">
         <div className="w-full mt-4 col-span-7">
           <div className="flex flex-col py-5 px-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg ">
             <p className="mt-0 mb-8 text-xl font-semibold">Select amount to deposit</p>
@@ -371,7 +371,7 @@ const PoolDepositPanel = () => {
                 <p className="m-0 font-bold">{symbols[0]}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances?.[0] ? formatEther(balances[0]) : 0}</p>
+                <p className="m-0 text-neutral-500 text-sm">Balance: {balances?.[0] ? (+formatEther(balances[0])).toFixed(2) : 0}</p>
                 <Button
                   auto
                   scale={0.33}
@@ -408,7 +408,7 @@ const PoolDepositPanel = () => {
                 <p className="m-0 font-bold">{symbols[1]}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances?.[1] ? formatEther(balances[1]) : 0}</p>
+                <p className="m-0 text-neutral-500 text-sm">Balance: {balances?.[1] ? (+formatEther(balances[1])).toFixed(2) : 0}</p>
                 <Button
                   auto
                   scale={0.33}
@@ -463,7 +463,7 @@ const PoolDepositPanel = () => {
             </div>
           </div>
         </div>
-        <div className="w-full mt-4 col-span-5">
+        <div className="hidden w-full mt-4 col-span-5">
           <div className="flex flex-col space-y-2 p-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg ">
           </div>
         </div>
