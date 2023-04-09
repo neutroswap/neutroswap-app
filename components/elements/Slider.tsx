@@ -5,6 +5,11 @@ import * as SliderPrimitive from "@radix-ui/react-slider"
 import { classNames } from "@/shared/helpers/classNames"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./Tooltip"
 
+const callAll =
+  (...fns: any) =>
+    (...args: any) =>
+      fns.forEach((fn: any) => fn && fn(...args));
+
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
@@ -16,6 +21,10 @@ const Slider = React.forwardRef<
   const [value, setValue] = React.useState<number[]>(defaultValue);
   const [isHovered, setIsHovered] = React.useState(false);
 
+  React.useEffect(() => {
+    if (props.value) setValue(props.value)
+  }, [props.value])
+
   return (
     <SliderPrimitive.Root
       ref={ref}
@@ -23,8 +32,8 @@ const Slider = React.forwardRef<
         "relative flex w-full touch-none select-none items-center",
         className
       )}
-      onValueChange={(value) => { setValue(value) }}
       {...props}
+      onValueChange={callAll((value: any) => setValue(value), props.onValueChange)}
     >
       <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-900">
         <SliderPrimitive.Range className="absolute h-full bg-neutral-400 dark:bg-neutral-700" />
