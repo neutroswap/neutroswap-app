@@ -12,9 +12,10 @@ import debounce from "lodash/debounce";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
+import { Currency } from "@/shared/types/currency.types";
 
 type PoolDepositPanelProps = {
-  balances: number[],
+  balances: Currency[],
   token0: Token,
   token1: Token,
 }
@@ -247,15 +248,15 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 <p className="m-0 font-bold">{token0.symbol}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[0]}</p>
+                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[0].formatted}</p>
                 <Button
                   auto
                   scale={0.33}
                   disabled={!balances}
                   onClick={() => {
                     if (!balances) return;
-                    setToken0Amount(formatEther(parseEther(balances[0].toString())))
-                    debouncedToken0(formatEther(parseEther(balances[0].toString())))
+                    setToken0Amount(formatEther(balances[0].raw));
+                    debouncedToken0(formatEther(balances[0].raw));
                   }}
                 >
                   MAX
@@ -284,15 +285,15 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 <p className="m-0 font-bold">{token1.symbol}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[1]}</p>
+                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[1].formatted}</p>
                 <Button
                   auto
                   scale={0.33}
                   disabled={!balances}
                   onClick={() => {
                     if (!balances) return;
-                    setToken1Amount(formatEther(parseEther(balances[1].toString())))
-                    debouncedToken1(formatEther(parseEther(balances[1].toString())))
+                    setToken1Amount(formatEther(balances[1].raw))
+                    debouncedToken1(formatEther(balances[1].raw))
                   }}
                 >
                   MAX
