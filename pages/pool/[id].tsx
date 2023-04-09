@@ -1,5 +1,5 @@
 import { classNames } from "@/shared/helpers/classNames";
-import { Text, Button, useTheme, Input, Loading, Spinner } from "@geist-ui/core";
+import { Text, Button, useTheme, Input, Spinner } from "@geist-ui/core";
 import { Tab } from "@headlessui/react";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 import { ArrowDownTrayIcon, ScaleIcon } from "@heroicons/react/24/solid";
@@ -8,19 +8,75 @@ import { useRouter } from "next/router";
 
 import NoContentDark from "@/public/states/empty/dark.svg"
 import NoContentLight from "@/public/states/empty/light.svg"
-import { useAccount, useContractRead, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
+import { useAccount, useContractRead, useContractReads, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { UniswapPair, UniswapPairFactory, UniswapPairSettings, UniswapVersion } from "simple-uniswap-sdk";
 import { FACTORY_CONTRACT, MULTICALL_CONTRACT, ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
-import useUpdateEffect from "@/shared/hooks/useUpdateEffect";
+import { formatEther, parseEther } from "ethers/lib/utils.js";
 import debounce from "lodash/debounce";
 import { BigNumber } from "ethers";
 import { CloneUniswapContractDetailsV2 } from "simple-uniswap-sdk/dist/esm/factories/pair/models/clone-uniswap-contract-details";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
+import { Token } from "@/shared/types/tokens.types";
 
+// TODO: use getServerSideProps so it will not redirected to unknown pool
 export default function PoolDetails() {
+  const router = useRouter();
+  const { address } = useAccount();
+
+  const poolContract = {
+    address: router.query.id as `0x${string}`,
+    abi: NEUTRO_POOL_ABI,
+  }
+
+  const [balances, setBalances] = useState<number[]>([0, 0]);
+  const [token0, setToken0] = useState<Token>()
+  const [token1, setToken1] = useState<Token>()
+
+  const { data: pairs } = useContractReads({
+    contracts: [
+      { ...poolContract, functionName: 'token0' },
+      { ...poolContract, functionName: 'token1' }
+    ]
+  })
+
+  useContractReads({
+    enabled: Boolean(pairs && address),
+    contracts: [
+      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'balanceOf', args: [address!] },
+      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'balanceOf', args: [address!] },
+      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'name' },
+      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'name' },
+      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'symbol' },
+      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'symbol' },
+      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'decimals' },
+      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'decimals' },
+    ],
+    onSuccess(value) {
+      setBalances([
+        Number(Number(formatEther(value[0])).toFixed(2)),
+        Number(Number(formatEther(value[1])).toFixed(2).toString())
+      ])
+      setToken0({
+        network_id: "15557",
+        name: value[2],
+        address: pairs?.[0]!,
+        symbol: value[4],
+        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${value[4].toLowerCase()}.svg`,
+        decimal: Number(formatEther(value[6]))
+      })
+      setToken1({
+        network_id: "15557",
+        address: pairs?.[1]!,
+        name: value[3],
+        symbol: value[5],
+        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${value[5].toLowerCase()}.svg`,
+        decimal: Number(formatEther(value[7]))
+      })
+    },
+  })
+
   return (
     <div className="flex py-4 sm:py-10">
       <Tab.Group>
@@ -61,7 +117,13 @@ export default function PoolDetails() {
               <PoolOverviewPanel />
             </Tab.Panel>
             <Tab.Panel unmount={true}>
-              <PoolDepositPanel />
+              {(token0 && token1) && (
+                <PoolDepositPanel
+                  balances={balances}
+                  token0={token0}
+                  token1={token1}
+                />
+              )}
             </Tab.Panel>
             <Tab.Panel>Content 3</Tab.Panel>
           </Tab.Panels>
@@ -111,12 +173,17 @@ const PoolOverviewPanel = () => {
   )
 }
 
+type PoolDepositPanelProps = {
+  balances: number[],
+  token0: Token,
+  token1: Token,
+}
 
-const PoolDepositPanel = () => {
+const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
+  const { balances, token0, token1 } = props;
+
   const router = useRouter();
   const { address } = useAccount();
-
-  const [symbols, setSymbols] = useState<string[]>(["UNKNOWN", "UNKNOWN"]);
 
   const [token0Amount, setToken0Amount] = useState<string>();
   const [token1Amount, setToken1Amount] = useState<string>();
@@ -132,53 +199,22 @@ const PoolDepositPanel = () => {
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.0005;
 
-  const poolContract = {
-    address: router.query.id as `0x${string}`,
-    abi: NEUTRO_POOL_ABI,
-  }
-
-  const { data: pairs } = useContractReads({
-    contracts: [
-      { ...poolContract, functionName: 'token0' },
-      { ...poolContract, functionName: 'token1' }
-    ]
-  })
-
-  const { data: balances } = useContractReads({
-    enabled: Boolean(pairs && address),
-    contracts: [
-      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'balanceOf', args: [address!] },
-      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'balanceOf', args: [address!] },
-    ]
-  })
-
-  useContractReads({
-    enabled: Boolean(pairs && address),
-    contracts: [
-      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'symbol' },
-      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'symbol' },
-    ],
-    onSuccess(value) {
-      setSymbols([value[0], value[1]]);
-    },
-  })
-
   const { data: token0Min } = useContractRead({
-    enabled: Boolean(token1Amount && pairs),
+    enabled: Boolean(token1Amount),
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: 'getAmountsOut',
     args: [
       !!token1Amount && parseEther(token1Amount),
-      [pairs?.[1], pairs?.[0]]
+      [token1.address, token0.address]
     ] as any
   })
 
   const { refetch: refetchAllowance } = useContractReads({
-    enabled: Boolean(pairs && address),
+    enabled: Boolean(address),
     contracts: [
-      { address: pairs?.[0], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
-      { address: pairs?.[1], abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
+      { address: token0.address, abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
+      { address: token1.address, abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
     ],
     onSuccess(value) {
       setIsToken0Approved(+formatEther(value[0]) > 0);
@@ -187,7 +223,7 @@ const PoolDepositPanel = () => {
   })
 
   const { config: approveConfig0 } = usePrepareContractWrite({
-    address: pairs?.[0],
+    address: token0.address,
     abi: ERC20_ABI,
     functionName: 'approve',
     args: [
@@ -203,7 +239,7 @@ const PoolDepositPanel = () => {
   })
 
   const { config: approveConfig1 } = usePrepareContractWrite({
-    address: pairs?.[1],
+    address: token1.address,
     abi: ERC20_ABI,
     functionName: 'approve',
     args: [
@@ -213,22 +249,22 @@ const PoolDepositPanel = () => {
   })
   const { isLoading: isApprovingToken1, write: approveToken1 } = useContractWrite({
     ...approveConfig1,
-    address: pairs?.[1],
+    address: token1.address,
     onSuccess(result) {
       result.wait().then(() => refetchAllowance())
     }
   })
 
   const addLiquidityArgs: any = useMemo(() => [
-    pairs?.[0],
-    pairs?.[1],
+    token0.address,
+    token1.address,
     !!token0Amount && parseEther(token0Amount),
     !!token1Amount && parseEther(token1Amount),
     !!token0Min && token0Min[1],
     parseEther(token1Min),
     address!,
     BigNumber.from(deadline)
-  ], [pairs, token0Amount, token1Amount, token1Min, address, deadline, token0Min]);
+  ], [token0, token1, token0Amount, token1Amount, token1Min, address, deadline, token0Min]);
 
   const { config: addLiquidityConfig } = usePrepareContractWrite({
     address: ROUTER_CONTRACT,
@@ -276,11 +312,11 @@ const PoolDepositPanel = () => {
   }), [cloneUniswapContractDetailsV2, customNetworkData])
 
   useEffect(() => {
-    if (!pairs || !address) return;
+    if (!address) return;
     (async () => {
       const uniswapPair = new UniswapPair({
-        fromTokenContractAddress: pairs?.[0],
-        toTokenContractAddress: pairs?.[1],
+        fromTokenContractAddress: token0.address,
+        toTokenContractAddress: token1.address,
         ethereumAddress: address as string,
         chainId: 15557,
         providerUrl: "https://api-testnet2.trust.one/",
@@ -289,7 +325,7 @@ const PoolDepositPanel = () => {
       const pairFactory = await uniswapPair.createFactory();
       setUniswapPairFactory(pairFactory);
     })()
-  }, [pairs, address, customPairSettings])
+  }, [token0, token1, address, customPairSettings])
 
   const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -361,25 +397,25 @@ const PoolDepositPanel = () => {
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
                 <img
-                  alt={`${symbols[0]} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbols[0].toLowerCase()}.svg`}
+                  alt={`${token0.symbol} Icon`}
+                  src={token0.logo}
                   className="h-6 rounded-full"
                   onError={(e) => {
-                    handleImageFallback(symbols[0], e);
+                    handleImageFallback(token0.symbol, e);
                   }}
                 />
-                <p className="m-0 font-bold">{symbols[0]}</p>
+                <p className="m-0 font-bold">{token0.symbol}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances?.[0] ? (+formatEther(balances[0])).toFixed(2) : 0}</p>
+                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[0]}</p>
                 <Button
                   auto
                   scale={0.33}
                   disabled={!balances}
                   onClick={() => {
                     if (!balances) return;
-                    setToken0Amount(formatEther(balances[0]))
-                    debouncedToken0(formatEther(balances[0]))
+                    setToken0Amount(formatEther(parseEther(balances[0].toString())))
+                    debouncedToken0(formatEther(parseEther(balances[0].toString())))
                   }}
                 >
                   MAX
@@ -398,25 +434,25 @@ const PoolDepositPanel = () => {
             <div className="flex items-center justify-between mt-6">
               <div className="flex space-x-2 items-center">
                 <img
-                  alt={`${symbols[1]} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbols[1].toLowerCase()}.svg`}
+                  alt={`${token1.symbol} Icon`}
+                  src={token1.logo}
                   className="h-6 rounded-full"
                   onError={(e) => {
-                    handleImageFallback(symbols[1], e);
+                    handleImageFallback(token1.symbol, e);
                   }}
                 />
-                <p className="m-0 font-bold">{symbols[1]}</p>
+                <p className="m-0 font-bold">{token1.symbol}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances?.[1] ? (+formatEther(balances[1])).toFixed(2) : 0}</p>
+                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[1]}</p>
                 <Button
                   auto
                   scale={0.33}
                   disabled={!balances}
                   onClick={() => {
                     if (!balances) return;
-                    setToken1Amount(formatEther(balances[1]))
-                    debouncedToken1(formatEther(balances[1]))
+                    setToken1Amount(formatEther(parseEther(balances[1].toString())))
+                    debouncedToken1(formatEther(parseEther(balances[1].toString())))
                   }}
                 >
                   MAX
@@ -444,8 +480,8 @@ const PoolDepositPanel = () => {
                   }}
                 >
                   {!isToken0Approved
-                    ? `Approve ${symbols[0]}`
-                    : !isToken1Approved && `Approve ${symbols[1]}`
+                    ? `Approve ${token0.symbol}`
+                    : !isToken1Approved && `Approve ${token1.symbol}`
                   }
                 </Button>
               )}

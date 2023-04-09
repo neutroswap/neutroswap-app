@@ -1,6 +1,6 @@
 export interface Token {
   network_id: string
-  address: string
+  address: `0x${string}`
   decimal: number
   name: string
   symbol: string
@@ -27,7 +27,7 @@ export interface LiquidityToken {
   token1: any
 }
 
-export interface Network{
+export interface Network {
   id: string
   name: string
   rpc: string

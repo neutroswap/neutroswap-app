@@ -16,7 +16,7 @@ import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 
-type TokenDetails = {
+export type TokenDetails = {
   address: `0x${string}`,
   decimal: number,
   name: string,
