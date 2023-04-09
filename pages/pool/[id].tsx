@@ -65,12 +65,12 @@ export default function PoolDetails() {
         {
           decimal: value[7].toNumber(),
           raw: value[0],
-          formatted: Number(Number(formatEther(value[0])).toFixed(2)).toString()
+          formatted: Number(formatEther(value[0])).toFixed(2)
         },
         {
           decimal: value[7].toNumber(),
           raw: value[1],
-          formatted: Number(Number(formatEther(value[1])).toFixed(2)).toString()
+          formatted: Number(formatEther(value[1])).toFixed(2)
         }
       ])
       setToken0({

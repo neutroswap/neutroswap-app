@@ -1,4 +1,4 @@
-import { ERC20_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
+import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { FACTORY_CONTRACT, MULTICALL_CONTRACT, ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
@@ -11,10 +11,13 @@ import { useAccount, useContractRead, useContractReads, useContractWrite, usePre
 import debounce from "lodash/debounce";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
-import { Button, Input, Slider, Spinner } from "@geist-ui/core";
+import { Button, Input, Spinner } from "@geist-ui/core";
+import { Slider } from "@/components/elements/Slider";
+import { Currency } from "@/shared/types/currency.types";
+import dayjs from "dayjs";
 
 type PoolWithdrawalPanelProps = {
-  balances: number[],
+  balances: Currency[],
   token0: Token,
   token1: Token,
 }
@@ -29,15 +32,81 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
   const [token1Amount, setToken1Amount] = useState<string>();
   const [token1Min, setToken1Min] = useState("0");
   const [deadline, setDeadline] = useState(0);
+  const [percentage, setPercentage] = useState(33);
+  const [amount, setAmount] = useState<BigNumber>(BigNumber.from(0));
+  const [totalLPSupply, setTotalLPSupply] = useState<BigNumber>(BigNumber.from(0));
+  const [userLPBalance, setUserLPBalance] = useState<Currency>({
+    decimal: 18,
+    raw: BigNumber.from(0),
+    formatted: "0.00"
+  })
+  const [poolBalances, setPoolBalances] = useState<Currency[]>([
+    {
+      decimal: 18,
+      raw: BigNumber.from(0),
+      formatted: "0.00"
+    },
+    {
+      decimal: 18,
+      raw: BigNumber.from(0),
+      formatted: "0.00"
+    }
+  ])
 
-  const [isToken0Approved, setIsToken0Approved] = useState(false);
-  const [isToken1Approved, setIsToken1Approved] = useState(false);
-  const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
-  const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
+  const [isLPTokenApproved, setIsLPTokenApproved] = useState(false);
 
   const [uniswapPairFactory, setUniswapPairFactory] = useState<UniswapPairFactory>();
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.0005;
+
+  useContractReads({
+    enabled: Boolean(address && router.query.id),
+    contracts: [
+      {
+        address: router.query.id as `0x${string}`,
+        abi: NEUTRO_POOL_ABI,
+        functionName: 'balanceOf',
+        args: [address!],
+      },
+      {
+        address: router.query.id as `0x${string}`,
+        abi: NEUTRO_POOL_ABI,
+        functionName: 'totalSupply',
+      },
+      {
+        address: token0.address,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [router.query.id as `0x${string}`]
+      },
+      {
+        address: token1.address,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [router.query.id as `0x${string}`]
+      },
+    ],
+    onSuccess: (value) => {
+      setUserLPBalance({
+        decimal: 18,
+        raw: value[0],
+        formatted: Number(formatEther(value[0])).toFixed(2)
+      })
+      setTotalLPSupply(value[1])
+      setPoolBalances([
+        {
+          decimal: 18,
+          raw: value[2],
+          formatted: Number(formatEther(value[2])).toFixed(2)
+        },
+        {
+          decimal: 18,
+          raw: value[3],
+          formatted: Number(formatEther(value[3])).toFixed(2)
+        }
+      ])
+    }
+  })
 
   const { data: token0Min } = useContractRead({
     enabled: Boolean(token1Amount),
@@ -50,72 +119,63 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     ] as any
   })
 
-  const { refetch: refetchAllowance } = useContractReads({
-    enabled: Boolean(address),
-    contracts: [
-      { address: token0.address, abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
-      { address: token1.address, abi: ERC20_ABI, functionName: 'allowance', args: [address!, ROUTER_CONTRACT] },
-    ],
+  const { refetch: refetchAllowance } = useContractRead({
+    enabled: Boolean(address && router.query.id),
+    address: router.query.id as `0x${string}`,
+    abi: ERC20_ABI,
+    functionName: 'allowance',
+    args: [address!, ROUTER_CONTRACT],
     onSuccess(value) {
-      setIsToken0Approved(+formatEther(value[0]) > 0);
-      setIsToken1Approved(+formatEther(value[1]) > 0);
+      setIsLPTokenApproved(+formatEther(value) > 0);
     },
   })
 
-  const { config: approveConfig0 } = usePrepareContractWrite({
-    address: token0.address,
-    abi: ERC20_ABI,
+  const { config: approveLPTokenConfig } = usePrepareContractWrite({
+    enabled: Boolean(router.query.id),
+    address: router.query.id as `0x${string}`,
+    abi: NEUTRO_POOL_ABI,
     functionName: 'approve',
     args: [
       ROUTER_CONTRACT,
       BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639935")
     ]
   })
-  const { isLoading: isApprovingToken0, write: approveToken0 } = useContractWrite({
-    ...approveConfig0,
+  const { isLoading: isApprovingLPToken, write: approveLPToken } = useContractWrite({
+    ...approveLPTokenConfig,
     onSuccess(result) {
       result.wait().then(() => refetchAllowance())
     }
   })
 
-  const { config: approveConfig1 } = usePrepareContractWrite({
-    address: token1.address,
-    abi: ERC20_ABI,
-    functionName: 'approve',
-    args: [
-      ROUTER_CONTRACT,
-      BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639935")
-    ]
-  })
-  const { isLoading: isApprovingToken1, write: approveToken1 } = useContractWrite({
-    ...approveConfig1,
-    address: token1.address,
-    onSuccess(result) {
-      result.wait().then(() => refetchAllowance())
-    }
-  })
+  // const removeLiquidityArgs: any = useMemo(() => [
+  //   token0.address, // tokenA
+  //   token1.address, // tokenB
+  //   amount, // liquidity
+  //   parseEther(token0Amount!), // amountAMin
+  //   parseEther(token1Amount!), // amountBMin
+  //   address!, // address
+  //   BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
+  // ], [amount, token0, token1, token0Amount, token1Amount, address]);
 
-  const addLiquidityArgs: any = useMemo(() => [
-    token0.address,
-    token1.address,
-    !!token0Amount && parseEther(token0Amount),
-    !!token1Amount && parseEther(token1Amount),
-    !!token0Min && token0Min[1],
-    parseEther(token1Min),
-    address!,
-    BigNumber.from(deadline)
-  ], [token0, token1, token0Amount, token1Amount, token1Min, address, deadline, token0Min]);
-
-  const { config: addLiquidityConfig } = usePrepareContractWrite({
+  const { config: removeLiquidityConfig } = usePrepareContractWrite({
+    enabled: Boolean(token0 && token1 && amount && !!token0Amount && !!token1Amount && address && deadline),
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
-    functionName: 'addLiquidity',
-    args: addLiquidityArgs
+    functionName: 'removeLiquidity',
+    args: [
+      token0.address, // tokenA
+      token1.address, // tokenB
+      amount, // liquidity
+      !!token0Amount ? parseEther(token0Amount!) : parseEther("0"), // amountAMin
+      !!token1Amount ? parseEther(token1Amount!) : parseEther("0"), // amountBMin
+      address!, // address
+      BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
+    ]
   })
   const {
-    isLoading: isAddingLiquidity,
-    write: addLiquidity
-  } = useContractWrite(addLiquidityConfig)
+    isLoading: isRemovingLiquidity,
+    write: removeLiquidity
+  } = useContractWrite(removeLiquidityConfig)
 
   let cloneUniswapContractDetailsV2: CloneUniswapContractDetailsV2 = useMemo(() => ({
     routerAddress: ROUTER_CONTRACT,
@@ -176,13 +236,11 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
 
   const debouncedToken0 = debounce(async (nextValue) => {
     if (!uniswapPairFactory) return new Error('No Uniswap Pair Factory');
-    setIsFetchingToken1Price(true);
     const trade = await uniswapPairFactory.trade(nextValue);
     setToken1Amount(trade.expectedConvertQuote);
     if (!trade.minAmountConvertQuote) return;
     setToken1Min(trade.minAmountConvertQuote)
     setDeadline(trade.tradeExpires);
-    setIsFetchingToken1Price(false);
   }, 500)
 
   const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -194,28 +252,35 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
 
   const debouncedToken1 = debounce(async (nextValue) => {
     if (!uniswapPairFactory) return new Error('No Uniswap Pair Factory');
-    setIsFetchingToken0Price(true);
     const trade = await uniswapPairFactory.trade(nextValue);
     setToken0Amount(trade.expectedConvertQuote);
     if (!trade.minAmountConvertQuote) return;
     setToken1Min(nextValue);
     setDeadline(trade.tradeExpires);
-    setIsFetchingToken0Price(false);
   }, 500)
 
+  useEffect(() => {
+    if (amount.isZero() || totalLPSupply.isZero()) return;
+    const slippage = 50; // 0.50% slippage
+    const token0 = amount.mul(poolBalances[0].raw).mul(10000 - slippage).div(10000).div(totalLPSupply);
+    const token1 = amount.mul(poolBalances[1].raw).mul(10000 - slippage).div(10000).div(totalLPSupply);
+    // console.log(Number(formatEther(token0Amount)).toFixed(6), Number(formatEther(token1Amount)).toFixed(6));
+    setToken0Amount(formatEther(token0));
+    setToken1Amount(formatEther(token1));
+  }, [amount, poolBalances, totalLPSupply, uniswapPairFactory])
+
   // NOTE: Enable for debugging only
-  // useEffect(() => {
-  //   console.log([
-  //     pairs?.[0],
-  //     pairs?.[1],
-  //     !!token0Amount && parseEther(token0Amount).toString(),
-  //     !!token1Amount && parseEther(token1Amount).toString(),
-  //     !!token0Min && token0Min[1].toString(),
-  //     parseEther(token1Min).toString(),
-  //     address!,
-  //     BigNumber.from(deadline).toString()
-  //   ])
-  // }, [pairs, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
+  useEffect(() => {
+    console.log([
+      token0.address, // tokenA
+      token1.address, // tokenB
+      amount.toString(), // liquidity
+      !!token0Amount && parseEther(token0Amount!).toString(), // amountAMin
+      !!token1Amount && parseEther(token1Amount!).toString(), // amountBMin
+      address!, // address
+      BigNumber.from(dayjs().add(5, 'minutes').unix()).toString() // deadline
+    ])
+  }, [amount, token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
   return (
     <div className="">
@@ -230,14 +295,81 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
       </div>
       {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mt-4">
         <div className="w-full mt-4 col-span-7">
-          <p className="mt-0 mb-2 font-medium text-neutral-400 dark:text-neutral-500">Amount to withdraw</p>
+          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">Amount to withdraw</p>
           <div className="flex flex-col py-5 px-7 border border-neutral-200 dark:border-neutral-800 rounded-lg ">
-            <Slider step={10} showMarkers width="75%" />
+            <div className="flex items-center justify-between mb-2">
+              <span className="m-0 text-2xl font-semibold bg-transparent w-full">
+                {formatEther(amount)}
+              </span>
+            </div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-sm text-neutral-500 dark:text-neutral-400">$0</span>
+              <span className="text-sm text-neutral-500 dark:text-neutral-400">Available {userLPBalance.formatted}</span>
+            </div>
+            <Slider
+              step={10}
+              max={100}
+              defaultValue={[percentage]}
+              value={[percentage]}
+              onValueChange={(value) => {
+                setPercentage(value[0])
+              }}
+              onValueCommit={(value) => {
+                setAmount(userLPBalance.raw.mul(value[0]).div(100));
+              }}
+            />
+            <div className="grid grid-cols-4 gap-4 mt-4">
+              <Button
+                auto
+                scale={0.5}
+                className="bg-transparent"
+                onClick={() => {
+                  setPercentage(25)
+                  setAmount(userLPBalance.raw.mul(25).div(100));
+                }}
+              >
+                25%
+              </Button>
+              <Button
+                auto
+                scale={0.5}
+                className="bg-transparent"
+                onClick={() => {
+                  setPercentage(50)
+                  setAmount(userLPBalance.raw.mul(50).div(100));
+                }}
+              >
+                50%
+              </Button>
+              <Button
+                auto
+                scale={0.5}
+                className="bg-transparent"
+                onClick={() => {
+                  setPercentage(75)
+                  setAmount(userLPBalance.raw.mul(75).div(100));
+                }}
+              >
+                75%
+              </Button>
+              <Button
+                auto
+                scale={0.5}
+                className="bg-transparent"
+                onClick={() => {
+                  setPercentage(100)
+                  setAmount(userLPBalance.raw);
+                }}
+              >
+                MAX
+              </Button>
+            </div>
           </div>
         </div>
         <div className="w-full col-span-7">
+          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">Expected to receive</p>
           <div className="flex flex-col py-5 px-7 border border-neutral-200 dark:border-neutral-800 rounded-lg ">
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
@@ -252,29 +384,15 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 <p className="m-0 font-bold">{token0.symbol}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[0]}</p>
-                <Button
-                  auto
-                  scale={0.33}
-                  disabled={!balances}
-                  onClick={() => {
-                    if (!balances) return;
-                    setToken0Amount(formatEther(parseEther(balances[0].toString())))
-                    debouncedToken0(formatEther(parseEther(balances[0].toString())))
-                  }}
-                >
-                  MAX
-                </Button>
+                <Input
+                  scale={1.5}
+                  className="w-full rounded-lg"
+                  placeholder="0.00"
+                  value={token0Amount}
+                  onChange={handleToken0Change}
+                />
               </div>
             </div>
-            <Input
-              scale={1.5}
-              className="w-full rounded-lg mt-3"
-              placeholder="0.00"
-              value={token0Amount}
-              onChange={handleToken0Change}
-              iconRight={isFetchingToken0Price ? <Spinner /> : <></>}
-            />
 
             <div className="flex items-center justify-between mt-6">
               <div className="flex space-x-2 items-center">
@@ -289,56 +407,36 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 <p className="m-0 font-bold">{token1.symbol}</p>
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">Balance: {balances[1]}</p>
-                <Button
-                  auto
-                  scale={0.33}
-                  disabled={!balances}
-                  onClick={() => {
-                    if (!balances) return;
-                    setToken1Amount(formatEther(parseEther(balances[1].toString())))
-                    debouncedToken1(formatEther(parseEther(balances[1].toString())))
-                  }}
-                >
-                  MAX
-                </Button>
+                <Input
+                  scale={1.5}
+                  className="w-full rounded-lg"
+                  placeholder="0.00"
+                  value={token1Amount}
+                  onChange={handleToken1Change}
+                />
               </div>
             </div>
-            <Input
-              scale={1.5}
-              className="w-full rounded-lg mt-3"
-              placeholder="0.00"
-              value={token1Amount}
-              onChange={handleToken1Change}
-              iconRight={isFetchingToken1Price ? <Spinner /> : <></>}
-            />
 
             <div className="flex flex-col w-full mt-4">
-              {(!isToken0Approved || !isToken1Approved) && (
+              {!isLPTokenApproved && (
                 <Button
                   scale={1.25}
                   className="!mt-2"
-                  loading={isApprovingToken0 || isApprovingToken1}
-                  onClick={() => {
-                    if (!isToken0Approved) return approveToken0?.();
-                    if (!isToken1Approved) return approveToken1?.();
-                  }}
+                  loading={isApprovingLPToken}
+                  onClick={() => approveLPToken?.()}
                 >
-                  {!isToken0Approved
-                    ? `Approve ${token0.symbol}`
-                    : !isToken1Approved && `Approve ${token1.symbol}`
-                  }
+                  Approve LP token
                 </Button>
               )}
-              {(isToken0Approved && isToken1Approved) && (
+              {isLPTokenApproved && (
                 <Button
                   scale={1.25}
                   className="!mt-2"
-                  loading={isAddingLiquidity}
-                  disabled={!addLiquidity}
-                  onClick={() => addLiquidity?.()}
+                  loading={isRemovingLiquidity}
+                  disabled={!removeLiquidity}
+                  onClick={() => removeLiquidity?.()}
                 >
-                  Deposit Now
+                  Withdraw
                 </Button>
               )}
             </div>
