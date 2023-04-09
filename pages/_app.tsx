@@ -22,6 +22,11 @@ import { publicProvider } from "wagmi/providers/public";
 import Footer from "@/components/modules/Footer";
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime)
+
 const eosChain: any = {
   id: 15557,
   name: 'EOS EVM',
