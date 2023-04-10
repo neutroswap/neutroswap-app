@@ -14,6 +14,7 @@ import {
   UniswapVersion,
   UniswapPairSettings,
   UniswapPairFactory,
+  ETH,
 } from "simple-uniswap-sdk";
 import { useAccount, useBalance, useSigner } from "wagmi";
 import { NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
@@ -29,6 +30,7 @@ export default function Swap() {
   const [tokenTwoAmount, setTokenTwoAmount] = useState("0");
   // const [prices, setPrices] = useState(null);
   // const [amountsOut, setAmountsOut] = useState(0);
+  const [trade, setTrade] = useState([]);
   const [tokenOne, setTokenOne] = useState<`0x${string}`>(
     "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6"
   );
@@ -414,13 +416,37 @@ export default function Swap() {
               </ConnectButton.Custom>
             )}
             {isConnected && (
-              <Button
-                onClick={() => swap()}
-                disabled={!tokenOneAmount || !isConnected}
-                className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-              >
-                Swap
-              </Button>
+              <>
+                <Button
+                  onClick={() => swap()}
+                  disabled={!tokenOneAmount || !isConnected}
+                  className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                >
+                  Swap
+                </Button>
+                <div>
+                  {/* <div className="flex justify-between mb-2">
+                    <div>Price Impact</div>
+                    <div>+0.15%</div>
+                  </div> */}
+                  {/* <div className="flex justify-between mb-2">
+                    <div>Est. received</div>
+                    <div>{trade.expectedConvertQuote}</div>
+                  </div>
+                  <div className="flex justify-between mb-2">
+                    <div>Min. received</div>
+                    <div>{trade.mintAmountConvertQuote}</div>
+                  </div> */}
+                  {/* <div className="flex justify-between mb-2">
+                    <div>Network fee</div>
+                    <div>~$0.01</div>
+                  </div> */}
+                  <div className="flex justify-between mb-2">
+                    <div>Recipient</div>
+                    <div>{address}</div>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>
