@@ -1,9 +1,12 @@
-import React, { useState, useEffect, Fragment, useRef } from "react";
-import { Button, Card, Divider, Page, Text } from "@geist-ui/core";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import React, { useState, useEffect, Fragment } from "react";
+import { Button, Text } from "@geist-ui/core";
+import {
+  ChevronDownIcon,
+  AdjustmentsHorizontalIcon,
+} from "@heroicons/react/20/solid";
+import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
-import SettingsPopover from "@/components/modules/swap/SettingsPopover";
 import NumberInput from "@/components/elements/NumberInput";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
@@ -11,14 +14,18 @@ import {
   UniswapVersion,
   UniswapPairSettings,
   UniswapPairFactory,
-  TradeContext,
 } from "simple-uniswap-sdk";
-import { useAccount, useContract, useProvider, useSigner } from "wagmi";
+import { useAccount, useSigner } from "wagmi";
 import { NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
+import { classNames } from "@/shared/helpers/classNames";
+
+const TABS = ["0.1", "0.5", "1.0"];
 
 export default function Swap() {
   const { address, isConnected } = useAccount();
+  const [slippage, setSlippage] = useState("0.5");
+  const [selectedSlippage, setSelectedSlippage] = useState(0.5);
   const [tokenOneAmount, setTokenOneAmount] = useState("0");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("0");
   // const [prices, setPrices] = useState(null);
@@ -30,7 +37,6 @@ export default function Swap() {
     "0x0000000000000000000000000000000000000000"
   );
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
-  const [trade, setTrade] = useState<TradeContext>();
 
   useEffect(() => {
     console.log("latest ", uniswapFactory);
@@ -43,6 +49,7 @@ export default function Swap() {
     chainId: 15557,
     args: [tokenOne, tokenTwo],
   });
+  console.log("pair", getPair);
 
   useEffect(() => {
     let customNetworkData = {
@@ -79,8 +86,8 @@ export default function Swap() {
         chainId: 15557,
         providerUrl: "https://api-testnet2.trust.one/",
         settings: new UniswapPairSettings({
-          slippage: 0.0005,
-          deadlineMinutes: 5,
+          slippage: Number(slippage) / 100, //Edit to receive state change
+          deadlineMinutes: 15,
           disableMultihops: true,
           cloneUniswapContractDetails: {
             v2Override: cloneUniswapContractDetailsV2,
@@ -142,7 +149,72 @@ export default function Swap() {
               <Text h3 height={2} className="text-center">
                 Swap
               </Text>
-              <SettingsPopover />
+              <Popover className="relative">
+                <>
+                  <Popover.Button>
+                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer" />
+                  </Popover.Button>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-200"
+                    enterFrom="opacity-0 translate-y-1"
+                    enterTo="opacity-100 translate-y-0"
+                    leave="transition ease-in duration-150"
+                    leaveFrom="opacity-100 translate-y-0"
+                    leaveTo="opacity-0 translate-y-1"
+                  >
+                    <Popover.Panel className="absolute top-10 right-0 z-50 -mr-2.5 min-w-20 md:m-w-22 md:-mr-5 bg-[#2D3036] rounded-lg w-80 shadow-lg">
+                      <div className="p-4 space-y-4">
+                        <div className="text-base font-bold text-high-emphesis">
+                          Settings
+                        </div>
+                        <div className="bg-[#060606] py-4 px-3 rounded-lg space-y-3">
+                          <div className="flex justify-between">
+                            <span className="text-neutral-400">Slippage</span>
+                            <span className="text-neutral-400">
+                              {slippage}%
+                            </span>
+                          </div>
+                          <RadioGroup onChange={setSlippage}>
+                            <div className="items-center relative bg-black/[0.08] dark:bg-white/[0.04] ring-4 ring-black/[0.08] dark:ring-white/[0.04] rounded-lg overflow-hidden flex gap-1">
+                              <>
+                                {TABS.map((tab, i) => (
+                                  <RadioGroup.Option
+                                    as={Fragment}
+                                    key={i}
+                                    value={tab}
+                                  >
+                                    {({ checked }) => (
+                                      <button
+                                        className={classNames(
+                                          checked
+                                            ? "text-gray-900 dark:text-white bg-white dark:bg-[#2D3036]"
+                                            : "text-gray-500 dark:text-neutral-400 hover:bg-gray-100 hover:dark:bg-white/[0.04]",
+                                          "z-[1] relative rounded-lg text-sm h-8 font-medium flex flex-grow items-center justify-center"
+                                        )}
+                                      >
+                                        {tab}%
+                                      </button>
+                                    )}
+                                  </RadioGroup.Option>
+                                ))}
+
+                                {/* <div className="h-[28px] w-0.5 bg-gray-900/5 dark:bg-slate-200/5" /> */}
+                                <NumberInput
+                                  className="focus:dark:bg-[#2D3036] dark:placeholder:text-neutral-400 focus:dark:text-white rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px]"
+                                  placeholder="custom"
+                                  value={slippage}
+                                  onChange={setSlippage}
+                                />
+                              </>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      </div>
+                    </Popover.Panel>
+                  </Transition>
+                </>
+              </Popover>
             </div>
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
