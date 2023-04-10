@@ -1,17 +1,14 @@
 import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
-import { FACTORY_CONTRACT, MULTICALL_CONTRACT, ROUTER_CONTRACT } from "@/shared/helpers/contract";
+import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
 import { formatEther, parseEther } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import { UniswapPair, UniswapPairFactory, UniswapPairSettings, UniswapVersion } from "simple-uniswap-sdk";
-import { CloneUniswapContractDetailsV2 } from "simple-uniswap-sdk/dist/esm/factories/pair/models/clone-uniswap-contract-details";
+import { useEffect, useState } from "react";
 import { useAccount, useContractRead, useContractReads, useContractWrite, usePrepareContractWrite } from "wagmi";
-import debounce from "lodash/debounce";
-import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/solid";
+import { ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
-import { Button, Input, Spinner } from "@geist-ui/core";
+import { Button, Input } from "@geist-ui/core";
 import { Slider } from "@/components/elements/Slider";
 import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
@@ -22,16 +19,18 @@ type PoolWithdrawalPanelProps = {
   token1: Token,
 }
 
+// TODO: move slippage to state or store
+const SLIPPAGE = 50;
 const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
-  const { balances, token0, token1 } = props;
+  const { token0, token1 } = props;
 
   const router = useRouter();
   const { address } = useAccount();
 
+  const [isLPTokenApproved, setIsLPTokenApproved] = useState(false);
+
   const [token0Amount, setToken0Amount] = useState<string>();
   const [token1Amount, setToken1Amount] = useState<string>();
-  const [token1Min, setToken1Min] = useState("0");
-  const [deadline, setDeadline] = useState(0);
   const [percentage, setPercentage] = useState(33);
   const [amount, setAmount] = useState<BigNumber>(BigNumber.from(0));
   const [totalLPSupply, setTotalLPSupply] = useState<BigNumber>(BigNumber.from(0));
@@ -53,13 +52,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     }
   ])
 
-  const [isLPTokenApproved, setIsLPTokenApproved] = useState(false);
-
-  const [uniswapPairFactory, setUniswapPairFactory] = useState<UniswapPairFactory>();
-  // TODO: move slippage to state or store
-  const SLIPPAGE = 0.0005;
-
-  useContractReads({
+  const { refetch: refetchAllBalance } = useContractReads({
     enabled: Boolean(address && router.query.id),
     contracts: [
       {
@@ -87,6 +80,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
       },
     ],
     onSuccess: (value) => {
+      console.log('fetching balance');
       setUserLPBalance({
         decimal: 18,
         raw: value[0],
@@ -106,17 +100,6 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
         }
       ])
     }
-  })
-
-  const { data: token0Min } = useContractRead({
-    enabled: Boolean(token1Amount),
-    address: ROUTER_CONTRACT,
-    abi: NEUTRO_ROUTER_ABI,
-    functionName: 'getAmountsOut',
-    args: [
-      !!token1Amount && parseEther(token1Amount),
-      [token1.address, token0.address]
-    ] as any
   })
 
   const { refetch: refetchAllowance } = useContractRead({
@@ -147,18 +130,8 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     }
   })
 
-  // const removeLiquidityArgs: any = useMemo(() => [
-  //   token0.address, // tokenA
-  //   token1.address, // tokenB
-  //   amount, // liquidity
-  //   parseEther(token0Amount!), // amountAMin
-  //   parseEther(token1Amount!), // amountBMin
-  //   address!, // address
-  //   BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
-  // ], [amount, token0, token1, token0Amount, token1Amount, address]);
-
-  const { config: removeLiquidityConfig } = usePrepareContractWrite({
-    enabled: Boolean(token0 && token1 && amount && !!token0Amount && !!token1Amount && address && deadline),
+  const { config: removeLiquidityConfig, isFetching: isSimulatingRemoveLiquidity } = usePrepareContractWrite({
+    enabled: Boolean(token0 && token1 && amount && !!token0Amount && !!token1Amount && address),
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: 'removeLiquidity',
@@ -170,117 +143,39 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
       !!token1Amount ? parseEther(token1Amount!) : parseEther("0"), // amountBMin
       address!, // address
       BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
-    ]
+    ],
   })
   const {
     isLoading: isRemovingLiquidity,
     write: removeLiquidity
-  } = useContractWrite(removeLiquidityConfig)
-
-  let cloneUniswapContractDetailsV2: CloneUniswapContractDetailsV2 = useMemo(() => ({
-    routerAddress: ROUTER_CONTRACT,
-    routerAbi: NEUTRO_ROUTER_ABI as any,
-    factoryAddress: FACTORY_CONTRACT,
-    pairAddress: router.query.id as `0x${string}`,
-  }), [router.query.id]);
-
-  let customNetworkData = useMemo(() => ({
-    nameNetwork: "EOS EVM Testnet",
-    multicallContractAddress: MULTICALL_CONTRACT,
-    nativeCurrency: {
-      name: "EOS",
-      symbol: "EOS",
-    },
-    nativeWrappedTokenInfo: {
-      chainId: 15557,
-      contractAddress: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
-      decimals: 18,
-      symbol: "WEOS",
-      name: "Wrapped EOS",
-    },
-  }), []);
-
-  let customPairSettings = useMemo(() => new UniswapPairSettings({
-    slippage: SLIPPAGE,
-    deadlineMinutes: 5,
-    disableMultihops: true,
-    cloneUniswapContractDetails: {
-      v2Override: cloneUniswapContractDetailsV2,
-    },
-    uniswapVersions: [UniswapVersion.v2],
-    customNetwork: customNetworkData,
-  }), [cloneUniswapContractDetailsV2, customNetworkData])
-
-  useEffect(() => {
-    if (!address) return;
-    (async () => {
-      const uniswapPair = new UniswapPair({
-        fromTokenContractAddress: token0.address,
-        toTokenContractAddress: token1.address,
-        ethereumAddress: address as string,
-        chainId: 15557,
-        providerUrl: "https://api-testnet2.trust.one/",
-        settings: customPairSettings,
-      });
-      const pairFactory = await uniswapPair.createFactory();
-      setUniswapPairFactory(pairFactory);
-    })()
-  }, [token0, token1, address, customPairSettings])
-
-  const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (isNaN(+value)) return;
-    setToken0Amount(value);
-    if (+value) debouncedToken0(value)
-  }
-
-  const debouncedToken0 = debounce(async (nextValue) => {
-    if (!uniswapPairFactory) return new Error('No Uniswap Pair Factory');
-    const trade = await uniswapPairFactory.trade(nextValue);
-    setToken1Amount(trade.expectedConvertQuote);
-    if (!trade.minAmountConvertQuote) return;
-    setToken1Min(trade.minAmountConvertQuote)
-    setDeadline(trade.tradeExpires);
-  }, 500)
-
-  const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (isNaN(+value) || !+value) return;
-    setToken1Amount(value);
-    if (+value) debouncedToken1(value);
-  }
-
-  const debouncedToken1 = debounce(async (nextValue) => {
-    if (!uniswapPairFactory) return new Error('No Uniswap Pair Factory');
-    const trade = await uniswapPairFactory.trade(nextValue);
-    setToken0Amount(trade.expectedConvertQuote);
-    if (!trade.minAmountConvertQuote) return;
-    setToken1Min(nextValue);
-    setDeadline(trade.tradeExpires);
-  }, 500)
+  } = useContractWrite({
+    ...removeLiquidityConfig,
+    onSuccess: async (tx) => {
+      await tx.wait()
+      await refetchAllBalance();
+    }
+  })
 
   useEffect(() => {
     if (amount.isZero() || totalLPSupply.isZero()) return;
-    const slippage = 50; // 0.50% slippage
-    const token0 = amount.mul(poolBalances[0].raw).mul(10000 - slippage).div(10000).div(totalLPSupply);
-    const token1 = amount.mul(poolBalances[1].raw).mul(10000 - slippage).div(10000).div(totalLPSupply);
-    // console.log(Number(formatEther(token0Amount)).toFixed(6), Number(formatEther(token1Amount)).toFixed(6));
+    const token0 = amount.mul(poolBalances[0].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
+    const token1 = amount.mul(poolBalances[1].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
     setToken0Amount(formatEther(token0));
     setToken1Amount(formatEther(token1));
-  }, [amount, poolBalances, totalLPSupply, uniswapPairFactory])
+  }, [amount, poolBalances, totalLPSupply])
 
   // NOTE: Enable for debugging only
-  useEffect(() => {
-    console.log([
-      token0.address, // tokenA
-      token1.address, // tokenB
-      amount.toString(), // liquidity
-      !!token0Amount && parseEther(token0Amount!).toString(), // amountAMin
-      !!token1Amount && parseEther(token1Amount!).toString(), // amountBMin
-      address!, // address
-      BigNumber.from(dayjs().add(5, 'minutes').unix()).toString() // deadline
-    ])
-  }, [amount, token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
+  // useEffect(() => {
+  //   console.log([
+  //     token0.address, // tokenA
+  //     token1.address, // tokenB
+  //     amount.toString(), // liquidity
+  //     !!token0Amount && parseEther(token0Amount!).toString(), // amountAMin
+  //     !!token1Amount && parseEther(token1Amount!).toString(), // amountBMin
+  //     address!, // address
+  //     BigNumber.from(dayjs().add(5, 'minutes').unix()).toString() // deadline
+  //   ])
+  // }, [amount, token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
   return (
     <div className="">
@@ -389,7 +284,6 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                   className="w-full rounded-lg"
                   placeholder="0.00"
                   value={token0Amount}
-                  onChange={handleToken0Change}
                 />
               </div>
             </div>
@@ -412,7 +306,6 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                   className="w-full rounded-lg"
                   placeholder="0.00"
                   value={token1Amount}
-                  onChange={handleToken1Change}
                 />
               </div>
             </div>
@@ -432,7 +325,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 <Button
                   scale={1.25}
                   className="!mt-2"
-                  loading={isRemovingLiquidity}
+                  loading={isRemovingLiquidity || isSimulatingRemoveLiquidity}
                   disabled={!removeLiquidity}
                   onClick={() => removeLiquidity?.()}
                 >

@@ -103,7 +103,7 @@ export default function PoolDetails() {
                 <span>Pool</span>
               </div>
             </Link>
-            <div className="flex flex-row sm:flex-col gap-y-2">
+            <div className="flex flex-row md:flex-col gap-y-2">
               <Tab className={({ selected }) => classNames(
                 selected && "bg-neutral-200/50 dark:bg-neutral-900",
                 selected && "!text-neutral-800 dark:!text-neutral-300",
