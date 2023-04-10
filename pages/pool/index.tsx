@@ -1,22 +1,28 @@
-import { Button, Fieldset, Input, Link, Note, Radio, Text, Textarea, useTheme } from "@geist-ui/core";
-import { useState } from "react";
+import { Text, Button, Loading, useTheme } from "@geist-ui/core";
+import { useEffect, useState } from "react";
 import NoContentDark from "@/public/states/empty/dark.svg"
 import NoContentLight from "@/public/states/empty/light.svg"
 import { Disclosure } from "@headlessui/react";
-import { ChevronDownIcon, ChevronRightIcon, ChevronUpIcon, QuestionMarkCircleIcon, XCircleIcon } from "@heroicons/react/20/solid";
-import { BigNumber, BigNumberish } from "ethers";
+import { ChevronRightIcon, ChevronUpIcon, XCircleIcon } from "@heroicons/react/20/solid";
+import { BigNumberish } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { classNames } from "@/shared/helpers/classNames";
-import { ArrowRightIcon, PlusIcon, PlusSmallIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { ArrowRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
 import { Modal, ModalContents, ModalOpenButton } from "@/components/elements/Modal";
-import NumberInput from "@/components/elements/NumberInput";
-import { SwapButton } from "@/components/modules/swap/SwapButton";
-import { SwitchTokensButton } from "@/components/modules/swap/SwitchTokensButton";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
-import { useContractRead } from "wagmi";
+import { useAccount, useContractRead } from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
+import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
+
+export type TokenDetails = {
+  address: `0x${string}`,
+  decimal: number,
+  name: string,
+  symbol: string,
+  logo: string
+}
 
 type PositionsResponse = {
   network_id: string,
@@ -25,33 +31,30 @@ type PositionsResponse = {
   name: string,
   symbol: Array<string>,
   logo: Array<string>,
-  balance: BigNumberish
+  userBalance: BigNumberish
+  token0: TokenDetails,
+  token1: TokenDetails
 }
 
 export default function Pool() {
   const theme = useTheme();
-  const [positions, setPositions] = useState<Array<PositionsResponse>>([]);
-  // const [positions, setPositions] = useState([
-  //   {
-  //     network_id: '36d45ac3-284b-4ad8-8262-b4980294e8e6',
-  //     address: '0xd0646b3FDeFb047d6C2bB7cc5475C7493BB83Ddc',
-  //     decimal: 18,
-  //     name: 'DONI-WETH',
-  //     symbol: ['vLPN', 'USDT', 'WETH'],
-  //     logo: [null, null, '/logo/eth.svg'],
-  //     balance: BigNumber.from(0x038d7ea4c67c18)
+  const { address } = useAccount();
 
-  //   },
-  //   {
-  //     network_id: '36d45ac3-284b-4ad8-8262-b4980294e8e6',
-  //     address: '0xd0646b3FDeFb047d6C2bB7cc5475C7493BB83Ddc',
-  //     decimal: 18,
-  //     name: 'vLPN-USDT-WETH',
-  //     symbol: ['vLPN', 'USDT', 'WETH'],
-  //     logo: [null, null, '/logo/eth.svg'],
-  //     balance: BigNumber.from(0x038d7ea4c67c18)
-  //   }
-  // ]);
+  const [positions, setPositions] = useState<Array<PositionsResponse>>([]);
+  const [isFetchingPool, setIsFetchingPool] = useState(false);
+
+  useEffect(() => {
+    if (!address) return;
+    (async () => {
+      setIsFetchingPool(true);
+      // const req = await fetch(`/api/getUserLP?userAddress=${address}`)
+      const req = await fetch(`/api/getUserLP?userAddress=0x222da5f13d800ff94947c20e8714e103822ff716`);
+      const response = await req.json();
+      console.log(response.data);
+      setPositions(response.data);
+      setIsFetchingPool(false);
+    })()
+  }, [address])
 
 
   return (
@@ -62,7 +65,7 @@ export default function Pool() {
       </div>
       <div className="flex justify-center items-center">
         <div className="mt-8 flex items-center text-center rounded-lg border border-neutral-200 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg w-full max-w-lg">
-          {!positions.length && (
+          {(!positions.length && !isFetchingPool) && (
             <div className="flex flex-col items-center p-8">
               {theme.type === "light" && <NoContentLight className="w-40 h-40 opacity-75" />}
               {theme.type === "dark" && <NoContentDark className="w-40 h-40 opacity-75" />}
@@ -81,6 +84,10 @@ export default function Pool() {
             </div>
           )}
 
+          {(!positions.length && isFetchingPool) && (
+            <Loading scale={3} />
+          )}
+
           {!!positions.length && (
             <div className="p-8 w-full">
               {positions.map((position) => (
@@ -93,21 +100,22 @@ export default function Pool() {
                       )}>
                         <div className="flex space-x-2 ml-4">
                           <div className="flex -space-x-1 relative z-0 overflow-hidden">
-                            {position.logo.map((logo, index) => (
-                              <>
-                                {!logo && (
-                                  <div className="relative z-30 inline-flex justify-center items-center h-6 w-6 rounded-full ring-2 ring-neutral-200 dark:ring-neutral-900 bg-neutral-500">
-                                    <p className="p-0 m-0 text-xs text-white font-medium uppercase">{position.name.split('-')[index].slice(0, 2)}</p>
-                                  </div>
-                                )}
-                                {!!logo && <img
-                                  key={logo}
-                                  className="relative z-30 inline-block h-6 w-6 rounded-full ring-2 ring-neutral-200 dark:ring-neutral-900"
-                                  src={logo}
-                                  alt=""
-                                />}
-                              </>
-                            ))}
+                            <img
+                              alt={`${position.token0.symbol} Icon`}
+                              src={position.token0.symbol}
+                              className="h-6 rounded-full"
+                              onError={(e) => {
+                                handleImageFallback(position.token0.symbol, e);
+                              }}
+                            />
+                            <img
+                              alt={`${position.token1.symbol} Icon`}
+                              src={position.token1.symbol}
+                              className="h-6 rounded-full"
+                              onError={(e) => {
+                                handleImageFallback(position.token1.symbol, e);
+                              }}
+                            />
                           </div>
                           <span className="text-left font-semibold text-lg">{position.name}</span>
                         </div>
@@ -119,10 +127,10 @@ export default function Pool() {
                       <Disclosure.Panel className="p-4 pt-6  rounded-md rounded-t-none border border-neutral-200 dark:border-neutral-900">
                         <dl className="inline-block">
                           <dt className="float-left text-left w-1/2">Total Pooled Tokens</dt>
-                          <dd className="float-right text-right w-1/2">{formatEther(position.balance)}</dd>
+                          <dd className="float-right text-right w-1/2">{formatEther(position.userBalance)}</dd>
 
                           <dt className="float-left text-left w-1/2">Total Pooled Tokens</dt>
-                          <dd className="float-right text-right w-1/2">{formatEther(position.balance)}</dd>
+                          <dd className="float-right text-right w-1/2">{formatEther(position.userBalance)}</dd>
                         </dl>
                         <div className="flex w-full justify-between gap-4 mt-4">
                           <Button
@@ -148,6 +156,17 @@ export default function Pool() {
                   )}
                 </Disclosure>
               ))}
+
+              <Modal>
+                <ModalOpenButton>
+                  <Button className="!mt-2">Add Liquidity</Button>
+                </ModalOpenButton>
+                <ModalContents>
+                  {({ close }) => (
+                    <AddLiquidityModal handleClose={close} />
+                  )}
+                </ModalContents>
+              </Modal>
             </div>
           )}
         </div>

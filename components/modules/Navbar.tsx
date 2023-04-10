@@ -7,6 +7,7 @@ import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNames";
+import { ArrowPathIcon } from "@heroicons/react/24/solid";
 
 interface Props { }
 
@@ -91,8 +92,11 @@ const Navbar: React.FC<Props> = () => {
                             scale={3 / 4}
                             px={0.6}
                             onClick={openChainModal}
+                            type="warning-light"
+                            ghost
+                            iconRight={<ArrowPathIcon />}
                           >
-                            Wrong Network
+                            Switch Network
                           </Button>
                         );
                       }
