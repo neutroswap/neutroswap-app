@@ -107,7 +107,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     BigNumber.from(deadline)
   ], [token0, token1, token0Amount, token1Amount, token1Min, address, deadline, token0Min]);
 
-  const { config: addLiquidityConfig } = usePrepareContractWrite({
+  const { config: addLiquidityConfig, isFetching: isSimulatingAddLiquidity } = usePrepareContractWrite({
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
     functionName: 'addLiquidity',
@@ -330,7 +330,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 <Button
                   scale={1.25}
                   className="!mt-2"
-                  loading={isAddingLiquidity}
+                  loading={isAddingLiquidity || isSimulatingAddLiquidity}
                   disabled={!addLiquidity}
                   onClick={() => addLiquidity?.()}
                 >
