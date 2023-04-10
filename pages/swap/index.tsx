@@ -14,43 +14,51 @@ import {
   UniswapVersion,
   UniswapPairSettings,
   UniswapPairFactory,
-  ETH,
+  TradeContext,
 } from "simple-uniswap-sdk";
 import { useAccount, useBalance, useSigner } from "wagmi";
 import { NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
+import { parseEther } from "ethers/lib/utils.js";
+import { ethers } from "ethers";
+import { bronos } from "wagmi/dist/chains";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
 export default function Swap() {
   const { address, isConnected } = useAccount();
   const [slippage, setSlippage] = useState("0.5");
-  const [tokenOneAmount, setTokenOneAmount] = useState("0");
-  const [tokenTwoAmount, setTokenTwoAmount] = useState("0");
-  // const [prices, setPrices] = useState(null);
-  // const [amountsOut, setAmountsOut] = useState(0);
-  const [trade, setTrade] = useState([]);
-  const [tokenOne, setTokenOne] = useState<`0x${string}`>(
+  const [token0Amount, setToken0Amount] = useState("0");
+  const [token1Amount, setToken1Amount] = useState("0");
+  const [token1Min, setToken1Min] = useState("0");
+  const [token1Est, setToken1Est] = useState("0");
+  const [tradeContext, setTradeContext] = useState<TradeContext>();
+  const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
+  const [token0, setToken0] = useState<`0x${string}`>(
     "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6"
   );
-  const [tokenTwo, setTokenTwo] = useState<`0x${string}`>(
+  const [token1, setToken1] = useState<`0x${string}`>(
     "0x0000000000000000000000000000000000000000"
   );
-  const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
 
   useEffect(() => {
-    console.log("latest ", uniswapFactory);
-  }, [uniswapFactory]);
+    console.log("Trade Info", tradeContext);
+    console.log(tradeContext);
+  }, []);
+
+  useEffect(() => {
+    console.log("latest =", uniswapFactory, "| getPair =", getPair);
+    console.log(tradeContext);
+  }, [uniswapFactory, tradeContext]);
 
   const { data: getPair } = useContractRead({
     address: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a", //Use Factory
     abi: NEUTRO_FACTORY_ABI,
     functionName: "getPair",
     chainId: 15557,
-    args: [tokenOne, tokenTwo],
+    args: [token0, token1],
   });
-  console.log("pair", getPair);
 
   useEffect(() => {
     let customNetworkData = {
@@ -74,19 +82,23 @@ export default function Swap() {
       factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
       pairAddress: getPair as string,
     };
-    console.log("Pair", getPair);
 
     if (
-      tokenOne !== "0x0000000000000000000000000000000000000000" &&
-      tokenTwo !== "0x0000000000000000000000000000000000000000"
+      token0 !== "0x0000000000000000000000000000000000000000" &&
+      token1 !== "0x0000000000000000000000000000000000000000"
     ) {
       const uniswapPair = new UniswapPair({
-        fromTokenContractAddress: tokenOne,
-        toTokenContractAddress: tokenTwo,
+        fromTokenContractAddress: token0,
+        toTokenContractAddress: token1,
         ethereumAddress: address as string,
         chainId: 15557,
         providerUrl: "https://api-testnet2.trust.one/",
         settings: new UniswapPairSettings({
+          gasSettings: {
+            getGasPrice: async () => {
+              return "GWEI_GAS_PRICE";
+            },
+          },
           slippage: Number(slippage) / 100,
           deadlineMinutes: 15,
           disableMultihops: true,
@@ -99,37 +111,55 @@ export default function Swap() {
       });
 
       const fac = async (uni: any) => {
-        console.log("owowow");
         let x = await uni.createFactory();
         setUniswapFactory(x);
-        console.log("mmm ", uniswapFactory);
       };
       fac(uniswapPair);
     }
-  }, [tokenOne, tokenTwo]);
+  }, [token0, token1]);
 
   const { data: signer } = useSigner({
     chainId: 15557,
   });
 
-  const tokenOneBalance = useBalance({
-    address: address,
-    token: tokenOne,
-    chainId: 15557,
-    watch: true,
-  });
+  useEffect(() => {
+    if (!uniswapFactory) return;
+    const tradeInfo = async () => {
+      const trade = await uniswapFactory.trade(token0Amount);
+      setTradeContext(trade);
+      setToken1Min(trade.minAmountConvertQuote as string);
+      setToken1Est(trade.expectedConvertQuote as string);
+    };
+    tradeInfo();
+  }, [token0Amount]);
 
-  const tokenTwoBalance = useBalance({
-    address: address,
-    token: tokenTwo,
-    chainId: 15557,
-    watch: true,
-  });
+  // const tokenOneBalance = useBalance({
+  //   address: address,
+  //   token: tokenOne,
+  //   chainId: 15557,
+  //   watch: true,
+  // });
+
+  // const tokenTwoBalance = useBalance({
+  //   address: address,
+  //   token: tokenTwo,
+  //   chainId: 15557,
+  //   watch: true,
+  // });
+
+  // const estimatedAmount = () => {
+  //   ethers.utils.parseEther(trade?.expectedConvertQuote);
+  // };
+
+  // const minimalAmount = () => {
+  //   ethers.utils.parseEther(trade?.minAmountConvertQuote);
+  // };
 
   const swap = async () => {
     if (!uniswapFactory) return;
-    const trade = await uniswapFactory.trade(tokenOneAmount);
-    console.log("Trade info", trade);
+    const trade = await uniswapFactory.trade(token0Amount);
+    setTradeContext(trade);
+    console.log("Trade info", tradeContext);
 
     if (!signer) {
       throw new Error("No signer");
@@ -191,7 +221,7 @@ export default function Swap() {
                             </span>
                           </div>
                           <RadioGroup onChange={setSlippage}>
-                            <div className="items-center relative bg-black/[0.08] dark:bg-white/[0.04] ring-4 ring-black/[0.08] dark:ring-white/[0.04] rounded-lg overflow-hidden flex gap-1">
+                            <div className="items-center relative bg-black/[0.08] dark:bg-white/[0.04] ring-4 ring-black/[0.08] dark:ring-white/[0.04] rounded-lg overflow-hidden flex p-1">
                               <>
                                 {TABS.map((tab, i) => (
                                   <RadioGroup.Option
@@ -240,10 +270,10 @@ export default function Swap() {
                 <NumberInput
                   className="text-2xl bg-transparent focus:outline-none"
                   placeholder="0.0"
-                  value={tokenOneAmount}
-                  onChange={setTokenOneAmount}
+                  value={token0Amount}
+                  onChange={setToken0Amount}
                 />
-                <TokenPicker setToken={setTokenOne}>
+                <TokenPicker setToken={setToken0}>
                   {({ selectedToken }) => (
                     <button
                       placeholder="Select a token"
@@ -289,10 +319,10 @@ export default function Swap() {
                 <NumberInput
                   className="text-2xl bg-transparent focus:outline-none"
                   placeholder="0.0"
-                  value={tokenTwoAmount}
-                  onChange={setTokenTwoAmount}
+                  value={token1Est}
+                  // onChange={setToken1Amount}
                 />
-                <TokenPicker setToken={setTokenTwo}>
+                <TokenPicker setToken={setToken1}>
                   {({ selectedToken }) => (
                     <button
                       placeholder="Select a token"
@@ -416,37 +446,29 @@ export default function Swap() {
               </ConnectButton.Custom>
             )}
             {isConnected && (
-              <>
+              <div className="flex flex-col w-full">
                 <Button
                   onClick={() => swap()}
-                  disabled={!tokenOneAmount || !isConnected}
+                  disabled={!token0Amount || !isConnected}
                   className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
                 >
                   Swap
                 </Button>
-                <div>
-                  {/* <div className="flex justify-between mb-2">
-                    <div>Price Impact</div>
-                    <div>+0.15%</div>
-                  </div> */}
-                  {/* <div className="flex justify-between mb-2">
+                <div className="text-sm">
+                  <div className="flex justify-between mb-2">
                     <div>Est. received</div>
-                    <div>{trade.expectedConvertQuote}</div>
+                    <div>{parseFloat(token1Est).toFixed(2).toString()}</div>
                   </div>
                   <div className="flex justify-between mb-2">
                     <div>Min. received</div>
-                    <div>{trade.mintAmountConvertQuote}</div>
-                  </div> */}
+                    <div>{parseFloat(token1Min).toFixed(2).toString()}</div>
+                  </div>
                   {/* <div className="flex justify-between mb-2">
                     <div>Network fee</div>
                     <div>~$0.01</div>
                   </div> */}
-                  <div className="flex justify-between mb-2">
-                    <div>Recipient</div>
-                    <div>{address}</div>
-                  </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
