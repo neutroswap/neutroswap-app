@@ -15,7 +15,7 @@ import {
   UniswapPairSettings,
   UniswapPairFactory,
 } from "simple-uniswap-sdk";
-import { useAccount, useSigner } from "wagmi";
+import { useAccount, useBalance, useSigner } from "wagmi";
 import { NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
@@ -25,11 +25,10 @@ const TABS = ["0.1", "0.5", "1.0"];
 export default function Swap() {
   const { address, isConnected } = useAccount();
   const [slippage, setSlippage] = useState("0.5");
-  const [selectedSlippage, setSelectedSlippage] = useState(0.5);
   const [tokenOneAmount, setTokenOneAmount] = useState("0");
   const [tokenTwoAmount, setTokenTwoAmount] = useState("0");
   // const [prices, setPrices] = useState(null);
-  const [amountsOut, setAmountsOut] = useState(0);
+  // const [amountsOut, setAmountsOut] = useState(0);
   const [tokenOne, setTokenOne] = useState<`0x${string}`>(
     "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6"
   );
@@ -86,7 +85,7 @@ export default function Swap() {
         chainId: 15557,
         providerUrl: "https://api-testnet2.trust.one/",
         settings: new UniswapPairSettings({
-          slippage: Number(slippage) / 100, //Edit to receive state change
+          slippage: Number(slippage) / 100,
           deadlineMinutes: 15,
           disableMultihops: true,
           cloneUniswapContractDetails: {
@@ -109,6 +108,20 @@ export default function Swap() {
 
   const { data: signer } = useSigner({
     chainId: 15557,
+  });
+
+  const tokenOneBalance = useBalance({
+    address: address,
+    token: tokenOne,
+    chainId: 15557,
+    watch: true,
+  });
+
+  const tokenTwoBalance = useBalance({
+    address: address,
+    token: tokenTwo,
+    chainId: 15557,
+    watch: true,
   });
 
   const swap = async () => {
@@ -219,7 +232,7 @@ export default function Swap() {
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
                 <p className="text-sm text-neutral-400">You Sell</p>
-                {/* <p className="text-sm text-neutral-400">{tokenBalance}</p> */}
+                {/* <p className="text-sm text-neutral-400">{tokenOneBalance}</p> */}
               </div>
               <div className="flex justify-between">
                 <NumberInput
@@ -268,7 +281,7 @@ export default function Swap() {
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
                 <p className="text-sm text-neutral-400">You Buy</p>
-                {/* <p className="text-sm text-neutral-400">{tokensBalance}</p> */}
+                {/* <p className="text-sm text-neutral-400">{tokenTwoBalance}</p> */}
               </div>
               <div className="flex justify-between">
                 <NumberInput
