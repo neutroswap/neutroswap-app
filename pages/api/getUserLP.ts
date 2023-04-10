@@ -12,7 +12,7 @@ import {
 import { NEUTRO_LP_TOKEN_ABI } from '@/shared/abi'
 
 type Data = {
-  name: string
+  data: any
 }
 
 export async function getAllLPs () {
@@ -33,11 +33,11 @@ export async function getUserLP (userAddress: any) {
     const provider = new ethers.providers.JsonRpcProvider(network.rpc, {
       chainId: network.chain_id,
       name: network.name,
-      url: network.rpc
+      // url: network.rpc
     })
     console.log("privderrs ", provider)
     const multicall = new Multicall({
-      multicallCustomContractAddress: '0x294bb4c48F762DC0AFfe9DA653E9C6E1A4011452',
+      multicallCustomContractAddress:  network.multicall_addr,
       ethersProvider: provider,
       tryAggregate: true
     })
@@ -46,64 +46,12 @@ export async function getUserLP (userAddress: any) {
     let promises = []
     let userLPs = []
 
-    let lpABI = [
-      {
-        constant: true,
-        inputs: [{ name: '_owner', type: 'address' }],
-        name: 'balanceOf',
-        outputs: [{ name: 'balance', type: 'uint256' }],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function'
-      },
-      {
-        constant: true,
-        inputs: [],
-        name: 'getReserves',
-        outputs: [
-          {
-            internalType: 'uint112',
-            name: '_reserve0',
-            type: 'uint112'
-          },
-          {
-            internalType: 'uint112',
-            name: '_reserve1',
-            type: 'uint112'
-          },
-          {
-            internalType: 'uint32',
-            name: '_blockTimestampLast',
-            type: 'uint32'
-          }
-        ],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function'
-      },
-      {
-        constant: true,
-        inputs: [],
-        name: 'totalSupply',
-        outputs: [
-          {
-            internalType: 'uint256',
-            name: '',
-            type: 'uint256'
-          }
-        ],
-        payable: false,
-        stateMutability: 'view',
-        type: 'function'
-      }
-    ]
-
     for (let i = 0; i < lps.length; i++) {
       let lp = lps[i]
       contractCallContext.push({
         reference: 'LP' + i,
         contractAddress: lp.address,
-        abi: NEUTRO_LP_TOKEN_ABI,
+        abi: NEUTRO_LP_TOKEN_ABI as any,
         calls: [
           {
             reference: 'balance',
@@ -190,11 +138,15 @@ export async function getUserLP (userAddress: any) {
     }
     console.log("users lp ", userLPs)
     let tokens = await Promise.all(promises)
-    console.log('tokenss ', tokens[0].data[0], tokens.length)
+    if (!tokens) return;
+    // console.log('tokenss ', tokens[0].data[0], tokens.length)
     for (let i = 0; i < tokens.length; i += 2) { //assign ke userLP terkait. Karena tiap LP ada 2, makanya dibagi 2 buat dapet index nya 
       console.log("dsadsa ")
-      userLPs[i/2].token0 = tokens[i].data[0] 
-      userLPs[i/2].token1 = tokens[i + 1].data[0]
+      const token0 = tokens[i];
+      const token1 = tokens[i+1];
+      if (!token0.data || !token1.data) return;
+      userLPs[i/2].token0 = token0.data[0]; 
+      userLPs[i/2].token1 = token1.data[0];
     }
     console.log('Data ', userLPs)
     return userLPs
@@ -214,7 +166,7 @@ export default async function handler (
     case 'GET':
       const { userAddress } = req.query
       console.log('iser ', userAddress)
-      let nonZeroLP = await getUserLP(userAddress)
+      let nonZeroLP:any = await getUserLP(userAddress)
       let response = {
         data: nonZeroLP
       }
