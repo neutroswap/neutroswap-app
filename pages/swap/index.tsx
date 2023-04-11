@@ -62,10 +62,10 @@ export default function Swap() {
   const [balance1, setBalance1] = useState("0");
   const [tokenName0, setTokenName0] = useState("");
   const [tokenName1, setTokenName1] = useState("");
-  const [token0Amount, setToken0Amount] = useState("0");
-  const [token1Amount, setToken1Amount] = useState("0");
-  const [token1Min, setToken1Min] = useState("0");
-  const [token1Est, setToken1Est] = useState("0");
+  const [tokenAmount0, setTokenAmount0] = useState("0");
+  const [tokenAmount1, setTokenAmount1] = useState("0");
+  const [tokenMin1, setTokenMin1] = useState("0");
+  const [tokenEst1, setTokenEst1] = useState("0");
   const [token0, setToken0] = useState<Token>(tokens[0]);
   const [token1, setToken1] = useState<Token>(tokens[1]);
 
@@ -207,8 +207,8 @@ export default function Swap() {
 
   useEffect(() => {
     if (!tradeContext) return;
-    setToken1Min(tradeContext.minAmountConvertQuote as string);
-    setToken1Est(tradeContext.expectedConvertQuote as string);
+    setTokenMin1(tradeContext.minAmountConvertQuote as string);
+    setTokenEst1(tradeContext.expectedConvertQuote as string);
 
     if (tradeContext.hasEnoughAllowance === true) {
       setIsApproved(true);
@@ -218,7 +218,7 @@ export default function Swap() {
   const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
-    setToken0Amount(value);
+    setTokenAmount0(value);
     debouncedToken0(value);
   };
 
@@ -229,9 +229,9 @@ export default function Swap() {
 
     setIsFetchingToken1Price(true);
     const trade = await uniswapFactory.trade(nextValue, TradeDirection.input);
-    setToken1Amount(trade.expectedConvertQuote);
-    setToken1Min(trade.minAmountConvertQuote as string);
-    setToken1Est(trade.expectedConvertQuote as string);
+    setTokenAmount1(trade.expectedConvertQuote);
+    setTokenMin1(trade.minAmountConvertQuote as string);
+    setTokenEst1(trade.expectedConvertQuote as string);
     setDirection("input");
     setTradeContext(trade);
     setIsFetchingToken1Price(false);
@@ -240,7 +240,7 @@ export default function Swap() {
   const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (isNaN(+value) || !+value) return;
-    setToken1Amount(value);
+    setTokenAmount1(value);
     debouncedToken1(value);
   };
 
@@ -250,7 +250,7 @@ export default function Swap() {
 
     setIsFetchingToken0Price(true);
     const trade = await uniswapFactory.trade(nextValue, TradeDirection.output);
-    setToken0Amount(trade.expectedConvertQuote);
+    setTokenAmount0(trade.expectedConvertQuote);
     const flippedTrade = await uniswapFactory.trade(
       trade.expectedConvertQuote,
       TradeDirection.input
@@ -263,6 +263,8 @@ export default function Swap() {
   const handleSwitchTokens = () => {
     setToken0(token1);
     setToken1(token0);
+    setTokenAmount0(tokenAmount1);
+    setTokenAmount1(tokenAmount0);
   };
 
   const swap = async () => {
@@ -388,7 +390,7 @@ export default function Swap() {
                   className="flex items-center cursor-pointer"
                   onClick={() => {
                     if (!address) return;
-                    setToken0Amount(balance0);
+                    setTokenAmount0(balance0);
                     debouncedToken0(balance0);
                   }}
                 >
@@ -408,7 +410,7 @@ export default function Swap() {
                   <input
                     className="text-2xl bg-transparent focus:outline-none"
                     placeholder="0.0"
-                    value={token0Amount}
+                    value={tokenAmount0}
                     onChange={handleToken0Change}
                   />
                 </div>
@@ -465,7 +467,7 @@ export default function Swap() {
                   className="flex items-center cursor-pointer "
                   onClick={() => {
                     if (!address) return;
-                    setToken1Amount(balance1);
+                    setTokenAmount1(balance1);
                     debouncedToken1(balance1);
                   }}
                 >
@@ -485,7 +487,7 @@ export default function Swap() {
                   <input
                     className="text-2xl bg-transparent focus:outline-none"
                     placeholder="0.0"
-                    value={token1Amount}
+                    value={tokenAmount1}
                     onChange={handleToken1Change}
                   />
                 </div>
@@ -635,11 +637,11 @@ export default function Swap() {
                       <div className="flex items-center justify-between ">
                         <div className="flex flex-col ">
                           <div className="text-2xl mb-1 font-medium">
-                            Buy {parseFloat(token1Amount).toFixed(5).toString()}{" "}
+                            Buy {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
                             {tokenName1}
                           </div>
                           <div className="text-lg text-neutral-400 font-medium">
-                            Sell {token0Amount} {tokenName0}
+                            Sell {tokenAmount0} {tokenName0}
                           </div>
                         </div>
                         <img
@@ -671,7 +673,7 @@ export default function Swap() {
                             </div>
                           </div>
                           <div>
-                            {parseFloat(token1Min).toFixed(5).toString()} $
+                            {parseFloat(tokenMin1).toFixed(5).toString()} $
                             {tokenName1}
                           </div>
                         </div>
@@ -696,7 +698,7 @@ export default function Swap() {
                         <>
                           <Button
                             onClick={() => swap()}
-                            disabled={!token0Amount || !isConnected}
+                            disabled={!tokenAmount0 || !isConnected}
                             className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
                             loading={isLoading}
                           >
@@ -704,7 +706,7 @@ export default function Swap() {
                           </Button>
                           <Button
                             onClick={() => swap()}
-                            disabled={!token0Amount || !isConnected}
+                            disabled={!tokenAmount0 || !isConnected}
                             className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
                             loading={isLoading}
                           >
