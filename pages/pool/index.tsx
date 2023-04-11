@@ -15,14 +15,8 @@ import { useAccount, useContractRead } from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
-
-export type TokenDetails = {
-  address: `0x${string}`,
-  decimal: number,
-  name: string,
-  symbol: string,
-  logo: string
-}
+import { Token } from "@/shared/types/tokens.types";
+import { tokens } from "@/shared/statics/tokenList";
 
 type PositionsResponse = {
   network_id: string,
@@ -32,8 +26,8 @@ type PositionsResponse = {
   symbol: Array<string>,
   logo: Array<string>,
   userBalance: BigNumberish
-  token0: TokenDetails,
-  token1: TokenDetails
+  token0: Token,
+  token1: Token
 }
 
 export default function Pool() {
@@ -177,16 +171,14 @@ export default function Pool() {
 
 const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({ handleClose }) => {
   const router = useRouter();
-  const [tokenOneAmount, setTokenOneAmount] = useState("");
-  const [tokenTwoAmount, setTokenTwoAmount] = useState("");
-  const [tokenOne, setTokenOne] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
-  const [tokenTwo, setTokenTwo] = useState<`0x${string}`>("0x0000000000000000000000000000000000000000");
+  const [token0, setToken0] = useState<Token>(tokens[0]);
+  const [token1, setToken1] = useState<Token>(tokens[1]);
 
   const { data: existingPool, isError, isLoading: isFetchingGetPair } = useContractRead({
     address: FACTORY_CONTRACT,
     abi: NEUTRO_FACTORY_ABI,
     functionName: 'getPair',
-    args: [tokenOne, tokenTwo]
+    args: [token0.address, token1.address]
   })
 
   return (
@@ -203,7 +195,11 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({ handleClose 
         </button>
       </div>
 
-      <TokenPicker setToken={setTokenOne}>
+      <TokenPicker
+        selectedToken={token0}
+        setSelectedToken={setToken0}
+        disabledToken={token1}
+      >
         {({ selectedToken }) => (
           <div className={classNames(
             "py-1 px-4 rounded-2xl rounded-b-none cursor-pointer transition-colors group",
@@ -215,20 +211,24 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({ handleClose 
                 <p className="text-sm text-neutral-600 dark:text-neutral-600">1</p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.ticker.toLowerCase()}.svg`}
+                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
-                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.ticker}`;
+                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
                   }}
                 />
-                <span className="text-sm font-semibold text-black dark:text-white">{selectedToken.ticker}</span>
+                <span className="text-sm font-semibold text-black dark:text-white">{selectedToken.symbol}</span>
               </div>
               <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
             </div>
           </div>
         )}
       </TokenPicker>
-      <TokenPicker setToken={setTokenTwo}>
+      <TokenPicker
+        selectedToken={token1}
+        setSelectedToken={setToken1}
+        disabledToken={token0}
+      >
         {({ selectedToken }) => (
           <div className={classNames(
             "py-1 px-4 rounded-2xl rounded-t-none cursor-pointer transition-colors group",
@@ -240,13 +240,13 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({ handleClose 
                 <p className="text-sm text-neutral-600 dark:text-neutral-600">2</p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.ticker.toLowerCase()}.svg`}
+                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
-                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.ticker}`;
+                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
                   }}
                 />
-                <span className="text-sm font-semibold text-black dark:text-white">{selectedToken.ticker}</span>
+                <span className="text-sm font-semibold text-black dark:text-white">{selectedToken.symbol}</span>
               </div>
               <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
             </div>
