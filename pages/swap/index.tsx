@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, {
   useState,
   useEffect,
@@ -25,13 +26,16 @@ import {
   appendEthToContractAddress,
   TradeDirection,
 } from "simple-uniswap-sdk";
-import { useAccount, useBalance, useSigner } from "wagmi";
-import { NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
+import { useAccount, useBalance, useContractReads, useSigner } from "wagmi";
+import { ERC20_ABI, NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
 import truncateEthAddress from "truncate-eth-address";
 import { tokens } from "@/components/modules/swap/TokenPicker";
 import debounce from "lodash/debounce";
+import { BigNumber } from "ethers";
+import { Currency } from "@/shared/types/currency.types";
+import { formatEther } from "ethers/lib/utils.js";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -43,7 +47,10 @@ export default function Swap() {
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
   const [isPreferNative, setIsPreferNative] = useState(true);
-
+  const [balance0, setBalance0] = useState("0");
+  const [balance1, setBalance1] = useState("0");
+  const [tokenName0, setTokenName0] = useState("");
+  const [tokenName1, setTokenName1] = useState("");
   const [token0Amount, setToken0Amount] = useState("0");
   const [token1Amount, setToken1Amount] = useState("0");
   const [token1Min, setToken1Min] = useState("0");
@@ -58,6 +65,32 @@ export default function Swap() {
   );
 
   const [direction, setDirection] = useState<"input" | "output">("input");
+
+  useContractReads({
+    enabled: Boolean(address),
+    contracts: [
+      {
+        address: token0,
+        abi: ERC20_ABI,
+        functionName: "balanceOf",
+        args: [address!],
+      },
+      {
+        address: token1,
+        abi: ERC20_ABI,
+        functionName: "balanceOf",
+        args: [address!],
+      },
+      { address: token0, abi: ERC20_ABI, functionName: "symbol" },
+      { address: token1, abi: ERC20_ABI, functionName: "symbol" },
+    ],
+    onSuccess(value) {
+      setBalance0(Number(formatEther(value[0])).toFixed(2).toString());
+      setBalance1(Number(formatEther(value[1])).toFixed(2).toString());
+      setTokenName0(value[2]);
+      setTokenName1(value[3]);
+    },
+  });
 
   useEffect(() => {
     console.log("latest =", uniswapFactory, "| pairs =", pairs);
@@ -311,7 +344,6 @@ export default function Swap() {
                                   </RadioGroup.Option>
                                 ))}
 
-                                {/* <div className="h-[28px] w-0.5 bg-gray-900/5 dark:bg-slate-200/5" /> */}
                                 <NumberInput
                                   className="focus:dark:bg-[#2D3036] dark:placeholder:text-neutral-400 focus:dark:text-white rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px]"
                                   placeholder="custom"
@@ -332,13 +364,11 @@ export default function Swap() {
               <div className="flex justify-between">
                 <p className="text-sm text-neutral-400">You Sell</p>
                 <div
-                  className="flex items-center cursor-pointer hover:text-[#2D3036]/50"
+                  className="flex items-center cursor-pointer"
                   onClick={() => {
-                    if (tradeContext?.fromBalance.balance) return;
-                    setToken0Amount(
-                      tradeContext?.fromBalance.balance as string
-                    );
-                    debouncedToken0(tradeContext?.fromBalance.balance);
+                    if (!address) return;
+                    setToken0Amount(balance0);
+                    debouncedToken0(balance0);
                   }}
                 >
                   <img
@@ -346,19 +376,12 @@ export default function Swap() {
                     alt="Wallet Icon"
                     className="h-5 mr-1"
                   />
-                  <p className="text-sm text-neutral-400">
-                    {tradeContext?.fromBalance.balance}
+                  <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
+                    {balance0} {tokenName0}
                   </p>
                 </div>
               </div>
               <div className="flex justify-between">
-                {/* <NumberInput
-                  className="text-2xl bg-transparent focus:outline-none"
-                  placeholder="0.0"
-                  value={token0Amount}
-                  onChange={handleToken0Change}
-                /> */}
-
                 <div>
                   {isFetchingToken0Price && <Spinner className="w-5 h-5" />}
                   <input
@@ -409,30 +432,24 @@ export default function Swap() {
               <div className="flex justify-between">
                 <p className="text-sm text-neutral-400">You Buy</p>
                 <div
-                  className="flex items-center cursor-pointer hover:text-[#2D3036]/50"
+                  className="flex items-center cursor-pointer "
                   onClick={() => {
-                    if (!tradeContext?.toBalance) return;
-                    setToken1Amount(tradeContext.toBalance);
-                    debouncedToken1(tradeContext.toBalance);
+                    if (!address) return;
+                    setToken1Amount(balance1);
+                    debouncedToken1(balance1);
                   }}
                 >
                   <img
                     src="/icons/wallet.png"
                     alt="Wallet Icon"
-                    className="h-5 mr-1 "
+                    className="h-5 mr-1"
                   />
-                  <p className="text-sm text-neutral-400">
-                    {tradeContext?.toBalance}
+                  <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
+                    {balance1} {tokenName1}
                   </p>
                 </div>
               </div>
               <div className="flex justify-between">
-                {/* <NumberInput
-                  className="text-2xl bg-transparent focus:outline-none"
-                  placeholder="0.0"
-                  value={token1Amount}
-                  onChange={handleToken1Change}
-                /> */}
                 <div className="relative">
                   {isFetchingToken1Price && <Spinner className="w-5 h-5" />}
                   <input
@@ -577,11 +594,17 @@ export default function Swap() {
                 <div className="text-sm">
                   <div className="flex justify-between mb-2">
                     <div>Est. received</div>
-                    <div>{parseFloat(token1Est).toFixed(2).toString()}</div>
+                    <div>
+                      {parseFloat(token1Est).toFixed(2).toString()} $
+                      {tokenName1}
+                    </div>
                   </div>
                   <div className="flex justify-between mb-2">
                     <div>Min. received</div>
-                    <div>{parseFloat(token1Min).toFixed(2).toString()}</div>
+                    <div>
+                      {parseFloat(token1Min).toFixed(2).toString()} $
+                      {tokenName1}
+                    </div>
                   </div>
                   {/* <div className="flex justify-between mb-2">
                     <div>Network fee</div>
