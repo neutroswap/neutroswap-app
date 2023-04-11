@@ -26,27 +26,28 @@ import {
   appendEthToContractAddress,
   TradeDirection,
 } from "simple-uniswap-sdk";
-import { useAccount, useBalance, useContractReads, useSigner } from "wagmi";
-import { ERC20_ABI, NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
+import { useAccount, useContractReads, useSigner } from "wagmi";
+import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
 import truncateEthAddress from "truncate-eth-address";
 import { tokens } from "@/components/modules/swap/TokenPicker";
 import debounce from "lodash/debounce";
-import { BigNumber } from "ethers";
-import { Currency } from "@/shared/types/currency.types";
 import { formatEther } from "ethers/lib/utils.js";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
 export default function Swap() {
   const { address, isConnected } = useAccount();
+
   const [slippage, setSlippage] = useState("0.5");
 
+  const [isApproved, setIsApproved] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
   const [isPreferNative, setIsPreferNative] = useState(true);
+
   const [balance0, setBalance0] = useState("0");
   const [balance1, setBalance1] = useState("0");
   const [tokenName0, setTokenName0] = useState("");
@@ -55,8 +56,6 @@ export default function Swap() {
   const [token1Amount, setToken1Amount] = useState("0");
   const [token1Min, setToken1Min] = useState("0");
   const [token1Est, setToken1Est] = useState("0");
-  const [tradeContext, setTradeContext] = useState<TradeContext>();
-  const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [token0, setToken0] = useState<`0x${string}`>(
     tokens[0].address as `0x${string}`
   );
@@ -64,6 +63,8 @@ export default function Swap() {
     tokens[1].address as `0x${string}`
   );
 
+  const [tradeContext, setTradeContext] = useState<TradeContext>();
+  const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
 
   useContractReads({
@@ -85,16 +86,17 @@ export default function Swap() {
       { address: token1, abi: ERC20_ABI, functionName: "symbol" },
     ],
     onSuccess(value) {
-      setBalance0(Number(formatEther(value[0])).toFixed(2).toString());
-      setBalance1(Number(formatEther(value[1])).toFixed(2).toString());
+      setBalance0(Number(formatEther(value[0])).toFixed(5).toString());
+      setBalance1(Number(formatEther(value[1])).toFixed(5).toString());
       setTokenName0(value[2]);
       setTokenName1(value[3]);
     },
   });
 
   useEffect(() => {
-    console.log("latest =", uniswapFactory, "| pairs =", pairs);
-    console.log(tradeContext);
+    console.log("Uniswap Factory =", uniswapFactory);
+    console.log("Pairs =", pairs);
+    console.log("Trade context = ", tradeContext);
   }, [uniswapFactory, tradeContext]);
 
   const { data: pairs } = useContractRead({
@@ -146,6 +148,7 @@ export default function Swap() {
 
   useEffect(() => {
     if (!pairs) return;
+    if (!address) return;
     const uniswapPair = new UniswapPair({
       fromTokenContractAddress: formatWrappedToken(token0, isPreferNative),
       toTokenContractAddress: formatWrappedToken(token1, isPreferNative),
@@ -193,15 +196,12 @@ export default function Swap() {
     if (!tradeContext) return;
     setToken1Min(tradeContext.minAmountConvertQuote as string);
     setToken1Est(tradeContext.expectedConvertQuote as string);
+
+    if (tradeContext.hasEnoughAllowance === true) {
+      setIsApproved(true);
+    } else setIsApproved(false);
   }, [tradeContext]);
 
-  // const estimatedAmount = () => {
-  //   ethers.utils.parseEther(trade?.expectedConvertQuote);
-  // };
-
-  // const minimalAmount = () => {
-  //   ethers.utils.parseEther(trade?.minAmountConvertQuote);
-  // };
   const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
@@ -297,7 +297,7 @@ export default function Swap() {
               <Popover className="relative">
                 <>
                   <Popover.Button>
-                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer" />
+                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer hover:dark:text-neutral-600" />
                   </Popover.Button>
                   <Transition
                     as={Fragment}
@@ -362,7 +362,10 @@ export default function Swap() {
             </div>
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
-                <p className="text-sm text-neutral-400">You Sell</p>
+                <div className="flex items-center">
+                  <p className="text-sm text-neutral-400 mr-2">You Sell</p>
+                  {isFetchingToken0Price && <Spinner className="w-4 h-4" />}
+                </div>
                 <div
                   className="flex items-center cursor-pointer"
                   onClick={() => {
@@ -389,7 +392,6 @@ export default function Swap() {
                     value={token0Amount}
                     onChange={handleToken0Change}
                   />
-                  {isFetchingToken0Price && <Spinner className="w-5 h-5" />}
                 </div>
                 <TokenPicker setToken={setToken0}>
                   {({ selectedToken0: selectedToken0 }) => (
@@ -430,7 +432,10 @@ export default function Swap() {
             </div>
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
-                <p className="text-sm text-neutral-400">You Buy</p>
+                <div className="flex items-center">
+                  <p className="text-sm text-neutral-400 mr-2">You Buy</p>
+                  {isFetchingToken1Price && <Spinner className="w-4 h-4" />}
+                </div>
                 <div
                   className="flex items-center cursor-pointer "
                   onClick={() => {
@@ -451,7 +456,6 @@ export default function Swap() {
               </div>
               <div className="flex justify-between">
                 <div className="relative">
-                  {isFetchingToken1Price && <Spinner className="w-5 h-5" />}
                   <input
                     className="text-2xl bg-transparent focus:outline-none"
                     placeholder="0.0"
@@ -581,7 +585,21 @@ export default function Swap() {
                 }}
               </ConnectButton.Custom>
             )}
-            {isConnected && (
+
+            {isConnected && isApproved === false && (
+              <div className="flex flex-col w-full">
+                <Button
+                  onClick={() => swap()}
+                  disabled={!token0Amount || !isConnected}
+                  className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                  loading={isLoading}
+                >
+                  Approve Token
+                </Button>
+              </div>
+            )}
+
+            {isApproved === true && (
               <div className="flex flex-col w-full">
                 <Button
                   onClick={() => swap()}
@@ -595,14 +613,14 @@ export default function Swap() {
                   <div className="flex justify-between mb-2">
                     <div>Est. received</div>
                     <div>
-                      {parseFloat(token1Est).toFixed(2).toString()} $
+                      {parseFloat(token1Est).toFixed(5).toString()} $
                       {tokenName1}
                     </div>
                   </div>
                   <div className="flex justify-between mb-2">
                     <div>Min. received</div>
                     <div>
-                      {parseFloat(token1Min).toFixed(2).toString()} $
+                      {parseFloat(token1Min).toFixed(5).toString()} $
                       {tokenName1}
                     </div>
                   </div>
@@ -610,7 +628,7 @@ export default function Swap() {
                     <div>Network fee</div>
                     <div>~$0.01</div>
                   </div> */}
-                  <div className="flex justify-between mb-2">
+                  <div className="flex justify-between mb-2 font-semibold">
                     <div>Recipient</div>
                     <div>{truncateEthAddress(address as string)}</div>
                   </div>
