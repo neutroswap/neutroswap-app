@@ -1,5 +1,12 @@
-import React, { useState, useEffect, Fragment } from "react";
-import { Button, Text } from "@geist-ui/core";
+import React, {
+  useState,
+  useEffect,
+  Fragment,
+  useMemo,
+  ChangeEvent,
+  useCallback,
+} from "react";
+import { Button, Spinner, Text } from "@geist-ui/core";
 import {
   ChevronDownIcon,
   AdjustmentsHorizontalIcon,
@@ -15,20 +22,28 @@ import {
   UniswapPairSettings,
   UniswapPairFactory,
   TradeContext,
+  appendEthToContractAddress,
+  TradeDirection,
 } from "simple-uniswap-sdk";
 import { useAccount, useBalance, useSigner } from "wagmi";
 import { NEUTRO_FACTORY_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
-import { parseEther } from "ethers/lib/utils.js";
-import { ethers } from "ethers";
-import { bronos } from "wagmi/dist/chains";
+import truncateEthAddress from "truncate-eth-address";
+import { tokens } from "@/components/modules/swap/TokenPicker";
+import debounce from "lodash/debounce";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
 export default function Swap() {
   const { address, isConnected } = useAccount();
   const [slippage, setSlippage] = useState("0.5");
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
+  const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
+  const [isPreferNative, setIsPreferNative] = useState(true);
+
   const [token0Amount, setToken0Amount] = useState("0");
   const [token1Amount, setToken1Amount] = useState("0");
   const [token1Min, setToken1Min] = useState("0");
@@ -36,32 +51,29 @@ export default function Swap() {
   const [tradeContext, setTradeContext] = useState<TradeContext>();
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [token0, setToken0] = useState<`0x${string}`>(
-    "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6"
+    tokens[0].address as `0x${string}`
   );
   const [token1, setToken1] = useState<`0x${string}`>(
-    "0x0000000000000000000000000000000000000000"
+    tokens[0].address as `0x${string}`
   );
 
-  useEffect(() => {
-    console.log("Trade Info", tradeContext);
-    console.log(tradeContext);
-  }, []);
+  const [direction, setDirection] = useState<"input" | "output">("input");
 
   useEffect(() => {
-    console.log("latest =", uniswapFactory, "| getPair =", getPair);
+    console.log("latest =", uniswapFactory, "| pairs =", pairs);
     console.log(tradeContext);
   }, [uniswapFactory, tradeContext]);
 
-  const { data: getPair } = useContractRead({
-    address: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a", //Use Factory
+  const { data: pairs } = useContractRead({
+    address: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
     abi: NEUTRO_FACTORY_ABI,
     functionName: "getPair",
     chainId: 15557,
     args: [token0, token1],
   });
 
-  useEffect(() => {
-    let customNetworkData = {
+  let customNetworkData = useMemo(
+    () => ({
       nameNetwork: "EOS EVM",
       multicallContractAddress: "0x294bb4c48F762DC0AFfe9DA653E9C6E1A4011452",
       nativeCurrency: {
@@ -70,82 +82,85 @@ export default function Swap() {
       },
       nativeWrappedTokenInfo: {
         chainId: 15557,
-        contractAddress: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
+        contractAddress: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
         decimals: 18,
         symbol: "WEOS",
         name: "Wrapped EOS",
       },
-    };
+    }),
+    []
+  );
 
-    let cloneUniswapContractDetailsV2 = {
-      routerAddress: "0xa3F17F5BC296674415205D50Fa5081834411d65e",
-      factoryAddress: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
-      pairAddress: getPair as string,
-    };
+  let cloneUniswapContractDetailsV2 = useMemo(
+    () => ({
+      routerAddress: "0xa406053604bFBbE8BEc48313fB6edb5c5032A3ad",
+      factoryAddress: "0xa5AD06E9E70Fde3011489A4fbfa49Ce4cBd1D583",
+      pairAddress: pairs as string,
+    }),
+    [pairs]
+  );
 
-    if (
-      token0 !== "0x0000000000000000000000000000000000000000" &&
-      token1 !== "0x0000000000000000000000000000000000000000"
-    ) {
-      const uniswapPair = new UniswapPair({
-        fromTokenContractAddress: token0,
-        toTokenContractAddress: token1,
-        ethereumAddress: address as string,
-        chainId: 15557,
-        providerUrl: "https://api-testnet2.trust.one/",
-        settings: new UniswapPairSettings({
-          gasSettings: {
-            getGasPrice: async () => {
-              return "GWEI_GAS_PRICE";
-            },
+  let formatWrappedToken = useCallback(
+    (token: `0x${string}`, isPreferNative: boolean) => {
+      if (token !== customNetworkData.nativeWrappedTokenInfo.contractAddress)
+        return token;
+      if (!isPreferNative) return token;
+      let appendedToken = appendEthToContractAddress(token);
+      return appendedToken as `0x${string}`;
+    },
+    [customNetworkData]
+  );
+
+  useEffect(() => {
+    if (!pairs) return;
+    const uniswapPair = new UniswapPair({
+      fromTokenContractAddress: formatWrappedToken(token0, isPreferNative),
+      toTokenContractAddress: formatWrappedToken(token1, isPreferNative),
+      ethereumAddress: address as string,
+      chainId: 15557,
+      providerUrl: "https://api-testnet2.trust.one/",
+      settings: new UniswapPairSettings({
+        gasSettings: {
+          getGasPrice: async () => {
+            return "GWEI_GAS_PRICE";
           },
-          slippage: Number(slippage) / 100,
-          deadlineMinutes: 15,
-          disableMultihops: true,
-          cloneUniswapContractDetails: {
-            v2Override: cloneUniswapContractDetailsV2,
-          },
-          uniswapVersions: [UniswapVersion.v2],
-          customNetwork: customNetworkData,
-        }),
-      });
-
-      const fac = async (uni: any) => {
-        let x = await uni.createFactory();
-        setUniswapFactory(x);
-      };
-      fac(uniswapPair);
-    }
-  }, [token0, token1]);
+        },
+        slippage: Number(slippage) / 100,
+        deadlineMinutes: 15,
+        disableMultihops: true,
+        cloneUniswapContractDetails: {
+          v2Override: cloneUniswapContractDetailsV2,
+        },
+        uniswapVersions: [UniswapVersion.v2],
+        customNetwork: customNetworkData,
+      }),
+    });
+    const fac = async (uni: any) => {
+      let x = await uni.createFactory();
+      setUniswapFactory(x);
+    };
+    fac(uniswapPair);
+  }, [
+    address,
+    cloneUniswapContractDetailsV2,
+    customNetworkData,
+    formatWrappedToken,
+    isPreferNative,
+    pairs,
+    slippage,
+    token0,
+    token1,
+  ]);
 
   const { data: signer } = useSigner({
     chainId: 15557,
   });
 
   useEffect(() => {
-    if (!uniswapFactory) return;
-    const tradeInfo = async () => {
-      const trade = await uniswapFactory.trade(token0Amount);
-      setTradeContext(trade);
-      setToken1Min(trade.minAmountConvertQuote as string);
-      setToken1Est(trade.expectedConvertQuote as string);
-    };
-    tradeInfo();
-  }, [token0Amount]);
-
-  // const tokenOneBalance = useBalance({
-  //   address: address,
-  //   token: tokenOne,
-  //   chainId: 15557,
-  //   watch: true,
-  // });
-
-  // const tokenTwoBalance = useBalance({
-  //   address: address,
-  //   token: tokenTwo,
-  //   chainId: 15557,
-  //   watch: true,
-  // });
+    if (!tradeContext) return;
+    setToken1Min(tradeContext.minAmountConvertQuote as string);
+    setToken1Est(tradeContext.expectedConvertQuote as string);
+  }, [tradeContext]);
 
   // const estimatedAmount = () => {
   //   ethers.utils.parseEther(trade?.expectedConvertQuote);
@@ -154,27 +169,79 @@ export default function Swap() {
   // const minimalAmount = () => {
   //   ethers.utils.parseEther(trade?.minAmountConvertQuote);
   // };
+  const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (isNaN(+value)) return;
+    setToken0Amount(value);
+    debouncedToken0(value);
+  };
+
+  const debouncedToken0 = debounce(async (nextValue) => {
+    console.log("kepanggil");
+    if (!uniswapFactory) throw new Error("No Uniswap Pair Factory");
+    // if (!tradeContext) throw new Error("No TradeContext found");
+
+    setIsFetchingToken1Price(true);
+    const trade = await uniswapFactory.trade(nextValue, TradeDirection.input);
+    setToken1Amount(trade.expectedConvertQuote);
+    setToken1Min(trade.minAmountConvertQuote as string);
+    setToken1Est(trade.expectedConvertQuote as string);
+    setDirection("input");
+    setTradeContext(trade);
+    setIsFetchingToken1Price(false);
+  }, 500);
+
+  const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (isNaN(+value) || !+value) return;
+    setToken1Amount(value);
+    debouncedToken1(value);
+  };
+
+  const debouncedToken1 = debounce(async (nextValue) => {
+    if (!uniswapFactory) return new Error("No Uniswap Pair Factory");
+    // if (!tradeContext) return new Error("No TradeContext found");
+
+    setIsFetchingToken0Price(true);
+    const trade = await uniswapFactory.trade(nextValue, TradeDirection.output);
+    setToken0Amount(trade.expectedConvertQuote);
+    const flippedTrade = await uniswapFactory.trade(
+      trade.expectedConvertQuote,
+      TradeDirection.input
+    );
+    setDirection("output");
+    setTradeContext(flippedTrade);
+    setIsFetchingToken0Price(false);
+  }, 500);
 
   const swap = async () => {
-    if (!uniswapFactory) return;
-    const trade = await uniswapFactory.trade(token0Amount);
-    setTradeContext(trade);
-    console.log("Trade info", tradeContext);
+    setIsLoading(true);
+    if (!tradeContext) return new Error("No TradeContext found");
+    if (!signer) throw new Error("No signer");
 
-    if (!signer) {
-      throw new Error("No signer");
-    }
-    if (trade.approvalTransaction) {
-      const approved = await signer.sendTransaction(trade.approvalTransaction);
+    if (tradeContext.approvalTransaction) {
+      const approved = await signer.sendTransaction(
+        tradeContext.approvalTransaction
+      );
       console.log("approved txHash", approved.hash);
       const approvedReceipt = await approved.wait();
       console.log("approved receipt", approvedReceipt);
+      setIsLoading(false);
     }
 
-    const tradeTransaction = await signer.sendTransaction(trade.transaction);
-    console.log("trade txHash", tradeTransaction.hash);
-    const tradeReceipt = await tradeTransaction.wait();
-    console.log("trade receipt", tradeReceipt);
+    try {
+      const tradeTransaction = await signer.sendTransaction(
+        tradeContext.transaction
+      );
+      console.log("trade txHash", tradeTransaction.hash);
+      const tradeReceipt = await tradeTransaction.wait();
+      console.log("trade receipt", tradeReceipt);
+      setIsLoading(false);
+      tradeContext.destroy(); //Coba dulu
+    } catch (error) {
+      setIsLoading(false);
+      tradeContext.destroy(); //Coba dulu
+    }
   };
 
   return (
@@ -264,15 +331,43 @@ export default function Swap() {
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
                 <p className="text-sm text-neutral-400">You Sell</p>
-                {/* <p className="text-sm text-neutral-400">{tokenOneBalance}</p> */}
+                <div
+                  className="flex items-center cursor-pointer hover:text-[#2D3036]/50"
+                  onClick={() => {
+                    if (tradeContext?.fromBalance.balance) return;
+                    setToken0Amount(
+                      tradeContext?.fromBalance.balance as string
+                    );
+                    debouncedToken0(tradeContext?.fromBalance.balance);
+                  }}
+                >
+                  <img
+                    src="/icons/wallet.png"
+                    alt="Wallet Icon"
+                    className="h-5 mr-1"
+                  />
+                  <p className="text-sm text-neutral-400">
+                    {tradeContext?.fromBalance.balance}
+                  </p>
+                </div>
               </div>
               <div className="flex justify-between">
-                <NumberInput
+                {/* <NumberInput
                   className="text-2xl bg-transparent focus:outline-none"
                   placeholder="0.0"
                   value={token0Amount}
-                  onChange={setToken0Amount}
-                />
+                  onChange={handleToken0Change}
+                /> */}
+
+                <div>
+                  {isFetchingToken0Price && <Spinner className="w-5 h-5" />}
+                  <input
+                    className="text-2xl bg-transparent focus:outline-none"
+                    placeholder="0.0"
+                    value={token0Amount}
+                    onChange={handleToken0Change}
+                  />
+                </div>
                 <TokenPicker setToken={setToken0}>
                   {({ selectedToken }) => (
                     <button
@@ -313,15 +408,40 @@ export default function Swap() {
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
                 <p className="text-sm text-neutral-400">You Buy</p>
-                {/* <p className="text-sm text-neutral-400">{tokenTwoBalance}</p> */}
+                <div
+                  className="flex items-center cursor-pointer hover:text-[#2D3036]/50"
+                  onClick={() => {
+                    if (!tradeContext?.toBalance) return;
+                    setToken1Amount(tradeContext.toBalance);
+                    debouncedToken1(tradeContext.toBalance);
+                  }}
+                >
+                  <img
+                    src="/icons/wallet.png"
+                    alt="Wallet Icon"
+                    className="h-5 mr-1 "
+                  />
+                  <p className="text-sm text-neutral-400">
+                    {tradeContext?.toBalance}
+                  </p>
+                </div>
               </div>
               <div className="flex justify-between">
-                <NumberInput
+                {/* <NumberInput
                   className="text-2xl bg-transparent focus:outline-none"
                   placeholder="0.0"
-                  value={token1Est}
-                  // onChange={setToken1Amount}
-                />
+                  value={token1Amount}
+                  onChange={handleToken1Change}
+                /> */}
+                <div className="relative">
+                  {isFetchingToken1Price && <Spinner className="w-5 h-5" />}
+                  <input
+                    className="text-2xl bg-transparent focus:outline-none"
+                    placeholder="0.0"
+                    value={token1Amount}
+                    onChange={handleToken1Change}
+                  />
+                </div>
                 <TokenPicker setToken={setToken1}>
                   {({ selectedToken }) => (
                     <button
@@ -430,7 +550,6 @@ export default function Swap() {
                               )}
                               {chain.name}
                             </button>
-
                             <button onClick={openAccountModal} type="button">
                               {account.displayName}
                               {account.displayBalance
@@ -451,6 +570,7 @@ export default function Swap() {
                   onClick={() => swap()}
                   disabled={!token0Amount || !isConnected}
                   className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                  loading={isLoading}
                 >
                   Swap
                 </Button>
@@ -467,6 +587,10 @@ export default function Swap() {
                     <div>Network fee</div>
                     <div>~$0.01</div>
                   </div> */}
+                  <div className="flex justify-between mb-2">
+                    <div>Recipient</div>
+                    <div>{truncateEthAddress(address as string)}</div>
+                  </div>
                 </div>
               </div>
             )}

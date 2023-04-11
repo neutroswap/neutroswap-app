@@ -12,13 +12,14 @@ import React, { FC, SyntheticEvent, useState } from "react";
 import { classNames } from "@/shared/helpers/classNames";
 import { RadioGroup } from "@headlessui/react";
 import { XCircleIcon } from "@heroicons/react/24/solid";
+import { appendEthToContractAddress } from "simple-uniswap-sdk";
 
-const tokens = [
+export const tokens = [
   {
     ticker: "WEOS",
     img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
     name: "Wrapped EOS",
-    address: "0x3d7b65FB8f005a3Dd257C33A93340216dbe6F180",
+    address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     decimals: 18,
   },
   {
