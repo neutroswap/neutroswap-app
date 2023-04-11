@@ -31,9 +31,11 @@ import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
 import truncateEthAddress from "truncate-eth-address";
-import { tokens } from "@/components/modules/swap/TokenPicker";
+// import { tokens } from "@/components/modules/swap/TokenPicker";
 import debounce from "lodash/debounce";
 import { formatEther } from "ethers/lib/utils.js";
+import { tokens } from "@/shared/statics/tokenList";
+import { Token } from "@/shared/types/tokens.types";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -56,12 +58,8 @@ export default function Swap() {
   const [token1Amount, setToken1Amount] = useState("0");
   const [token1Min, setToken1Min] = useState("0");
   const [token1Est, setToken1Est] = useState("0");
-  const [token0, setToken0] = useState<`0x${string}`>(
-    tokens[0].address as `0x${string}`
-  );
-  const [token1, setToken1] = useState<`0x${string}`>(
-    tokens[1].address as `0x${string}`
-  );
+  const [token0, setToken0] = useState<Token>(tokens[0]);
+  const [token1, setToken1] = useState<Token>(tokens[1]);
 
   const [tradeContext, setTradeContext] = useState<TradeContext>();
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
@@ -71,19 +69,19 @@ export default function Swap() {
     enabled: Boolean(address),
     contracts: [
       {
-        address: token0,
+        address: token0.address,
         abi: ERC20_ABI,
         functionName: "balanceOf",
         args: [address!],
       },
       {
-        address: token1,
+        address: token1.address,
         abi: ERC20_ABI,
         functionName: "balanceOf",
         args: [address!],
       },
-      { address: token0, abi: ERC20_ABI, functionName: "symbol" },
-      { address: token1, abi: ERC20_ABI, functionName: "symbol" },
+      { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
+      { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
     ],
     onSuccess(value) {
       setBalance0(Number(formatEther(value[0])).toFixed(5).toString());
@@ -104,7 +102,7 @@ export default function Swap() {
     abi: NEUTRO_FACTORY_ABI,
     functionName: "getPair",
     chainId: 15557,
-    args: [token0, token1],
+    args: [token0.address, token1.address],
   });
 
   let customNetworkData = useMemo(
@@ -150,8 +148,14 @@ export default function Swap() {
     if (!pairs) return;
     if (!address) return;
     const uniswapPair = new UniswapPair({
-      fromTokenContractAddress: formatWrappedToken(token0, isPreferNative),
-      toTokenContractAddress: formatWrappedToken(token1, isPreferNative),
+      fromTokenContractAddress: formatWrappedToken(
+        token0.address,
+        isPreferNative
+      ),
+      toTokenContractAddress: formatWrappedToken(
+        token1.address,
+        isPreferNative
+      ),
       ethereumAddress: address as string,
       chainId: 15557,
       providerUrl: "https://api-testnet2.trust.one/",
@@ -393,8 +397,12 @@ export default function Swap() {
                     onChange={handleToken0Change}
                   />
                 </div>
-                <TokenPicker setToken={setToken0}>
-                  {({ selectedToken0: selectedToken0 }) => (
+                <TokenPicker
+                  selectedToken={token0}
+                  setSelectedToken={setToken0}
+                  disabledToken={token1}
+                >
+                  {({ selectedToken: selectedToken }) => (
                     <button
                       placeholder="Select a token"
                       type="button"
@@ -402,11 +410,11 @@ export default function Swap() {
                     >
                       <div className="flex items-center">
                         <img
-                          src={selectedToken0.img}
+                          src={selectedToken.logo}
                           alt="Selected Token 0"
                           className="h-6 mr-2"
                         />
-                        <span className="text-md">{selectedToken0.ticker}</span>
+                        <span className="text-md">{selectedToken.symbol}</span>
                       </div>
                       <div>
                         <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
@@ -463,8 +471,12 @@ export default function Swap() {
                     onChange={handleToken1Change}
                   />
                 </div>
-                <TokenPicker setToken={setToken1}>
-                  {({ selectedToken1: selectedToken1 }) => (
+                <TokenPicker
+                  selectedToken={token1}
+                  setSelectedToken={setToken1}
+                  disabledToken={token0}
+                >
+                  {({ selectedToken }) => (
                     <button
                       placeholder="Select a token"
                       type="button"
@@ -472,11 +484,11 @@ export default function Swap() {
                     >
                       <div className="flex items-center">
                         <img
-                          src={selectedToken1.img}
+                          src={selectedToken.logo}
                           alt="Selected Token 1"
                           className="h-6 mr-2"
                         />
-                        <span className="text-md">{selectedToken1.ticker}</span>
+                        <span className="text-md">{selectedToken.symbol}</span>
                       </div>
                       <div>
                         <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
