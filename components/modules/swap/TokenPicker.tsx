@@ -53,18 +53,22 @@ type TokenPickerProps = {
   setImg?: React.Dispatch<React.SetStateAction<string>>;
   setToken: React.Dispatch<React.SetStateAction<`0x${string}`>>;
   children: ({
-    selectedToken,
+    selectedToken0,
+    selectedToken1,
   }: {
-    selectedToken: TokenDetails;
+    selectedToken0: TokenDetails;
+    selectedToken1: TokenDetails;
   }) => React.ReactElement;
 };
 
 export const TokenPicker: FC<TokenPickerProps> = (props) => {
   const { setToken, children } = props;
-  const [selectedToken, setSelectedToken] = useState(tokens[0]);
+  const [selectedToken0, setSelectedToken0] = useState(tokens[0]);
+  const [selectedToken1, setSelectedToken1] = useState(tokens[1]);
 
   const handleChange = (value: any) => {
-    setSelectedToken(value);
+    setSelectedToken0(value);
+    setSelectedToken1(value);
     setToken(value.address);
   };
 
@@ -78,7 +82,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
   return (
     <Modal>
       <ModalOpenButton>
-        {children({ selectedToken: selectedToken })}
+        {children({ selectedToken0, selectedToken1 })}
       </ModalOpenButton>
       <ModalContents>
         {({ close }) => (
@@ -104,7 +108,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
               <div className="w-full py-2">
                 <div className="w-full ">
                   <RadioGroup
-                    value={selectedToken}
+                    value={selectedToken0 && selectedToken1}
                     onChange={handleChange}
                     onClick={close}
                   >

@@ -61,7 +61,7 @@ export default function Swap() {
     tokens[0].address as `0x${string}`
   );
   const [token1, setToken1] = useState<`0x${string}`>(
-    tokens[0].address as `0x${string}`
+    tokens[1].address as `0x${string}`
   );
 
   const [direction, setDirection] = useState<"input" | "output">("input");
@@ -383,16 +383,16 @@ export default function Swap() {
               </div>
               <div className="flex justify-between">
                 <div>
-                  {isFetchingToken0Price && <Spinner className="w-5 h-5" />}
                   <input
                     className="text-2xl bg-transparent focus:outline-none"
                     placeholder="0.0"
                     value={token0Amount}
                     onChange={handleToken0Change}
                   />
+                  {isFetchingToken0Price && <Spinner className="w-5 h-5" />}
                 </div>
                 <TokenPicker setToken={setToken0}>
-                  {({ selectedToken }) => (
+                  {({ selectedToken0: selectedToken0 }) => (
                     <button
                       placeholder="Select a token"
                       type="button"
@@ -400,11 +400,11 @@ export default function Swap() {
                     >
                       <div className="flex items-center">
                         <img
-                          src={selectedToken.img}
+                          src={selectedToken0.img}
                           alt="Selected Token 0"
                           className="h-6 mr-2"
                         />
-                        <span className="text-md">{selectedToken.ticker}</span>
+                        <span className="text-md">{selectedToken0.ticker}</span>
                       </div>
                       <div>
                         <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
@@ -460,7 +460,7 @@ export default function Swap() {
                   />
                 </div>
                 <TokenPicker setToken={setToken1}>
-                  {({ selectedToken }) => (
+                  {({ selectedToken1: selectedToken1 }) => (
                     <button
                       placeholder="Select a token"
                       type="button"
@@ -468,11 +468,11 @@ export default function Swap() {
                     >
                       <div className="flex items-center">
                         <img
-                          src={selectedToken.img}
+                          src={selectedToken1.img}
                           alt="Selected Token 1"
                           className="h-6 mr-2"
                         />
-                        <span className="text-md">{selectedToken.ticker}</span>
+                        <span className="text-md">{selectedToken1.ticker}</span>
                       </div>
                       <div>
                         <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
