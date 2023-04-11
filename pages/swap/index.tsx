@@ -11,6 +11,7 @@ import { Button, Spinner, Text } from "@geist-ui/core";
 import {
   ChevronDownIcon,
   AdjustmentsHorizontalIcon,
+  XMarkIcon,
 } from "@heroicons/react/20/solid";
 import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { ArrowDownIcon } from "@heroicons/react/24/outline";
@@ -36,6 +37,12 @@ import debounce from "lodash/debounce";
 import { formatEther } from "ethers/lib/utils.js";
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
+import {
+  Modal,
+  ModalContents,
+  ModalOpenButton,
+} from "@/components/elements/Modal";
+import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -95,6 +102,7 @@ export default function Swap() {
     console.log("Uniswap Factory =", uniswapFactory);
     console.log("Pairs =", pairs);
     console.log("Trade context = ", tradeContext);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uniswapFactory, tradeContext]);
 
   const { data: pairs } = useContractRead({
@@ -598,54 +606,87 @@ export default function Swap() {
               </ConnectButton.Custom>
             )}
 
-            {isConnected && isApproved === false && (
-              <div className="flex flex-col w-full">
-                <Button
-                  onClick={() => swap()}
-                  disabled={!token0Amount || !isConnected}
-                  className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                  loading={isLoading}
-                >
-                  Approve Token
-                </Button>
-              </div>
-            )}
-
-            {isApproved === true && (
-              <div className="flex flex-col w-full">
-                <Button
-                  onClick={() => swap()}
-                  disabled={!token0Amount || !isConnected}
-                  className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                  loading={isLoading}
-                >
-                  Swap
-                </Button>
-                <div className="text-sm">
-                  <div className="flex justify-between mb-2">
-                    <div>Est. received</div>
+            {isConnected && (
+              <Modal>
+                <ModalOpenButton>
+                  <Button className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md">
+                    Swap
+                  </Button>
+                </ModalOpenButton>
+                <ModalContents>
+                  {({ close }) => (
                     <div>
-                      {parseFloat(token1Est).toFixed(5).toString()} $
-                      {tokenName1}
+                      <div className="w-full flex mb-5">
+                        <ArrowLeftIcon
+                          className="h-7 cursor-pointer hover:dark:text-neutral-600"
+                          onClick={close}
+                        />
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex flex-col ">
+                          <div className="text-lg mb-1">
+                            Buy {token1Amount} {tokenName1}
+                          </div>
+                          <div>
+                            Sell {token0Amount} {tokenName0}
+                          </div>
+                        </div>
+                        <img
+                          src={token1.logo}
+                          alt="Token1 Logo"
+                          className="h-12"
+                        />
+                      </div>
+                      <div className="p-3 my-5 flex bg-gray-500 rounded-lg items-center justify-between">
+                        <div className="flex flex-col">
+                          <div>Min. Received after slippage ({slippage})</div>
+                          <div>
+                            The minimum amount you are guaranteeed to receive
+                          </div>
+                        </div>
+                        <div>
+                          {parseFloat(token1Min).toFixed(5).toString()} $
+                          {tokenName1}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex justify-between mb-2">
-                    <div>Min. received</div>
-                    <div>
-                      {parseFloat(token1Min).toFixed(5).toString()} $
-                      {tokenName1}
-                    </div>
-                  </div>
-                  {/* <div className="flex justify-between mb-2">
-                    <div>Network fee</div>
-                    <div>~$0.01</div>
-                  </div> */}
-                  <div className="flex justify-between mb-2 font-semibold">
-                    <div>Recipient</div>
-                    <div>{truncateEthAddress(address as string)}</div>
-                  </div>
-                </div>
-              </div>
+                  )}
+                </ModalContents>
+              </Modal>
+              // <div className="flex flex-col w-full">
+              //   <Button
+              //     onClick={() => swap()}
+              //     disabled={!token0Amount || !isConnected}
+              //     className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+              //     loading={isLoading}
+              //   >
+              //     Swap
+              //   </Button>
+              //   <div className="text-sm">
+              //     <div className="flex justify-between mb-2">
+              //       <div>Est. received</div>
+              //       <div>
+              //         {parseFloat(token1Est).toFixed(5).toString()} $
+              //         {tokenName1}
+              //       </div>
+              //     </div>
+              //     <div className="flex justify-between mb-2">
+              //       <div>Min. received</div>
+              //       <div>
+              //         {parseFloat(token1Min).toFixed(5).toString()} $
+              //         {tokenName1}
+              //       </div>
+              //     </div>
+              //     {/* <div className="flex justify-between mb-2">
+              //       <div>Network fee</div>
+              //       <div>~$0.01</div>
+              //     </div> */}
+              //     <div className="flex justify-between mb-2 font-semibold">
+              //       <div>Recipient</div>
+              //       <div>{truncateEthAddress(address as string)}</div>
+              //     </div>
+              //   </div>
+              // </div>
             )}
           </div>
         </div>
