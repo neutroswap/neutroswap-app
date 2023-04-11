@@ -31,7 +31,6 @@ import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
 import truncateEthAddress from "truncate-eth-address";
-// import { tokens } from "@/components/modules/swap/TokenPicker";
 import debounce from "lodash/debounce";
 import { formatEther } from "ethers/lib/utils.js";
 import { tokens } from "@/shared/statics/tokenList";
@@ -73,7 +72,7 @@ export default function Swap() {
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
 
-  const { isFetching: isFetchingBalance } = useContractReads({
+  const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
     contracts: [
       {
@@ -82,20 +81,28 @@ export default function Swap() {
         functionName: "balanceOf",
         args: [address!],
       },
+      { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
+    ],
+    onSuccess(value) {
+      setBalance0(Number(formatEther(value[0])).toFixed(5).toString());
+      setTokenName0(value[1]);
+    },
+  });
+
+  const { isFetching: isFetchingBalance1 } = useContractReads({
+    enabled: Boolean(address),
+    contracts: [
       {
         address: token1.address,
         abi: ERC20_ABI,
         functionName: "balanceOf",
         args: [address!],
       },
-      { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
       { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
     ],
     onSuccess(value) {
-      setBalance0(Number(formatEther(value[0])).toFixed(5).toString());
-      setBalance1(Number(formatEther(value[1])).toFixed(5).toString());
-      setTokenName0(value[2]);
-      setTokenName1(value[3]);
+      setBalance1(Number(formatEther(value[0])).toFixed(5).toString());
+      setTokenName1(value[1]);
     },
   });
 
@@ -395,10 +402,10 @@ export default function Swap() {
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                  {isFetchingBalance && (
+                  {isFetchingBalance0 && (
                     <div className="w-24 h-5 bg-neutral-700 rounded animate-pulse"></div>
                   )}
-                  {!isFetchingBalance && (
+                  {!isFetchingBalance0 && (
                     <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
                       {balance0} {tokenName0}
                     </p>
@@ -472,10 +479,10 @@ export default function Swap() {
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
-                  {isFetchingBalance && (
+                  {isFetchingBalance1 && (
                     <div className="w-24 h-5 bg-neutral-700 rounded animate-pulse"></div>
                   )}
-                  {!isFetchingBalance && (
+                  {!isFetchingBalance1 && (
                     <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
                       {balance1} {tokenName1}
                     </p>
