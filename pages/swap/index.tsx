@@ -43,6 +43,7 @@ import {
   ModalOpenButton,
 } from "@/components/elements/Modal";
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import WalletIcon from "@/public/icons/wallet.svg"
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -72,7 +73,7 @@ export default function Swap() {
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
 
-  useContractReads({
+  const { isFetching: isFetchingBalance } = useContractReads({
     enabled: Boolean(address),
     contracts: [
       {
@@ -391,14 +392,15 @@ export default function Swap() {
                     debouncedToken0(balance0);
                   }}
                 >
-                  <img
-                    src="/icons/wallet.png"
-                    alt="Wallet Icon"
-                    className="h-5 mr-1"
-                  />
-                  <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
-                    {balance0} {tokenName0}
-                  </p>
+                  <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                  {isFetchingBalance && (
+                    <div className="w-24 h-5 bg-neutral-700 rounded animate-pulse"></div>
+                  )}
+                  {!isFetchingBalance && (
+                    <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
+                      {balance0} {tokenName0}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex justify-between">
@@ -467,14 +469,15 @@ export default function Swap() {
                     debouncedToken1(balance1);
                   }}
                 >
-                  <img
-                    src="/icons/wallet.png"
-                    alt="Wallet Icon"
-                    className="h-5 mr-1"
-                  />
-                  <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
-                    {balance1} {tokenName1}
-                  </p>
+                  <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                  {isFetchingBalance && (
+                    <div className="w-24 h-5 bg-neutral-700 rounded animate-pulse"></div>
+                  )}
+                  {!isFetchingBalance && (
+                    <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
+                      {balance1} {tokenName1}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex justify-between">
