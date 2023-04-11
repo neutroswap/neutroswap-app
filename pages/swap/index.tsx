@@ -230,7 +230,7 @@ export default function Swap() {
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
-    console.log("kepanggil");
+    console.log("Called");
     if (!uniswapFactory) throw new Error("No Uniswap Pair Factory");
     // if (!tradeContext) throw new Error("No TradeContext found");
 
@@ -391,7 +391,6 @@ export default function Swap() {
               <div className="flex justify-between">
                 <div className="flex items-center">
                   <p className="text-sm text-neutral-400 mr-2">You Sell</p>
-                  {isFetchingToken0Price && <Spinner className="w-4 h-4" />}
                 </div>
                 <div
                   className="flex items-center cursor-pointer"
@@ -414,12 +413,17 @@ export default function Swap() {
               </div>
               <div className="flex justify-between">
                 <div>
-                  <input
-                    className="text-2xl bg-transparent focus:outline-none"
-                    placeholder="0.0"
-                    value={tokenAmount0}
-                    onChange={handleToken0Change}
-                  />
+                  {isFetchingToken0Price && (
+                    <div className="w-40 h-8 bg-neutral-700 rounded animate-pulse"></div>
+                  )}
+                  {!isFetchingToken0Price && (
+                    <input
+                      className="text-2xl bg-transparent focus:outline-none"
+                      placeholder="0.0"
+                      value={tokenAmount0}
+                      onChange={handleToken0Change}
+                    />
+                  )}
                 </div>
                 <TokenPicker
                   selectedToken={token0}
@@ -468,7 +472,6 @@ export default function Swap() {
               <div className="flex justify-between">
                 <div className="flex items-center">
                   <p className="text-sm text-neutral-400 mr-2">You Buy</p>
-                  {isFetchingToken1Price && <Spinner className="w-4 h-4" />}
                 </div>
                 <div
                   className="flex items-center cursor-pointer "
@@ -491,12 +494,17 @@ export default function Swap() {
               </div>
               <div className="flex justify-between">
                 <div className="relative">
-                  <input
-                    className="text-2xl bg-transparent focus:outline-none"
-                    placeholder="0.0"
-                    value={tokenAmount1}
-                    onChange={handleToken1Change}
-                  />
+                  {isFetchingToken1Price && (
+                    <div className="w-40 h-8 bg-neutral-700 rounded animate-pulse"></div>
+                  )}
+                  {!isFetchingToken1Price && (
+                    <input
+                      className="text-2xl bg-transparent focus:outline-none"
+                      placeholder="0.0"
+                      value={tokenAmount1}
+                      onChange={handleToken1Change}
+                    />
+                  )}
                 </div>
                 <TokenPicker
                   selectedToken={token1}
