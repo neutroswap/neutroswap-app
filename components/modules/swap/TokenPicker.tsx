@@ -3,73 +3,30 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import {
-  ChevronDownIcon,
-  MagnifyingGlassIcon,
-  XMarkIcon,
-} from "@heroicons/react/20/solid";
+import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import React, { FC, SyntheticEvent, useState } from "react";
 import { classNames } from "@/shared/helpers/classNames";
 import { RadioGroup } from "@headlessui/react";
 import { XCircleIcon } from "@heroicons/react/24/solid";
-import { appendEthToContractAddress } from "simple-uniswap-sdk";
-
-export const tokens = [
-  {
-    ticker: "WEOS",
-    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
-    name: "Wrapped EOS",
-    address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
-    decimals: 18,
-  },
-  {
-    ticker: "USDC",
-    img: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdc.svg",
-    name: "USD Circle",
-    address: "0x4ceaC0A4104D29f9d5f97F34B1060A98A5eAf21d",
-    decimals: 6,
-  },
-  {
-    ticker: "NEUTRO",
-    img: "https://cdn.moralis.io/eth/0x6b175474e89094c44da98b954eedeac495271d0f.png",
-    name: "Neutroswap Token",
-    address: "0x4D0BfAF503fE1e229b1B4F8E4FC1952803ec843f",
-    decimals: 18,
-  },
-];
-
-type TokenDetails = {
-  ticker: string;
-  img: string;
-  name: string;
-  address: string;
-  decimals: number;
-};
+import { tokens } from "@/shared/statics/tokenList";
+import { Token } from "@/shared/types/tokens.types";
 
 type TokenPickerProps = {
   ticker?: string;
   img?: string;
   setTicker?: React.Dispatch<React.SetStateAction<string>>;
   setImg?: React.Dispatch<React.SetStateAction<string>>;
-  setToken: React.Dispatch<React.SetStateAction<`0x${string}`>>;
-  children: ({
-    selectedToken0,
-    selectedToken1,
-  }: {
-    selectedToken0: TokenDetails;
-    selectedToken1: TokenDetails;
-  }) => React.ReactElement;
+  selectedToken: Token;
+  setSelectedToken: React.Dispatch<React.SetStateAction<Token>>;
+  disabledToken: Token;
+  children: ({ selectedToken }: { selectedToken: Token }) => React.ReactElement;
 };
 
 export const TokenPicker: FC<TokenPickerProps> = (props) => {
-  const { setToken, children } = props;
-  const [selectedToken0, setSelectedToken0] = useState(tokens[0]);
-  const [selectedToken1, setSelectedToken1] = useState(tokens[1]);
+  const { selectedToken, setSelectedToken, children, disabledToken } = props;
 
-  const handleChange = (value: any) => {
-    setSelectedToken0(value);
-    setSelectedToken1(value);
-    setToken(value.address);
+  const handleChange = (value: Token) => {
+    setSelectedToken(value);
   };
 
   const handleImageFallback = (
@@ -82,7 +39,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
   return (
     <Modal>
       <ModalOpenButton>
-        {children({ selectedToken0, selectedToken1 })}
+        {children({ selectedToken })}
       </ModalOpenButton>
       <ModalContents>
         {({ close }) => (
@@ -108,7 +65,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
               <div className="w-full py-2">
                 <div className="w-full ">
                   <RadioGroup
-                    value={selectedToken0 && selectedToken1}
+                    value={selectedToken}
                     onChange={handleChange}
                     onClick={close}
                   >
@@ -120,11 +77,13 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                         <RadioGroup.Option
                           key={token.name}
                           value={token}
-                          className={({ active, checked }) =>
+                          disabled={token.address === disabledToken.address}
+                          className={({ active, checked, disabled }) =>
                             classNames(
                               "relative flex cursor-pointer rounded-lg px-5 py-2 focus:outline-none transition-colors duration-300",
-                              "hover:bg-neutral-100 dark:hover:bg-neutral-900",
-                              checked && "bg-neutral-100 dark:bg-neutral-900"
+                              disabled && "opacity-50 cursor-not-allowed",
+                              !disabled && "hover:bg-neutral-100 dark:hover:bg-neutral-900",
+                              checked && "bg-neutral-100 dark:bg-neutral-900",
                             )
                           }
                         >
@@ -134,10 +93,10 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                                 <div className="flex space-x-4 items-center w-full">
                                   <img
                                     alt={`${token.name} Icon`}
-                                    src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${token.ticker.toLowerCase()}.svg`}
+                                    src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${token.symbol.toLowerCase()}.svg`}
                                     className="h-8 rounded-full"
                                     onError={(e) => {
-                                      handleImageFallback(token.ticker, e);
+                                      handleImageFallback(token.symbol, e);
                                     }}
                                   />
                                   <div className="flex flex-col">
@@ -145,7 +104,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                                       as="p"
                                       className="font-medium m-0 text-black dark:text-white"
                                     >
-                                      {token.ticker}
+                                      {token.symbol}
                                     </RadioGroup.Label>
                                     <RadioGroup.Description
                                       as="span"

@@ -1,11 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
-import { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } from '@/shared/helpers/constants';
+import { SUPABASE_URL, SUPABASE_SERVICE_KEY } from '@/shared/helpers/constants';
 
-if (!NEXT_PUBLIC_SUPABASE_URL) throw new Error("Missing env.NEXT_APP_SUPABASE_URL");
-if (!NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  throw new Error("Missing env.NEXT_APP_SUPABASE_ANON_KEY");
+if (!SUPABASE_URL) throw new Error("Missing env.SUPABASE_URL");
+if (!SUPABASE_SERVICE_KEY)
+  throw new Error("Missing env.SUPABASE_SERVICE_KEY");
 
 export const supabaseClient = createClient(
-  NEXT_PUBLIC_SUPABASE_URL,
-  NEXT_PUBLIC_SUPABASE_ANON_KEY
+  SUPABASE_URL,
+  SUPABASE_SERVICE_KEY
 );
