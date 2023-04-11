@@ -6,7 +6,7 @@ export const tokens: Array<Token> = [
     symbol: "WEOS",
     logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
     name: "Wrapped EOS",
-    address: "0x3d7b65FB8f005a3Dd257C33A93340216dbe6F180",
+    address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     decimal: 18,
   },
   {
