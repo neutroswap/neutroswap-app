@@ -259,6 +259,11 @@ export default function Swap() {
     setIsFetchingToken0Price(false);
   }, 500);
 
+  const handleSwitchTokens = () => {
+    setToken0(token1);
+    setToken1(token0);
+  }
+
   const swap = async () => {
     setIsLoading(true);
     if (!tradeContext) return new Error("No TradeContext found");
@@ -432,9 +437,10 @@ export default function Swap() {
                 </TokenPicker>
               </div>
             </div>
+
             <div className="left-0 right-0 -mt-3 -mb-3 flex items-center justify-center">
               <button
-                // onClick={() => switchTokens}
+                onClick={() => handleSwitchTokens()}
                 type="button"
                 className="z-10 group bg-gray-100 hover:bg-gray-200 hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-md cursor-pointer"
               >
@@ -446,6 +452,7 @@ export default function Swap() {
                 </div>
               </button>
             </div>
+
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
                 <div className="flex items-center">
