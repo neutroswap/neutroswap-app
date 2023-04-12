@@ -21,6 +21,14 @@ import BannerUploadStatic from "@/components/templates/Forms/BannerUpload";
 import LogoUploadStatic from "@/components/templates/Forms/LogoUpload";
 // import { DonutChart } from "@tremor/react";
 
+// WARNING: REMOVE THIS WHEN PRODUCTION READY
+export function getStaticProps() {
+  return {
+    // returns the default 404 page with a status code of 404 in production
+    notFound: process.env.NODE_ENV === 'production'
+  }
+}
+
 const DonutChart = dynamic(() =>
   import("@tremor/react").then((mod) => mod.DonutChart),
   { loading: () => <Loading className="!my-8" spaceRatio={2.5} /> }

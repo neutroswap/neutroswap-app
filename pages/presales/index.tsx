@@ -1,6 +1,15 @@
 import { Button, Table, Fieldset, Input, Link, Note, Text, Toggle } from "@geist-ui/core";
+import { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
+
+// WARNING: REMOVE THIS WHEN PRODUCTION READY
+export function getStaticProps() {
+  return {
+    // returns the default 404 page with a status code of 404 in production
+    notFound: process.env.NODE_ENV === 'production'
+  }
+}
 
 export default function Presales() {
   const router = useRouter();
