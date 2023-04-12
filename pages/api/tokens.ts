@@ -4,7 +4,7 @@ import { ERC20_ABI } from '../../shared/abi'
 import { supabaseClient } from '@/shared/helpers/supabaseClient'
 import { TokenFE, Token } from '@/shared/types/tokens.types'
 
-export async function getNetworkByName (networkName: string){
+export async function getNetworkByName(networkName: string) {
   let currNetwork;
   let { data: network } = await supabaseClient
     .from('networks')
@@ -15,7 +15,7 @@ export async function getNetworkByName (networkName: string){
   return currNetwork;
 }
 
-export async function getNetworkById (networkId: string){
+export async function getNetworkById(networkId: string) {
   let currNetwork;
   let { data: network } = await supabaseClient
     .from('networks')
@@ -26,14 +26,14 @@ export async function getNetworkById (networkId: string){
   return currNetwork;
 }
 
-export async function createNewToken (newToken: TokenFE) {
+export async function createNewToken(newToken: TokenFE) {
   let { tokenAddress, networkName } = newToken
   let existingToken = await getTokenDetails(tokenAddress)
   if (existingToken) {
     console.log('Token already exist! ', existingToken)
     return existingToken
   }
-  let network:any = await getNetworkByName(networkName)
+  let network: any = await getNetworkByName(networkName)
   let rpc = network.rpc
   console.log('rpcc ', rpc)
   // console.log("wawawa ", await coingecko.contract({
@@ -57,7 +57,7 @@ export async function createNewToken (newToken: TokenFE) {
 
   const token: Token = {
     network_id: network.id,
-    address: tokenAddress,
+    address: tokenAddress as `0x${string}`,
     decimal: decimals.toNumber() ?? 18,
     name: symbol,
     symbol,
@@ -69,7 +69,7 @@ export async function createNewToken (newToken: TokenFE) {
   return token
 }
 
-export async function getTokenDetails (data: string) {
+export async function getTokenDetails(data: string) {
   let tokenDetails
   let errorDetails = null
   console.log('data dulu daaahh ', data)
@@ -95,7 +95,7 @@ export async function getTokenDetails (data: string) {
   return tokenDetails //return errorDetails if any
 }
 
-export default async function handler (
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
