@@ -6,7 +6,7 @@ import { MoonIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { classNames } from "@/shared/helpers/classNames";
+import { classNames } from "@/shared/helpers/classNamer";
 
 interface Props {
   handleThemeSwitch: () => void;

@@ -5,7 +5,7 @@ import {
 } from "@/components/elements/Modal";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import React, { FC, SyntheticEvent, useState } from "react";
-import { classNames } from "@/shared/helpers/classNames";
+import { classNames } from "@/shared/helpers/classNamer";
 import { RadioGroup } from "@headlessui/react";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import { tokens } from "@/shared/statics/tokenList";
@@ -38,9 +38,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
 
   return (
     <Modal>
-      <ModalOpenButton>
-        {children({ selectedToken })}
-      </ModalOpenButton>
+      <ModalOpenButton>{children({ selectedToken })}</ModalOpenButton>
       <ModalContents>
         {({ close }) => (
           <div className="flex">
@@ -82,8 +80,9 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                             classNames(
                               "relative flex cursor-pointer rounded-lg px-5 py-2 focus:outline-none transition-colors duration-300",
                               disabled && "opacity-50 cursor-not-allowed",
-                              !disabled && "hover:bg-neutral-100 dark:hover:bg-neutral-900",
-                              checked && "bg-neutral-100 dark:bg-neutral-900",
+                              !disabled &&
+                                "hover:bg-neutral-100 dark:hover:bg-neutral-900",
+                              checked && "bg-neutral-100 dark:bg-neutral-900"
                             )
                           }
                         >

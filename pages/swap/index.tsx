@@ -29,7 +29,7 @@ import {
 import { useAccount, useBalance, useContractReads, useSigner } from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
-import { classNames } from "@/shared/helpers/classNames";
+import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
 import debounce from "lodash/debounce";
 import { formatEther } from "ethers/lib/utils.js";
