@@ -26,7 +26,7 @@ import {
   appendEthToContractAddress,
   TradeDirection,
 } from "simple-uniswap-sdk";
-import { useAccount, useContractReads, useSigner } from "wagmi";
+import { useAccount, useBalance, useContractReads, useSigner } from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNames";
@@ -66,11 +66,27 @@ export default function Swap() {
   const [tokenMin1, setTokenMin1] = useState("0");
   const [tokenEst1, setTokenEst1] = useState("0");
   const [token0, setToken0] = useState<Token>(tokens[0]);
-  const [token1, setToken1] = useState<Token>(tokens[1]);
+  const [token1, setToken1] = useState<Token>(tokens[2]);
 
   const [tradeContext, setTradeContext] = useState<TradeContext>();
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
+
+  const { data: EOSBalance } = useBalance({
+    address: address,
+    onSuccess(value) {
+      if (token0 === tokens[0]) {
+        setBalance0(parseFloat(value.formatted).toFixed(5));
+      }
+      if (token1 === tokens[0]) {
+        setBalance1(value.formatted);
+      }
+    },
+  });
+  console.log(
+    "EOSBalance =",
+    parseFloat(EOSBalance?.formatted as string).toFixed(5)
+  );
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),

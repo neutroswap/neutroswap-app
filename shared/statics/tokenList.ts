@@ -9,14 +9,14 @@ export const tokens: Array<Token> = [
     address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     decimal: 18,
   },
-  {
-    network_id: "15557",
-    symbol: "WEOS",
-    logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
-    name: "Wrapped EOS",
-    address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
-    decimal: 18,
-  },
+  // {
+  //   network_id: "15557",
+  //   symbol: "WEOS",
+  //   logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
+  //   name: "Wrapped EOS",
+  //   address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
+  //   decimal: 18,
+  // },
   {
     network_id: "15557",
     symbol: "USDC",
