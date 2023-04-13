@@ -829,11 +829,12 @@ export default function Swap() {
                               <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
                             </Link>
                           </div>
-                          <Link href="/swap" rel="noreferrer">
-                            <Button className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md">
-                              Swap again
-                            </Button>
-                          </Link>
+                          <Button
+                            onClick={close}
+                            className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                          >
+                            Swap again
+                          </Button>
                         </>
                       )}
                     </div>
