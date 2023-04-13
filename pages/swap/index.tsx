@@ -458,7 +458,7 @@ export default function Swap() {
                   onClick={() => {
                     if (!address) return;
                     setTokenAmount0(balance0.raw.toString());
-                    debouncedToken0(balance0);
+                    debouncedToken0(balance0.raw.toString());
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -539,7 +539,7 @@ export default function Swap() {
                   onClick={() => {
                     if (!address) return;
                     setTokenAmount1(balance1.raw.toString());
-                    debouncedToken1(balance1);
+                    debouncedToken1(balance1.raw.toString());
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
