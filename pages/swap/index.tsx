@@ -29,7 +29,7 @@ import {
 import { useAccount, useBalance, useContractReads, useSigner } from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
-import { classNames } from "@/shared/helpers/classNames";
+import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
 import debounce from "lodash/debounce";
 import { formatEther } from "ethers/lib/utils.js";
@@ -40,9 +40,14 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowLeftIcon,
+  ArrowTopRightOnSquareIcon,
+} from "@heroicons/react/24/solid";
 import WalletIcon from "@/public/icons/wallet.svg";
 import Link from "next/link";
+import { Currency } from "@/shared/types/currency.types";
+import { BigNumber } from "ethers";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -56,9 +61,18 @@ export default function Swap() {
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
   const [isPreferNative, setIsPreferNative] = useState(true);
+  // const [isBalanceEnough, setIsBalanceEnough] = useState(true);
 
-  const [balance0, setBalance0] = useState("0");
-  const [balance1, setBalance1] = useState("0");
+  const [balance0, setBalance0] = useState<Currency>({
+    decimal: 18,
+    raw: BigNumber.from(0),
+    formatted: "0.00",
+  });
+  const [balance1, setBalance1] = useState<Currency>({
+    decimal: 18,
+    raw: BigNumber.from(0),
+    formatted: "0.00",
+  });
   const [tokenName0, setTokenName0] = useState("");
   const [tokenName1, setTokenName1] = useState("");
   const [tokenAmount0, setTokenAmount0] = useState("0");
@@ -66,27 +80,12 @@ export default function Swap() {
   const [tokenMin1, setTokenMin1] = useState("0");
   const [tokenEst1, setTokenEst1] = useState("0");
   const [token0, setToken0] = useState<Token>(tokens[0]);
-  const [token1, setToken1] = useState<Token>(tokens[2]);
+  const [token1, setToken1] = useState<Token>(tokens[1]);
 
   const [tradeContext, setTradeContext] = useState<TradeContext>();
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
-
-  const { data: EOSBalance } = useBalance({
-    address: address,
-    onSuccess(value) {
-      if (token0 === tokens[0]) {
-        setBalance0(parseFloat(value.formatted).toFixed(5));
-      }
-      if (token1 === tokens[0]) {
-        setBalance1(value.formatted);
-      }
-    },
-  });
-  console.log(
-    "EOSBalance =",
-    parseFloat(EOSBalance?.formatted as string).toFixed(5)
-  );
+  const [txHash, setTxHash] = useState<string>("");
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
@@ -98,9 +97,18 @@ export default function Swap() {
         args: [address!],
       },
       { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
+      {
+        address: token0.address,
+        abi: ERC20_ABI,
+        functionName: "decimals",
+      },
     ],
     onSuccess(value) {
-      setBalance0(Number(formatEther(value[0])).toFixed(5).toString());
+      setBalance0({
+        decimal: value[2].toNumber(),
+        raw: value[0],
+        formatted: Number(formatEther(value[0])).toFixed(5).toString(),
+      });
       setTokenName0(value[1]);
     },
   });
@@ -115,12 +123,45 @@ export default function Swap() {
         args: [address!],
       },
       { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
+      {
+        address: token0.address,
+        abi: ERC20_ABI,
+        functionName: "decimals",
+      },
     ],
     onSuccess(value) {
-      setBalance1(Number(formatEther(value[0])).toFixed(5).toString());
+      setBalance1({
+        decimal: value[2].toNumber(),
+        raw: value[0],
+        formatted: Number(formatEther(value[0])).toFixed(5).toString(),
+      });
       setTokenName1(value[1]);
     },
   });
+
+  const { data: EOSBalance } = useBalance({
+    address: address,
+    onSuccess(value) {
+      if (token0 === tokens[0]) {
+        setBalance0({
+          decimal: value.decimals,
+          raw: value.value,
+          formatted: parseFloat(value.formatted).toFixed(5),
+        });
+      }
+      if (token1 === tokens[0]) {
+        setBalance1({
+          decimal: value.decimals,
+          raw: value.value,
+          formatted: parseFloat(value.formatted).toFixed(5),
+        });
+      }
+    },
+  });
+  console.log(
+    "EOSBalance =",
+    parseFloat(EOSBalance?.formatted as string).toFixed(5)
+  );
 
   useEffect(() => {
     console.log("Uniswap Factory =", uniswapFactory);
@@ -243,6 +284,9 @@ export default function Swap() {
     if (isNaN(+value)) return;
     setTokenAmount0(value);
     debouncedToken0(value);
+    // if (value < balance0.raw.toString()) {
+    //   setIsBalanceEnough(false);
+    // }
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
@@ -265,6 +309,9 @@ export default function Swap() {
     if (isNaN(+value) || !+value) return;
     setTokenAmount1(value);
     debouncedToken1(value);
+    // if (value < balance1.raw.toString()) {
+    //   setIsBalanceEnough(false);
+    // }
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
@@ -290,7 +337,7 @@ export default function Swap() {
     setTokenAmount1(tokenAmount0);
   };
 
-  const swap = async () => {
+  const approve = async () => {
     setIsLoading(true);
     if (!tradeContext) return new Error("No TradeContext found");
     if (!signer) throw new Error("No signer");
@@ -303,13 +350,31 @@ export default function Swap() {
       const approvedReceipt = await approved.wait();
       console.log("approved receipt", approvedReceipt);
       setIsLoading(false);
+      setIsApproved(true);
     }
+  };
+
+  const swap = async () => {
+    setIsLoading(true);
+    if (!tradeContext) return new Error("No TradeContext found");
+    if (!signer) throw new Error("No signer");
+
+    // if (tradeContext.approvalTransaction) {
+    //   const approved = await signer.sendTransaction(
+    //     tradeContext.approvalTransaction
+    //   );
+    //   console.log("approved txHash", approved.hash);
+    //   const approvedReceipt = await approved.wait();
+    //   console.log("approved receipt", approvedReceipt);
+    //   setIsLoading(false);
+    // }
 
     try {
       const tradeTransaction = await signer.sendTransaction(
         tradeContext.transaction
       );
       console.log("trade txHash", tradeTransaction.hash);
+      setTxHash(tradeTransaction.hash);
       const tradeReceipt = await tradeTransaction.wait();
       console.log("trade receipt", tradeReceipt);
       setIsLoading(false);
@@ -403,6 +468,7 @@ export default function Swap() {
                 </>
               </Popover>
             </div>
+
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
                 <div className="flex items-center">
@@ -412,8 +478,8 @@ export default function Swap() {
                   className="flex items-center cursor-pointer"
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount0(balance0);
-                    debouncedToken0(balance0);
+                    setTokenAmount0(balance0.raw.toString());
+                    debouncedToken0(balance0.raw.toString());
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -422,7 +488,7 @@ export default function Swap() {
                   )}
                   {!isFetchingBalance0 && (
                     <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
-                      {balance0} {tokenName0}
+                      {balance0.formatted} {tokenName0}
                     </p>
                   )}
                 </div>
@@ -493,8 +559,8 @@ export default function Swap() {
                   className="flex items-center cursor-pointer "
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount1(balance1);
-                    debouncedToken1(balance1);
+                    setTokenAmount1(balance1.raw.toString());
+                    debouncedToken1(balance1.raw.toString());
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -503,7 +569,7 @@ export default function Swap() {
                   )}
                   {!isFetchingBalance1 && (
                     <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
-                      {balance1} {tokenName1}
+                      {balance1.formatted} {tokenName1}
                     </p>
                   )}
                 </div>
@@ -550,6 +616,7 @@ export default function Swap() {
               </div>
             </div>
           </div>
+
           <div className="flex my-3 justify-center">
             {!isConnected && (
               <ConnectButton.Custom>
@@ -658,93 +725,126 @@ export default function Swap() {
                 </ModalOpenButton>
                 <ModalContents>
                   {({ close }) => (
-                    <div className="">
+                    <div>
                       <div className="w-full flex mb-5">
                         <ArrowLeftIcon
                           className="h-7 cursor-pointer hover:dark:text-neutral-600"
                           onClick={close}
                         />
                       </div>
-                      <div className="flex items-center justify-between ">
-                        <div className="flex flex-col ">
-                          <div className="text-2xl mb-1 font-medium">
-                            Buy {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
-                            {tokenName1}
-                          </div>
-                          <div className="text-lg text-neutral-400 font-medium">
-                            Sell {tokenAmount0} {tokenName0}
-                          </div>
-                        </div>
-                        <img
-                          src={token1.logo}
-                          alt="Token1 Logo"
-                          className="h-16"
-                        />
-                      </div>
-                      <div className="p-3 my-5 flex flex-col bg-zinc-900 rounded-lg">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex flex-col max-w-xs">
-                            <div className="font-medium text-neutral-300">
-                              Slippage
-                            </div>
-                            <div className="font-light text-sm text-neutral-300">
-                              The slippage you set for the trade
-                            </div>
-                          </div>
-                          <div>{slippage}%</div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-col max-w-xs">
-                            <div className="font-medium text-neutral-300">
-                              Minimal received
-                            </div>
-                            <div className="font-light text-sm text-neutral-300">
-                              The minimum amount you are <br /> guaranteeed to
-                              receive
-                            </div>
-                          </div>
-                          <div>
-                            {parseFloat(tokenMin1).toFixed(5).toString()} $
-                            {tokenName1}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-3 my-5 flex bg-zinc-900 rounded-lg items-center justify-between">
-                        <div className="flex flex-col max-w-xs">
-                          <div className="font-medium text-neutral-300">
-                            Recipient
-                          </div>
-                        </div>
-                        <Link
-                          href={`https://explorer-testnet2.trust.one/address/${
-                            address as string
-                          }`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {truncateEthAddress(address as string)}
-                        </Link>
-                      </div>
-                      <div className="flex space-x-2">
+                      {txHash === "" && (
                         <>
+                          <div className="flex items-center justify-between ">
+                            <div className="flex flex-col ">
+                              <div className="text-2xl mb-1 font-medium">
+                                Buy{" "}
+                                {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
+                                {tokenName1}
+                              </div>
+                              <div className="text-lg text-neutral-400 font-medium">
+                                Sell {tokenAmount0} {tokenName0}
+                              </div>
+                            </div>
+                            <img
+                              src={token1.logo}
+                              alt="Token1 Logo"
+                              className="h-16"
+                            />
+                          </div>
+                          <div className="p-3 my-5 flex flex-col bg-zinc-900 rounded-lg">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex flex-col max-w-xs">
+                                <div className="font-medium text-neutral-300">
+                                  Slippage
+                                </div>
+                                <div className="font-light text-sm text-neutral-300">
+                                  The slippage you set for the trade
+                                </div>
+                              </div>
+                              <div>{slippage}%</div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex flex-col max-w-xs">
+                                <div className="font-medium text-neutral-300">
+                                  Minimal received
+                                </div>
+                                <div className="font-light text-sm text-neutral-300">
+                                  The minimum amount you are <br /> guaranteeed
+                                  to receive
+                                </div>
+                              </div>
+                              <div>
+                                {parseFloat(tokenMin1).toFixed(5).toString()} $
+                                {tokenName1}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="p-3 my-5 flex bg-zinc-900 rounded-lg items-center justify-between">
+                            <div className="flex flex-col max-w-xs">
+                              <div className="font-medium text-neutral-300">
+                                Recipient
+                              </div>
+                            </div>
+                            <Link
+                              href={`https://explorer-testnet2.trust.one/address/${
+                                address as string
+                              }`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              {truncateEthAddress(address as string)}
+                            </Link>
+                          </div>
+                          <div className="flex space-x-2">
+                            <>
+                              {!isApproved && (
+                                <Button
+                                  onClick={() => approve()}
+                                  disabled={!tokenAmount0 || !isConnected}
+                                  className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                  loading={isLoading}
+                                >
+                                  Approve
+                                </Button>
+                              )}
+                              {isApproved && (
+                                <Button
+                                  onClick={() => swap()}
+                                  disabled={!tokenAmount0 || !isConnected}
+                                  className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                  loading={isLoading}
+                                >
+                                  Swap
+                                </Button>
+                              )}
+                            </>
+                          </div>
+                        </>
+                      )}
+                      {txHash !== "" && (
+                        <>
+                          <div className="flex justify-center items-center py-20 mb-5 ">
+                            <div className="mr-2">
+                              You sold {tokenAmount0} {tokenName0} for{" "}
+                              {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
+                              {tokenName1}
+                            </div>
+                            <Link
+                              href={`https://explorer-testnet2.trust.one/tx/${txHash}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
+                            </Link>
+                          </div>
                           <Button
-                            onClick={() => swap()}
-                            disabled={!tokenAmount0 || !isConnected}
+                            onClick={close}
                             className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                            loading={isLoading}
                           >
-                            Approve
-                          </Button>
-                          <Button
-                            onClick={() => swap()}
-                            disabled={!tokenAmount0 || !isConnected}
-                            className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                            loading={isLoading}
-                          >
-                            Swap
+                            Swap again
                           </Button>
                         </>
-                      </div>
+                      )}
                     </div>
                   )}
                 </ModalContents>

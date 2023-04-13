@@ -1,4 +1,4 @@
-import { classNames } from "@/shared/helpers/classNames";
+import { classNames } from "@/shared/helpers/classNamer";
 import useUpdateEffect from "@/shared/hooks/useUpdateEffect";
 import { useTheme } from "@geist-ui/core";
 import { useEffect, useMemo, useRef, useState } from "react";

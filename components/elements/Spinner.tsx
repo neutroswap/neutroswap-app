@@ -1,5 +1,5 @@
 import * as React from "react";
-import { classNames } from "../../shared/helpers/classNames";
+import { classNames } from "../../shared/helpers/classNamer";
 
 export interface ISpinProps {
   /* Size of the spinner */
@@ -16,7 +16,7 @@ const sizes = {
 
 export interface SpinProps
   extends React.HTMLAttributes<SVGSVGElement>,
-  ISpinProps { }
+    ISpinProps {}
 
 export const Spinner = (props: SpinProps) => {
   const { size = "sm", className, ...rest } = props;
