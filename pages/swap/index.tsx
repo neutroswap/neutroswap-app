@@ -40,7 +40,10 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
+import {
+  ArrowLeftIcon,
+  ArrowTopRightOnSquareIcon,
+} from "@heroicons/react/24/solid";
 import WalletIcon from "@/public/icons/wallet.svg";
 import Link from "next/link";
 import { Currency } from "@/shared/types/currency.types";
@@ -58,6 +61,7 @@ export default function Swap() {
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
   const [isPreferNative, setIsPreferNative] = useState(true);
+  // const [isBalanceEnough, setIsBalanceEnough] = useState(true);
 
   const [balance0, setBalance0] = useState<Currency>({
     decimal: 18,
@@ -81,6 +85,7 @@ export default function Swap() {
   const [tradeContext, setTradeContext] = useState<TradeContext>();
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
+  const [txHash, setTxHash] = useState<string>("");
 
   // const { data: EOSBalance } = useBalance({
   //   address: address,
@@ -271,6 +276,9 @@ export default function Swap() {
     if (isNaN(+value)) return;
     setTokenAmount0(value);
     debouncedToken0(value);
+    // if (value < balance0.raw.toString()) {
+    //   setIsBalanceEnough(false);
+    // }
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
@@ -293,6 +301,9 @@ export default function Swap() {
     if (isNaN(+value) || !+value) return;
     setTokenAmount1(value);
     debouncedToken1(value);
+    // if (value < balance1.raw.toString()) {
+    //   setIsBalanceEnough(false);
+    // }
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
@@ -355,6 +366,7 @@ export default function Swap() {
         tradeContext.transaction
       );
       console.log("trade txHash", tradeTransaction.hash);
+      setTxHash(tradeTransaction.hash);
       const tradeReceipt = await tradeTransaction.wait();
       console.log("trade receipt", tradeReceipt);
       setIsLoading(false);
@@ -448,6 +460,7 @@ export default function Swap() {
                 </>
               </Popover>
             </div>
+
             <div className="p-4 bg-black/50 rounded-lg">
               <div className="flex justify-between">
                 <div className="flex items-center">
@@ -595,6 +608,7 @@ export default function Swap() {
               </div>
             </div>
           </div>
+
           <div className="flex my-3 justify-center">
             {!isConnected && (
               <ConnectButton.Custom>
@@ -703,97 +717,125 @@ export default function Swap() {
                 </ModalOpenButton>
                 <ModalContents>
                   {({ close }) => (
-                    <div className="">
+                    <div>
                       <div className="w-full flex mb-5">
                         <ArrowLeftIcon
                           className="h-7 cursor-pointer hover:dark:text-neutral-600"
                           onClick={close}
                         />
                       </div>
-                      <div className="flex items-center justify-between ">
-                        <div className="flex flex-col ">
-                          <div className="text-2xl mb-1 font-medium">
-                            Buy {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
-                            {tokenName1}
-                          </div>
-                          <div className="text-lg text-neutral-400 font-medium">
-                            Sell {tokenAmount0} {tokenName0}
-                          </div>
-                        </div>
-                        <img
-                          src={token1.logo}
-                          alt="Token1 Logo"
-                          className="h-16"
-                        />
-                      </div>
-                      <div className="p-3 my-5 flex flex-col bg-zinc-900 rounded-lg">
-                        <div className="flex items-center justify-between mb-3">
-                          <div className="flex flex-col max-w-xs">
-                            <div className="font-medium text-neutral-300">
-                              Slippage
-                            </div>
-                            <div className="font-light text-sm text-neutral-300">
-                              The slippage you set for the trade
-                            </div>
-                          </div>
-                          <div>{slippage}%</div>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-col max-w-xs">
-                            <div className="font-medium text-neutral-300">
-                              Minimal received
-                            </div>
-                            <div className="font-light text-sm text-neutral-300">
-                              The minimum amount you are <br /> guaranteeed to
-                              receive
-                            </div>
-                          </div>
-                          <div>
-                            {parseFloat(tokenMin1).toFixed(5).toString()} $
-                            {tokenName1}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="p-3 my-5 flex bg-zinc-900 rounded-lg items-center justify-between">
-                        <div className="flex flex-col max-w-xs">
-                          <div className="font-medium text-neutral-300">
-                            Recipient
-                          </div>
-                        </div>
-                        <Link
-                          href={`https://explorer-testnet2.trust.one/address/${
-                            address as string
-                          }`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          {truncateEthAddress(address as string)}
-                        </Link>
-                      </div>
-                      <div className="flex space-x-2">
+                      {txHash === "" && (
                         <>
-                          {!isApproved && (
-                            <Button
-                              onClick={() => approve()}
-                              disabled={!tokenAmount0 || !isConnected}
-                              className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                              loading={isLoading}
+                          <div className="flex items-center justify-between ">
+                            <div className="flex flex-col ">
+                              <div className="text-2xl mb-1 font-medium">
+                                Buy{" "}
+                                {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
+                                {tokenName1}
+                              </div>
+                              <div className="text-lg text-neutral-400 font-medium">
+                                Sell {tokenAmount0} {tokenName0}
+                              </div>
+                            </div>
+                            <img
+                              src={token1.logo}
+                              alt="Token1 Logo"
+                              className="h-16"
+                            />
+                          </div>
+                          <div className="p-3 my-5 flex flex-col bg-zinc-900 rounded-lg">
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex flex-col max-w-xs">
+                                <div className="font-medium text-neutral-300">
+                                  Slippage
+                                </div>
+                                <div className="font-light text-sm text-neutral-300">
+                                  The slippage you set for the trade
+                                </div>
+                              </div>
+                              <div>{slippage}%</div>
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <div className="flex flex-col max-w-xs">
+                                <div className="font-medium text-neutral-300">
+                                  Minimal received
+                                </div>
+                                <div className="font-light text-sm text-neutral-300">
+                                  The minimum amount you are <br /> guaranteeed
+                                  to receive
+                                </div>
+                              </div>
+                              <div>
+                                {parseFloat(tokenMin1).toFixed(5).toString()} $
+                                {tokenName1}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="p-3 my-5 flex bg-zinc-900 rounded-lg items-center justify-between">
+                            <div className="flex flex-col max-w-xs">
+                              <div className="font-medium text-neutral-300">
+                                Recipient
+                              </div>
+                            </div>
+                            <Link
+                              href={`https://explorer-testnet2.trust.one/address/${
+                                address as string
+                              }`}
+                              target="_blank"
+                              rel="noreferrer"
                             >
-                              Approve
-                            </Button>
-                          )}
-                          {isApproved && (
-                            <Button
-                              onClick={() => swap()}
-                              disabled={!tokenAmount0 || !isConnected}
-                              className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                              loading={isLoading}
-                            >
-                              Swap
-                            </Button>
-                          )}
+                              {truncateEthAddress(address as string)}
+                            </Link>
+                          </div>
+                          <div className="flex space-x-2">
+                            <>
+                              {!isApproved && (
+                                <Button
+                                  onClick={() => approve()}
+                                  disabled={!tokenAmount0 || !isConnected}
+                                  className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                  loading={isLoading}
+                                >
+                                  Approve
+                                </Button>
+                              )}
+                              {isApproved && (
+                                <Button
+                                  onClick={() => swap()}
+                                  disabled={!tokenAmount0 || !isConnected}
+                                  className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                  loading={isLoading}
+                                >
+                                  Swap
+                                </Button>
+                              )}
+                            </>
+                          </div>
                         </>
-                      </div>
+                      )}
+                      {txHash !== "" && (
+                        <>
+                          <div className="flex justify-center items-center py-20 mb-5 ">
+                            <div className="mr-2">
+                              You sold {tokenAmount0} {tokenName0} for{" "}
+                              {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
+                              {tokenName1}
+                            </div>
+                            <Link
+                              href={`https://explorer-testnet2.trust.one/tx/${txHash}`}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
+                            </Link>
+                          </div>
+                          <Link href="/swap" rel="noreferrer">
+                            <Button className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md">
+                              Swap again
+                            </Button>
+                          </Link>
+                        </>
+                      )}
                     </div>
                   )}
                 </ModalContents>
