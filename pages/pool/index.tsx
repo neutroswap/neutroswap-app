@@ -52,10 +52,8 @@ export default function Pool() {
     if (!address) return;
     (async () => {
       setIsFetchingPool(true);
-      // const req = await fetch(`/api/getUserLP?userAddress=${address}`)
-      const req = await fetch(
-        `/api/getUserLP?userAddress=0x222da5f13d800ff94947c20e8714e103822ff716`
-      );
+      const req = await fetch(`/api/getUserLP?userAddress=${address}`)
+      // const req = await fetch(`/api/getUserLP?userAddress=0x222da5f13d800ff94947c20e8714e103822ff716`);
       const response = await req.json();
       console.log(response.data);
       setPositions(response.data);

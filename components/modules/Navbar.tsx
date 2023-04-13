@@ -24,7 +24,7 @@ const Navbar: React.FC<Props> = () => {
         }}
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto py-3 px-4 lg:px-0  submenu__inner">
-          <Link href="/">
+          <Link href="/swap">
             <Logo className="h-5 lg:h-6 text-black dark:text-white mr-4" />
           </Link>
           <Tabs
@@ -33,10 +33,17 @@ const Navbar: React.FC<Props> = () => {
             onChange={(route) => router.push(route)}
             className="hidden lg:block !w-full"
           >
-            <Tabs.Item label="Home" value="/" />
+            {/* <Tabs.Item label="Home" value="/" /> */}
             <Tabs.Item label="Swap" value="/swap" />
             <Tabs.Item label="Pool" value="/pool" />
-            {process.env.NODE_ENV !== 'production' && (<Tabs.Item label="Presales" value="/presales" />)}
+            <Tabs.Item label="Launchpad" value="/launchpad" />
+            <Tabs.Item label="Farm" value="/farm" />
+            <Tabs.Item label="Vault" value="/vault" />
+            <Tabs.Item label="Analytics" value="/analytics" />
+
+            {process.env.NODE_ENV !== "production" && (
+              <Tabs.Item label="Presales" value="/presales" />
+            )}
           </Tabs>
           <div className="flex space-x-2">
             <ConnectButton.Custom>

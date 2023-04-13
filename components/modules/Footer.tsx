@@ -26,7 +26,7 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto  submenu__inner">
           <p className="text-sm text-neutral-400 dark:text-neutral-600 md:m-0 p-0">
-            Copyright &copy; {new Date().getFullYear()} Nava Labs, LLC. All
+            Copyright &copy; {new Date().getFullYear()} Neutroswap, LLC. All
             rights reserved.
           </p>
           <div></div>
