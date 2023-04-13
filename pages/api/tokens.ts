@@ -57,7 +57,7 @@ export async function createNewToken (newToken: TokenFE) {
 
   const token: Token = {
     network_id: network.id,
-    address: tokenAddress,
+    address: tokenAddress as `0x${string}`,
     decimal: decimals.toNumber() ?? 18,
     name: symbol,
     symbol,

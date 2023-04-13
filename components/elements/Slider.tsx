@@ -1,29 +1,32 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import * as SliderPrimitive from "@radix-ui/react-slider"
-import { classNames } from "@/shared/helpers/classNames"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./Tooltip"
+import * as React from "react";
+import * as SliderPrimitive from "@radix-ui/react-slider";
+import { classNames } from "@/shared/helpers/classNamer";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "./Tooltip";
 
 const callAll =
   (...fns: any) =>
-    (...args: any) =>
-      fns.forEach((fn: any) => fn && fn(...args));
+  (...args: any) =>
+    fns.forEach((fn: any) => fn && fn(...args));
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof SliderPrimitive.Root>
 >(({ className, ...props }, ref) => {
-  const {
-    defaultValue = [33]
-  } = props;
+  const { defaultValue = [33] } = props;
 
   const [value, setValue] = React.useState<number[]>(defaultValue);
   const [isHovered, setIsHovered] = React.useState(false);
 
   React.useEffect(() => {
-    if (props.value) setValue(props.value)
-  }, [props.value])
+    if (props.value) setValue(props.value);
+  }, [props.value]);
 
   return (
     <SliderPrimitive.Root
@@ -33,7 +36,10 @@ const Slider = React.forwardRef<
         className
       )}
       {...props}
-      onValueChange={callAll((value: any) => setValue(value), props.onValueChange)}
+      onValueChange={callAll(
+        (value: any) => setValue(value),
+        props.onValueChange
+      )}
     >
       <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-900">
         <SliderPrimitive.Range className="absolute h-full bg-neutral-400 dark:bg-neutral-700" />
@@ -61,11 +67,12 @@ const Slider = React.forwardRef<
           "bg-neutral-400 dark:bg-neutral-500",
           "disabled:pointer-events-none disabled:opacity-50",
           "border-1.5 border-neutral-400 dark:border-neutral-800",
-          "focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:ring-offset-2 dark:focus:ring-neutral-500 dark:focus:ring-offset-neutral-900",
-        )} />
+          "focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:ring-offset-2 dark:focus:ring-neutral-500 dark:focus:ring-offset-neutral-900"
+        )}
+      />
     </SliderPrimitive.Root>
-  )
-})
-Slider.displayName = SliderPrimitive.Root.displayName
+  );
+});
+Slider.displayName = SliderPrimitive.Root.displayName;
 
-export { Slider }
+export { Slider };

@@ -8,12 +8,12 @@ import {
   useState,
 } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { classNames } from "../../shared/helpers/classNames";
+import { classNames } from "../../shared/helpers/classNamer";
 
 const callAll =
   (...fns: any) =>
-    (...args: any) =>
-      fns.forEach((fn: any) => fn && fn(...args));
+  (...args: any) =>
+    fns.forEach((fn: any) => fn && fn(...args));
 const ModalContext = createContext<
   [boolean, Dispatch<SetStateAction<boolean>>] | any
 >([]);

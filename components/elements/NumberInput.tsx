@@ -6,7 +6,7 @@ import React, {
   SetStateAction,
   HTMLInputTypeAttribute,
 } from "react";
-import { classNames } from "@/shared/helpers/classNames";
+import { classNames } from "@/shared/helpers/classNamer";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 
 type SimpleProps<L, R> = R & Pick<L, Exclude<keyof L, keyof R>>;

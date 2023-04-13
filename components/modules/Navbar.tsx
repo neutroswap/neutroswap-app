@@ -6,10 +6,10 @@ import { MoonIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { classNames } from "@/shared/helpers/classNames";
+import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
 
-interface Props { }
+interface Props {}
 
 const Navbar: React.FC<Props> = () => {
   const router = useRouter();
