@@ -43,6 +43,8 @@ import {
 import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import WalletIcon from "@/public/icons/wallet.svg";
 import Link from "next/link";
+import { Currency } from "@/shared/types/currency.types";
+import { BigNumber } from "ethers";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -57,8 +59,16 @@ export default function Swap() {
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
   const [isPreferNative, setIsPreferNative] = useState(true);
 
-  const [balance0, setBalance0] = useState("0");
-  const [balance1, setBalance1] = useState("0");
+  const [balance0, setBalance0] = useState<Currency>({
+    decimal: 18,
+    raw: BigNumber.from(0),
+    formatted: "0.00",
+  });
+  const [balance1, setBalance1] = useState<Currency>({
+    decimal: 18,
+    raw: BigNumber.from(0),
+    formatted: "0.00",
+  });
   const [tokenName0, setTokenName0] = useState("");
   const [tokenName1, setTokenName1] = useState("");
   const [tokenAmount0, setTokenAmount0] = useState("0");
@@ -66,27 +76,27 @@ export default function Swap() {
   const [tokenMin1, setTokenMin1] = useState("0");
   const [tokenEst1, setTokenEst1] = useState("0");
   const [token0, setToken0] = useState<Token>(tokens[0]);
-  const [token1, setToken1] = useState<Token>(tokens[2]);
+  const [token1, setToken1] = useState<Token>(tokens[1]);
 
   const [tradeContext, setTradeContext] = useState<TradeContext>();
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
 
-  const { data: EOSBalance } = useBalance({
-    address: address,
-    onSuccess(value) {
-      if (token0 === tokens[0]) {
-        setBalance0(parseFloat(value.formatted).toFixed(5));
-      }
-      if (token1 === tokens[0]) {
-        setBalance1(value.formatted);
-      }
-    },
-  });
-  console.log(
-    "EOSBalance =",
-    parseFloat(EOSBalance?.formatted as string).toFixed(5)
-  );
+  // const { data: EOSBalance } = useBalance({
+  //   address: address,
+  //   onSuccess(value) {
+  //     if (token0 === tokens[0]) {
+  //       setBalance0(parseFloat(value.formatted).toFixed(5));
+  //     }
+  //     if (token1 === tokens[0]) {
+  //       setBalance1(value.formatted);
+  //     }
+  //   },
+  // });
+  // console.log(
+  //   "EOSBalance =",
+  //   parseFloat(EOSBalance?.formatted as string).toFixed(5)
+  // );
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
@@ -98,9 +108,18 @@ export default function Swap() {
         args: [address!],
       },
       { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
+      {
+        address: token0.address,
+        abi: ERC20_ABI,
+        functionName: "decimals",
+      },
     ],
     onSuccess(value) {
-      setBalance0(Number(formatEther(value[0])).toFixed(5).toString());
+      setBalance0({
+        decimal: value[2].toNumber(),
+        raw: value[0],
+        formatted: Number(formatEther(value[0])).toFixed(5).toString(),
+      });
       setTokenName0(value[1]);
     },
   });
@@ -115,9 +134,18 @@ export default function Swap() {
         args: [address!],
       },
       { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
+      {
+        address: token0.address,
+        abi: ERC20_ABI,
+        functionName: "decimals",
+      },
     ],
     onSuccess(value) {
-      setBalance1(Number(formatEther(value[0])).toFixed(5).toString());
+      setBalance1({
+        decimal: value[2].toNumber(),
+        raw: value[0],
+        formatted: Number(formatEther(value[0])).toFixed(5).toString(),
+      });
       setTokenName1(value[1]);
     },
   });
@@ -290,7 +318,7 @@ export default function Swap() {
     setTokenAmount1(tokenAmount0);
   };
 
-  const swap = async () => {
+  const approve = async () => {
     setIsLoading(true);
     if (!tradeContext) return new Error("No TradeContext found");
     if (!signer) throw new Error("No signer");
@@ -303,7 +331,24 @@ export default function Swap() {
       const approvedReceipt = await approved.wait();
       console.log("approved receipt", approvedReceipt);
       setIsLoading(false);
+      setIsApproved(true);
     }
+  };
+
+  const swap = async () => {
+    setIsLoading(true);
+    if (!tradeContext) return new Error("No TradeContext found");
+    if (!signer) throw new Error("No signer");
+
+    // if (tradeContext.approvalTransaction) {
+    //   const approved = await signer.sendTransaction(
+    //     tradeContext.approvalTransaction
+    //   );
+    //   console.log("approved txHash", approved.hash);
+    //   const approvedReceipt = await approved.wait();
+    //   console.log("approved receipt", approvedReceipt);
+    //   setIsLoading(false);
+    // }
 
     try {
       const tradeTransaction = await signer.sendTransaction(
@@ -412,7 +457,7 @@ export default function Swap() {
                   className="flex items-center cursor-pointer"
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount0(balance0);
+                    setTokenAmount0(balance0.raw.toString());
                     debouncedToken0(balance0);
                   }}
                 >
@@ -422,7 +467,7 @@ export default function Swap() {
                   )}
                   {!isFetchingBalance0 && (
                     <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
-                      {balance0} {tokenName0}
+                      {balance0.formatted} {tokenName0}
                     </p>
                   )}
                 </div>
@@ -493,7 +538,7 @@ export default function Swap() {
                   className="flex items-center cursor-pointer "
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount1(balance1);
+                    setTokenAmount1(balance1.raw.toString());
                     debouncedToken1(balance1);
                   }}
                 >
@@ -503,7 +548,7 @@ export default function Swap() {
                   )}
                   {!isFetchingBalance1 && (
                     <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
-                      {balance1} {tokenName1}
+                      {balance1.formatted} {tokenName1}
                     </p>
                   )}
                 </div>
@@ -727,22 +772,26 @@ export default function Swap() {
                       </div>
                       <div className="flex space-x-2">
                         <>
-                          <Button
-                            onClick={() => swap()}
-                            disabled={!tokenAmount0 || !isConnected}
-                            className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                            loading={isLoading}
-                          >
-                            Approve
-                          </Button>
-                          <Button
-                            onClick={() => swap()}
-                            disabled={!tokenAmount0 || !isConnected}
-                            className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                            loading={isLoading}
-                          >
-                            Swap
-                          </Button>
+                          {!isApproved && (
+                            <Button
+                              onClick={() => approve()}
+                              disabled={!tokenAmount0 || !isConnected}
+                              className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                              loading={isLoading}
+                            >
+                              Approve
+                            </Button>
+                          )}
+                          {isApproved && (
+                            <Button
+                              onClick={() => swap()}
+                              disabled={!tokenAmount0 || !isConnected}
+                              className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                              loading={isLoading}
+                            >
+                              Swap
+                            </Button>
+                          )}
                         </>
                       </div>
                     </div>
