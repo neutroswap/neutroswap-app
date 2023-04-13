@@ -87,22 +87,6 @@ export default function Swap() {
   const [direction, setDirection] = useState<"input" | "output">("input");
   const [txHash, setTxHash] = useState<string>("");
 
-  // const { data: EOSBalance } = useBalance({
-  //   address: address,
-  //   onSuccess(value) {
-  //     if (token0 === tokens[0]) {
-  //       setBalance0(parseFloat(value.formatted).toFixed(5));
-  //     }
-  //     if (token1 === tokens[0]) {
-  //       setBalance1(value.formatted);
-  //     }
-  //   },
-  // });
-  // console.log(
-  //   "EOSBalance =",
-  //   parseFloat(EOSBalance?.formatted as string).toFixed(5)
-  // );
-
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
     contracts: [
@@ -154,6 +138,30 @@ export default function Swap() {
       setTokenName1(value[1]);
     },
   });
+
+  const { data: EOSBalance } = useBalance({
+    address: address,
+    onSuccess(value) {
+      if (token0 === tokens[0]) {
+        setBalance0({
+          decimal: value.decimals,
+          raw: value.value,
+          formatted: parseFloat(value.formatted).toFixed(5),
+        });
+      }
+      if (token1 === tokens[0]) {
+        setBalance1({
+          decimal: value.decimals,
+          raw: value.value,
+          formatted: parseFloat(value.formatted).toFixed(5),
+        });
+      }
+    },
+  });
+  console.log(
+    "EOSBalance =",
+    parseFloat(EOSBalance?.formatted as string).toFixed(5)
+  );
 
   useEffect(() => {
     console.log("Uniswap Factory =", uniswapFactory);
