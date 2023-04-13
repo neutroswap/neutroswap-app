@@ -9,7 +9,7 @@ import Logo from "@/public/logo.svg";
 export default function Launchpad() {
   return (
     <div className="flex flex-col h-screen justify-center items-center">
-      <Text h1 className="text-neutral-400">
+      <Text h1 className="text-white">
         Coming Soon
       </Text>
     </div>
