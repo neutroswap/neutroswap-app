@@ -25,6 +25,8 @@ import { useRouter } from "next/router";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";
+import { decimalFormat } from "@/shared/helpers/decimalFormat";
+import Link from "next/link";
 
 type PositionsResponse = {
   network_id: string;
@@ -36,6 +38,7 @@ type PositionsResponse = {
   userBalance: BigNumberish;
   token0: Token;
   token1: Token;
+  poolShare: string;
 };
 
 export default function Pool() {
@@ -69,9 +72,9 @@ export default function Pool() {
         <Text type="secondary">Add or Remove liquidity to Neutroswap pool</Text>
       </div>
       <div className="flex justify-center items-center">
-        <div className="mt-8 flex items-center text-center rounded-lg border border-neutral-200 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg w-full max-w-lg">
+        <div className="mt-8 flex items-center text-center rounded-lg border border-neutral-200 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg w-full max-w-3xl">
           {!positions.length && !isFetchingPool && (
-            <div className="flex flex-col items-center p-8">
+            <div className="flex flex-col items-center w-full p-8">
               {theme.type === "light" && (
                 <NoContentLight className="w-40 h-40 opacity-75" />
               )}
@@ -94,88 +97,94 @@ export default function Pool() {
             </div>
           )}
 
-          {!positions.length && isFetchingPool && <Loading scale={3} />}
+          {!positions.length && isFetchingPool && (
+            <div className="flex py-40 w-full">
+              <Loading scale={3} />
+            </div>
+          )}
 
           {!!positions.length && (
             <div className="p-8 w-full">
               {positions.map((position) => (
-                <Disclosure key={position.address}>
-                  {({ open }) => (
-                    <div className="mb-4">
-                      <Disclosure.Button
-                        className={classNames(
-                          "flex justify-between items-center py-2 w-full bg-neutral-200 dark:bg-neutral-900 rounded-lg",
-                          open && "rounded-b-none"
-                        )}
-                      >
-                        <div className="flex space-x-2 ml-4">
-                          <div className="flex -space-x-1 relative z-0 overflow-hidden">
+                <Link key={position.address} href={`/pool/${position.address}`}>
+                  <div
+                    className={classNames(
+                      "mb-4 flex flex-col justify-center w-full rounded-lg group transition",
+                      "bg-transparent dark:bg-neutral-900/75 hover:dark:bg-neutral-800/60",
+                      "border border-neutral-200 dark:border-transparent",
+                      "text-black dark:text-white"
+                    )}
+                  >
+                    <div className="flex items-center justify-between py-3 px-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center space-x-4">
+                          <div className="flex -space-x-2 relative z-0 overflow-hidden">
                             <img
                               alt={`${position.token0.symbol} Icon`}
-                              src={position.token0.symbol}
-                              className="h-6 rounded-full"
+                              src={position.token0.logo}
+                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-neutral-200 dark:ring-neutral-900"
                               onError={(e) => {
                                 handleImageFallback(position.token0.symbol, e);
                               }}
                             />
                             <img
                               alt={`${position.token1.symbol} Icon`}
-                              src={position.token1.symbol}
-                              className="h-6 rounded-full"
+                              src={position.token1.logo}
+                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-neutral-200 dark:ring-neutral-900"
                               onError={(e) => {
                                 handleImageFallback(position.token1.symbol, e);
                               }}
                             />
                           </div>
-                          <span className="text-left font-semibold text-lg">
-                            {position.name}
-                          </span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-left font-medium text-lg">
+                              {position.token0.symbol}
+                            </span>
+                            <span className="text-left font-medium text-lg opacity-25">
+                              /
+                            </span>
+                            <span className="text-left font-medium text-lg">
+                              {position.token1.symbol}
+                            </span>
+                          </div>
                         </div>
-                        <ChevronUpIcon
-                          className={`${
-                            open ? "rotate-180 transform" : ""
-                          } h-5 w-5 text-orange-400 mr-4`}
-                        />
-                      </Disclosure.Button>
-                      <Disclosure.Panel className="p-4 pt-6  rounded-md rounded-t-none border border-neutral-200 dark:border-neutral-900">
-                        <dl className="inline-block">
-                          <dt className="float-left text-left w-1/2">
-                            Total Pooled Tokens
-                          </dt>
-                          <dd className="float-right text-right w-1/2">
-                            {formatEther(position.userBalance)}
-                          </dd>
+                        <div className="flex text-sm space-x-4">
+                          <div className="flex space-x-2">
+                            <span className="opacity-50">Pool share</span>
+                            <span className="font-semibold">
+                              {decimalFormat(
+                                Number(formatEther(position.poolShare)) * 100,
+                                2
+                              )}
+                              %
+                            </span>
+                          </div>
+                          <div className="flex space-x-2">
+                            <span className="opacity-50">Owned LP token</span>
+                            <span className="font-semibold">
+                              {decimalFormat(
+                                Number(formatEther(position.userBalance)),
+                                2
+                              )}{" "}
+                              {position.symbol}
+                            </span>
+                          </div>
 
-                          <dt className="float-left text-left w-1/2">
-                            Total Pooled Tokens
-                          </dt>
-                          <dd className="float-right text-right w-1/2">
-                            {formatEther(position.userBalance)}
-                          </dd>
-                        </dl>
-                        <div className="flex w-full justify-between gap-4 mt-4">
-                          <Button
-                            type="error-light"
-                            scale={0.75}
-                            className="!w-full"
-                            ghost
-                            icon={<TrashIcon />}
-                          >
-                            Remove Liquidity
-                          </Button>
-                          <Button
-                            type="success-light"
-                            scale={0.75}
-                            className="!w-full"
-                            icon={<PlusIcon />}
-                          >
-                            Add Liquidity
-                          </Button>
+                          {/* NOTE: Show token0 and token1 balance in each pool */}
+                          {/* <div className="flex space-x-2"> */}
+                          {/*   <span className="opacity-50">{position.token0.symbol}</span> */}
+                          {/*   <span className="font-semibold">{0} {position.token0.symbol}</span> */}
+                          {/* </div> */}
+                          {/* <div className="flex space-x-2"> */}
+                          {/*   <span className="opacity-50">{position.token1.symbol}</span> */}
+                          {/*   <span className="font-semibold">{0} {position.token1.symbol}</span> */}
+                          {/* </div> */}
                         </div>
-                      </Disclosure.Panel>
+                      </div>
+                      <ChevronRightIcon className="w-6 h-6 group-hover:translate-x-1 transition" />
                     </div>
-                  )}
-                </Disclosure>
+                  </div>
+                </Link>
               ))}
 
               <Modal>
@@ -332,7 +341,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
             <PlusIcon className="w-4 h-4 mr-2" />
             <span>Start adding liquidity</span>
           </Button>
-          <p className="max-w-sm mx-auto text-sm text-neutral-400 dark:text-neutral-600 text-center">
+          <p className="max-w-3xl mx-auto text-sm text-neutral-400 dark:text-neutral-600 text-center">
             No pool found! But, you can create it now and start providing
             liquidity.
           </p>

@@ -10,6 +10,7 @@ import { formatEther, parseEther } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
+  TradeDirection,
   UniswapPair,
   UniswapPairFactory,
   UniswapPairSettings,
@@ -241,7 +242,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
   const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (isNaN(+value) || !+value) return;
+    if (isNaN(+value)) return;
     setToken1Amount(value);
     if (+value) debouncedToken1(value);
   };
@@ -249,27 +250,27 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const debouncedToken1 = debounce(async (nextValue) => {
     if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
     setIsFetchingToken0Price(true);
-    const trade = await uniswapPairFactory.trade(nextValue);
+    const trade = await uniswapPairFactory.trade(nextValue, TradeDirection.output);
     setToken0Amount(trade.expectedConvertQuote);
-    if (!trade.minAmountConvertQuote) return;
-    setToken1Min(nextValue);
+    if (!trade.maximumSent) return;
+    setToken1Min(trade.maximumSent);
     setDeadline(trade.tradeExpires);
     setIsFetchingToken0Price(false);
   }, 500);
 
   // NOTE: Enable for debugging only
-  // useEffect(() => {
-  //   console.log([
-  //     pairs?.[0],
-  //     pairs?.[1],
-  //     !!token0Amount && parseEther(token0Amount).toString(),
-  //     !!token1Amount && parseEther(token1Amount).toString(),
-  //     !!token0Min && token0Min[1].toString(),
-  //     parseEther(token1Min).toString(),
-  //     address!,
-  //     BigNumber.from(deadline).toString()
-  //   ])
-  // }, [pairs, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
+  useEffect(() => {
+    console.log([
+      token0.address,
+      token1.address,
+      !!token0Amount && parseEther(token0Amount).toString(),
+      !!token1Amount && parseEther(token1Amount).toString(),
+      !!token0Min && token0Min[1].toString(),
+      parseEther(token1Min).toString(),
+      address!,
+      BigNumber.from(deadline).toString()
+    ])
+  }, [token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
   return (
     <div className="">
