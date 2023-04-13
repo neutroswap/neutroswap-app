@@ -1,4 +1,4 @@
-import { ERC20_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
+import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import {
   FACTORY_CONTRACT,
   MULTICALL_CONTRACT,
@@ -6,7 +6,7 @@ import {
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, parseEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
@@ -19,16 +19,19 @@ import {
 import { CloneUniswapContractDetailsV2 } from "simple-uniswap-sdk/dist/esm/factories/pair/models/clone-uniswap-contract-details";
 import {
   useAccount,
+  useContract,
   useContractRead,
   useContractReads,
   useContractWrite,
   usePrepareContractWrite,
+  useSigner,
 } from "wagmi";
 import debounce from "lodash/debounce";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
 import { Currency } from "@/shared/types/currency.types";
+import dayjs from "dayjs";
 
 type PoolDepositPanelProps = {
   balances: Currency[];
@@ -40,11 +43,13 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { balances, token0, token1 } = props;
 
   const router = useRouter();
+  const signer = useSigner();
   const { address } = useAccount();
 
   const [token0Amount, setToken0Amount] = useState<string>();
   const [token1Amount, setToken1Amount] = useState<string>();
-  const [token1Min, setToken1Min] = useState("0");
+  const [token0Min, setToken0Min] = useState(BigNumber.from(0));
+  const [token1Min, setToken1Min] = useState(BigNumber.from(0));
   const [deadline, setDeadline] = useState(0);
 
   const [isToken0Approved, setIsToken0Approved] = useState(false);
@@ -52,21 +57,54 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
+  const [priceRatio, setPriceRatio] = useState<[number, number]>([0, 0]);
+  const [reserves, setReserves] = useState<[BigNumber, BigNumber]>([BigNumber.from(0), BigNumber.from(0)]);
+
   const [uniswapPairFactory, setUniswapPairFactory] =
     useState<UniswapPairFactory>();
   // TODO: move slippage to state or store
-  const SLIPPAGE = 0.0005;
+  const SLIPPAGE = 0.5; // in percent
 
-  const { data: token0Min } = useContractRead({
-    enabled: Boolean(token1Amount),
+  const neutroRouter = useContract({
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
-    functionName: "getAmountsOut",
-    args: [
-      !!token1Amount && parseEther(token1Amount),
-      [token1.address, token0.address],
-    ] as any,
+    signerOrProvider: signer.data
+  })
+
+  useContractRead({
+    address: router.query.id as `0x${string}`,
+    abi: NEUTRO_POOL_ABI,
+    functionName: "getReserves",
+    onSuccess(response) {
+      setPriceRatio([
+        +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
+        +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
+      ])
+      setReserves([response._reserve0, response._reserve1]);
+      // amount1 * ratio1 = quote0
+      // console.log('ratio0', +formatEther(response._reserve0) / +formatEther(response._reserve1))
+
+      // amount1 * ratio1 = quote0
+      // console.log('ratio1', +formatEther(response._reserve1) / +formatEther(response._reserve0))
+    }
   });
+
+  // useContractRead({
+  //   enabled: Boolean(token1Amount),
+  //   address: ROUTER_CONTRACT,
+  //   abi: NEUTRO_ROUTER_ABI,
+  //   functionName: "getAmountsOut",
+  //   args: [
+  //     !!token1Amount && parseEther(token1Amount),
+  //     [token1.address, token0.address],
+  //   ] as any,
+  //   onSuccess(response) {
+  //     console.log('getAmountsOut', [
+  //       response[0].toString(),
+  //       response[1].toString()
+  //     ]);
+  //   }
+  // });
 
   const { refetch: refetchAllowance } = useContractReads({
     enabled: Boolean(address),
@@ -105,7 +143,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     useContractWrite({
       ...approveConfig0,
       onSuccess(result) {
-        result.wait().then(() => refetchAllowance());
+        result.wait().then((receipt) => console.log(receipt));
       },
     });
 
@@ -135,32 +173,41 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       token1.address,
       !!token0Amount && parseEther(token0Amount),
       !!token1Amount && parseEther(token1Amount),
-      !!token0Min && token0Min[1],
-      parseEther(token1Min),
+      // !!token0Min && token0Min[1],
+      token0Min,
+      token1Min,
       address!,
-      BigNumber.from(deadline),
+      BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
     ],
     [
       token0,
       token1,
       token0Amount,
       token1Amount,
+      token0Min,
       token1Min,
       address,
-      deadline,
-      token0Min,
     ]
   );
 
   const { config: addLiquidityConfig, isFetching: isSimulatingAddLiquidity } =
     usePrepareContractWrite({
+      enabled: Boolean(!token0Min.isZero() || !token0Min.isZero()),
       address: ROUTER_CONTRACT,
       abi: NEUTRO_ROUTER_ABI,
       functionName: "addLiquidity",
       args: addLiquidityArgs,
+      onError(error) {
+        console.log('Error', error)
+      },
     });
   const { isLoading: isAddingLiquidity, write: addLiquidity } =
-    useContractWrite(addLiquidityConfig);
+    useContractWrite({
+      ...addLiquidityConfig,
+      onSuccess(result) {
+        result.wait().then(() => refetchAllowance())
+      }
+    });
 
   let cloneUniswapContractDetailsV2: CloneUniswapContractDetailsV2 = useMemo(
     () => ({
@@ -194,8 +241,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   let customPairSettings = useMemo(
     () =>
       new UniswapPairSettings({
-        slippage: SLIPPAGE,
-        deadlineMinutes: 5,
+        slippage: SLIPPAGE / 100,
+        deadlineMinutes: 15,
         disableMultihops: true,
         cloneUniswapContractDetails: {
           v2Override: cloneUniswapContractDetailsV2,
@@ -232,11 +279,37 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const debouncedToken0 = debounce(async (nextValue) => {
     if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
     setIsFetchingToken1Price(true);
-    const trade = await uniswapPairFactory.trade(nextValue);
-    setToken1Amount(trade.expectedConvertQuote);
-    if (!trade.minAmountConvertQuote) return;
-    setToken1Min(trade.minAmountConvertQuote);
-    setDeadline(trade.tradeExpires);
+
+    // (r0 / r1) * amount0
+    const amount = (priceRatio[1] * Number(nextValue)).toString();
+    setToken1Amount(amount)
+
+    // calculate token0Min
+    const amountsOut0 = await neutroRouter?.getAmountsOut(
+      parseEther(amount),
+      [token1.address, token0.address]
+    )
+    if (!amountsOut0) throw new Error("Fail getAmountsOut0");
+    const [, min0] = amountsOut0;
+    setToken0Min(min0);
+
+    // calculate token1Min
+    const amountsOut1 = await neutroRouter?.getAmountsOut(
+      parseEther(nextValue),
+      [token0.address, token1.address]
+    )
+    if (!amountsOut1) throw new Error("Fail getAmountsOut1");
+    const [, min1] = amountsOut1;
+    setToken1Min(min1);
+
+    // const min0 = parseEther(nextValue).mul(10000 - (SLIPPAGE * 100)).div(10000);
+    // setToken0Min(min0);
+
+    // let amount = (Number(nextValue) * priceRatio[0]).toFixed(18);
+    // setToken1Amount(amount);
+    // const min1 = parseEther(amount).mul(10000 - (SLIPPAGE * 100)).div(10000);
+    // setToken1Min(min1);
+
     setIsFetchingToken1Price(false);
   }, 500);
 
@@ -250,27 +323,43 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const debouncedToken1 = debounce(async (nextValue) => {
     if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
     setIsFetchingToken0Price(true);
-    const trade = await uniswapPairFactory.trade(nextValue, TradeDirection.output);
-    setToken0Amount(trade.expectedConvertQuote);
-    if (!trade.maximumSent) return;
-    setToken1Min(trade.maximumSent);
-    setDeadline(trade.tradeExpires);
+    // (r1 / r0) * amount1
+    const amount = (priceRatio[0] * Number(nextValue)).toString();
+    setToken0Amount(amount)
+    // calculate token0Min
+    const amountsOut0 = await neutroRouter?.getAmountsOut(
+      parseEther(nextValue),
+      [token1.address, token0.address]
+    )
+    if (!amountsOut0) throw new Error("Fail getAmountsOut0");
+    const [, min0] = amountsOut0;
+    setToken0Min(min0);
+
+    // calculate token1Min
+    const amountsOut1 = await neutroRouter?.getAmountsOut(
+      parseEther(amount),
+      [token0.address, token1.address]
+    )
+    if (!amountsOut1) throw new Error("Fail getAmountsOut1");
+    const [, min1] = amountsOut1;
+    setToken1Min(min1);
     setIsFetchingToken0Price(false);
   }, 500);
 
   // NOTE: Enable for debugging only
-  useEffect(() => {
-    console.log([
-      token0.address,
-      token1.address,
-      !!token0Amount && parseEther(token0Amount).toString(),
-      !!token1Amount && parseEther(token1Amount).toString(),
-      !!token0Min && token0Min[1].toString(),
-      parseEther(token1Min).toString(),
-      address!,
-      BigNumber.from(deadline).toString()
-    ])
-  }, [token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
+  // useEffect(() => {
+  //   console.log([
+  //     token0.address,
+  //     token1.address,
+  //     !!token0Amount && parseEther(token0Amount).toString(),
+  //     !!token1Amount && parseEther(token1Amount).toString(),
+  //     // !!token0Min && token0Min[1].toString(),
+  //     token0Min.toString(),
+  //     token1Min.toString(),
+  //     address!,
+  //     BigNumber.from(dayjs().add(5, 'minutes').unix()).toString() // deadline
+  //   ])
+  // }, [token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
   return (
     <div className="">
