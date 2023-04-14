@@ -73,6 +73,11 @@ export default function Swap() {
     raw: BigNumber.from(0),
     formatted: "0.00",
   });
+  const [eosBalance, setEosBalance] = useState<Currency>({
+    decimal: 18,
+    raw: BigNumber.from(0),
+    formatted: "0.00",
+  });
   const [tokenName0, setTokenName0] = useState("");
   const [tokenName1, setTokenName1] = useState("");
   const [tokenAmount0, setTokenAmount0] = useState("0");
@@ -87,8 +92,21 @@ export default function Swap() {
   const [direction, setDirection] = useState<"input" | "output">("input");
   const [txHash, setTxHash] = useState<string>("");
 
+  // useBalance({
+  //   address: address,
+  //   onSuccess(value) {
+  //     setEosBalance({
+  //       decimal: value.decimals,
+  //       raw: value.value,
+  //       formatted: parseFloat(value.formatted).toFixed(5),
+  //     });
+  //   },
+  // });
+
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
+    // &&
+    // token0.address !== "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     contracts: [
       {
         address: token0.address,
@@ -104,17 +122,23 @@ export default function Swap() {
       },
     ],
     onSuccess(value) {
+      // if (token0 === tokens[0]) {
+      //   setBalance0(eosBalance);
+      // } else {
       setBalance0({
         decimal: value[2].toNumber(),
         raw: value[0],
         formatted: Number(formatEther(value[0])).toFixed(5).toString(),
       });
       setTokenName0(value[1]);
+      // }
     },
   });
 
   const { isFetching: isFetchingBalance1 } = useContractReads({
     enabled: Boolean(address),
+    // &&
+    // token1.address !== "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     contracts: [
       {
         address: token1.address,
@@ -130,38 +154,18 @@ export default function Swap() {
       },
     ],
     onSuccess(value) {
+      // if (token1 === tokens[0]) {
+      //   setBalance1(eosBalance);
+      // } else {
       setBalance1({
         decimal: value[2].toNumber(),
         raw: value[0],
         formatted: Number(formatEther(value[0])).toFixed(5).toString(),
       });
       setTokenName1(value[1]);
+      // }
     },
   });
-
-  const { data: EOSBalance } = useBalance({
-    address: address,
-    onSuccess(value) {
-      if (token0 === tokens[0]) {
-        setBalance0({
-          decimal: value.decimals,
-          raw: value.value,
-          formatted: parseFloat(value.formatted).toFixed(5),
-        });
-      }
-      if (token1 === tokens[0]) {
-        setBalance1({
-          decimal: value.decimals,
-          raw: value.value,
-          formatted: parseFloat(value.formatted).toFixed(5),
-        });
-      }
-    },
-  });
-  console.log(
-    "EOSBalance =",
-    parseFloat(EOSBalance?.formatted as string).toFixed(5)
-  );
 
   useEffect(() => {
     console.log("Uniswap Factory =", uniswapFactory);
@@ -478,8 +482,8 @@ export default function Swap() {
                   className="flex items-center cursor-pointer"
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount0(balance0.raw.toString());
-                    debouncedToken0(balance0.raw.toString());
+                    setTokenAmount0(formatEther(balance0.raw));
+                    debouncedToken0(formatEther(balance0.raw));
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
@@ -559,8 +563,8 @@ export default function Swap() {
                   className="flex items-center cursor-pointer "
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount1(balance1.raw.toString());
-                    debouncedToken1(balance1.raw.toString());
+                    setTokenAmount1(formatEther(balance1.raw));
+                    debouncedToken1(formatEther(balance1.raw));
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
