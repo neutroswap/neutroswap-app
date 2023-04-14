@@ -16,9 +16,6 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { Chain } from "wagmi/chains"
-import { mainnet, polygon, optimism, arbitrum, goerli } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
 import Footer from "@/components/modules/Footer";
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 

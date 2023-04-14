@@ -37,10 +37,11 @@ type PoolDepositPanelProps = {
   balances: Currency[];
   token0: Token;
   token1: Token;
+  priceRatio: [number, number]
 };
 
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
-  const { balances, token0, token1 } = props;
+  const { balances, token0, token1, priceRatio } = props;
 
   const router = useRouter();
   const signer = useSigner();
@@ -50,15 +51,12 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [token1Amount, setToken1Amount] = useState<string>();
   const [token0Min, setToken0Min] = useState(BigNumber.from(0));
   const [token1Min, setToken1Min] = useState(BigNumber.from(0));
-  const [deadline, setDeadline] = useState(0);
 
   const [isToken0Approved, setIsToken0Approved] = useState(false);
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
-  const [priceRatio, setPriceRatio] = useState<[number, number]>([0, 0]);
-  const [reserves, setReserves] = useState<[BigNumber, BigNumber]>([BigNumber.from(0), BigNumber.from(0)]);
 
   const [uniswapPairFactory, setUniswapPairFactory] =
     useState<UniswapPairFactory>();
@@ -70,24 +68,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     abi: NEUTRO_ROUTER_ABI,
     signerOrProvider: signer.data
   })
-
-  useContractRead({
-    address: router.query.id as `0x${string}`,
-    abi: NEUTRO_POOL_ABI,
-    functionName: "getReserves",
-    onSuccess(response) {
-      setPriceRatio([
-        +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
-        +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
-      ])
-      setReserves([response._reserve0, response._reserve1]);
-      // amount1 * ratio1 = quote0
-      // console.log('ratio0', +formatEther(response._reserve0) / +formatEther(response._reserve1))
-
-      // amount1 * ratio1 = quote0
-      // console.log('ratio1', +formatEther(response._reserve1) / +formatEther(response._reserve0))
-    }
-  });
 
   // useContractRead({
   //   enabled: Boolean(token1Amount),
