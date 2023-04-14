@@ -382,7 +382,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               value={token0Amount}
               onChange={handleToken0Change}
               iconRight={isFetchingToken0Price ? <Spinner /> : <></>}
+              type={Number(token0Amount) > +formatEther(balances[0].raw) ? "error" : "default"}
             />
+            {Number(token0Amount) > +formatEther(balances[0].raw) && (
+              <small className="mt-1 text-red-500">Insufficient balance</small>
+            )}
 
             <div className="flex items-center justify-between mt-6">
               <div className="flex space-x-2 items-center">
@@ -421,7 +425,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               value={token1Amount}
               onChange={handleToken1Change}
               iconRight={isFetchingToken1Price ? <Spinner /> : <></>}
+              type={Number(token1Amount) > +formatEther(balances[1].raw) ? "error" : "default"}
             />
+            {Number(token1Amount) > +formatEther(balances[1].raw) && (
+              <small className="mt-1 text-red-500">Insufficient balance</small>
+            )}
 
             <div className="flex flex-col w-full mt-4">
               {(!isToken0Approved || !isToken1Approved) && (
