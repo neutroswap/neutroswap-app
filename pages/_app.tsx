@@ -118,7 +118,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <CssBaseline />
           <PrefersContext.Provider value={{ themeType, switchTheme }}>
             <Navbar />
-            <div className="bg-white dark:bg-black min-h-[86vh] mt-16">
+            <div className="min-h-[86vh] mt-16">
               <div className="max-w-7xl px-4 mx-auto">
                 <Component {...pageProps} />
               </div>
