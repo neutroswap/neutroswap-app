@@ -56,8 +56,8 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
 
       <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg">
         <div className="w-full flex flex-col items-center py-6">
-          {theme.type === "light" && <NoContentLight className="w-40 h-40" />}
-          {theme.type === "dark" && <NoContentDark className="w-40 h-40" />}
+          {theme.type === "nlight" && <NoContentLight className="w-40 h-40" />}
+          {theme.type === "ndark" && <NoContentDark className="w-40 h-40" />}
           <p className="text-neutral-500 text-center">You do not have any liquidity positions. Deposit some tokens to open a position.</p>
           <Button className="!mt-2">Deposit now</Button>
         </div>

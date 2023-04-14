@@ -27,6 +27,7 @@ import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";
 import { decimalFormat } from "@/shared/helpers/decimalFormat";
 import Link from "next/link";
+import { ThemeType } from "@/shared/hooks/usePrefers";
 
 type PositionsResponse = {
   network_id: string;
@@ -73,10 +74,10 @@ export default function Pool() {
         <div className="mt-8 flex items-center text-center rounded-lg border border-neutral-200 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg w-full max-w-3xl">
           {!positions.length && !isFetchingPool && (
             <div className="flex flex-col items-center w-full p-8">
-              {theme.type === "light" && (
+              {theme.type as ThemeType === "nlight" && (
                 <NoContentLight className="w-40 h-40 opacity-75" />
               )}
-              {theme.type === "dark" && (
+              {theme.type as ThemeType === "ndark" && (
                 <NoContentDark className="w-40 h-40 opacity-75" />
               )}
               <p className="text-neutral-500 w-3/4">
