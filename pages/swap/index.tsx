@@ -13,7 +13,7 @@ import {
   AdjustmentsHorizontalIcon,
 } from "@heroicons/react/20/solid";
 import { Popover, Transition, RadioGroup } from "@headlessui/react";
-import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import NumberInput from "@/components/elements/NumberInput";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
@@ -401,7 +401,7 @@ export default function Swap() {
           </Text>
         </div>
         <div>
-          <div className="mt-8 rounded-lg border border-neutral-800/50 shadow-dark-lg p-4">
+          <div className="mt-8 rounded-lg border border-neutral-200/60 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg p-4">
             <div className="flex justify-between items-center ">
               <Text h3 height={2} className="text-center">
                 Swap
@@ -409,7 +409,7 @@ export default function Swap() {
               <Popover className="relative">
                 <>
                   <Popover.Button>
-                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer hover:dark:text-neutral-600" />
+                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer text-neutral-500 hover:text-inherit transition" />
                   </Popover.Button>
                   <Transition
                     as={Fragment}
@@ -420,52 +420,51 @@ export default function Swap() {
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 translate-y-1"
                   >
-                    <Popover.Panel className="absolute top-10 right-0 z-50 -mr-2.5 min-w-20 md:m-w-22 md:-mr-5 bg-[#2D3036] rounded-lg w-80 shadow-lg">
-                      <div className="p-4 space-y-4">
-                        <div className="text-base font-bold text-high-emphesis">
-                          Settings
+                    <Popover.Panel className="absolute top-10 right-0 z-50 -mr-2.5 min-w-20 md:m-w-22 md:-mr-5 rounded-lg w-72 shadow-dark-sm dark:shadow-dark-lg">
+                      <div className={classNames(
+                        "py-4 px-3 rounded-lg space-y-3",
+                        "bg-neutral-50 dark:bg-[#0C0C0C]",
+                        "border border-neutral-200 dark:border-neutral-800/50"
+                      )}>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-neutral-500 dark:text-neutral-400">Slippage</span>
+                          <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
+                            {slippage}%
+                          </span>
                         </div>
-                        <div className="bg-[#060606] py-4 px-3 rounded-lg space-y-3">
-                          <div className="flex justify-between">
-                            <span className="text-neutral-400">Slippage</span>
-                            <span className="text-neutral-400">
-                              {slippage}%
-                            </span>
-                          </div>
-                          <RadioGroup onChange={setSlippage}>
-                            <div className="items-center relative bg-black/[0.08] dark:bg-white/[0.04] ring-4 ring-black/[0.08] dark:ring-white/[0.04] rounded-lg overflow-hidden flex p-1">
-                              <>
-                                {TABS.map((tab, i) => (
-                                  <RadioGroup.Option
-                                    as={Fragment}
-                                    key={i}
-                                    value={tab}
-                                  >
-                                    {({ checked }) => (
-                                      <button
-                                        className={classNames(
-                                          checked
-                                            ? "text-gray-900 dark:text-white bg-white dark:bg-[#2D3036]"
-                                            : "text-gray-500 dark:text-neutral-400 hover:bg-gray-100 hover:dark:bg-white/[0.04]",
-                                          "z-[1] relative rounded-lg text-sm h-8 font-medium flex flex-grow items-center justify-center"
-                                        )}
-                                      >
-                                        {tab}%
-                                      </button>
-                                    )}
-                                  </RadioGroup.Option>
-                                ))}
+                        <RadioGroup onChange={setSlippage}>
+                          <div className="items-center relative bg-neutral-200/50 dark:bg-white/[0.04] rounded-lg overflow-hidden flex p-1 space-x-1">
+                            <>
+                              {TABS.map((tab, i) => (
+                                <RadioGroup.Option
+                                  as={Fragment}
+                                  key={i}
+                                  value={tab}
+                                >
+                                  {({ checked }) => (
+                                    <button
+                                      className={classNames(
+                                        checked
+                                          ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 shadow"
+                                          : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 hover:dark:bg-white/[0.04]",
+                                        "z-[1] relative rounded-lg text-xs h-8 font-medium flex flex-grow items-center justify-center"
+                                      )}
+                                    >
+                                      {tab}%
+                                    </button>
+                                  )}
+                                </RadioGroup.Option>
+                              ))}
 
-                                <NumberInput
-                                  className="focus:dark:bg-[#2D3036] dark:placeholder:text-neutral-400 focus:dark:text-white rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px]"
-                                  placeholder="custom"
-                                  value={slippage}
-                                  onChange={setSlippage}
-                                />
-                              </>
-                            </div>
-                          </RadioGroup>
-                        </div>
+                              <NumberInput
+                                className="focus:bg-neutral-200 focus:dark:bg-black dark:placeholder:text-neutral-400 focus:dark:text-white rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px] transition"
+                                placeholder="Custom"
+                                value={slippage}
+                                onChange={setSlippage}
+                              />
+                            </>
+                          </div>
+                        </RadioGroup>
                       </div>
                     </Popover.Panel>
                   </Transition>
@@ -473,10 +472,10 @@ export default function Swap() {
               </Popover>
             </div>
 
-            <div className="p-4 bg-black/50 rounded-lg">
+            <div className="p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
               <div className="flex justify-between">
                 <div className="flex items-center">
-                  <p className="text-sm text-neutral-400 mr-2">You Sell</p>
+                  <p className="text-sm text-neutral-500 mr-2">You Sell</p>
                 </div>
                 <div
                   className="flex items-center cursor-pointer"
@@ -486,12 +485,12 @@ export default function Swap() {
                     debouncedToken0(formatEther(balance0.raw));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-800" />
                   {isFetchingBalance0 && (
-                    <div className="w-24 h-5 bg-neutral-700 rounded animate-pulse"></div>
+                    <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance0 && (
-                    <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
+                    <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
                       {balance0.formatted} {tokenName0}
                     </p>
                   )}
@@ -520,7 +519,11 @@ export default function Swap() {
                     <button
                       placeholder="Select a token"
                       type="button"
-                      className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer"
+                      className={classNames(
+                        "flex items-center space-x-2 z-10 group p-2 transition-all rounded-lg cursor-pointer",
+                        "bg-neutral-100 hover:bg-neutral-200/40 dark:bg-neutral-900 hover:dark:bg-neutral-800/75 ",
+                        "border border-neutral-200 dark:border-transparent",
+                      )}
                     >
                       <div className="flex items-center">
                         <img
@@ -528,7 +531,7 @@ export default function Swap() {
                           alt="Selected Token 0"
                           className="h-6 mr-2"
                         />
-                        <span className="text-md">{selectedToken.symbol}</span>
+                        <span className="text-sm">{selectedToken.symbol}</span>
                       </div>
                       <div>
                         <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
@@ -539,25 +542,29 @@ export default function Swap() {
               </div>
             </div>
 
-            <div className="left-0 right-0 -mt-3 -mb-3 flex items-center justify-center">
+            <div className="left-0 right-0 -my-[15px] flex items-center justify-center">
               <button
                 onClick={() => handleSwitchTokens()}
                 type="button"
-                className="z-10 group bg-gray-100 hover:bg-gray-200 hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-md cursor-pointer"
+                className={classNames(
+                  "z-10 group p-2 transition-all rounded-lg cursor-pointer",
+                  "bg-neutral-200/50 hover:bg-neutral-300/70 dark:bg-neutral-800/75 hover:dark:bg-neutral-800/50",
+                  "ring-4 ring-white dark:ring-black"
+                )}
               >
                 <div className="transition-transform rotate-0 group-hover:rotate-180">
                   <ArrowDownIcon
                     strokeWidth={3}
-                    className="w-4 h-4 text-blue"
+                    className="w-5 h-5 text-neutral-600 dark:text-neutral-100"
                   />
                 </div>
               </button>
             </div>
 
-            <div className="p-4 bg-black/50 rounded-lg">
+            <div className="p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
               <div className="flex justify-between">
                 <div className="flex items-center">
-                  <p className="text-sm text-neutral-400 mr-2">You Buy</p>
+                  <p className="text-sm text-neutral-500 mr-2">You Buy</p>
                 </div>
                 <div
                   className="flex items-center cursor-pointer "
@@ -567,12 +574,12 @@ export default function Swap() {
                     debouncedToken1(formatEther(balance1.raw));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-4 h-4 text-neutral-600 dark:text-neutral-400" />
+                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-800" />
                   {isFetchingBalance1 && (
-                    <div className="w-24 h-5 bg-neutral-700 rounded animate-pulse"></div>
+                    <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance1 && (
-                    <p className="text-sm text-neutral-400 hover:dark:text-neutral-600">
+                    <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
                       {balance1.formatted} {tokenName1}
                     </p>
                   )}
@@ -581,7 +588,7 @@ export default function Swap() {
               <div className="flex justify-between">
                 <div className="relative">
                   {isFetchingToken1Price && (
-                    <div className="w-40 h-8 bg-neutral-700 rounded animate-pulse"></div>
+                    <div className="w-40 h-8 bg-neutral-300 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingToken1Price && (
                     <input
@@ -601,7 +608,11 @@ export default function Swap() {
                     <button
                       placeholder="Select a token"
                       type="button"
-                      className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] p-2 border-white transition-all rounded-lg cursor-pointer"
+                      className={classNames(
+                        "flex items-center space-x-2 z-10 group p-2 transition-all rounded-lg cursor-pointer",
+                        "bg-neutral-100 hover:bg-neutral-200/40 dark:bg-neutral-900 hover:dark:bg-neutral-800/75 ",
+                        "border border-neutral-200 dark:border-transparent",
+                      )}
                     >
                       <div className="flex items-center">
                         <img
@@ -609,7 +620,7 @@ export default function Swap() {
                           alt="Selected Token 1"
                           className="h-6 mr-2"
                         />
-                        <span className="text-md">{selectedToken.symbol}</span>
+                        <span className="text-sm">{selectedToken.symbol}</span>
                       </div>
                       <div>
                         <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
@@ -619,241 +630,244 @@ export default function Swap() {
                 </TokenPicker>
               </div>
             </div>
-          </div>
+            <div className="flex mt-3 justify-center">
+              {!isConnected && (
+                <ConnectButton.Custom>
+                  {({
+                    account,
+                    chain,
+                    openAccountModal,
+                    openChainModal,
+                    openConnectModal,
+                    authenticationStatus,
+                    mounted,
+                  }) => {
+                    const ready = mounted && authenticationStatus !== "loading";
+                    const connected =
+                      ready &&
+                      account &&
+                      chain &&
+                      (!authenticationStatus ||
+                        authenticationStatus === "authenticated");
 
-          <div className="flex my-3 justify-center">
-            {!isConnected && (
-              <ConnectButton.Custom>
-                {({
-                  account,
-                  chain,
-                  openAccountModal,
-                  openChainModal,
-                  openConnectModal,
-                  authenticationStatus,
-                  mounted,
-                }) => {
-                  const ready = mounted && authenticationStatus !== "loading";
-                  const connected =
-                    ready &&
-                    account &&
-                    chain &&
-                    (!authenticationStatus ||
-                      authenticationStatus === "authenticated");
+                    return (
+                      <div
+                        className="flex flex-col w-full"
+                        {...(!ready && {
+                          "aria-hidden": true,
+                          style: {
+                            opacity: 0,
+                            pointerEvents: "none",
+                            userSelect: "none",
+                          },
+                        })}
+                      >
+                        {(() => {
+                          if (!connected) {
+                            return (
+                              <button
+                                onClick={openConnectModal}
+                                className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] border-white transition-all rounded-lg cursor-pointer w-full justify-center"
+                              >
+                                <div className="p-2">Connect Wallet</div>
+                              </button>
+                            );
+                          }
 
-                  return (
-                    <div
-                      className="flex flex-col w-full"
-                      {...(!ready && {
-                        "aria-hidden": true,
-                        style: {
-                          opacity: 0,
-                          pointerEvents: "none",
-                          userSelect: "none",
-                        },
-                      })}
-                    >
-                      {(() => {
-                        if (!connected) {
+                          if (chain.unsupported) {
+                            return (
+                              <button onClick={openChainModal} type="button">
+                                Wrong network
+                              </button>
+                            );
+                          }
+
                           return (
-                            <button
-                              onClick={openConnectModal}
-                              className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] border-white transition-all rounded-lg cursor-pointer w-full justify-center"
-                            >
-                              <div className="p-2">Connect Wallet</div>
-                            </button>
+                            <div style={{ display: "flex", gap: 12 }}>
+                              <button
+                                onClick={openChainModal}
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                                type="button"
+                              >
+                                {chain.hasIcon && (
+                                  <div
+                                    style={{
+                                      background: chain.iconBackground,
+                                      width: 12,
+                                      height: 12,
+                                      borderRadius: 999,
+                                      overflow: "hidden",
+                                      marginRight: 4,
+                                    }}
+                                  >
+                                    {chain.iconUrl && (
+                                      <img
+                                        alt={chain.name ?? "Chain icon"}
+                                        src={chain.iconUrl}
+                                        style={{ width: 12, height: 12 }}
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                                {chain.name}
+                              </button>
+                              <button onClick={openAccountModal} type="button">
+                                {account.displayName}
+                                {account.displayBalance
+                                  ? ` (${account.displayBalance})`
+                                  : ""}
+                              </button>
+                            </div>
                           );
-                        }
-
-                        if (chain.unsupported) {
-                          return (
-                            <button onClick={openChainModal} type="button">
-                              Wrong network
-                            </button>
-                          );
-                        }
-
-                        return (
-                          <div style={{ display: "flex", gap: 12 }}>
-                            <button
-                              onClick={openChainModal}
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                              }}
-                              type="button"
-                            >
-                              {chain.hasIcon && (
-                                <div
-                                  style={{
-                                    background: chain.iconBackground,
-                                    width: 12,
-                                    height: 12,
-                                    borderRadius: 999,
-                                    overflow: "hidden",
-                                    marginRight: 4,
-                                  }}
-                                >
-                                  {chain.iconUrl && (
-                                    <img
-                                      alt={chain.name ?? "Chain icon"}
-                                      src={chain.iconUrl}
-                                      style={{ width: 12, height: 12 }}
-                                    />
-                                  )}
-                                </div>
-                              )}
-                              {chain.name}
-                            </button>
-                            <button onClick={openAccountModal} type="button">
-                              {account.displayName}
-                              {account.displayBalance
-                                ? ` (${account.displayBalance})`
-                                : ""}
-                            </button>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  );
-                }}
-              </ConnectButton.Custom>
-            )}
-
-            {isConnected && (
-              <Modal>
-                <ModalOpenButton>
-                  <Button className="!flex !items-center hover:bg-[#2D3036]/50 !my-3 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md">
-                    Swap
-                  </Button>
-                </ModalOpenButton>
-                <ModalContents>
-                  {({ close }) => (
-                    <div>
-                      <div className="w-full flex mb-5">
-                        <ArrowLeftIcon
-                          className="h-7 cursor-pointer hover:dark:text-neutral-600"
-                          onClick={close}
-                        />
+                        })()}
                       </div>
-                      {txHash === "" && (
-                        <>
-                          <div className="flex items-center justify-between ">
-                            <div className="flex flex-col ">
-                              <div className="text-2xl mb-1 font-medium">
-                                Buy{" "}
+                    );
+                  }}
+                </ConnectButton.Custom>
+              )}
+
+              {isConnected && (
+                <Modal>
+                  <ModalOpenButton>
+                    <Button className={classNames(
+                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                      "text-white dark:text-amber-600",
+                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    )}>
+                      Swap
+                    </Button>
+                  </ModalOpenButton>
+                  <ModalContents>
+                    {({ close }) => (
+                      <div>
+                        <div className="w-full flex mb-5">
+                          <ArrowLeftIcon
+                            className="h-7 cursor-pointer hover:dark:text-neutral-600"
+                            onClick={close}
+                          />
+                        </div>
+                        {txHash === "" && (
+                          <>
+                            <div className="flex items-center justify-between ">
+                              <div className="flex flex-col ">
+                                <div className="text-2xl mb-1 font-medium">
+                                  Buy{" "}
+                                  {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
+                                  {tokenName1}
+                                </div>
+                                <div className="text-lg text-neutral-400 font-medium">
+                                  Sell {tokenAmount0} {tokenName0}
+                                </div>
+                              </div>
+                              <img
+                                src={token1.logo}
+                                alt="Token1 Logo"
+                                className="h-16"
+                              />
+                            </div>
+                            <div className="p-3 my-5 flex flex-col bg-zinc-900 rounded-lg">
+                              <div className="flex items-center justify-between mb-3">
+                                <div className="flex flex-col max-w-xs">
+                                  <div className="font-medium text-neutral-300">
+                                    Slippage
+                                  </div>
+                                  <div className="font-light text-sm text-neutral-300">
+                                    The slippage you set for the trade
+                                  </div>
+                                </div>
+                                <div>{slippage}%</div>
+                              </div>
+                              <div className="flex items-center justify-between">
+                                <div className="flex flex-col max-w-xs">
+                                  <div className="font-medium text-neutral-300">
+                                    Minimal received
+                                  </div>
+                                  <div className="font-light text-sm text-neutral-300">
+                                    The minimum amount you are <br /> guaranteeed
+                                    to receive
+                                  </div>
+                                </div>
+                                <div>
+                                  {parseFloat(tokenMin1).toFixed(5).toString()} $
+                                  {tokenName1}
+                                </div>
+                              </div>
+                            </div>
+                            <div className="p-3 my-5 flex bg-zinc-900 rounded-lg items-center justify-between">
+                              <div className="flex flex-col max-w-xs">
+                                <div className="font-medium text-neutral-300">
+                                  Recipient
+                                </div>
+                              </div>
+                              <Link
+                                href={`https://explorer-testnet2.trust.one/address/${address as string
+                                  }`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                {truncateEthAddress(address as string)}
+                              </Link>
+                            </div>
+                            <div className="flex space-x-2">
+                              <>
+                                {!isApproved && (
+                                  <Button
+                                    onClick={() => approve()}
+                                    disabled={!tokenAmount0 || !isConnected}
+                                    className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                    loading={isLoading}
+                                  >
+                                    Approve
+                                  </Button>
+                                )}
+                                {isApproved && (
+                                  <Button
+                                    onClick={() => swap()}
+                                    disabled={!tokenAmount0 || !isConnected}
+                                    className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                    loading={isLoading}
+                                  >
+                                    Swap
+                                  </Button>
+                                )}
+                              </>
+                            </div>
+                          </>
+                        )}
+                        {txHash !== "" && (
+                          <>
+                            <div className="flex justify-center items-center py-20 mb-5 ">
+                              <div className="mr-2">
+                                You sold {tokenAmount0} {tokenName0} for{" "}
                                 {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
                                 {tokenName1}
                               </div>
-                              <div className="text-lg text-neutral-400 font-medium">
-                                Sell {tokenAmount0} {tokenName0}
-                              </div>
+                              <Link
+                                href={`https://explorer-testnet2.trust.one/tx/${txHash}`}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
+                              </Link>
                             </div>
-                            <img
-                              src={token1.logo}
-                              alt="Token1 Logo"
-                              className="h-16"
-                            />
-                          </div>
-                          <div className="p-3 my-5 flex flex-col bg-zinc-900 rounded-lg">
-                            <div className="flex items-center justify-between mb-3">
-                              <div className="flex flex-col max-w-xs">
-                                <div className="font-medium text-neutral-300">
-                                  Slippage
-                                </div>
-                                <div className="font-light text-sm text-neutral-300">
-                                  The slippage you set for the trade
-                                </div>
-                              </div>
-                              <div>{slippage}%</div>
-                            </div>
-                            <div className="flex items-center justify-between">
-                              <div className="flex flex-col max-w-xs">
-                                <div className="font-medium text-neutral-300">
-                                  Minimal received
-                                </div>
-                                <div className="font-light text-sm text-neutral-300">
-                                  The minimum amount you are <br /> guaranteeed
-                                  to receive
-                                </div>
-                              </div>
-                              <div>
-                                {parseFloat(tokenMin1).toFixed(5).toString()} $
-                                {tokenName1}
-                              </div>
-                            </div>
-                          </div>
-                          <div className="p-3 my-5 flex bg-zinc-900 rounded-lg items-center justify-between">
-                            <div className="flex flex-col max-w-xs">
-                              <div className="font-medium text-neutral-300">
-                                Recipient
-                              </div>
-                            </div>
-                            <Link
-                              href={`https://explorer-testnet2.trust.one/address/${
-                                address as string
-                              }`}
-                              target="_blank"
-                              rel="noreferrer"
+                            <Button
+                              onClick={close}
+                              className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
                             >
-                              {truncateEthAddress(address as string)}
-                            </Link>
-                          </div>
-                          <div className="flex space-x-2">
-                            <>
-                              {!isApproved && (
-                                <Button
-                                  onClick={() => approve()}
-                                  disabled={!tokenAmount0 || !isConnected}
-                                  className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                                  loading={isLoading}
-                                >
-                                  Approve
-                                </Button>
-                              )}
-                              {isApproved && (
-                                <Button
-                                  onClick={() => swap()}
-                                  disabled={!tokenAmount0 || !isConnected}
-                                  className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                                  loading={isLoading}
-                                >
-                                  Swap
-                                </Button>
-                              )}
-                            </>
-                          </div>
-                        </>
-                      )}
-                      {txHash !== "" && (
-                        <>
-                          <div className="flex justify-center items-center py-20 mb-5 ">
-                            <div className="mr-2">
-                              You sold {tokenAmount0} {tokenName0} for{" "}
-                              {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
-                              {tokenName1}
-                            </div>
-                            <Link
-                              href={`https://explorer-testnet2.trust.one/tx/${txHash}`}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
-                            </Link>
-                          </div>
-                          <Button
-                            onClick={close}
-                            className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
-                          >
-                            Swap again
-                          </Button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </ModalContents>
-              </Modal>
-            )}
+                              Swap again
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </ModalContents>
+                </Modal>
+              )}
+            </div>
           </div>
         </div>
       </div>

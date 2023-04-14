@@ -7,6 +7,7 @@ import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNamer";
+import { ThemeType } from "@/shared/hooks/usePrefers";
 
 interface Props {
   handleThemeSwitch: () => void;
@@ -37,8 +38,8 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
               className="!hidden lg:!block"
               icon={
                 <>
-                  {theme.type === "dark" && <MoonIcon className="w-4 h-4" />}
-                  {theme.type === "light" && <SunIcon className="w-4 h-4" />}
+                  {theme.type as ThemeType === "ndark" && <MoonIcon className="w-4 h-4" />}
+                  {theme.type as ThemeType === "nlight" && <SunIcon className="w-4 h-4" />}
                 </>
               }
               scale={2 / 3}

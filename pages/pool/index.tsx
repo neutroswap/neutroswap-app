@@ -27,6 +27,7 @@ import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";
 import { decimalFormat } from "@/shared/helpers/decimalFormat";
 import Link from "next/link";
+import { ThemeType } from "@/shared/hooks/usePrefers";
 
 type PositionsResponse = {
   network_id: string;
@@ -73,10 +74,10 @@ export default function Pool() {
         <div className="mt-8 flex items-center text-center rounded-lg border border-neutral-200 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg w-full max-w-3xl">
           {!positions.length && !isFetchingPool && (
             <div className="flex flex-col items-center w-full p-8">
-              {theme.type === "light" && (
+              {theme.type as ThemeType === "nlight" && (
                 <NoContentLight className="w-40 h-40 opacity-75" />
               )}
-              {theme.type === "dark" && (
+              {theme.type as ThemeType === "ndark" && (
                 <NoContentDark className="w-40 h-40 opacity-75" />
               )}
               <p className="text-neutral-500 w-3/4">
@@ -116,11 +117,11 @@ export default function Pool() {
                     <div className="flex items-center justify-between py-3 px-4">
                       <div className="space-y-2">
                         <div className="flex items-center space-x-4">
-                          <div className="flex -space-x-2 relative z-0 overflow-hidden">
+                          <div className="flex -space-x-2 relative z-0">
                             <img
                               alt={`${position.token0.symbol} Icon`}
                               src={position.token0.logo}
-                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-neutral-200 dark:ring-neutral-900"
+                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
                               onError={(e) => {
                                 handleImageFallback(position.token0.symbol, e);
                               }}
@@ -128,7 +129,7 @@ export default function Pool() {
                             <img
                               alt={`${position.token1.symbol} Icon`}
                               src={position.token1.logo}
-                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-neutral-200 dark:ring-neutral-900"
+                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
                               onError={(e) => {
                                 handleImageFallback(position.token1.symbol, e);
                               }}
@@ -305,24 +306,24 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
       </TokenPicker>
       {(!existingPool ||
         existingPool !== "0x0000000000000000000000000000000000000000") && (
-        <Button
-          scale={1.25}
-          className={classNames(
-            "!w-full !mt-4 !bg-transparent !rounded-lg",
-            "!border-neutral-300 dark:!border-neutral-700",
-            "hover:!border-neutral-400 dark:hover:!border-neutral-600",
-            "focus:!border-neutral-400 dark:focus:!border-neutral-600",
-            "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
-            "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
-          )}
-          disabled={isError}
-          loading={isFetchingGetPair}
-          onClick={() => router.push(`/pool/${existingPool}`)}
-        >
-          <span>Enter pool</span>
-          <ArrowRightIcon className="w-4 h-4 ml-2" />
-        </Button>
-      )}
+          <Button
+            scale={1.25}
+            className={classNames(
+              "!w-full !mt-4 !bg-transparent !rounded-lg",
+              "!border-neutral-300 dark:!border-neutral-700",
+              "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+              "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+              "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+              "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+            )}
+            disabled={isError}
+            loading={isFetchingGetPair}
+            onClick={() => router.push(`/pool/${existingPool}`)}
+          >
+            <span>Enter pool</span>
+            <ArrowRightIcon className="w-4 h-4 ml-2" />
+          </Button>
+        )}
       {existingPool === "0x0000000000000000000000000000000000000000" && (
         <div>
           <Button

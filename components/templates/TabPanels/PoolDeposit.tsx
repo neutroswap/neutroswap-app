@@ -37,10 +37,11 @@ type PoolDepositPanelProps = {
   balances: Currency[];
   token0: Token;
   token1: Token;
+  priceRatio: [number, number]
 };
 
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
-  const { balances, token0, token1 } = props;
+  const { balances, token0, token1, priceRatio } = props;
 
   const router = useRouter();
   const signer = useSigner();
@@ -50,15 +51,12 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [token1Amount, setToken1Amount] = useState<string>();
   const [token0Min, setToken0Min] = useState(BigNumber.from(0));
   const [token1Min, setToken1Min] = useState(BigNumber.from(0));
-  const [deadline, setDeadline] = useState(0);
 
   const [isToken0Approved, setIsToken0Approved] = useState(false);
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
-  const [priceRatio, setPriceRatio] = useState<[number, number]>([0, 0]);
-  const [reserves, setReserves] = useState<[BigNumber, BigNumber]>([BigNumber.from(0), BigNumber.from(0)]);
 
   const [uniswapPairFactory, setUniswapPairFactory] =
     useState<UniswapPairFactory>();
@@ -70,41 +68,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     abi: NEUTRO_ROUTER_ABI,
     signerOrProvider: signer.data
   })
-
-  useContractRead({
-    address: router.query.id as `0x${string}`,
-    abi: NEUTRO_POOL_ABI,
-    functionName: "getReserves",
-    onSuccess(response) {
-      setPriceRatio([
-        +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
-        +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
-      ])
-      setReserves([response._reserve0, response._reserve1]);
-      // amount1 * ratio1 = quote0
-      // console.log('ratio0', +formatEther(response._reserve0) / +formatEther(response._reserve1))
-
-      // amount1 * ratio1 = quote0
-      // console.log('ratio1', +formatEther(response._reserve1) / +formatEther(response._reserve0))
-    }
-  });
-
-  // useContractRead({
-  //   enabled: Boolean(token1Amount),
-  //   address: ROUTER_CONTRACT,
-  //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "getAmountsOut",
-  //   args: [
-  //     !!token1Amount && parseEther(token1Amount),
-  //     [token1.address, token0.address],
-  //   ] as any,
-  //   onSuccess(response) {
-  //     console.log('getAmountsOut', [
-  //       response[0].toString(),
-  //       response[1].toString()
-  //     ]);
-  //   }
-  // });
 
   const { refetch: refetchAllowance } = useContractReads({
     enabled: Boolean(address),
@@ -273,77 +236,79 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken0Amount(value);
-    if (+value) debouncedToken0(value);
+    debouncedToken0(value);
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
+    if (!Number(nextValue)) return setToken1Amount("");
     if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
+
     setIsFetchingToken1Price(true);
+    try {
+      // (r0 / r1) * amount0
+      const amount = (priceRatio[1] * Number(nextValue)).toString();
+      setToken1Amount(amount)
 
-    // (r0 / r1) * amount0
-    const amount = (priceRatio[1] * Number(nextValue)).toString();
-    setToken1Amount(amount)
+      // calculate token0Min
+      const amountsOut0 = await neutroRouter?.getAmountsOut(
+        parseEther(amount),
+        [token1.address, token0.address]
+      )
+      if (!amountsOut0) throw new Error("Fail getAmountsOut0");
+      const [, min0] = amountsOut0;
+      setToken0Min(min0);
 
-    // calculate token0Min
-    const amountsOut0 = await neutroRouter?.getAmountsOut(
-      parseEther(amount),
-      [token1.address, token0.address]
-    )
-    if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-    const [, min0] = amountsOut0;
-    setToken0Min(min0);
-
-    // calculate token1Min
-    const amountsOut1 = await neutroRouter?.getAmountsOut(
-      parseEther(nextValue),
-      [token0.address, token1.address]
-    )
-    if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-    const [, min1] = amountsOut1;
-    setToken1Min(min1);
-
-    // const min0 = parseEther(nextValue).mul(10000 - (SLIPPAGE * 100)).div(10000);
-    // setToken0Min(min0);
-
-    // let amount = (Number(nextValue) * priceRatio[0]).toFixed(18);
-    // setToken1Amount(amount);
-    // const min1 = parseEther(amount).mul(10000 - (SLIPPAGE * 100)).div(10000);
-    // setToken1Min(min1);
-
-    setIsFetchingToken1Price(false);
+      // calculate token1Min
+      const amountsOut1 = await neutroRouter?.getAmountsOut(
+        parseEther(nextValue),
+        [token0.address, token1.address]
+      )
+      if (!amountsOut1) throw new Error("Fail getAmountsOut1");
+      const [, min1] = amountsOut1;
+      setToken1Min(min1);
+      setIsFetchingToken1Price(false);
+    } catch (error) {
+      setIsFetchingToken1Price(false);
+    }
   }, 500);
 
   const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken1Amount(value);
-    if (+value) debouncedToken1(value);
+    debouncedToken1(value);
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
+    if (!Number(nextValue)) return setToken0Amount("");
     if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
-    setIsFetchingToken0Price(true);
-    // (r1 / r0) * amount1
-    const amount = (priceRatio[0] * Number(nextValue)).toString();
-    setToken0Amount(amount)
-    // calculate token0Min
-    const amountsOut0 = await neutroRouter?.getAmountsOut(
-      parseEther(nextValue),
-      [token1.address, token0.address]
-    )
-    if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-    const [, min0] = amountsOut0;
-    setToken0Min(min0);
 
-    // calculate token1Min
-    const amountsOut1 = await neutroRouter?.getAmountsOut(
-      parseEther(amount),
-      [token0.address, token1.address]
-    )
-    if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-    const [, min1] = amountsOut1;
-    setToken1Min(min1);
-    setIsFetchingToken0Price(false);
+    setIsFetchingToken0Price(true);
+    try {
+      // (r1 / r0) * amount1
+      const amount = (priceRatio[0] * Number(nextValue)).toString();
+      setToken0Amount(amount)
+      // calculate token0Min
+      const amountsOut0 = await neutroRouter?.getAmountsOut(
+        parseEther(nextValue),
+        [token1.address, token0.address]
+      )
+      if (!amountsOut0) throw new Error("Fail getAmountsOut0");
+      const [, min0] = amountsOut0;
+      setToken0Min(min0);
+
+      // calculate token1Min
+      const amountsOut1 = await neutroRouter?.getAmountsOut(
+        parseEther(amount),
+        [token0.address, token1.address]
+      )
+      if (!amountsOut1) throw new Error("Fail getAmountsOut1");
+      const [, min1] = amountsOut1;
+      setToken1Min(min1);
+      setIsFetchingToken0Price(false);
+    } catch (error) {
+      setIsFetchingToken0Price(false);
+    }
   }, 500);
 
   // NOTE: Enable for debugging only
@@ -375,11 +340,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mt-8">
-        <div className="w-full mt-4 col-span-7">
+        <div className="w-full col-span-7">
+          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">
+            Select amount to deposit
+          </p>
           <div className="flex flex-col py-5 px-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg ">
-            <p className="mt-0 mb-8 text-xl font-semibold">
-              Select amount to deposit
-            </p>
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
                 <img
@@ -417,7 +382,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               value={token0Amount}
               onChange={handleToken0Change}
               iconRight={isFetchingToken0Price ? <Spinner /> : <></>}
+              type={Number(token0Amount) > +formatEther(balances[0].raw) ? "error" : "default"}
             />
+            {Number(token0Amount) > +formatEther(balances[0].raw) && (
+              <small className="mt-1 text-red-500">Insufficient balance</small>
+            )}
 
             <div className="flex items-center justify-between mt-6">
               <div className="flex space-x-2 items-center">
@@ -456,7 +425,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               value={token1Amount}
               onChange={handleToken1Change}
               iconRight={isFetchingToken1Price ? <Spinner /> : <></>}
+              type={Number(token1Amount) > +formatEther(balances[1].raw) ? "error" : "default"}
             />
+            {Number(token1Amount) > +formatEther(balances[1].raw) && (
+              <small className="mt-1 text-red-500">Insufficient balance</small>
+            )}
 
             <div className="flex flex-col w-full mt-4">
               {(!isToken0Approved || !isToken1Approved) && (

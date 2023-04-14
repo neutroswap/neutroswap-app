@@ -7,7 +7,7 @@ import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 
 import { Token } from "@/shared/types/tokens.types";
 import { formatEther } from "ethers/lib/utils.js";
-import { useAccount, useContractReads } from "wagmi";
+import { useAccount, useContractRead, useContractReads } from "wagmi";
 import { ERC20_ABI, NEUTRO_POOL_ABI } from "@/shared/abi";
 
 import PoolDepositPanel from "@/components/templates/TabPanels/PoolDeposit";
@@ -26,6 +26,10 @@ export default function PoolDetails() {
     abi: NEUTRO_POOL_ABI,
   };
 
+  const [priceRatio, setPriceRatio] = useState<[number, number]>([0, 0]);
+  const [reserves, setReserves] = useState<[BigNumber, BigNumber]>([BigNumber.from(0), BigNumber.from(0)]);
+  const [token0, setToken0] = useState<Token>();
+  const [token1, setToken1] = useState<Token>();
   const [balances, setBalances] = useState<Currency[]>([
     {
       decimal: 18,
@@ -38,14 +42,25 @@ export default function PoolDetails() {
       formatted: "0.00",
     },
   ]);
-  const [token0, setToken0] = useState<Token>();
-  const [token1, setToken1] = useState<Token>();
 
   const { data: pairs } = useContractReads({
     contracts: [
       { ...poolContract, functionName: "token0" },
       { ...poolContract, functionName: "token1" },
     ],
+  });
+
+  useContractRead({
+    address: router.query.id as `0x${string}`,
+    abi: NEUTRO_POOL_ABI,
+    functionName: "getReserves",
+    onSuccess(response) {
+      setPriceRatio([
+        +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
+        +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
+      ])
+      setReserves([response._reserve0, response._reserve1]);
+    }
   });
 
   useContractReads({
@@ -157,7 +172,13 @@ export default function PoolDetails() {
           </Tab.List>
           <Tab.Panels className="w-full md:col-span-10">
             <Tab.Panel unmount={true}>
-              <PoolOverviewPanel />
+              {token0 && token1 && (
+                <PoolOverviewPanel
+                  token0={token0}
+                  token1={token1}
+                  priceRatio={priceRatio}
+                />
+              )}
             </Tab.Panel>
             <Tab.Panel unmount={true}>
               {token0 && token1 && (
@@ -165,6 +186,7 @@ export default function PoolDetails() {
                   balances={balances}
                   token0={token0}
                   token1={token1}
+                  priceRatio={priceRatio}
                 />
               )}
             </Tab.Panel>

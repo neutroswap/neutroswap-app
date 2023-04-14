@@ -4,7 +4,7 @@ import "@/styles/filepond.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
 import type { AppProps } from "next/app";
-import { GeistProvider, CssBaseline, Themes } from "@geist-ui/core";
+import { GeistProvider, CssBaseline, Themes, GeistUIThemes } from "@geist-ui/core";
 import Navbar from "@/components/modules/Navbar";
 import { useCallback, useEffect, useState } from "react";
 import { PrefersContext, themes, ThemeType } from "@/shared/hooks/usePrefers";
@@ -16,14 +16,12 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { Chain } from "wagmi/chains"
-import { mainnet, polygon, optimism, arbitrum, goerli } from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
 import Footer from "@/components/modules/Footer";
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import colors from 'tailwindcss/colors'
 
 dayjs.extend(relativeTime)
 
@@ -73,23 +71,15 @@ const wagmiClient = createClient({
   provider,
 });
 
-export default function App({ Component, pageProps }: AppProps) {
-  const [themeType, setThemeType] = useState<"dark" | "light">("light");
 
-  // const switchThemes = () => {
-  //   setThemeType((last) => (last === 'dark' ? 'light' : 'dark'))
-  //   if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-  //     document.documentElement.classList.add('dark')
-  //   } else {
-  //     document.documentElement.classList.remove('dark')
-  //   }
-  // }
-  //
+export default function App({ Component, pageProps }: AppProps) {
+  const [themeType, setThemeType] = useState<ThemeType>("nlight");
+
   const switchTheme = useCallback((theme: ThemeType) => {
     setThemeType(theme);
     if (typeof window !== "undefined" && window.localStorage) {
       window.localStorage.setItem("theme", theme);
-      if (theme === "dark") {
+      if (theme === "ndark") {
         document.documentElement.classList.add("dark");
       } else {
         document.documentElement.classList.remove("dark");
@@ -105,41 +95,37 @@ export default function App({ Component, pageProps }: AppProps) {
     if (themes.includes(theme)) switchTheme(theme);
   }, [switchTheme]);
 
-  // const myTheme1 = Themes.createFromDark({
-  //   type: 'coolTheme',
-  //   palette: {
-  //     background: "hsl(40, 54%, 2%, 100%)",
-  //     accents_1: "hsl(40, 54%, 4%, 100%)",
-  //     accents_2: "hsl(40, 54%, 60%, 20%)",
-  //     accents_3: "hsl(40, 54%, 60%, 50%)",
-  //     accents_4: "hsl(47, 54%, 50%)",
-  //     accents_5: "hsl(47, 54%, 60%)",
-  //     accents_6: "hsl(47, 54%, 70%)",
-  //     accents_7: "hsl(47, 54%, 80%)",
-  //     accents_8: "hsl(47, 54%, 85%)",
-  //     foreground: "hsl(47, 54%, 95%)",
-  //     border: "hsl(46, 54%, 11%, 100%)",
-  //   },
-  // })
+
+  const geistLightTheme = Themes.createFromLight({
+    type: 'nlight',
+  })
+  const geistDarkTheme: GeistUIThemes = Themes.createFromDark({
+    type: 'ndark',
+    palette: {
+      error: colors.red[500],
+      selection: `hsl(15deg 55.99% 15.48%)`
+    },
+  })
+
   return (
     // <GeistProvider themes={[myTheme1]} themeType={'coolTheme'}>
     <WagmiConfig client={wagmiClient}>
       <RainbowKitProvider
         chains={chains}
-        theme={themeType === "dark" ? midnightTheme() : lightTheme()}
+        theme={themeType === "ndark" ? midnightTheme() : lightTheme()}
       >
-        <GeistProvider themeType={themeType}>
+        <GeistProvider themes={[geistDarkTheme, geistLightTheme]} themeType={themeType}>
           <CssBaseline />
           <PrefersContext.Provider value={{ themeType, switchTheme }}>
             <Navbar />
-            <div className="bg-white dark:bg-black min-h-[86vh] mt-16">
+            <div className="min-h-[86vh] mt-16">
               <div className="max-w-7xl px-4 mx-auto">
                 <Component {...pageProps} />
               </div>
             </div>
             <Footer
               handleThemeSwitch={() =>
-                switchTheme(themeType === "dark" ? "light" : "dark")
+                switchTheme(themeType === "ndark" ? "nlight" : "ndark")
               }
             />
           </PrefersContext.Provider>
