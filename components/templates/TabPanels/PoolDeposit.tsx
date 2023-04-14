@@ -69,23 +69,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     signerOrProvider: signer.data
   })
 
-  // useContractRead({
-  //   enabled: Boolean(token1Amount),
-  //   address: ROUTER_CONTRACT,
-  //   abi: NEUTRO_ROUTER_ABI,
-  //   functionName: "getAmountsOut",
-  //   args: [
-  //     !!token1Amount && parseEther(token1Amount),
-  //     [token1.address, token0.address],
-  //   ] as any,
-  //   onSuccess(response) {
-  //     console.log('getAmountsOut', [
-  //       response[0].toString(),
-  //       response[1].toString()
-  //     ]);
-  //   }
-  // });
-
   const { refetch: refetchAllowance } = useContractReads({
     enabled: Boolean(address),
     contracts: [
@@ -253,77 +236,79 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken0Amount(value);
-    if (+value) debouncedToken0(value);
+    debouncedToken0(value);
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
+    if (!Number(nextValue)) return setToken1Amount("");
     if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
+
     setIsFetchingToken1Price(true);
+    try {
+      // (r0 / r1) * amount0
+      const amount = (priceRatio[1] * Number(nextValue)).toString();
+      setToken1Amount(amount)
 
-    // (r0 / r1) * amount0
-    const amount = (priceRatio[1] * Number(nextValue)).toString();
-    setToken1Amount(amount)
+      // calculate token0Min
+      const amountsOut0 = await neutroRouter?.getAmountsOut(
+        parseEther(amount),
+        [token1.address, token0.address]
+      )
+      if (!amountsOut0) throw new Error("Fail getAmountsOut0");
+      const [, min0] = amountsOut0;
+      setToken0Min(min0);
 
-    // calculate token0Min
-    const amountsOut0 = await neutroRouter?.getAmountsOut(
-      parseEther(amount),
-      [token1.address, token0.address]
-    )
-    if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-    const [, min0] = amountsOut0;
-    setToken0Min(min0);
-
-    // calculate token1Min
-    const amountsOut1 = await neutroRouter?.getAmountsOut(
-      parseEther(nextValue),
-      [token0.address, token1.address]
-    )
-    if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-    const [, min1] = amountsOut1;
-    setToken1Min(min1);
-
-    // const min0 = parseEther(nextValue).mul(10000 - (SLIPPAGE * 100)).div(10000);
-    // setToken0Min(min0);
-
-    // let amount = (Number(nextValue) * priceRatio[0]).toFixed(18);
-    // setToken1Amount(amount);
-    // const min1 = parseEther(amount).mul(10000 - (SLIPPAGE * 100)).div(10000);
-    // setToken1Min(min1);
-
-    setIsFetchingToken1Price(false);
+      // calculate token1Min
+      const amountsOut1 = await neutroRouter?.getAmountsOut(
+        parseEther(nextValue),
+        [token0.address, token1.address]
+      )
+      if (!amountsOut1) throw new Error("Fail getAmountsOut1");
+      const [, min1] = amountsOut1;
+      setToken1Min(min1);
+      setIsFetchingToken1Price(false);
+    } catch (error) {
+      setIsFetchingToken1Price(false);
+    }
   }, 500);
 
   const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken1Amount(value);
-    if (+value) debouncedToken1(value);
+    debouncedToken1(value);
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
+    if (!Number(nextValue)) return setToken0Amount("");
     if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
-    setIsFetchingToken0Price(true);
-    // (r1 / r0) * amount1
-    const amount = (priceRatio[0] * Number(nextValue)).toString();
-    setToken0Amount(amount)
-    // calculate token0Min
-    const amountsOut0 = await neutroRouter?.getAmountsOut(
-      parseEther(nextValue),
-      [token1.address, token0.address]
-    )
-    if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-    const [, min0] = amountsOut0;
-    setToken0Min(min0);
 
-    // calculate token1Min
-    const amountsOut1 = await neutroRouter?.getAmountsOut(
-      parseEther(amount),
-      [token0.address, token1.address]
-    )
-    if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-    const [, min1] = amountsOut1;
-    setToken1Min(min1);
-    setIsFetchingToken0Price(false);
+    setIsFetchingToken0Price(true);
+    try {
+      // (r1 / r0) * amount1
+      const amount = (priceRatio[0] * Number(nextValue)).toString();
+      setToken0Amount(amount)
+      // calculate token0Min
+      const amountsOut0 = await neutroRouter?.getAmountsOut(
+        parseEther(nextValue),
+        [token1.address, token0.address]
+      )
+      if (!amountsOut0) throw new Error("Fail getAmountsOut0");
+      const [, min0] = amountsOut0;
+      setToken0Min(min0);
+
+      // calculate token1Min
+      const amountsOut1 = await neutroRouter?.getAmountsOut(
+        parseEther(amount),
+        [token0.address, token1.address]
+      )
+      if (!amountsOut1) throw new Error("Fail getAmountsOut1");
+      const [, min1] = amountsOut1;
+      setToken1Min(min1);
+      setIsFetchingToken0Price(false);
+    } catch (error) {
+      setIsFetchingToken0Price(false);
+    }
   }, 500);
 
   // NOTE: Enable for debugging only
@@ -355,11 +340,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mt-8">
-        <div className="w-full mt-4 col-span-7">
+        <div className="w-full col-span-7">
+          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">
+            Select amount to deposit
+          </p>
           <div className="flex flex-col py-5 px-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg ">
-            <p className="mt-0 mb-8 text-xl font-semibold">
-              Select amount to deposit
-            </p>
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
                 <img
