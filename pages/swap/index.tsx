@@ -49,10 +49,12 @@ import Link from "next/link";
 import { Currency } from "@/shared/types/currency.types";
 import { BigNumber } from "ethers";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
+import { useRouter } from "next/router";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
 export default function Swap() {
+  const router = useRouter();
   const isMounted = useIsMounted();
   const { address, isConnected } = useAccount();
 
@@ -341,6 +343,11 @@ export default function Swap() {
     setToken1(token0);
     setTokenAmount0(tokenAmount1);
     setTokenAmount1(tokenAmount0);
+  };
+
+  const handleSwapAgain = () => {
+    setTxHash("");
+    router.reload();
   };
 
   const approve = async () => {
@@ -869,7 +876,7 @@ export default function Swap() {
                         {txHash !== "" && (
                           <>
                             <div className="flex justify-center items-center py-20 mb-5 ">
-                              <div className="mr-2">
+                              <div className="mr-2 text-black dark:text-white">
                                 You sold {tokenAmount0} {tokenName0} for{" "}
                                 {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
                                 {tokenName1}
@@ -883,8 +890,13 @@ export default function Swap() {
                               </Link>
                             </div>
                             <Button
-                              onClick={close}
-                              className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                              onClick={handleSwapAgain}
+                              className={classNames(
+                                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                                "text-white dark:text-amber-600",
+                                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                              )}
                             >
                               Swap again
                             </Button>
