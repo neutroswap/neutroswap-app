@@ -392,7 +392,7 @@ export default function Swap() {
   };
 
   if (!isMounted) {
-    return <Spinner />
+    return <Spinner />;
   }
 
   return (
@@ -427,13 +427,17 @@ export default function Swap() {
                     leaveTo="opacity-0 translate-y-1"
                   >
                     <Popover.Panel className="absolute top-10 right-0 z-50 -mr-2.5 min-w-20 md:m-w-22 md:-mr-5 rounded-lg w-72 shadow-dark-sm dark:shadow-dark-lg">
-                      <div className={classNames(
-                        "py-4 px-3 rounded-lg space-y-3",
-                        "bg-neutral-50 dark:bg-[#0C0C0C]",
-                        "border border-neutral-200 dark:border-neutral-800/50"
-                      )}>
+                      <div
+                        className={classNames(
+                          "py-4 px-3 rounded-lg space-y-3",
+                          "bg-neutral-50 dark:bg-[#0C0C0C]",
+                          "border border-neutral-200 dark:border-neutral-800/50"
+                        )}
+                      >
                         <div className="flex justify-between text-sm">
-                          <span className="text-neutral-500 dark:text-neutral-400">Slippage</span>
+                          <span className="text-neutral-500 dark:text-neutral-400">
+                            Slippage
+                          </span>
                           <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
                             {slippage}%
                           </span>
@@ -491,7 +495,7 @@ export default function Swap() {
                     debouncedToken0(formatEther(balance0.raw));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-800" />
+                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
                   {isFetchingBalance0 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
@@ -528,7 +532,7 @@ export default function Swap() {
                       className={classNames(
                         "flex items-center space-x-2 z-10 group p-2 transition-all rounded-lg cursor-pointer",
                         "bg-neutral-100 hover:bg-neutral-200/40 dark:bg-neutral-900 hover:dark:bg-neutral-800/75 ",
-                        "border border-neutral-200 dark:border-transparent",
+                        "border border-neutral-200 dark:border-transparent"
                       )}
                     >
                       <div className="flex items-center">
@@ -580,7 +584,7 @@ export default function Swap() {
                     debouncedToken1(formatEther(balance1.raw));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-800" />
+                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
                   {isFetchingBalance1 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
@@ -617,7 +621,7 @@ export default function Swap() {
                       className={classNames(
                         "flex items-center space-x-2 z-10 group p-2 transition-all rounded-lg cursor-pointer",
                         "bg-neutral-100 hover:bg-neutral-200/40 dark:bg-neutral-900 hover:dark:bg-neutral-800/75 ",
-                        "border border-neutral-200 dark:border-transparent",
+                        "border border-neutral-200 dark:border-transparent"
                       )}
                     >
                       <div className="flex items-center">
@@ -739,12 +743,14 @@ export default function Swap() {
               {isConnected && (
                 <Modal>
                   <ModalOpenButton>
-                    <Button className={classNames(
-                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                      "text-white dark:text-amber-600",
-                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                    )}>
+                    <Button
+                      className={classNames(
+                        "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                        "text-white dark:text-amber-600",
+                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                      )}
+                    >
                       Swap
                     </Button>
                   </ModalOpenButton>
@@ -753,7 +759,7 @@ export default function Swap() {
                       <div>
                         <div className="w-full flex mb-5">
                           <ArrowLeftIcon
-                            className="h-7 cursor-pointer hover:dark:text-neutral-600"
+                            className="h-7 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500"
                             onClick={close}
                           />
                         </div>
@@ -761,12 +767,14 @@ export default function Swap() {
                           <>
                             <div className="flex items-center justify-between ">
                               <div className="flex flex-col ">
-                                <div className="text-2xl mb-1 font-medium">
+                                <div className="text-2xl mb-1 font-medium text-black dark:text-white">
                                   Buy{" "}
-                                  {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
+                                  {parseFloat(tokenAmount1)
+                                    .toFixed(5)
+                                    .toString()}{" "}
                                   {tokenName1}
                                 </div>
-                                <div className="text-lg text-neutral-400 font-medium">
+                                <div className="text-lg text-black/60 dark:text-neutral-400 font-medium">
                                   Sell {tokenAmount0} {tokenName0}
                                 </div>
                               </div>
@@ -776,43 +784,46 @@ export default function Swap() {
                                 className="h-16"
                               />
                             </div>
-                            <div className="p-3 my-5 flex flex-col bg-zinc-900 rounded-lg">
+                            <div className="p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-zinc-900 rounded-lg">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex flex-col max-w-xs">
-                                  <div className="font-medium text-neutral-300">
+                                  <div className="font-medium text-black dark:text-neutral-300">
                                     Slippage
                                   </div>
-                                  <div className="font-light text-sm text-neutral-300">
+                                  <div className="font-light text-sm text-black/60 dark:text-neutral-300">
                                     The slippage you set for the trade
                                   </div>
                                 </div>
-                                <div>{slippage}%</div>
+                                <div className="text-black dark:text-neutral-300">
+                                  {slippage}%
+                                </div>
                               </div>
                               <div className="flex items-center justify-between">
                                 <div className="flex flex-col max-w-xs">
-                                  <div className="font-medium text-neutral-300">
+                                  <div className="font-medium text-black dark:text-neutral-300">
                                     Minimal received
                                   </div>
-                                  <div className="font-light text-sm text-neutral-300">
-                                    The minimum amount you are <br /> guaranteeed
-                                    to receive
+                                  <div className="font-light text-sm text-black/60 dark:text-neutral-300">
+                                    The minimum amount you are <br />{" "}
+                                    guaranteeed to receive
                                   </div>
                                 </div>
-                                <div>
-                                  {parseFloat(tokenMin1).toFixed(5).toString()} $
-                                  {tokenName1}
+                                <div className="text-black dark:text-neutral-300">
+                                  {parseFloat(tokenMin1).toFixed(5).toString()}{" "}
+                                  ${tokenName1}
                                 </div>
                               </div>
                             </div>
-                            <div className="p-3 my-5 flex bg-zinc-900 rounded-lg items-center justify-between">
+                            <div className="p-3 my-5 flex bg-neutral-100/75 dark:bg-zinc-900 rounded-lg items-center justify-between">
                               <div className="flex flex-col max-w-xs">
-                                <div className="font-medium text-neutral-300">
+                                <div className="font-medium text-black dark:text-neutral-300">
                                   Recipient
                                 </div>
                               </div>
                               <Link
-                                href={`https://explorer-testnet2.trust.one/address/${address as string
-                                  }`}
+                                href={`https://explorer-testnet2.trust.one/address/${
+                                  address as string
+                                }`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
@@ -825,7 +836,12 @@ export default function Swap() {
                                   <Button
                                     onClick={() => approve()}
                                     disabled={!tokenAmount0 || !isConnected}
-                                    className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                    className={classNames(
+                                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                                      "text-white dark:text-amber-600",
+                                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                    )}
                                     loading={isLoading}
                                   >
                                     Approve
@@ -835,7 +851,12 @@ export default function Swap() {
                                   <Button
                                     onClick={() => swap()}
                                     disabled={!tokenAmount0 || !isConnected}
-                                    className="!flex !items-center hover:bg-[#2D3036]/50 !bg-[#2D3036] !p-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !border-none !text-white !text-md"
+                                    className={classNames(
+                                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                                      "text-white dark:text-amber-600",
+                                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                    )}
                                     loading={isLoading}
                                   >
                                     Swap
