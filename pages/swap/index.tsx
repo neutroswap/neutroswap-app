@@ -48,10 +48,12 @@ import WalletIcon from "@/public/icons/wallet.svg";
 import Link from "next/link";
 import { Currency } from "@/shared/types/currency.types";
 import { BigNumber } from "ethers";
+import { useIsMounted } from "@/shared/hooks/useIsMounted";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
 export default function Swap() {
+  const isMounted = useIsMounted();
   const { address, isConnected } = useAccount();
 
   const [slippage, setSlippage] = useState("0.5");
@@ -385,6 +387,10 @@ export default function Swap() {
     }
   };
 
+  if (!isMounted) {
+    return <Spinner />
+  }
+
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-[80%] py-10">
@@ -438,16 +444,16 @@ export default function Swap() {
                                   value={tab}
                                 >
                                   {({ checked }) => (
-                                    <button
+                                    <div
                                       className={classNames(
                                         checked
                                           ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 shadow"
                                           : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 hover:dark:bg-white/[0.04]",
-                                        "z-[1] relative rounded-lg text-xs h-8 font-medium flex flex-grow items-center justify-center"
+                                        "z-[1] relative rounded-lg text-xs h-8 font-medium flex flex-grow items-center justify-center cursor-pointer"
                                       )}
                                     >
                                       {tab}%
-                                    </button>
+                                    </div>
                                   )}
                                 </RadioGroup.Option>
                               ))}
@@ -626,6 +632,7 @@ export default function Swap() {
                 </TokenPicker>
               </div>
             </div>
+
             <div className="flex mt-3 justify-center">
               {!isConnected && (
                 <ConnectButton.Custom>
