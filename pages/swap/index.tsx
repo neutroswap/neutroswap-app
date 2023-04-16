@@ -514,7 +514,7 @@ export default function Swap() {
                 </div>
               </div>
               <div className="flex justify-between">
-                <div>
+                <div className="flex flex-col">
                   {isFetchingToken0Price && (
                     <div className="w-40 h-8 bg-neutral-700 rounded animate-pulse"></div>
                   )}
@@ -525,6 +525,11 @@ export default function Swap() {
                       value={tokenAmount0}
                       onChange={handleToken0Change}
                     />
+                  )}
+                  {Number(tokenAmount0) > +formatEther(balance0.raw) && (
+                    <small className="mt-1 text-red-500">
+                      Insufficient balance
+                    </small>
                   )}
                 </div>
                 <TokenPicker
