@@ -15,7 +15,7 @@ type Data = {
   data: any
 }
 
-export async function getAllLPs () {
+export async function getAllLPs() {
   const { data: liquidityTokens, error } = await supabaseClient
     .from('liquidity_tokens')
     .select('network_id,address,decimal,name,symbol,logo')
@@ -23,7 +23,7 @@ export async function getAllLPs () {
   return liquidityTokens
 }
 
-export async function getUserLP (userAddress: any) {
+export async function getUserLP(userAddress: any) {
   try {
     let lps: any = await getAllLPs()
     console.log('lps ', lps)
@@ -37,7 +37,7 @@ export async function getUserLP (userAddress: any) {
     })
     console.log("privderrs ", provider)
     const multicall = new Multicall({
-      multicallCustomContractAddress:  network.multicall_addr,
+      multicallCustomContractAddress: network.multicall_addr,
       ethersProvider: provider,
       tryAggregate: true
     })
@@ -98,6 +98,19 @@ export async function getUserLP (userAddress: any) {
       let callValues = results.results[index].callsReturnContext
       console.log('call values ', callValues)
       let [balance, totalSupply, reserves, token0, token1, devFee, swapFee] = callValues
+      let data1 = await supabaseClient
+        .from('tokens')
+        .select('decimal')
+        .eq('address', token0.returnValues[0])
+      let data2 = await supabaseClient
+        .from('tokens')
+        .select('decimal')
+        .eq('address', token1.returnValues[0])
+      if (!data1.data) return;
+      if (!data2.data) return;
+      const token0Decimal = Number(data1.data[0].decimal)
+      const token1Decimal = Number(data2.data[0].decimal)
+
       console.log("balanceeeeeeee ", balance.returnValues[0])
       let balanceBN = BigNumber.from(balance.returnValues[0].hex);
       let totalSupplyBN = BigNumber.from(totalSupply.returnValues[0].hex);
@@ -106,14 +119,25 @@ export async function getUserLP (userAddress: any) {
       if (balanceBN.eq(ethers.BigNumber.from(0))) {
         console.log('Balance is zero, skip...')
       } else {
+        console.log("reserves ", BigNumber.from(reserves.returnValues[0].hex))
         userLPs.push({
           ...lps[i],
           userBalance: balanceBN,
           totalSupply: totalSupply.returnValues[0],
           poolShare: poolShare,
           reserves: {
-            r0: reserves.returnValues[0],
-            r1: reserves.returnValues[1],
+            r0: {
+              decimal: token0Decimal,
+              raw: reserves.returnValues[0],
+              // fix: now we use stagnan pow 18 for testnet, later we need to change the 18 to using token0Decimal var
+              formatted: BigNumber.from(reserves.returnValues[0].hex).div(BigNumber.from(10).pow(18)).toNumber().toFixed(2),
+            },
+            r1: {
+              decimal: token1Decimal,
+              raw: reserves.returnValues[1],
+              // fix: now we use stagnan pow 18 for testnet, later we need to change the 18 to using token0Decimal var
+              formatted: BigNumber.from(reserves.returnValues[1].hex).div(BigNumber.from(10).pow(18)).toNumber().toFixed(2),
+            },
           }
         })
         //supabase hit
@@ -143,10 +167,10 @@ export async function getUserLP (userAddress: any) {
     for (let i = 0; i < tokens.length; i += 2) { //assign ke userLP terkait. Karena tiap LP ada 2, makanya dibagi 2 buat dapet index nya 
       console.log("dsadsa ")
       const token0 = tokens[i];
-      const token1 = tokens[i+1];
+      const token1 = tokens[i + 1];
       if (!token0.data || !token1.data) return;
-      userLPs[i/2].token0 = token0.data[0]; 
-      userLPs[i/2].token1 = token1.data[0];
+      userLPs[i / 2].token0 = token0.data[0];
+      userLPs[i / 2].token1 = token1.data[0];
     }
     console.log('Data ', userLPs)
     return userLPs
@@ -156,7 +180,7 @@ export async function getUserLP (userAddress: any) {
   }
 }
 
-export default async function handler (
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
@@ -166,7 +190,7 @@ export default async function handler (
     case 'GET':
       const { userAddress } = req.query
       console.log('iser ', userAddress)
-      let nonZeroLP:any = await getUserLP(userAddress)
+      let nonZeroLP: any = await getUserLP(userAddress)
       let response = {
         data: nonZeroLP
       }
