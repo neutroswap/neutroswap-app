@@ -20,8 +20,8 @@ const coingecko = new CoinGeckoClient({
   autoRetry: true
 })
 
-interface YieldFarm {
-  tvl: string,
+interface FarmHoldings {
+  holdings: string,
   farms: Farm[]
 }
 
@@ -36,9 +36,8 @@ interface Farm {
 }
 
 interface FarmDetails {
-  totalLiquidity: string,
-  rps: string,
-  apr: string
+  totalStaked: string,
+  pendingTokens: string,
 }
 
 
@@ -68,7 +67,7 @@ export async function getAllFarms(): Promise<Farm[] | null> {
   }
 }
 
-export async function multicall(farms: Farm[] | null): Promise<YieldFarm | null> {
+export async function multicall(farms: Farm[] | null, address: any): Promise<FarmHoldings | null> {
   const provider = new ethers.providers.JsonRpcProvider("https://api-testnet2.trust.one", {
     chainId: 15557,
     name: "testnet_eos_evm",
@@ -79,21 +78,21 @@ export async function multicall(farms: Farm[] | null): Promise<YieldFarm | null>
 
   let calls = []
   // get all pids
-  const totalLps: CallContext[] = farms.map(farm => ({
-    reference: 'totalLp',
-    methodName: 'poolTotalLp',
-    methodParameters: [farm.pid]
+  const userInfo: CallContext[] = farms.map(farm => ({
+    reference: 'info',
+    methodName: 'userInfo',
+    methodParameters: [farm.pid, address]
     // methodParameters: [1]
   }));
-  calls.push(...totalLps)
+  calls.push(...userInfo)
 
   // get all pids
-  const rps: CallContext[] = farms.map(farm => ({
-    reference: 'rps',
-    methodName: 'poolRewardsPerSec',
-    methodParameters: [farm.pid]
+  const pendingTokens: CallContext[] = farms.map(farm => ({
+    reference: 'pending',
+    methodName: 'pendingTokens',
+    methodParameters: [farm.pid, address]
   }));
-  calls.push(...rps)
+  calls.push(...pendingTokens)
 
   const multicall = new Multicall({
     multicallCustomContractAddress: process.env.NEXT_PUBLIC_MULTICALL_CONTRACT,
@@ -116,39 +115,32 @@ export async function multicall(farms: Farm[] | null): Promise<YieldFarm | null>
     contractCallContext
   )
 
-  let tvl = 0;
+  let totalHoldings = 0;
   for (const farm of farms) {
     const result = contractCalls.results[indexName].callsReturnContext.filter(res => res.methodParameters[0] === farm.pid);
+    console.log(result)
 
     if (result) {
-      const liquidity = result[0].returnValues;
-      const rps = result[1].returnValues[3];
+      const totalStaked = result[0].returnValues[0];
+      const pendingTokens = result[1].returnValues[3];
+      console.log(totalStaked)
+      console.log(pendingTokens)
 
       farm.details = {
-        totalLiquidity: formatEther(BigNumber.from(liquidity[0].hex)),
-        apr: BigNumber.from(1).toString(),
-        // apr: await calculateApr(rps[0].hex, liquidity[0].hex),
-        // rps: parseEther(BigNumber.from(rps[0].hex).toString()).toNumber().toFixed(2)
-        rps: formatEther(BigNumber.from(rps[0].hex))
+        totalStaked: formatEther(BigNumber.from(totalStaked.hex)),
+        pendingTokens: formatEther(BigNumber.from(pendingTokens[0].hex))
       };
     }
-    const totalLiquidity = parseFloat(farm.details?.totalLiquidity ?? '0');
-    tvl += totalLiquidity;
+    const holdings = parseFloat(farm.details?.totalStaked ?? '0');
+    totalHoldings += holdings;
   }
 
-  const result: YieldFarm = {
-    tvl: tvl.toString(),
+  const result: FarmHoldings = {
+    holdings: totalHoldings.toString(),
     farms
   }
 
   return result
-}
-
-export async function calculateApr(rps: BigNumber, totalLiqiudity: BigNumber): Promise<BigNumber> {
-  const ONE_YEAR = BigNumber.from(31536000)
-  const tokenPrice = BigNumber.from(1.37)
-  // return (rps.mul(ONE_YEAR).mul(tokenPrice).div(totalLiqiudity)).mul(BigNumber.from("100"))
-  return (BigNumber.from("0x8e1f8b15e").mul(ONE_YEAR).mul(tokenPrice).div(469080)).mul(BigNumber.from("100"))
 }
 
 export async function getPrice(id: string, tokenAddress: string): Promise<SimplePriceResponse> {
@@ -168,12 +160,17 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const { method, body } = req
+  const { userAddress } = req.query
+  if (!userAddress) {
+    res.status(400).json({ error: 'Missing required parameter' });
+    return;
+  }
 
   switch (method) {
     case 'GET':
       try {
         let result = await getAllFarms()
-        let data = await multicall(result)
+        let data = await multicall(result, userAddress)
         let response = {
           data
         }
