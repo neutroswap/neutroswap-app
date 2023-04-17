@@ -12,10 +12,10 @@ export default function Vault() {
     <div className="flex flex-col items-center justify-center min-h-[80%] py-10">
       <div>
         <Text h2 height={3} className="text-center">
-          Yield Farming
+          Neutro Vault
         </Text>
         <Text type="secondary" p className="text-center !mt-0">
-          Earn yield by staking your LP Tokens
+          Earn more NEUTRO by locking your NEUTRO
         </Text>
       </div>
 
