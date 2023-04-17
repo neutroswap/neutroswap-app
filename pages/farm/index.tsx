@@ -8,36 +8,42 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { BigNumber } from "ethers";
 import { classNames } from "@/shared/helpers/classNamer";
 import NumberInput from "@/components/elements/NumberInput";
+import { useAccount } from "wagmi";
 
 // const inter = Inter({ subsets: ['latin'] })
 
 const TABS = ["All Farms", "My Farms"];
 
 export default function Farm() {
-  const [positions, setPositions] = useState([
-    {
-      network_id: "36d45ac3-284b-4ad8-8262-b4980294e8e6",
-      address: "0xd0646b3FDeFb047d6C2bB7cc5475C7493BB83Ddc",
-      decimal: 18,
-      name: "DONI-WETH",
-      symbol: ["vLPN", "USDT", "WETH"],
-      logo: [null, null, "/logo/eth.svg"],
-      balance: BigNumber.from(0x038d7ea4c67c18),
-    },
-    {
-      network_id: "36d45ac3-284b-4ad8-8262-b4980294e8e6",
-      address: "0xd0646b3FDeFb047d6C2bB7cc5475C7493BB83Ddc",
-      decimal: 18,
-      name: "vLPN-USDT-WETH",
-      symbol: ["vLPN", "USDT", "WETH"],
-      logo: [null, null, "/logo/eth.svg"],
-      balance: BigNumber.from(0x038d7ea4c67c18),
-    },
-  ]);
+  const { address } = useAccount();
+  const [farmList, setFarmList] = useState<any>([]);
+
+  useEffect(() => {
+    async function loadListFarm() {
+      const response = await fetch("/api/getListFarm", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const fetched = await response.json();
+      console.log("data", fetched.data);
+      const data = fetched.data.farms.map((details: any) => ({
+        name: details.name,
+        totalLiq: details.details.totalLiquidity,
+        rps: details.details.rps,
+        apr: details.details.apr,
+        pid: details.pid,
+      }));
+      setFarmList(data);
+    }
+    loadListFarm();
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[80%] py-10">
       <div>
@@ -107,14 +113,8 @@ export default function Farm() {
         </div>
       </div>
 
-      <div className=" flex mb-3 min-w-[80%] justify-between  text-xl text-black dark:text-neutral-600">
-        <div>Farm</div>
-        <div>APR</div>
-        <div>Liquidity</div>
-        <div>Earnings</div>
-      </div>
-      {positions.map((position) => (
-        <Disclosure key={position.address}>
+      {farmList.map((farm: any) => (
+        <Disclosure key={farm}>
           {({ open }) => (
             <div className="mb-4 min-w-[80%]">
               <Disclosure.Button
@@ -124,37 +124,14 @@ export default function Farm() {
                 )}
               >
                 <div className="flex justify-between w-full ml-4">
-                  <div>EOS-NEUTRO</div>
-                  <div>1,000%</div>
-                  <div>$1,000,000</div>
-                  <div>
-                    <div>0 NEUTRO</div>
-                    <div>0</div>
-                  </div>
-                  {/* <div className="flex -space-x-1 relative z-0 overflow-hidden">
-                    {position.logo.map((logo, index) => (
-                      <>
-                        {!logo && (
-                          <div className="relative z-30 inline-flex justify-center items-center h-6 w-6 rounded-full ring-2 ring-neutral-200 dark:ring-neutral-900 bg-neutral-500">
-                            <p className="p-0 m-0 text-xs text-white font-medium uppercase">
-                              {position.name.split("-")[index].slice(0, 2)}
-                            </p>
-                          </div>
-                        )}
-                        {!!logo && (
-                          <img
-                            key={logo}
-                            className="relative z-30 inline-block h-6 w-6 rounded-full ring-2 ring-neutral-200 dark:ring-neutral-900"
-                            src={logo}
-                            alt=""
-                          />
-                        )}
-                      </>
-                    ))}
-                  </div>
+                  <div className="flex -space-x-1 relative z-0 overflow-hidden"></div>
                   <span className="text-left font-semibold text-lg">
-                    {position.name}
-                  </span> */}
+                    {farmList[0].name}
+                    {farmList[0].totalLiq}
+                    {farmList[0].rps}
+                    {farmList[0].apr}
+                    {/* {farmList.} */}
+                  </span>
                 </div>
                 <ChevronUpIcon
                   className={`${
@@ -163,7 +140,6 @@ export default function Farm() {
                 />
               </Disclosure.Button>
               <Disclosure.Panel className="p-4 pt-6  rounded-md rounded-t-none border border-neutral-200 dark:border-neutral-900">
-                {/* Change here for content */}
                 <div className="flex w-full space-x-5">
                   <div className="flex flex-col justify-between w-full space-y-3">
                     <div className="flex justify-between">
