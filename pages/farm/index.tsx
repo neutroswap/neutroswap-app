@@ -51,16 +51,16 @@ export default function Farm() {
 
       <div className="flex justify-between items-center min-w-[80%] mt-5 mb-10">
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
-          <div className="mb-2">Total Value Locked</div>
-          <div className="text-center">$100,000,000</div>
+          <div className="mb-2 text-lg font-medium">Total Value Locked</div>
+          <div className="text-center text-amber-600">$100,000,000</div>
         </div>
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
-          <div className="mb-2">Your Staked Assets</div>
-          <div className="text-center">$100,000,000</div>
+          <div className="mb-2 text-lg font-medium">Your Staked Assets</div>
+          <div className="text-center text-amber-600">$100,000,000</div>
         </div>
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
-          <div className="mb-2">Unclaimed Rewards</div>
-          <div className="text-center">$100,000,000</div>
+          <div className="mb-2 text-lg font-medium">Unclaimed Rewards</div>
+          <div className="text-center text-amber-600">$100,000,000</div>
         </div>
         <Button
           className={classNames(
@@ -86,7 +86,7 @@ export default function Farm() {
                         checked
                           ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 shadow"
                           : "text-black dark:text-neutral-400 hover:bg-neutral-100 hover:dark:bg-white/[0.04]",
-                        "z-[1] relative rounded-lg text-sm h-8 px-3 py-1 text-center font-medium flex flex-grow items-center justify-center cursor-pointer"
+                        "z-[1] relative rounded-lg text-md h-8 px-3 py-1 text-center font-medium flex flex-grow items-center justify-center cursor-pointer"
                       )}
                     >
                       {tab}
@@ -107,6 +107,12 @@ export default function Farm() {
         </div>
       </div>
 
+      <div className=" flex mb-3 min-w-[80%] justify-between  text-xl text-black dark:text-neutral-600">
+        <div>Farm</div>
+        <div>APR</div>
+        <div>Liquidity</div>
+        <div>Earnings</div>
+      </div>
       {positions.map((position) => (
         <Disclosure key={position.address}>
           {({ open }) => (
@@ -117,8 +123,15 @@ export default function Farm() {
                   open && "rounded-b-none"
                 )}
               >
-                <div className="flex space-x-2 ml-4">
-                  <div className="flex -space-x-1 relative z-0 overflow-hidden">
+                <div className="flex justify-between w-full ml-4">
+                  <div>EOS-NEUTRO</div>
+                  <div>1,000%</div>
+                  <div>$1,000,000</div>
+                  <div>
+                    <div>0 NEUTRO</div>
+                    <div>0</div>
+                  </div>
+                  {/* <div className="flex -space-x-1 relative z-0 overflow-hidden">
                     {position.logo.map((logo, index) => (
                       <>
                         {!logo && (
@@ -141,7 +154,7 @@ export default function Farm() {
                   </div>
                   <span className="text-left font-semibold text-lg">
                     {position.name}
-                  </span>
+                  </span> */}
                 </div>
                 <ChevronUpIcon
                   className={`${
