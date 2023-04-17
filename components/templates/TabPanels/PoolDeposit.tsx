@@ -6,7 +6,7 @@ import {
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
+import { formatEther, getAddress, parseEther, parseUnits } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
@@ -19,6 +19,7 @@ import {
 import { CloneUniswapContractDetailsV2 } from "simple-uniswap-sdk/dist/esm/factories/pair/models/clone-uniswap-contract-details";
 import {
   useAccount,
+  useBalance,
   useContract,
   useContractRead,
   useContractReads,
@@ -32,6 +33,9 @@ import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
 import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
+import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
+import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { tokens } from "@/shared/statics/tokenList";
 
 type PoolDepositPanelProps = {
   balances: Currency[];
@@ -40,6 +44,7 @@ type PoolDepositPanelProps = {
   priceRatio: [number, number]
 };
 
+const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { balances, token0, token1, priceRatio } = props;
 
@@ -52,16 +57,21 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [token0Min, setToken0Min] = useState(BigNumber.from(0));
   const [token1Min, setToken1Min] = useState(BigNumber.from(0));
 
+  const [isPreferNative, setIsPreferNative] = useState(true);
   const [isToken0Approved, setIsToken0Approved] = useState(false);
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
-
   const [uniswapPairFactory, setUniswapPairFactory] =
     useState<UniswapPairFactory>();
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.5; // in percent
+
+  const { data: balance } = useBalance({
+    enabled: Boolean(address),
+    address
+  })
 
   const neutroRouter = useContract({
     address: ROUTER_CONTRACT,
@@ -167,6 +177,43 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { isLoading: isAddingLiquidity, write: addLiquidity } =
     useContractWrite({
       ...addLiquidityConfig,
+      onSuccess(result) {
+        result.wait().then(() => refetchAllowance())
+      }
+    });
+
+  const { config: addLiquidityETHConfig, isFetching: isSimulatingAddLiquidityETH } =
+    usePrepareContractWrite({
+      enabled: Boolean(
+        (token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS) && // do not enable if none of the addr is WEOS
+        !!token0Amount &&
+        !!token1Amount &&
+        isPreferNative
+      ),
+      address: ROUTER_CONTRACT,
+      abi: NEUTRO_ROUTER_ABI,
+      functionName: "addLiquidityETH",
+      args: [
+        token0.symbol === "WEOS" ? token1.address : token0.address, // token (address)
+        token0.symbol === "WEOS" ? parseEther(token1Amount ?? "0") : parseEther(token0Amount ?? "0"), // amountTokenDesired
+        token0.symbol === "WEOS" ? token1Min : token0Min, // amountTokenMin
+        token0.symbol === "WEOS" ? token0Min : token1Min, // amountETHMin
+        address!, // to
+        BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
+      ],
+      overrides: {
+        value: token0.symbol === "WEOS" ? parseEther(token0Amount ?? "0") : parseEther(token1Amount ?? "0"),
+      },
+      onError(error) {
+        console.log('Error', error)
+      },
+    });
+  const { isLoading: isAddingLiquidityETH, write: addLiquidityETH } =
+    useContractWrite({
+      ...addLiquidityETHConfig,
+      onMutate(result) {
+        console.log('VALUE:', result.request?.value)
+      },
       onSuccess(result) {
         result.wait().then(() => refetchAllowance())
       }
@@ -326,6 +373,20 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   //   ])
   // }, [token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
+  const isAmount0Invalid = () => {
+    let value: BigNumber;
+    if (isPreferNative && token0.symbol === "WEOS" && balance) value = balance.value;
+    else value = balances[0].raw
+    return Number(token0Amount) > +formatEther(value)
+  }
+
+  const isAmount1Invalid = () => {
+    let value: BigNumber;
+    if (isPreferNative && token1.symbol === "WEOS" && balance) value = balance.value;
+    else value = balances[1].raw
+    return Number(token1Amount) > +formatEther(value)
+  }
+
   return (
     <div className="">
       <div>
@@ -347,28 +408,43 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
           <div className="flex flex-col py-5 px-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg ">
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
-                <img
-                  alt={`${token0.symbol} Icon`}
-                  src={token0.logo}
-                  className="h-6 rounded-full"
-                  onError={(e) => {
-                    handleImageFallback(token0.symbol, e);
-                  }}
-                />
-                <p className="m-0 font-bold">{token0.symbol}</p>
+                {token0.symbol !== "WEOS" && (
+                  <>
+                    <img
+                      alt={`${token0.symbol} Icon`}
+                      src={token0.logo}
+                      className="h-6 rounded-full"
+                      onError={(e) => {
+                        handleImageFallback(token0.symbol, e);
+                      }}
+                    />
+                    <p className="m-0 font-bold">{token0.symbol}</p>
+                  </>
+                )}
+                {token0.symbol === "WEOS" && (
+                  <NativeTokenPicker handlePreferNative={setIsPreferNative} />
+                )}
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">
-                  Balance: {balances[0].formatted}
-                </p>
+                {token0.symbol !== "WEOS" && (
+                  <p className="m-0 text-neutral-500 text-sm">
+                    Balance: {balances[0].formatted}
+                  </p>
+                )}
+                {token0.symbol === "WEOS" && (
+                  <p className="m-0 text-neutral-500 text-sm">
+                    Balance: {(isPreferNative && balance) ? currencyFormat(+balance?.formatted) : balances[0].formatted}
+                  </p>
+                )}
                 <Button
                   auto
                   scale={0.33}
                   disabled={!balances}
                   onClick={() => {
                     if (!balances) return;
-                    setToken0Amount(formatEther(balances[0].raw));
-                    debouncedToken0(formatEther(balances[0].raw));
+                    const value = (balance && isPreferNative && token0.symbol === "WEOS") ? balance.value : balances[0].raw
+                    setToken0Amount(formatEther(value));
+                    debouncedToken0(formatEther(value));
                   }}
                 >
                   MAX
@@ -382,36 +458,51 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               value={token0Amount}
               onChange={handleToken0Change}
               iconRight={isFetchingToken0Price ? <Spinner /> : <></>}
-              type={Number(token0Amount) > +formatEther(balances[0].raw) ? "error" : "default"}
+              type={isAmount0Invalid() ? "error" : "default"}
             />
-            {Number(token0Amount) > +formatEther(balances[0].raw) && (
+            {isAmount0Invalid() && (
               <small className="mt-1 text-red-500">Insufficient balance</small>
             )}
 
             <div className="flex items-center justify-between mt-6">
               <div className="flex space-x-2 items-center">
-                <img
-                  alt={`${token1.symbol} Icon`}
-                  src={token1.logo}
-                  className="h-6 rounded-full"
-                  onError={(e) => {
-                    handleImageFallback(token1.symbol, e);
-                  }}
-                />
-                <p className="m-0 font-bold">{token1.symbol}</p>
+                {token1.symbol !== "WEOS" && (
+                  <>
+                    <img
+                      alt={`${token1.symbol} Icon`}
+                      src={token1.logo}
+                      className="h-6 rounded-full"
+                      onError={(e) => {
+                        handleImageFallback(token1.symbol, e);
+                      }}
+                    />
+                    <p className="m-0 font-bold">{token1.symbol}</p>
+                  </>
+                )}
+                {token1.symbol === "WEOS" && (
+                  <NativeTokenPicker handlePreferNative={setIsPreferNative} />
+                )}
               </div>
               <div className="flex space-x-2 items-center">
-                <p className="m-0 text-neutral-500 text-sm">
-                  Balance: {balances[1].formatted}
-                </p>
+                {token1.symbol !== "WEOS" && (
+                  <p className="m-0 text-neutral-500 text-sm">
+                    Balance: {balances[1].formatted}
+                  </p>
+                )}
+                {token1.symbol === "WEOS" && (
+                  <p className="m-0 text-neutral-500 text-sm">
+                    Balance: {(isPreferNative && balance) ? currencyFormat(+balance?.formatted) : balances[1].formatted}
+                  </p>
+                )}
                 <Button
                   auto
                   scale={0.33}
                   disabled={!balances}
                   onClick={() => {
                     if (!balances) return;
-                    setToken1Amount(formatEther(balances[1].raw));
-                    debouncedToken1(formatEther(balances[1].raw));
+                    const value = (balance && isPreferNative && token1.symbol === "WEOS") ? balance.value : balances[1].raw;
+                    setToken1Amount(formatEther(value));
+                    debouncedToken1(formatEther(value));
                   }}
                 >
                   MAX
@@ -425,9 +516,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               value={token1Amount}
               onChange={handleToken1Change}
               iconRight={isFetchingToken1Price ? <Spinner /> : <></>}
-              type={Number(token1Amount) > +formatEther(balances[1].raw) ? "error" : "default"}
+              type={isAmount1Invalid() ? "error" : "default"}
             />
-            {Number(token1Amount) > +formatEther(balances[1].raw) && (
+            {isAmount1Invalid() && (
               <small className="mt-1 text-red-500">Insufficient balance</small>
             )}
 
@@ -448,22 +539,51 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 </Button>
               )}
               {isToken0Approved && isToken1Approved && (
-                <Button
-                  scale={1.25}
-                  className="!mt-2"
-                  loading={isAddingLiquidity || isSimulatingAddLiquidity}
-                  disabled={!addLiquidity}
-                  onClick={() => addLiquidity?.()}
-                >
-                  Deposit Now
-                </Button>
+                <>
+                  {isPreferNative && (
+                    <Button
+                      name="addLiquidityETH"
+                      scale={1.25}
+                      className="!mt-2"
+                      loading={isAddingLiquidityETH || isSimulatingAddLiquidityETH}
+                      disabled={!addLiquidityETH}
+                      onClick={() => addLiquidityETH?.()}
+                    >
+                      Deposit Now
+                    </Button>
+                  )}
+                  {!isPreferNative && (
+                    <Button
+                      name="addLiquidity"
+                      scale={1.25}
+                      className="!mt-2"
+                      loading={isAddingLiquidity || isSimulatingAddLiquidity}
+                      disabled={!addLiquidity}
+                      onClick={() => addLiquidity?.()}
+                    >
+                      Deposit Now
+                    </Button>
+                  )}
+                </>
               )}
             </div>
           </div>
         </div>
-        <div className="hidden w-full mt-4 col-span-5">
-          <div className="flex flex-col space-y-2 p-7 border border-neutral-200/50 dark:border-neutral-800 rounded-lg "></div>
-        </div>
+        {/*  NOTE: FOR DEBUGGING ONLY */}
+        {/* <div className="w-full mt-4 col-span-5"> */}
+        {/*   <pre> */}
+        {/*     {JSON.stringify({ */}
+        {/*       isPreferNative: isPreferNative, */}
+        {/*       slippage: SLIPPAGE + "%", */}
+        {/*       isToken0WEOS: token0.address === NATIVE_TOKEN_ADDRESS, */}
+        {/*       isToken1WEOS: token1.address === NATIVE_TOKEN_ADDRESS, */}
+        {/*       token0Amount: token0Amount, */}
+        {/*       token1Amount: token1Amount, */}
+        {/*       token0Min: formatEther(token0Min), */}
+        {/*       token1Min: formatEther(token1Min), */}
+        {/*     }, null, 4)} */}
+        {/*   </pre> */}
+        {/* </div> */}
       </div>
     </div>
   );
