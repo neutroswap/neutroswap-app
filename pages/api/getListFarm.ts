@@ -31,6 +31,8 @@ interface Farm {
   lpToken: string,
   token0: string,
   token1: string,
+  token0Logo: string,
+  token1Logo: string
   reward: string,
   details: FarmDetails | null
 }
@@ -45,7 +47,7 @@ interface FarmDetails {
 export async function getAllFarms(): Promise<Farm[] | null> {
   const { data, error } = await supabaseClient
     .from('farms')
-    .select('*,liquidity_tokens(address, token0(address,symbol), token1(address,symbol)),rewards:tokens(address)')
+    .select('*,liquidity_tokens(address, token0(address,symbol,logo), token1(address,symbol,logo)),rewards:tokens(address)')
 
   if (error) {
     console.log(error)
@@ -59,6 +61,8 @@ export async function getAllFarms(): Promise<Farm[] | null> {
         lpToken: data[i].liquidity_tokens.address,
         token0: data[i].liquidity_tokens.token0.address,
         token1: data[i].liquidity_tokens.token1.address,
+        token0Logo: data[i].liquidity_tokens.token0.logo,
+        token1Logo: data[i].liquidity_tokens.token1.logo,
         reward: data[i].rewards.address,
         details: null
       }
