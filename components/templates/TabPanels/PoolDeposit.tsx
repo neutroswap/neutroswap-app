@@ -24,6 +24,7 @@ import dayjs from "dayjs";
 import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { tokens } from "@/shared/statics/tokenList";
+import { isFinite } from "lodash";
 
 type PoolDepositPanelProps = {
   balances: Currency[],
@@ -51,6 +52,12 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
+
+
+  const parseBigNumber = (value?: string): BigNumber => {
+    const parsedValue = (!!value && !!Number(value)) ? value : "0"
+    return parseEther(parsedValue);
+  }
 
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.5; // in percent
@@ -142,8 +149,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       args: [
         token0.address,
         token1.address,
-        Boolean(Number(token0Amount)) ? parseEther(token0Amount!) : parseEther("0"),
-        Boolean(Number(token1Amount)) ? parseEther(token1Amount!) : parseEther("0"),
+        parseBigNumber(token0Amount),
+        parseBigNumber(token1Amount),
         token0Min,
         token1Min,
         address!,
@@ -169,8 +176,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     usePrepareContractWrite({
       enabled: Boolean(
         (token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS) && // do not enable if none of the addr is WEOS
-        Boolean(Number(token0Amount)) &&
-        Boolean(Number(token1Amount)) &&
+        // Boolean(Number(token0Amount)) &&
+        // Boolean(Number(token1Amount)) &&
         isPreferNative
       ),
       address: ROUTER_CONTRACT,
@@ -178,16 +185,14 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       functionName: "addLiquidityETH",
       args: [
         token0.symbol === "WEOS" ? token1.address : token0.address, // token (address)
-        token0.symbol === "WEOS" ? parseEther(token1Amount ?? "0") : parseEther(token0Amount ?? "0"), // amountTokenDesired
+        token0.symbol === "WEOS" ? parseBigNumber(token1Amount) : parseBigNumber(token0Amount), // amountTokenDesired
         token0.symbol === "WEOS" ? token1Min : token0Min, // amountTokenMin
         token0.symbol === "WEOS" ? token0Min : token1Min, // amountETHMin
         address!, // to
         BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
       ],
       overrides: {
-        value: token0.symbol === "WEOS"
-          ? parseEther(Boolean(Number(token0Amount)) ? token0Amount! : "0")
-          : parseEther(Boolean(Number(token1Amount)) ? token1Amount! : "0"),
+        value: token0.symbol === "WEOS" ? parseBigNumber(token0Amount) : parseBigNumber(token1Amount),
       },
       onError(error) {
         console.log('Error', error)
