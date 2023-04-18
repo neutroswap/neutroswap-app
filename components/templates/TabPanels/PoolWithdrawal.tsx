@@ -19,6 +19,10 @@ type PoolWithdrawalPanelProps = {
   balances: Currency[],
   token0: Token,
   token1: Token,
+  totalLPSupply: BigNumber,
+  userLPBalance: Currency,
+  poolBalances: Currency[],
+  refetchAllBalance: (options?: any) => Promise<any>;
 }
 
 // TODO: move slippage to state or store
@@ -26,7 +30,7 @@ const SLIPPAGE = 50;
 const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 
 const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
-  const { token0, token1 } = props;
+  const { token0, token1, totalLPSupply, userLPBalance, poolBalances, refetchAllBalance } = props;
 
   const router = useRouter();
   const { address } = useAccount();
@@ -38,74 +42,6 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
   const [token1Amount, setToken1Amount] = useState<string>();
   const [percentage, setPercentage] = useState(33);
   const [amount, setAmount] = useState<BigNumber>(BigNumber.from(0));
-  const [totalLPSupply, setTotalLPSupply] = useState<BigNumber>(BigNumber.from(0));
-  const [userLPBalance, setUserLPBalance] = useState<Currency>({
-    decimal: 18,
-    raw: BigNumber.from(0),
-    formatted: "0.00"
-  })
-  const [poolBalances, setPoolBalances] = useState<Currency[]>([
-    {
-      decimal: 18,
-      raw: BigNumber.from(0),
-      formatted: "0.00"
-    },
-    {
-      decimal: 18,
-      raw: BigNumber.from(0),
-      formatted: "0.00"
-    }
-  ])
-
-  const { refetch: refetchAllBalance } = useContractReads({
-    enabled: Boolean(address && router.query.id),
-    contracts: [
-      {
-        address: router.query.id as `0x${string}`,
-        abi: NEUTRO_POOL_ABI,
-        functionName: 'balanceOf',
-        args: [address!],
-      },
-      {
-        address: router.query.id as `0x${string}`,
-        abi: NEUTRO_POOL_ABI,
-        functionName: 'totalSupply',
-      },
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: 'balanceOf',
-        args: [router.query.id as `0x${string}`]
-      },
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: 'balanceOf',
-        args: [router.query.id as `0x${string}`]
-      },
-    ],
-    onSuccess: (value) => {
-      console.log('fetching balance');
-      setUserLPBalance({
-        decimal: 18,
-        raw: value[0],
-        formatted: Number(formatEther(value[0])).toFixed(2)
-      })
-      setTotalLPSupply(value[1])
-      setPoolBalances([
-        {
-          decimal: 18,
-          raw: value[2],
-          formatted: Number(formatEther(value[2])).toFixed(2)
-        },
-        {
-          decimal: 18,
-          raw: value[3],
-          formatted: Number(formatEther(value[3])).toFixed(2)
-        }
-      ])
-    }
-  })
 
   const { refetch: refetchAllowance } = useContractRead({
     enabled: Boolean(address && router.query.id),

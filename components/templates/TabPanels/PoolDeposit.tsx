@@ -26,15 +26,16 @@ import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { tokens } from "@/shared/statics/tokenList";
 
 type PoolDepositPanelProps = {
-  balances: Currency[];
-  token0: Token;
-  token1: Token;
-  priceRatio: [number, number]
+  balances: Currency[],
+  token0: Token,
+  token1: Token,
+  priceRatio: [number, number],
+  refetchAllBalance: (options?: any) => Promise<any>;
 };
 
 const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
-  const { balances, token0, token1, priceRatio } = props;
+  const { balances, token0, token1, priceRatio, refetchAllBalance } = props;
 
   const signer = useSigner();
   const { address } = useAccount();
@@ -154,8 +155,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { isLoading: isAddingLiquidity, write: addLiquidity } =
     useContractWrite({
       ...addLiquidityConfig,
-      onSuccess(result) {
-        result.wait().then(() => refetchAllowance())
+      onSuccess: async (tx) => {
+        await tx.wait()
+        await refetchAllBalance();
       }
     });
 
@@ -188,11 +190,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { isLoading: isAddingLiquidityETH, write: addLiquidityETH } =
     useContractWrite({
       ...addLiquidityETHConfig,
-      onMutate(result) {
-        console.log('VALUE:', result.request?.value)
-      },
-      onSuccess(result) {
-        result.wait().then(() => refetchAllowance())
+      onSuccess: async (tx) => {
+        await tx.wait()
+        await refetchAllBalance();
       }
     });
 
