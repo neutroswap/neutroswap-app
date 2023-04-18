@@ -1,27 +1,15 @@
-import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
+import { ERC20_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import {
-  FACTORY_CONTRACT,
-  MULTICALL_CONTRACT,
   ROUTER_CONTRACT,
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, getAddress, parseEther, parseUnits } from "ethers/lib/utils.js";
-import { useRouter } from "next/router";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
-import {
-  TradeDirection,
-  UniswapPair,
-  UniswapPairFactory,
-  UniswapPairSettings,
-  UniswapVersion,
-} from "simple-uniswap-sdk";
-import { CloneUniswapContractDetailsV2 } from "simple-uniswap-sdk/dist/esm/factories/pair/models/clone-uniswap-contract-details";
+import { formatEther, getAddress, parseEther } from "ethers/lib/utils.js";
+import { ChangeEvent, useState } from "react";
 import {
   useAccount,
   useBalance,
   useContract,
-  useContractRead,
   useContractReads,
   useContractWrite,
   usePrepareContractWrite,
@@ -48,7 +36,6 @@ const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { balances, token0, token1, priceRatio } = props;
 
-  const router = useRouter();
   const signer = useSigner();
   const { address } = useAccount();
 
@@ -63,8 +50,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
-  const [uniswapPairFactory, setUniswapPairFactory] =
-    useState<UniswapPairFactory>();
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.5; // in percent
 
@@ -140,36 +125,28 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       },
     });
 
-  const addLiquidityArgs: any = useMemo(
-    () => [
-      token0.address,
-      token1.address,
-      !!token0Amount && parseEther(token0Amount),
-      !!token1Amount && parseEther(token1Amount),
-      // !!token0Min && token0Min[1],
-      token0Min,
-      token1Min,
-      address!,
-      BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
-    ],
-    [
-      token0,
-      token1,
-      token0Amount,
-      token1Amount,
-      token0Min,
-      token1Min,
-      address,
-    ]
-  );
-
   const { config: addLiquidityConfig, isFetching: isSimulatingAddLiquidity } =
     usePrepareContractWrite({
-      enabled: Boolean(!token0Min.isZero() || !token0Min.isZero()),
+      enabled: Boolean(
+        !isPreferNative &&
+        !token0Min.isZero() &&
+        !token1Min.isZero() &&
+        token0Amount &&
+        token1Amount
+      ),
       address: ROUTER_CONTRACT,
       abi: NEUTRO_ROUTER_ABI,
       functionName: "addLiquidity",
-      args: addLiquidityArgs,
+      args: [
+        token0.address,
+        token1.address,
+        parseEther(token0Amount ?? "0"),
+        parseEther(token1Amount ?? "0"),
+        token0Min,
+        token1Min,
+        address!,
+        BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
+      ],
       onError(error) {
         console.log('Error', error)
       },
@@ -219,66 +196,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       }
     });
 
-  let cloneUniswapContractDetailsV2: CloneUniswapContractDetailsV2 = useMemo(
-    () => ({
-      routerAddress: ROUTER_CONTRACT,
-      routerAbi: NEUTRO_ROUTER_ABI as any,
-      factoryAddress: FACTORY_CONTRACT,
-      pairAddress: router.query.id as `0x${string}`,
-    }),
-    [router.query.id]
-  );
-
-  let customNetworkData = useMemo(
-    () => ({
-      nameNetwork: "EOS EVM Testnet",
-      multicallContractAddress: MULTICALL_CONTRACT,
-      nativeCurrency: {
-        name: "EOS",
-        symbol: "EOS",
-      },
-      nativeWrappedTokenInfo: {
-        chainId: 15557,
-        contractAddress: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
-        decimals: 18,
-        symbol: "WEOS",
-        name: "Wrapped EOS",
-      },
-    }),
-    []
-  );
-
-  let customPairSettings = useMemo(
-    () =>
-      new UniswapPairSettings({
-        slippage: SLIPPAGE / 100,
-        deadlineMinutes: 15,
-        disableMultihops: true,
-        cloneUniswapContractDetails: {
-          v2Override: cloneUniswapContractDetailsV2,
-        },
-        uniswapVersions: [UniswapVersion.v2],
-        customNetwork: customNetworkData,
-      }),
-    [cloneUniswapContractDetailsV2, customNetworkData]
-  );
-
-  useEffect(() => {
-    if (!address) return;
-    (async () => {
-      const uniswapPair = new UniswapPair({
-        fromTokenContractAddress: token0.address,
-        toTokenContractAddress: token1.address,
-        ethereumAddress: address as string,
-        chainId: 15557,
-        providerUrl: "https://api-testnet2.trust.one/",
-        settings: customPairSettings,
-      });
-      const pairFactory = await uniswapPair.createFactory();
-      setUniswapPairFactory(pairFactory);
-    })();
-  }, [token0, token1, address, customPairSettings]);
-
   const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
@@ -288,7 +205,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
   const debouncedToken0 = debounce(async (nextValue) => {
     if (!Number(nextValue)) return setToken1Amount("");
-    if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
 
     setIsFetchingToken1Price(true);
     try {
@@ -328,7 +244,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
   const debouncedToken1 = debounce(async (nextValue) => {
     if (!Number(nextValue)) return setToken0Amount("");
-    if (!uniswapPairFactory) return new Error("No Uniswap Pair Factory");
 
     setIsFetchingToken0Price(true);
     try {
@@ -570,20 +485,22 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
           </div>
         </div>
         {/*  NOTE: FOR DEBUGGING ONLY */}
-        {/* <div className="w-full mt-4 col-span-5"> */}
-        {/*   <pre> */}
-        {/*     {JSON.stringify({ */}
-        {/*       isPreferNative: isPreferNative, */}
-        {/*       slippage: SLIPPAGE + "%", */}
-        {/*       isToken0WEOS: token0.address === NATIVE_TOKEN_ADDRESS, */}
-        {/*       isToken1WEOS: token1.address === NATIVE_TOKEN_ADDRESS, */}
-        {/*       token0Amount: token0Amount, */}
-        {/*       token1Amount: token1Amount, */}
-        {/*       token0Min: formatEther(token0Min), */}
-        {/*       token1Min: formatEther(token1Min), */}
-        {/*     }, null, 4)} */}
-        {/*   </pre> */}
-        {/* </div> */}
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="w-full mt-4 col-span-5">
+            <pre>
+              {JSON.stringify({
+                isPreferNative: isPreferNative,
+                slippage: SLIPPAGE + "%",
+                isToken0WEOS: token0.address === NATIVE_TOKEN_ADDRESS,
+                isToken1WEOS: token1.address === NATIVE_TOKEN_ADDRESS,
+                token0Amount: token0Amount,
+                token1Amount: token1Amount,
+                token0Min: formatEther(token0Min),
+                token1Min: formatEther(token1Min),
+              }, null, 4)}
+            </pre>
+          </div>
+        )}
       </div>
     </div>
   );
