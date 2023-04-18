@@ -44,7 +44,7 @@ export default function Farm() {
   const [farms, setFarms] = useState<any>([]);
   const [userFarms, setUserFarms] = useState<any>([]);
   const [combinedData, setCombinedData] = useState<FarmResponse[]>([]);
-  const [pid, setPid] = useState<number>(0);
+  const [tvl, setTvl] = useState<string>("");
 
   useEffect(() => {
     async function loadListFarm() {
@@ -55,6 +55,7 @@ export default function Farm() {
         },
       });
       const fetched = await response.json();
+      const tvl = fetched.data.tvl;
       const data = fetched.data.farms.map((details: any) => ({
         name: details.name,
         totalLiq: details.details.totalLiquidity,
@@ -66,6 +67,7 @@ export default function Farm() {
         lpToken: details.lpToken,
       }));
       setFarms(data);
+      setTvl(tvl);
     }
     loadListFarm();
   }, []);
@@ -162,7 +164,7 @@ export default function Farm() {
       <div className="flex justify-between items-center min-w-[80%] mt-5 mb-10">
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
           <div className="mb-2 text-lg font-medium">Total Value Locked</div>
-          <div className="text-center text-amber-600">$100,000,000</div>
+          <div className="text-center text-amber-600">${tvl}</div>
         </div>
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
           <div className="mb-2 text-lg font-medium">Your Staked Assets</div>
