@@ -27,7 +27,6 @@ export default function PoolDetails() {
   };
 
   const [priceRatio, setPriceRatio] = useState<[number, number]>([0, 0]);
-  const [reserves, setReserves] = useState<[BigNumber, BigNumber]>([BigNumber.from(0), BigNumber.from(0)]);
   const [token0, setToken0] = useState<Token>();
   const [token1, setToken1] = useState<Token>();
   const [balances, setBalances] = useState<Currency[]>([
@@ -42,6 +41,24 @@ export default function PoolDetails() {
       formatted: "0.00",
     },
   ]);
+  const [totalLPSupply, setTotalLPSupply] = useState<BigNumber>(BigNumber.from(0));
+  const [userLPBalance, setUserLPBalance] = useState<Currency>({
+    decimal: 18,
+    raw: BigNumber.from(0),
+    formatted: "0.00"
+  })
+  const [poolBalances, setPoolBalances] = useState<Currency[]>([
+    {
+      decimal: 18,
+      raw: BigNumber.from(0),
+      formatted: "0.00"
+    },
+    {
+      decimal: 18,
+      raw: BigNumber.from(0),
+      formatted: "0.00"
+    }
+  ])
 
   const { data: pairs } = useContractReads({
     contracts: [
@@ -59,11 +76,10 @@ export default function PoolDetails() {
         +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
         +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
       ])
-      setReserves([response._reserve0, response._reserve1]);
     }
   });
 
-  useContractReads({
+  const { refetch: refetchUserBalances } = useContractReads({
     enabled: Boolean(pairs && address),
     contracts: [
       {
@@ -116,6 +132,55 @@ export default function PoolDetails() {
       });
     },
   });
+
+  const { refetch: refetchAllBalance } = useContractReads({
+    enabled: Boolean(address && router.query.id && token0 && token1),
+    contracts: [
+      {
+        address: router.query.id as `0x${string}`,
+        abi: NEUTRO_POOL_ABI,
+        functionName: 'balanceOf',
+        args: [address!],
+      },
+      {
+        address: router.query.id as `0x${string}`,
+        abi: NEUTRO_POOL_ABI,
+        functionName: 'totalSupply',
+      },
+      {
+        address: token0?.address,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [router.query.id as `0x${string}`]
+      },
+      {
+        address: token1?.address,
+        abi: ERC20_ABI,
+        functionName: 'balanceOf',
+        args: [router.query.id as `0x${string}`]
+      },
+    ],
+    onSuccess: (value) => {
+      setUserLPBalance({
+        decimal: 18,
+        raw: value[0],
+        formatted: Number(formatEther(value[0])).toFixed(2)
+      })
+      setTotalLPSupply(value[1])
+      setPoolBalances([
+        {
+          decimal: 18,
+          raw: value[2],
+          formatted: Number(formatEther(value[2])).toFixed(2)
+        },
+        {
+          decimal: 18,
+          raw: value[3],
+          formatted: Number(formatEther(value[3])).toFixed(2)
+        }
+      ])
+    }
+  })
 
   return (
     <div className="flex py-4 sm:py-10">
@@ -177,6 +242,9 @@ export default function PoolDetails() {
                   token0={token0}
                   token1={token1}
                   priceRatio={priceRatio}
+                  totalLPSupply={totalLPSupply}
+                  userLPBalance={userLPBalance}
+                  poolBalances={poolBalances}
                 />
               )}
             </Tab.Panel>
@@ -187,6 +255,8 @@ export default function PoolDetails() {
                   token0={token0}
                   token1={token1}
                   priceRatio={priceRatio}
+                  refetchAllBalance={refetchAllBalance}
+                  refetchUserBalances={refetchUserBalances}
                 />
               )}
             </Tab.Panel>
@@ -196,6 +266,11 @@ export default function PoolDetails() {
                   balances={balances}
                   token0={token0}
                   token1={token1}
+                  totalLPSupply={totalLPSupply}
+                  userLPBalance={userLPBalance}
+                  poolBalances={poolBalances}
+                  refetchAllBalance={refetchAllBalance}
+                  refetchUserBalances={refetchUserBalances}
                 />
               )}
             </Tab.Panel>
