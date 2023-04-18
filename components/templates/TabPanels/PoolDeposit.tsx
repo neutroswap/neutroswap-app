@@ -31,11 +31,12 @@ type PoolDepositPanelProps = {
   token1: Token,
   priceRatio: [number, number],
   refetchAllBalance: (options?: any) => Promise<any>;
+  refetchUserBalances: (options?: any) => Promise<any>;
 };
 
 const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
-  const { balances, token0, token1, priceRatio, refetchAllBalance } = props;
+  const { balances, token0, token1, priceRatio, refetchAllBalance, refetchUserBalances } = props;
 
   const signer = useSigner();
   const { address } = useAccount();
@@ -54,7 +55,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.5; // in percent
 
-  const { data: balance } = useBalance({
+  const { data: balance, refetch: refetchBalanceETH } = useBalance({
     enabled: Boolean(address),
     address
   })
@@ -132,8 +133,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
         !isPreferNative &&
         !token0Min.isZero() &&
         !token1Min.isZero() &&
-        token0Amount &&
-        token1Amount
+        Boolean(Number(token0Amount)) &&
+        Boolean(Number(token1Amount))
       ),
       address: ROUTER_CONTRACT,
       abi: NEUTRO_ROUTER_ABI,
@@ -141,8 +142,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       args: [
         token0.address,
         token1.address,
-        parseEther(token0Amount ?? "0"),
-        parseEther(token1Amount ?? "0"),
+        Boolean(Number(token0Amount)) ? parseEther(token0Amount!) : parseEther("0"),
+        Boolean(Number(token1Amount)) ? parseEther(token1Amount!) : parseEther("0"),
         token0Min,
         token1Min,
         address!,
@@ -158,6 +159,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       onSuccess: async (tx) => {
         await tx.wait()
         await refetchAllBalance();
+        await refetchUserBalances();
+        setToken0Amount("")
+        setToken1Amount("")
       }
     });
 
@@ -165,8 +169,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     usePrepareContractWrite({
       enabled: Boolean(
         (token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS) && // do not enable if none of the addr is WEOS
-        !!token0Amount &&
-        !!token1Amount &&
+        Boolean(Number(token0Amount)) &&
+        Boolean(Number(token1Amount)) &&
         isPreferNative
       ),
       address: ROUTER_CONTRACT,
@@ -181,7 +185,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
         BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
       ],
       overrides: {
-        value: token0.symbol === "WEOS" ? parseEther(token0Amount ?? "0") : parseEther(token1Amount ?? "0"),
+        value: token0.symbol === "WEOS"
+          ? parseEther(Boolean(Number(token0Amount)) ? token0Amount! : "0")
+          : parseEther(Boolean(Number(token1Amount)) ? token1Amount! : "0"),
       },
       onError(error) {
         console.log('Error', error)
@@ -193,6 +199,10 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       onSuccess: async (tx) => {
         await tx.wait()
         await refetchAllBalance();
+        await refetchUserBalances();
+        await refetchBalanceETH();
+        setToken0Amount("")
+        setToken1Amount("")
       }
     });
 

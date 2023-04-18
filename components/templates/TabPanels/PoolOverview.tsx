@@ -1,22 +1,30 @@
 import { Button, useTheme } from "@geist-ui/core";
 import { ScaleIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useState } from "react";
 
 import NoContentDark from "@/public/states/empty/dark.svg"
 import NoContentLight from "@/public/states/empty/light.svg"
 import { Token } from "@/shared/types/tokens.types";
 import { classNames } from "@/shared/helpers/classNamer";
+import { BigNumber } from "ethers";
+import { Currency } from "@/shared/types/currency.types";
+import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
+import { getAddress } from "ethers/lib/utils.js";
+import { tokens } from "@/shared/statics/tokenList";
 
 type PoolOverviewPanelProps = {
-  token0: Token;
-  token1: Token;
-  priceRatio: [number, number]
+  token0: Token,
+  token1: Token,
+  priceRatio: [number, number],
+  totalLPSupply: BigNumber,
+  userLPBalance: Currency,
+  poolBalances: Currency[],
 };
 
+const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
-  const { priceRatio, token0, token1 } = props;
+  const { priceRatio, token0, token1, totalLPSupply, userLPBalance, poolBalances } = props;
 
   const router = useRouter();
   const theme = useTheme();
@@ -52,6 +60,48 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
             <span className="text-sm font-semibold">{priceRatio[0].toFixed(5)} {token0.symbol}</span>
           </>
         )}
+      </div>
+
+      <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg">
+        <div className="p-6 grid grid-cols-3">
+          <div>
+            <p className="m-0 text-neutral-500 text-sm">Assets in Pool</p>
+            <div className="space-y-3 mt-4">
+              <div className="flex space-x-4 items-center">
+                <div className="flex items-center px-2 py-1 bg-orange-300/20 rounded-lg">
+                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">50%</span>
+                </div>
+                <div className="flex space-x-2 items-center">
+                  <img
+                    alt={`${token0.symbol} Icon`}
+                    src={token0.logo}
+                    className="h-5 rounded-full"
+                    onError={(e) => {
+                      handleImageFallback(token0.symbol, e);
+                    }}
+                  />
+                  <p className="m-0 font-medium text-sm">{poolBalances[0].formatted} {token0.symbol}</p>
+                </div>
+              </div>
+              <div className="flex space-x-4 items-center">
+                <div className="flex items-center px-2 py-1 bg-orange-300/20 rounded-lg">
+                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">50%</span>
+                </div>
+                <div className="flex space-x-2 items-center">
+                  <img
+                    alt={`${token1.symbol} Icon`}
+                    src={token1.address === NATIVE_TOKEN_ADDRESS ? tokens[0].logo : token1.logo}
+                    className="h-5 rounded-full"
+                    onError={(e) => {
+                      handleImageFallback(token1.symbol, e);
+                    }}
+                  />
+                  <p className="m-0 font-medium text-sm">{poolBalances[1].formatted} {token1.symbol}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg">

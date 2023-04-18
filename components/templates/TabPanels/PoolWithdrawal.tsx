@@ -23,6 +23,7 @@ type PoolWithdrawalPanelProps = {
   userLPBalance: Currency,
   poolBalances: Currency[],
   refetchAllBalance: (options?: any) => Promise<any>;
+  refetchUserBalances: (options?: any) => Promise<any>;
 }
 
 // TODO: move slippage to state or store
@@ -30,7 +31,7 @@ const SLIPPAGE = 50;
 const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 
 const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
-  const { token0, token1, totalLPSupply, userLPBalance, poolBalances, refetchAllBalance } = props;
+  const { token0, token1, totalLPSupply, userLPBalance, poolBalances, refetchAllBalance, refetchUserBalances } = props;
 
   const router = useRouter();
   const { address } = useAccount();
@@ -94,6 +95,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     onSuccess: async (tx) => {
       await tx.wait()
       await refetchAllBalance();
+      await refetchUserBalances();
     }
   })
 
@@ -119,6 +121,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     onSuccess: async (tx) => {
       await tx.wait()
       await refetchAllBalance();
+      await refetchUserBalances();
     }
   })
 

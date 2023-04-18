@@ -79,7 +79,7 @@ export default function PoolDetails() {
     }
   });
 
-  useContractReads({
+  const { refetch: refetchUserBalances } = useContractReads({
     enabled: Boolean(pairs && address),
     contracts: [
       {
@@ -242,6 +242,9 @@ export default function PoolDetails() {
                   token0={token0}
                   token1={token1}
                   priceRatio={priceRatio}
+                  totalLPSupply={totalLPSupply}
+                  userLPBalance={userLPBalance}
+                  poolBalances={poolBalances}
                 />
               )}
             </Tab.Panel>
@@ -253,6 +256,7 @@ export default function PoolDetails() {
                   token1={token1}
                   priceRatio={priceRatio}
                   refetchAllBalance={refetchAllBalance}
+                  refetchUserBalances={refetchUserBalances}
                 />
               )}
             </Tab.Panel>
@@ -266,6 +270,7 @@ export default function PoolDetails() {
                   userLPBalance={userLPBalance}
                   poolBalances={poolBalances}
                   refetchAllBalance={refetchAllBalance}
+                  refetchUserBalances={refetchUserBalances}
                 />
               )}
             </Tab.Panel>
