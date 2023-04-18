@@ -120,6 +120,6 @@
 //   res.status(200).json();
 // }
 
-export default async function handler(){
+export default async function handler() {
 
 }
