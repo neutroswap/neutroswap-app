@@ -45,6 +45,7 @@ export default function Farm() {
   const [userFarms, setUserFarms] = useState<any>([]);
   const [combinedData, setCombinedData] = useState<FarmResponse[]>([]);
   const [tvl, setTvl] = useState<string>("");
+  const [totalStaked, setTotalStaked] = useState<string>("");
 
   useEffect(() => {
     async function loadListFarm() {
@@ -84,12 +85,14 @@ export default function Farm() {
         },
       });
       const fetched = await response.json();
+      const totalStaked = fetched.data.holdings;
       const data = fetched.data.farms.map((details: any) => ({
         name: details.name,
         staked: details.details.totalStaked,
         reward: details.details.pendingTokens,
       }));
       setUserFarms(data);
+      setTotalStaked(totalStaked);
       console.log("getUserFarm Data = ", data);
     }
     loadUserFarm();
@@ -168,7 +171,7 @@ export default function Farm() {
         </div>
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
           <div className="mb-2 text-lg font-medium">Your Staked Assets</div>
-          <div className="text-center text-amber-600">$100,000,000</div>
+          <div className="text-center text-amber-600">${totalStaked}</div>
         </div>
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
           <div className="mb-2 text-lg font-medium">Unclaimed Rewards</div>
