@@ -243,13 +243,13 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           <div
             className={classNames(
               "py-1 px-4 rounded-2xl rounded-b-none cursor-pointer transition-colors group",
-              "bg-neutral-50 dark:bg-neutral-900",
-              "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
+              "bg-neutral-100 dark:bg-neutral-900",
+              "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-600">
+                <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   1
                 </p>
                 <img
@@ -264,7 +264,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                   {selectedToken.symbol}
                 </span>
               </div>
-              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all text-black dark:text-white" />
             </div>
           </div>
         )}
@@ -278,13 +278,13 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           <div
             className={classNames(
               "py-1 px-4 rounded-2xl rounded-t-none cursor-pointer transition-colors group",
-              "bg-neutral-50 dark:bg-neutral-900",
-              "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
+              "bg-neutral-100 dark:bg-neutral-900",
+              "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-600">
+                <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   2
                 </p>
                 <img
@@ -299,7 +299,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                   {selectedToken.symbol}
                 </span>
               </div>
-              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all text-black dark:text-white" />
             </div>
           </div>
         )}
