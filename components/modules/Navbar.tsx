@@ -36,9 +36,9 @@ const Navbar: React.FC<Props> = () => {
             {/* <Tabs.Item label="Home" value="/" /> */}
             <Tabs.Item label="Swap" value="/swap" />
             <Tabs.Item label="Pool" value="/pool" />
-            <Tabs.Item label="Launchpad" value="/launchpad" />
             <Tabs.Item label="Farm" value="/farm" />
             <Tabs.Item label="Vault" value="/vault" />
+            <Tabs.Item label="Launchpad" value="/launchpad" />
             <Tabs.Item label="Analytics" value="/analytics" />
 
             {process.env.NODE_ENV !== "production" && (
