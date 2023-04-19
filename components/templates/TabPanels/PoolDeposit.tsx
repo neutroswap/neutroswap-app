@@ -5,7 +5,7 @@ import {
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
 import { formatEther, getAddress, parseEther } from "ethers/lib/utils.js";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import {
   useAccount,
   useBalance,
@@ -30,13 +30,24 @@ type PoolDepositPanelProps = {
   token0: Token,
   token1: Token,
   priceRatio: [number, number],
+  refetchReserves: (options?: any) => Promise<any>;
   refetchAllBalance: (options?: any) => Promise<any>;
   refetchUserBalances: (options?: any) => Promise<any>;
+  isNewPool: boolean;
 };
 
 const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
-  const { balances, token0, token1, priceRatio, refetchAllBalance, refetchUserBalances } = props;
+  const {
+    balances,
+    token0,
+    token1,
+    priceRatio,
+    refetchReserves,
+    refetchAllBalance,
+    refetchUserBalances,
+    isNewPool
+  } = props;
 
   const signer = useSigner();
   const { address } = useAccount();
@@ -46,11 +57,19 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [token0Min, setToken0Min] = useState(BigNumber.from(0));
   const [token1Min, setToken1Min] = useState(BigNumber.from(0));
 
-  const [isPreferNative, setIsPreferNative] = useState(true);
+  const [isPreferNative, setIsPreferNative] = useState(
+    token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS
+  );
   const [isToken0Approved, setIsToken0Approved] = useState(false);
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
+
+
+  const parseBigNumber = (value?: string): BigNumber => {
+    const parsedValue = (!!value && !!Number(value)) ? value : "0"
+    return parseEther(parsedValue);
+  }
 
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.5; // in percent
@@ -83,8 +102,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       },
     ],
     onSuccess(value) {
-      setIsToken0Approved(+formatEther(value[0]) > 0);
-      setIsToken1Approved(+formatEther(value[1]) > 0);
+      // console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
+      setIsToken0Approved(+formatEther(value[0]) > balances[0].decimal);
+      setIsToken1Approved(+formatEther(value[1]) > balances[1].decimal);
     },
   });
 
@@ -102,8 +122,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { isLoading: isApprovingToken0, write: approveToken0 } =
     useContractWrite({
       ...approveConfig0,
-      onSuccess(result) {
-        result.wait().then((receipt) => console.log(receipt));
+      onSuccess: async (result) => {
+        await result.wait()
+        await refetchAllowance()
       },
     });
 
@@ -122,8 +143,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     useContractWrite({
       ...approveConfig1,
       address: token1.address,
-      onSuccess(result) {
-        result.wait().then(() => refetchAllowance());
+      onSuccess: async (result) => {
+        await result.wait()
+        await refetchAllowance()
       },
     });
 
@@ -142,8 +164,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       args: [
         token0.address,
         token1.address,
-        Boolean(Number(token0Amount)) ? parseEther(token0Amount!) : parseEther("0"),
-        Boolean(Number(token1Amount)) ? parseEther(token1Amount!) : parseEther("0"),
+        parseBigNumber(token0Amount),
+        parseBigNumber(token1Amount),
         token0Min,
         token1Min,
         address!,
@@ -160,6 +182,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
         await tx.wait()
         await refetchAllBalance();
         await refetchUserBalances();
+        await refetchReserves();
         setToken0Amount("")
         setToken1Amount("")
       }
@@ -169,8 +192,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     usePrepareContractWrite({
       enabled: Boolean(
         (token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS) && // do not enable if none of the addr is WEOS
-        Boolean(Number(token0Amount)) &&
-        Boolean(Number(token1Amount)) &&
+        // Boolean(Number(token0Amount)) &&
+        // Boolean(Number(token1Amount)) &&
         isPreferNative
       ),
       address: ROUTER_CONTRACT,
@@ -178,16 +201,14 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       functionName: "addLiquidityETH",
       args: [
         token0.symbol === "WEOS" ? token1.address : token0.address, // token (address)
-        token0.symbol === "WEOS" ? parseEther(token1Amount ?? "0") : parseEther(token0Amount ?? "0"), // amountTokenDesired
+        token0.symbol === "WEOS" ? parseBigNumber(token1Amount) : parseBigNumber(token0Amount), // amountTokenDesired
         token0.symbol === "WEOS" ? token1Min : token0Min, // amountTokenMin
         token0.symbol === "WEOS" ? token0Min : token1Min, // amountETHMin
         address!, // to
         BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
       ],
       overrides: {
-        value: token0.symbol === "WEOS"
-          ? parseEther(Boolean(Number(token0Amount)) ? token0Amount! : "0")
-          : parseEther(Boolean(Number(token1Amount)) ? token1Amount! : "0"),
+        value: token0.symbol === "WEOS" ? parseBigNumber(token0Amount) : parseBigNumber(token1Amount),
       },
       onError(error) {
         console.log('Error', error)
@@ -201,6 +222,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
         await refetchAllBalance();
         await refetchUserBalances();
         await refetchBalanceETH();
+        await refetchReserves();
         setToken0Amount("")
         setToken1Amount("")
       }
@@ -210,7 +232,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken0Amount(value);
-    debouncedToken0(value);
+
+    if (isNewPool) return setToken0Min(parseEther(!!value ? value : "0"));
+    else debouncedToken0(value);
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
@@ -249,7 +273,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken1Amount(value);
-    debouncedToken1(value);
+
+    if (isNewPool) return setToken1Min(parseEther(!!value ? value : "0"));
+    else debouncedToken1(value);
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
@@ -311,6 +337,16 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     else value = balances[1].raw
     return Number(token1Amount) > +formatEther(value)
   }
+
+  const isToken0NeedApproval = useMemo(() => {
+    if (isPreferNative && (token0.address === NATIVE_TOKEN_ADDRESS)) return false;
+    return !isToken0Approved;
+  }, [token0.address, isToken0Approved, isPreferNative])
+
+  const isToken1NeedApproval = useMemo(() => {
+    if (isPreferNative && (token1.address === NATIVE_TOKEN_ADDRESS)) return false;
+    return !isToken1Approved;
+  }, [token1.address, isToken1Approved, isPreferNative])
 
   return (
     <div className="">
@@ -448,22 +484,22 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
             )}
 
             <div className="flex flex-col w-full mt-4">
-              {(!isToken0Approved || !isToken1Approved) && (
+              {(isToken0NeedApproval || isToken1NeedApproval) && (
                 <Button
                   scale={1.25}
                   className="!mt-2"
                   loading={isApprovingToken0 || isApprovingToken1}
                   onClick={() => {
-                    if (!isToken0Approved) return approveToken0?.();
-                    if (!isToken1Approved) return approveToken1?.();
+                    if (isToken0NeedApproval) return approveToken0?.();
+                    if (isToken1NeedApproval) return approveToken1?.();
                   }}
                 >
-                  {!isToken0Approved
+                  {isToken0NeedApproval
                     ? `Approve ${token0.symbol}`
                     : !isToken1Approved && `Approve ${token1.symbol}`}
                 </Button>
               )}
-              {isToken0Approved && isToken1Approved && (
+              {!isToken0NeedApproval && !isToken1NeedApproval && (
                 <>
                   {isPreferNative && (
                     <Button

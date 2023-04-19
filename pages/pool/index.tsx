@@ -8,7 +8,7 @@ import {
   ChevronUpIcon,
   XCircleIcon,
 } from "@heroicons/react/20/solid";
-import { BigNumberish } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
@@ -19,7 +19,7 @@ import {
 } from "@/components/elements/Modal";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContract, useContractRead, useContractWrite, usePrepareContractWrite } from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
@@ -220,6 +220,26 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
     args: [token0.address, token1.address],
   });
 
+  const { config: createPairConfig } = usePrepareContractWrite({
+    address: FACTORY_CONTRACT,
+    abi: NEUTRO_FACTORY_ABI,
+    functionName: "createPair",
+    args: [token0.address, token1.address],
+  });
+  const { isLoading: isCreatingPair, write: createPair } =
+    useContractWrite({
+      ...createPairConfig,
+      address: token1.address,
+      onSuccess: async (result) => {
+        const tx = await result.wait();
+        const decodedResult = ethers.utils.defaultAbiCoder.decode(
+          ['address', 'uint256'],
+          tx.logs[0].data
+        )
+        router.push(`/pool/${decodedResult[0]}`);
+      },
+    });
+
   return (
     <div>
       <div className="flex items-center justify-between text-black dark:text-white mb-8">
@@ -336,6 +356,9 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
               "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
               "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
             )}
+            disabled={!createPair}
+            loading={isCreatingPair}
+            onClick={() => createPair?.()}
           >
             <PlusIcon className="w-4 h-4 mr-2" />
             <span>Start adding liquidity</span>

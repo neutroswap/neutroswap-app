@@ -20,7 +20,7 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
   return (
     <>
       <div
-        className="border-t-[0.5px] border-white/25 p-3 lg:px-0"
+        className="border-t-[0.5px] border-neutral-300 dark:border-white/[.15] p-3 lg:px-0"
         style={{
           borderColor: theme.palette.border,
         }}
