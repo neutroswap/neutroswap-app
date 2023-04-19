@@ -43,6 +43,7 @@ type FarmResponse = {
   totalLiqInUsd: string;
   totalStaked: string;
   tvl: string;
+  holdings: string;
 };
 
 export default function Farm() {
@@ -54,16 +55,11 @@ export default function Farm() {
   const [tvl, setTvl] = useState<string>("");
   const [totalStaked, setTotalStaked] = useState<string>("");
   const [pendingReward, setPendingReward] = useState<string>("");
-  const [allPid, setAllPid] = useState([]);
+  // const [allPid, setAllPid] = useState([]);
 
   useEffect(() => {
     async function loadListFarm() {
-      const response = await fetch("/api/getListFarm", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch("/api/getListFarm");
       const fetched = await response.json();
       const tvl = fetched.data.tvl as string;
       const data = fetched.data.farms.map((details: any) => ({
@@ -79,23 +75,17 @@ export default function Farm() {
       }));
       setFarms(data);
       setTvl(tvl);
-      setAllPid(data.pid);
-      console.log("All PID = ", data.pid);
+      // setAllPid(data.pid);
     }
     loadListFarm();
-  }, [allPid]);
+  }, []);
 
   useEffect(() => {
     async function loadUserFarm() {
-      const response = await fetch(`/api/getUserFarm?userAddress=${address}`, {
-        // const response = await fetch(
-        //   `/api/getUserFarm?userAddress=0x222Da5f13D800Ff94947C20e8714E103822Ff716`,
-        //   {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(`/api/getUserFarm?userAddress=${address}`);
+      // const response = await fetch(
+      //   `/api/getUserFarm?userAddress=0x222Da5f13D800Ff94947C20e8714E103822Ff716`,
+      //   {
       const fetched = await response.json();
       const totalStaked = fetched.data.holdings as string;
       const pendingReward = fetched.data.totalPendingTokenInUsd as string;
