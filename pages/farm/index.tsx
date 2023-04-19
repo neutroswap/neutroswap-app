@@ -131,7 +131,7 @@ export default function Farm() {
     abi: NEUTRO_FARM_ABI,
     chainId: 15557,
     functionName: "harvestMany",
-    args: [[BigNumber.from(0)]],
+    args: [[BigNumber.from(0), BigNumber.from(2)]],
   });
 
   const { write: harvestAll } = useContractWrite(harvestMany);
@@ -160,6 +160,7 @@ export default function Farm() {
           <div className="mb-2 text-lg font-medium">Unclaimed Rewards</div>
           <div className="text-center text-amber-600">${pendingReward}</div>
         </div>
+
         <Button
           onClick={() => harvestAll?.()}
           className={classNames(
