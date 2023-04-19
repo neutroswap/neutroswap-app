@@ -40,6 +40,8 @@ type FarmResponse = {
   reward: string;
   stakedInUsd: string;
   totalLiqInUsd: string;
+  totalStaked: string;
+  tvl: string;
 };
 
 export default function Farm() {
@@ -62,7 +64,7 @@ export default function Farm() {
         },
       });
       const fetched = await response.json();
-      const tvl = fetched.data.tvl;
+      const tvl = fetched.data.tvl as string;
       const data = fetched.data.farms.map((details: any) => ({
         name: details.name,
         totalLiq: details.details.totalLiquidity,
@@ -94,8 +96,8 @@ export default function Farm() {
         },
       });
       const fetched = await response.json();
-      const totalStaked = fetched.data.holdings;
-      const pendingReward = fetched.data.totalPendingTokenInUsd;
+      const totalStaked = fetched.data.holdings as string;
+      const pendingReward = fetched.data.totalPendingTokenInUsd as string;
       const data = fetched.data.farms.map((details: any) => ({
         name: details.name,
         staked: details.details.totalStaked,
@@ -207,12 +209,12 @@ export default function Farm() {
         </div>
       </div> */}
 
-      {/* <div className="flex min-w-[80%] justify-between">
-        <div>Farm</div>
+      <div className="flex mb-4 min-w-[80%] justify-between items-center px-2">
+        <div className="ml-4 mr-10">Farm</div>
         <div>TVL</div>
         <div>Rewards</div>
-        <div>APR</div>
-      </div> */}
+        <div className="mr-4">APR</div>
+      </div>
 
       {combinedData.map((data) => (
         <Comp key={data.pid} data={data} />
@@ -333,11 +335,11 @@ const Comp = ({ data }: { data: FarmResponse }) => {
         <div className="mb-4 min-w-[80%]">
           <Disclosure.Button
             className={classNames(
-              "flex justify-between items-center py-2 w-full bg-neutral-200 dark:bg-neutral-900 rounded-lg",
+              "flex items-center py-2 w-full bg-neutral-200 dark:bg-neutral-900 rounded-lg",
               open && "rounded-b-none"
             )}
           >
-            <div className="flex justify-between items-center w-full ml-4">
+            <div className="flex items-center w-full justify-between ml-4">
               <div className="flex space-x-1 items-center">
                 <img src={data.logo0} alt="logo0" className="h-7" />
                 <img src={data.logo1} alt="logo1" className="h-7" />
@@ -345,12 +347,12 @@ const Comp = ({ data }: { data: FarmResponse }) => {
               </div>
               <div>${data.totalLiqInUsd}</div>
               <div>{(Number(data.rps) * 86400).toFixed(2)} NEUTRO / day</div>
-              <div>{data.apr}%</div>
-              <ChevronUpIcon
+              <div className="mr-4">{data.apr}%</div>
+              {/* <ChevronUpIcon
                 className={`${
                   open ? "rotate-180 transform" : ""
                 } h-5 w-5 text-orange-400 mr-4`}
-              />
+              /> */}
             </div>
           </Disclosure.Button>
 
