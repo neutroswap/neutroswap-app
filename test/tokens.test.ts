@@ -8,4 +8,3 @@ describe('getLPTokens', () => {
     expect(Array.isArray(result)).toBe(true);
   });
 });
-
