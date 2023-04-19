@@ -109,8 +109,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { isLoading: isApprovingToken0, write: approveToken0 } =
     useContractWrite({
       ...approveConfig0,
-      onSuccess(result) {
-        result.wait().then((receipt) => console.log(receipt));
+      onSuccess: async (result) => {
+        await result.wait()
+        await refetchAllowance()
       },
     });
 
@@ -129,8 +130,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     useContractWrite({
       ...approveConfig1,
       address: token1.address,
-      onSuccess(result) {
-        result.wait().then(() => refetchAllowance());
+      onSuccess: async (result) => {
+        await result.wait()
+        await refetchAllowance()
       },
     });
 
