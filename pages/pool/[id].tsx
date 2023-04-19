@@ -26,6 +26,8 @@ export default function PoolDetails() {
     abi: NEUTRO_POOL_ABI,
   };
 
+  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [isNewPool, setIsNewPool] = useState<boolean>(false);
   const [priceRatio, setPriceRatio] = useState<[number, number]>([0, 0]);
   const [token0, setToken0] = useState<Token>();
   const [token1, setToken1] = useState<Token>();
@@ -72,6 +74,11 @@ export default function PoolDetails() {
     abi: NEUTRO_POOL_ABI,
     functionName: "getReserves",
     onSuccess(response) {
+      if (response._reserve0.isZero() && response._reserve1.isZero()) {
+        setIsNewPool(true);
+        setSelectedIndex(1);
+        return setPriceRatio([0, 0]);
+      };
       setPriceRatio([
         +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
         +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
@@ -184,7 +191,7 @@ export default function PoolDetails() {
 
   return (
     <div className="flex py-4 sm:py-10">
-      <Tab.Group>
+      <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
         <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-14">
           <Tab.List className="w-full md:col-span-2">
             <Link href="/pool" className="group text-black dark:text-white">
@@ -194,40 +201,34 @@ export default function PoolDetails() {
               </div>
             </Link>
             <div className="flex flex-row md:flex-col gap-y-2">
-              <Tab
-                className={({ selected }) =>
-                  classNames(
-                    selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                    selected && "!text-neutral-800 dark:!text-neutral-300",
-                    "flex w-full rounded-lg text-neutral-500"
-                  )
-                }
+              <Tab disabled={isNewPool} className={({ selected }) => classNames(
+                selected && "bg-neutral-200/50 dark:bg-neutral-900",
+                selected && "!text-neutral-800 dark:!text-neutral-300",
+                "flex w-full rounded-lg text-neutral-500",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
               >
                 <span className="text-sm w-full text-center md:text-left px-3 py-2">
                   Overview
                 </span>
               </Tab>
-              <Tab
-                className={({ selected }) =>
-                  classNames(
-                    selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                    selected && "!text-neutral-800 dark:!text-neutral-300",
-                    "flex w-full rounded-lg text-neutral-500"
-                  )
-                }
+              <Tab className={({ selected }) => classNames(
+                selected && "bg-neutral-200/50 dark:bg-neutral-900",
+                selected && "!text-neutral-800 dark:!text-neutral-300",
+                "flex w-full rounded-lg text-neutral-500",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
               >
                 <span className="text-sm w-full text-center md:text-left px-3 py-2">
                   Deposit
                 </span>
               </Tab>
-              <Tab
-                className={({ selected }) =>
-                  classNames(
-                    selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                    selected && "!text-neutral-800 dark:!text-neutral-300",
-                    "flex w-full rounded-lg text-neutral-500"
-                  )
-                }
+              <Tab disabled={isNewPool} className={({ selected }) => classNames(
+                selected && "bg-neutral-200/50 dark:bg-neutral-900",
+                selected && "!text-neutral-800 dark:!text-neutral-300",
+                "flex w-full rounded-lg text-neutral-500",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
               >
                 <span className="text-sm w-full text-center md:text-left px-3 py-2">
                   Withdraw
@@ -236,7 +237,7 @@ export default function PoolDetails() {
             </div>
           </Tab.List>
           <Tab.Panels className="w-full md:col-span-10">
-            <Tab.Panel unmount={true}>
+            <Tab.Panel>
               {token0 && token1 && (
                 <PoolOverviewPanel
                   token0={token0}
@@ -248,7 +249,7 @@ export default function PoolDetails() {
                 />
               )}
             </Tab.Panel>
-            <Tab.Panel unmount={true}>
+            <Tab.Panel>
               {token0 && token1 && (
                 <PoolDepositPanel
                   balances={balances}
