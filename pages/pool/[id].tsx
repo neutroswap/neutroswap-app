@@ -69,7 +69,7 @@ export default function PoolDetails() {
     ],
   });
 
-  useContractRead({
+  const { refetch: refetchReserves } = useContractRead({
     address: router.query.id as `0x${string}`,
     abi: NEUTRO_POOL_ABI,
     functionName: "getReserves",
@@ -79,6 +79,7 @@ export default function PoolDetails() {
         setSelectedIndex(1);
         return setPriceRatio([0, 0]);
       };
+      setIsNewPool(false);
       setPriceRatio([
         +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
         +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
@@ -256,6 +257,8 @@ export default function PoolDetails() {
                   token0={token0}
                   token1={token1}
                   priceRatio={priceRatio}
+                  isNewPool={isNewPool}
+                  refetchReserves={refetchReserves}
                   refetchAllBalance={refetchAllBalance}
                   refetchUserBalances={refetchUserBalances}
                 />

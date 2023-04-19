@@ -30,13 +30,24 @@ type PoolDepositPanelProps = {
   token0: Token,
   token1: Token,
   priceRatio: [number, number],
+  refetchReserves: (options?: any) => Promise<any>;
   refetchAllBalance: (options?: any) => Promise<any>;
   refetchUserBalances: (options?: any) => Promise<any>;
+  isNewPool: boolean;
 };
 
 const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
-  const { balances, token0, token1, priceRatio, refetchAllBalance, refetchUserBalances } = props;
+  const {
+    balances,
+    token0,
+    token1,
+    priceRatio,
+    refetchReserves,
+    refetchAllBalance,
+    refetchUserBalances,
+    isNewPool
+  } = props;
 
   const signer = useSigner();
   const { address } = useAccount();
@@ -46,7 +57,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [token0Min, setToken0Min] = useState(BigNumber.from(0));
   const [token1Min, setToken1Min] = useState(BigNumber.from(0));
 
-  const [isPreferNative, setIsPreferNative] = useState(true);
+  const [isPreferNative, setIsPreferNative] = useState(
+    token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS
+  );
   const [isToken0Approved, setIsToken0Approved] = useState(false);
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
@@ -89,7 +102,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       },
     ],
     onSuccess(value) {
-      console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
+      // console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
       setIsToken0Approved(+formatEther(value[0]) > balances[0].decimal);
       setIsToken1Approved(+formatEther(value[1]) > balances[1].decimal);
     },
@@ -169,6 +182,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
         await tx.wait()
         await refetchAllBalance();
         await refetchUserBalances();
+        await refetchReserves();
         setToken0Amount("")
         setToken1Amount("")
       }
@@ -208,6 +222,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
         await refetchAllBalance();
         await refetchUserBalances();
         await refetchBalanceETH();
+        await refetchReserves();
         setToken0Amount("")
         setToken1Amount("")
       }
@@ -217,7 +232,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken0Amount(value);
-    debouncedToken0(value);
+
+    if (isNewPool) return setToken0Min(parseEther(!!value ? value : "0"));
+    else debouncedToken0(value);
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
@@ -256,7 +273,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setToken1Amount(value);
-    debouncedToken1(value);
+
+    if (isNewPool) return setToken1Min(parseEther(!!value ? value : "0"));
+    else debouncedToken1(value);
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
