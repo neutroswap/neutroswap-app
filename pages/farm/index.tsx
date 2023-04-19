@@ -8,7 +8,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import { Fragment, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useState } from "react";
 import { BigNumber } from "ethers";
 import { classNames } from "@/shared/helpers/classNamer";
 import NumberInput from "@/components/elements/NumberInput";
@@ -20,7 +20,8 @@ import {
 } from "wagmi";
 import { NEXT_PUBLIC_FARM_CONTRACT } from "@/shared/helpers/constants";
 import { ERC20_ABI, NEUTRO_FARM_ABI } from "@/shared/abi";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
+import debounce from "lodash/debounce";
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -37,15 +38,20 @@ type FarmResponse = {
   lpToken: `0x${string}`;
   staked: string;
   reward: string;
+  stakedInUsd: string;
+  totalLiqInUsd: string;
 };
 
 export default function Farm() {
   const { address } = useAccount();
+
   const [farms, setFarms] = useState<any>([]);
   const [userFarms, setUserFarms] = useState<any>([]);
   const [combinedData, setCombinedData] = useState<FarmResponse[]>([]);
   const [tvl, setTvl] = useState<string>("");
   const [totalStaked, setTotalStaked] = useState<string>("");
+  const [pendingReward, setPendingReward] = useState<string>("");
+  const [allPid, setAllPid] = useState([]);
 
   useEffect(() => {
     async function loadListFarm() {
@@ -60,6 +66,7 @@ export default function Farm() {
       const data = fetched.data.farms.map((details: any) => ({
         name: details.name,
         totalLiq: details.details.totalLiquidity,
+        totalLiqInUsd: details.valueOfLiquidity,
         rps: details.details.rps,
         apr: details.details.apr,
         pid: details.pid,
@@ -69,9 +76,11 @@ export default function Farm() {
       }));
       setFarms(data);
       setTvl(tvl);
+      setAllPid(data.pid);
+      console.log("All PID = ", data.pid);
     }
     loadListFarm();
-  }, []);
+  }, [allPid]);
 
   useEffect(() => {
     async function loadUserFarm() {
@@ -86,13 +95,16 @@ export default function Farm() {
       });
       const fetched = await response.json();
       const totalStaked = fetched.data.holdings;
+      const pendingReward = fetched.data.totalPendingTokenInUsd;
       const data = fetched.data.farms.map((details: any) => ({
         name: details.name,
         staked: details.details.totalStaked,
         reward: details.details.pendingTokens,
+        stakedInUsd: details.details.totalStakedInUsd,
       }));
       setUserFarms(data);
       setTotalStaked(totalStaked);
+      setPendingReward(pendingReward);
       console.log("getUserFarm Data = ", data);
     }
     loadUserFarm();
@@ -124,35 +136,6 @@ export default function Farm() {
 
   const { write: harvestAll } = useContractWrite(harvestMany);
 
-  // Problem: Input amount & PID selection
-
-  // Problem: Input amount & PID selection
-  // const { config: withdraw } = usePrepareContractWrite({
-  //   address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
-  //   abi: NEUTRO_FARM_ABI,
-  //   functionName: "withdraw",
-  //   args: [pid, 0],
-  // });
-
-  // const { write: unstake } = useContractWrite(withdraw);
-
-  // Problem: PID selection
-  // const { config: rewards } = usePrepareContractWrite({
-  //   address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
-  //   abi: NEUTRO_FARM_ABI,
-  //   chainId: 15557,
-  //   functionName: "deposit",
-  //   args: [pid, null],
-  // });
-  // console.log(rewards);
-  // // const { write: claim } = useContractWrite(rewards);
-  // const { write: claim } = useContractWrite({
-  //   ...rewards,
-  //   onError(error) {
-  //     console.log("Error", error);
-  //   },
-  // });
-
   return (
     <div className="flex flex-col items-center justify-center min-h-[80%] py-10">
       <div>
@@ -175,7 +158,7 @@ export default function Farm() {
         </div>
         <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
           <div className="mb-2 text-lg font-medium">Unclaimed Rewards</div>
-          <div className="text-center text-amber-600">$100,000,000</div>
+          <div className="text-center text-amber-600">${pendingReward}</div>
         </div>
         <Button
           onClick={() => harvestAll?.()}
@@ -238,9 +221,42 @@ export default function Farm() {
 }
 
 const Comp = ({ data }: { data: FarmResponse }) => {
-  const { address } = useAccount();
+  const { address, isConnected } = useAccount();
 
   const [isLpTokenApproved, setIsLpTokenApproved] = useState(false);
+
+  const [stakeAmount, setStakeAmount] = useState<string>("0");
+  const [unstakeAmount, setUnstakeAmount] = useState<string>("0");
+
+  const { data: lpTokenBalance } = useContractRead({
+    address: data.lpToken,
+    abi: ERC20_ABI,
+    functionName: "balanceOf",
+    args: [address as `0x${string}`],
+  });
+
+  const handleStakeAmountChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (isNaN(+value)) return;
+    setStakeAmount(value);
+    // debouncedStakeAmount(value);
+  };
+
+  // const debouncedStakeAmount = debounce(async (nextValue) => {
+  // }, 500);
+
+  const handleUnstakeAmountChange = async (
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    const value = e.target.value;
+    if (isNaN(+value)) return;
+    setUnstakeAmount(value);
+    // debouncedUnstakeAmount(value);
+  };
+
+  // const debouncedUnstakeAmount = debounce(async (nextValue) => {
+  //   console.log("Called");
+  // }, 500);
 
   const { refetch: refetchAllowance } = useContractRead({
     address: data.lpToken,
@@ -276,12 +292,11 @@ const Comp = ({ data }: { data: FarmResponse }) => {
     abi: NEUTRO_FARM_ABI,
     chainId: 15557,
     functionName: "deposit",
-    args: [BigNumber.from(data.pid), BigNumber.from(1)],
+    args: [BigNumber.from(data.pid), BigNumber.from(parseEther(stakeAmount!))],
     onError(error) {
       console.log("Error", error);
     },
   });
-  console.log("StakeConfig =", stakeConfig);
 
   const { write: stake } = useContractWrite({
     ...stakeConfig,
@@ -289,6 +304,28 @@ const Comp = ({ data }: { data: FarmResponse }) => {
       console.log("Error", error);
     },
   });
+
+  const { config: withdraw } = usePrepareContractWrite({
+    address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
+    abi: NEUTRO_FARM_ABI,
+    functionName: "withdraw",
+    args: [
+      BigNumber.from(data.pid),
+      BigNumber.from(parseEther(unstakeAmount!)),
+    ],
+  });
+
+  const { write: unstake } = useContractWrite(withdraw);
+
+  const { config: harvestConfig } = usePrepareContractWrite({
+    address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
+    abi: NEUTRO_FARM_ABI,
+    chainId: 15557,
+    functionName: "deposit",
+    args: [BigNumber.from(data.pid), BigNumber.from(0)],
+  });
+  const { write: harvest } = useContractWrite(harvestConfig);
+
   return (
     <Disclosure key={data.name}>
       {({ open }) => (
@@ -305,8 +342,8 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                 <img src={data.logo1} alt="logo1" className="h-7" />
                 <div>{data.name}</div>
               </div>
-              <div>{data.totalLiq}</div>
-              <div>{(Number(data.rps) * 86400).toFixed(3)} NEUTRO / day</div>
+              <div>${data.totalLiqInUsd}</div>
+              <div>{(Number(data.rps) * 86400).toFixed(2)} NEUTRO / day</div>
               <div>{data.apr}%</div>
               <ChevronUpIcon
                 className={`${
@@ -321,14 +358,21 @@ const Comp = ({ data }: { data: FarmResponse }) => {
               <div className="flex flex-col justify-between w-full space-y-3">
                 <div className="flex justify-between">
                   <div>Available:</div>
-                  <div>0.0 LP ($0)</div>
+                  <div>
+                    {Number(formatEther(lpTokenBalance!)).toFixed(2)} LP
+                  </div>
                 </div>
                 <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
-                  <NumberInput
+                  <input
+                    value={stakeAmount}
+                    onChange={handleStakeAmountChange}
                     placeholder="0.0"
                     className="bg-transparent !px-3 !py-2 !rounded-lg"
-                  ></NumberInput>
-                  <div className="mr-3 text-sm text-amber-600 cursor-pointer">
+                  ></input>
+                  <div
+                    className="mr-3 text-sm text-amber-600 cursor-pointer"
+                    onClick={() => setStakeAmount(formatEther(lpTokenBalance!))}
+                  >
                     MAX
                   </div>
                 </div>
@@ -367,23 +411,30 @@ const Comp = ({ data }: { data: FarmResponse }) => {
               <div className="flex flex-col justify-between w-full ">
                 <div className="flex justify-between">
                   <div>Deposited:</div>
-                  <div>{data.staked} LP ($0)</div>
+                  <div>
+                    {parseFloat(data.staked).toFixed(2)} LP (${data.stakedInUsd}
+                    )
+                  </div>
                 </div>
                 <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
-                  <NumberInput
+                  <input
+                    value={unstakeAmount}
+                    onChange={handleUnstakeAmountChange}
                     placeholder="0.0"
                     className="bg-transparent !px-3 !py-2 !rounded-lg"
-                  ></NumberInput>
-                  <div className="mr-3 text-sm text-amber-600 cursor-pointer">
+                  ></input>
+                  <div
+                    className="mr-3 text-sm text-amber-600 cursor-pointer"
+                    onClick={() => setUnstakeAmount(data.staked)}
+                  >
                     MAX
                   </div>
                 </div>
 
                 <Button
-                  // onClick={() => {
-                  //   setPid(data.pid);
-                  //   unstake?.();
-                  // }}
+                  onClick={() => {
+                    unstake?.();
+                  }}
                   className={classNames(
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
                     "text-white dark:text-amber-600",
@@ -401,10 +452,9 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                   {parseFloat(data.reward).toFixed(3)} $NEUTRO
                 </div>
                 <Button
-                  // onClick={() => {
-                  //   setPid(data.pid);
-                  //   claim?.();
-                  // }}
+                  onClick={() => {
+                    harvest?.();
+                  }}
                   className={classNames(
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
                     "text-white dark:text-amber-600",
