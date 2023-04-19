@@ -10,7 +10,7 @@ import { classNames } from "@/shared/helpers/classNamer";
 import { BigNumber } from "ethers";
 import { Currency } from "@/shared/types/currency.types";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
-import { getAddress } from "ethers/lib/utils.js";
+import { formatEther, getAddress } from "ethers/lib/utils.js";
 import { tokens } from "@/shared/statics/tokenList";
 
 type PoolOverviewPanelProps = {
@@ -62,6 +62,17 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
         )}
       </div>
 
+      <div className="grid grid-cols-2 gap-4">
+        <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg px-4 py-6 box-border">
+          <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">Owned LP</p>
+          <p className="m-0 text-2xl font-semibold">{(+formatEther(userLPBalance.raw)).toFixed(8)} NLP</p>
+        </div>
+        <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg px-4 py-6 box-border">
+          <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">Pool Shares</p>
+          <p className="m-0 text-2xl font-semibold">{(+formatEther(userLPBalance.raw) / +formatEther(totalLPSupply)).toFixed(6)}%</p>
+        </div>
+      </div>
+
       <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg">
         <div className="p-6 grid grid-cols-3">
           <div>
@@ -104,14 +115,14 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
         </div>
       </div>
 
-      <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg">
-        <div className="w-full flex flex-col items-center py-6">
-          {theme.type === "nlight" && <NoContentLight className="w-40 h-40" />}
-          {theme.type === "ndark" && <NoContentDark className="w-40 h-40" />}
-          <p className="text-neutral-500 text-center">You do not have any liquidity positions. Deposit some tokens to open a position.</p>
-          <Button className="!mt-2">Deposit now</Button>
-        </div>
-      </div>
+      {/* <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg"> */}
+      {/*   <div className="w-full flex flex-col items-center py-6"> */}
+      {/*     {theme.type === "nlight" && <NoContentLight className="w-40 h-40" />} */}
+      {/*     {theme.type === "ndark" && <NoContentDark className="w-40 h-40" />} */}
+      {/*     <p className="text-neutral-500 text-center">You do not have any liquidity positions. Deposit some tokens to open a position.</p> */}
+      {/*     <Button className="!mt-2">Deposit now</Button> */}
+      {/*   </div> */}
+      {/* </div> */}
     </div>
   )
 }
