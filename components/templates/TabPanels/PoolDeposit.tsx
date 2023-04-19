@@ -5,7 +5,7 @@ import {
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
 import { formatEther, getAddress, parseEther } from "ethers/lib/utils.js";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import {
   useAccount,
   useBalance,
@@ -24,7 +24,6 @@ import dayjs from "dayjs";
 import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { tokens } from "@/shared/statics/tokenList";
-import { isFinite } from "lodash";
 
 type PoolDepositPanelProps = {
   balances: Currency[],
@@ -90,8 +89,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       },
     ],
     onSuccess(value) {
-      setIsToken0Approved(+formatEther(value[0]) > 0);
-      setIsToken1Approved(+formatEther(value[1]) > 0);
+      console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
+      setIsToken0Approved(+formatEther(value[0]) > balances[0].decimal);
+      setIsToken1Approved(+formatEther(value[1]) > balances[1].decimal);
     },
   });
 
@@ -319,6 +319,16 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     return Number(token1Amount) > +formatEther(value)
   }
 
+  const isToken0NeedApproval = useMemo(() => {
+    if (isPreferNative && (token0.address === NATIVE_TOKEN_ADDRESS)) return false;
+    return !isToken0Approved;
+  }, [token0.address, isToken0Approved, isPreferNative])
+
+  const isToken1NeedApproval = useMemo(() => {
+    if (isPreferNative && (token1.address === NATIVE_TOKEN_ADDRESS)) return false;
+    return !isToken1Approved;
+  }, [token1.address, isToken1Approved, isPreferNative])
+
   return (
     <div className="">
       <div>
@@ -455,22 +465,22 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
             )}
 
             <div className="flex flex-col w-full mt-4">
-              {(!isToken0Approved || !isToken1Approved) && (
+              {(isToken0NeedApproval || isToken1NeedApproval) && (
                 <Button
                   scale={1.25}
                   className="!mt-2"
                   loading={isApprovingToken0 || isApprovingToken1}
                   onClick={() => {
-                    if (!isToken0Approved) return approveToken0?.();
-                    if (!isToken1Approved) return approveToken1?.();
+                    if (isToken0NeedApproval) return approveToken0?.();
+                    if (isToken1NeedApproval) return approveToken1?.();
                   }}
                 >
-                  {!isToken0Approved
+                  {isToken0NeedApproval
                     ? `Approve ${token0.symbol}`
                     : !isToken1Approved && `Approve ${token1.symbol}`}
                 </Button>
               )}
-              {isToken0Approved && isToken1Approved && (
+              {!isToken0NeedApproval && !isToken1NeedApproval && (
                 <>
                   {isPreferNative && (
                     <Button
