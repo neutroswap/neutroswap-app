@@ -174,7 +174,7 @@ export default function Farm() {
         </Button>
       </div>
 
-      <div className="flex min-w-[80%] justify-between mb-10">
+      {/* <div className="flex min-w-[80%] justify-between mb-10">
         <RadioGroup>
           <div className="flex w-full relative space-x-3">
             <>
@@ -205,7 +205,7 @@ export default function Farm() {
           />
           <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />
         </div>
-      </div>
+      </div> */}
 
       {/* <div className="flex min-w-[80%] justify-between">
         <div>Farm</div>
