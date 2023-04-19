@@ -412,8 +412,8 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                 <div className="flex justify-between">
                   <div>Deposited:</div>
                   <div>
-                    {parseFloat(data.staked).toFixed(2)} LP (${data.stakedInUsd}
-                    )
+                    {parseFloat(data.staked).toFixed(2)} LP ($
+                    {Number(data.stakedInUsd).toFixed(2)})
                   </div>
                 </div>
                 <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
