@@ -16,9 +16,19 @@ type Data = {
 }
 
 export async function getAllLPs() {
+  const { data: network, } = await supabaseClient
+    .from('networks')
+    .select('id,name')
+    .eq('name', process.env.NETWORK)
+
+  if (!network) { return }
+  console.log(network[0].id)
+
   const { data: liquidityTokens, error } = await supabaseClient
     .from('liquidity_tokens')
     .select('network_id,address,decimal,name,symbol,logo')
+    .eq('network_id', network[0].id)
+
   console.log("Error ", error);
   return liquidityTokens
 }
