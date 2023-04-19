@@ -164,7 +164,6 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
 
 // export async function calculateApr(yieldFarm: YieldFarm, rps: BigNumber, totalLiqiudity: BigNumber): Promise<{ apr: BigNumber[], updatedFarms: Farm[] }> {
 export async function addTokenPrice(yieldFarm: YieldFarm): Promise<YieldFarm> {
-  const ONE_YEAR = BigNumber.from(31536000);
   let promises = [];
 
   for (const farm of yieldFarm.farms) {
@@ -262,11 +261,6 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
   // console.log("call context", contractCallContext)
 
   const contractCalls: ContractCallResults = await multicall.call(contractCallContext);
-  // console.log(".", contractCalls.results.reserves);
-  // console.log("a", contractCalls.results.reserves.callsReturnContext);
-  // console.log("b", contractCalls.results.reserves.callsReturnContext[0]);
-  // console.log("c", contractCalls.results.reserves.callsReturnContext[0].returnValues[0]);
-  // console.log("d", contractCalls.results.reserves.callsReturnContext[0].returnValues[1]);
 
   let tvl = 0;
   for (const farm of yieldFarm.farms) {
@@ -283,7 +277,7 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
     const totalValueReserve0 = reserve0.mul(price0)
     const totalValueReserve1 = reserve1.mul(price1)
     const denominator = utils.parseUnits("1", 18);
-    farm.valueOfLiquidity = formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())
+    farm.valueOfLiquidity = Number(formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())).toFixed(2).toString()
     tvl += parseFloat(farm.valueOfLiquidity)
     // console.log(Number(formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())).toFixed(2))
   }
@@ -298,7 +292,7 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
 
 export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
   const SEC_IN_YEAR = parseFloat("31536000")
-  const neutroPrice = parseFloat("1")
+  const neutroPrice = parseFloat("0.01")
 
   for (const farm of yieldFarm.farms) {
     if (!farm.details?.rps) { throw Error }
