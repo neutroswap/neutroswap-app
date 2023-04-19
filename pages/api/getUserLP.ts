@@ -123,12 +123,12 @@ export async function getUserLP(userAddress: any) {
 
       console.log("balanceeeeeeee ", balance.returnValues[0])
       let balanceBN = BigNumber.from(balance.returnValues[0].hex);
-      let totalSupplyBN = BigNumber.from(totalSupply.returnValues[0].hex);
-      const poolShare = balanceBN.mul(BigNumber.from(10).pow(18)).div(totalSupplyBN).toString()
 
       if (balanceBN.eq(ethers.BigNumber.from(0))) {
         console.log('Balance is zero, skip...')
       } else {
+        let totalSupplyBN = BigNumber.from(totalSupply.returnValues[0].hex);
+        const poolShare = balanceBN.mul(BigNumber.from(10).pow(18)).div(totalSupplyBN).toString()
         console.log("reserves ", BigNumber.from(reserves.returnValues[0].hex))
         userLPs.push({
           ...lps[i],

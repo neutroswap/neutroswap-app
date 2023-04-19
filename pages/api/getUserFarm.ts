@@ -13,7 +13,6 @@ import {
 import { NEUTRO_FARM_ABI } from '@/shared/abi'
 import { CallContext } from 'ethereum-multicall/dist/esm/models'
 import { CoinGeckoClient, SimplePriceResponse } from 'coingecko-api-v3'
-import { NEXT_PUBLIC_FARM_CONTRACT } from '@/shared/helpers/constants'
 
 const coingecko = new CoinGeckoClient({
   timeout: 10000,
@@ -55,24 +54,26 @@ let CHAIN_NAME: string;
 let RPC: string;
 let CHAIN_ID: any;
 let MULTICALL_ADDR: string;
+let FARM_CONTRACT: string;
 
 export async function getAllFarms(): Promise<Farm[] | null> {
   const { data: network, } = await supabaseClient
     .from('networks')
     .select('id,name,rpc,chain_id,multicall_addr')
     .eq('name', process.env.NETWORK)
-
   if (!network) { return null }
-  console.log(network[0].id)
+
   const { data, error } = await supabaseClient
     .from('farms')
     .select('*,liquidity_tokens(address, token0(address,symbol,logo,coingecko_id), token1(address,symbol,logo,coingecko_id)),rewards:tokens(address)')
     .eq('network_id', network[0].id)
+  if (!data) { return null }
 
   CHAIN_NAME = network[0].name
   RPC = network[0].rpc
   CHAIN_ID = network[0].chain_id
   MULTICALL_ADDR = network[0].multicall_addr
+  FARM_CONTRACT = data[0].farm_contract
 
   if (error) {
     console.log(error)
@@ -130,18 +131,16 @@ export async function composeData(farms: Farm[] | null, address: any): Promise<F
   calls.push(...pendingTokens)
 
   const multicall = new Multicall({
-    multicallCustomContractAddress: process.env.NEXT_PUBLIC_MULTICALL_CONTRACT,
+    multicallCustomContractAddress: MULTICALL_ADDR,
     ethersProvider: provider,
     tryAggregate: true
   })
-
-  if (!NEXT_PUBLIC_FARM_CONTRACT) { return null }
 
   let contractCallContext: ContractCallContext[] = []
   let indexName = 'data'
   contractCallContext.push({
     reference: indexName,
-    contractAddress: NEXT_PUBLIC_FARM_CONTRACT,
+    contractAddress: FARM_CONTRACT,
     abi: NEUTRO_FARM_ABI as any,
     calls
   })
@@ -216,9 +215,9 @@ export async function addTokenPrice(farmHoldings: FarmHoldings): Promise<FarmHol
 }
 
 export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
-  const provider = new ethers.providers.JsonRpcProvider("https://api-testnet2.trust.one", {
-    chainId: 15557,
-    name: "testnet_eos_evm",
+  const provider = new ethers.providers.JsonRpcProvider(RPC, {
+    chainId: CHAIN_ID,
+    name: CHAIN_NAME,
     // url: network.rpc
   })
   // if (!farms) { return null }
@@ -282,7 +281,7 @@ export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
 
 export async function getPrice(id: string): Promise<number> {
   if (id === "neutro") {
-    return 1;
+    return 0.01;
   }
 
   const tokenPrice = await coingecko.simplePrice({
