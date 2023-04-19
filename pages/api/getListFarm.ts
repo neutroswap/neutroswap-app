@@ -50,11 +50,28 @@ interface FarmDetails {
   apr: string
 }
 
+let CHAIN_NAME: string;
+let RPC: string;
+let CHAIN_ID: any;
+let MULTICALL_ADDR: string;
 
 export async function getAllFarms(): Promise<Farm[] | null> {
+  const { data: network, } = await supabaseClient
+    .from('networks')
+    .select('id,name,rpc,chain_id,multicall_addr')
+    .eq('name', process.env.NETWORK)
+
+  if (!network) { return null }
+  console.log(network[0].id)
   const { data, error } = await supabaseClient
     .from('farms')
     .select('*,liquidity_tokens(address, token0(address,symbol,logo,coingecko_id), token1(address,symbol,logo,coingecko_id)),rewards:tokens(address)')
+    .eq('network_id', network[0].id)
+
+  CHAIN_NAME = network[0].name
+  RPC = network[0].rpc
+  CHAIN_ID = network[0].chain_id
+  MULTICALL_ADDR = network[0].multicall_addr
 
   if (error) {
     console.log(error)
@@ -278,7 +295,7 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
     const totalValueReserve1 = reserve1.mul(price1)
     const denominator = utils.parseUnits("1", 18);
     farm.valueOfLiquidity = Number(formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())).toFixed(2).toString()
-    tvl += parseFloat(farm.valueOfLiquidity)
+    tvl += parseFloat(farm.valueOfLiquidity) * parseFloat(farm.details?.totalLiquidity ?? '0');
     // console.log(Number(formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())).toFixed(2))
   }
 

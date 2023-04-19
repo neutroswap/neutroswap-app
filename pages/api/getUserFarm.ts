@@ -51,11 +51,28 @@ interface FarmDetails {
   pendingTokensInUsd: string,
 }
 
+let CHAIN_NAME: string;
+let RPC: string;
+let CHAIN_ID: any;
+let MULTICALL_ADDR: string;
 
 export async function getAllFarms(): Promise<Farm[] | null> {
+  const { data: network, } = await supabaseClient
+    .from('networks')
+    .select('id,name,rpc,chain_id,multicall_addr')
+    .eq('name', process.env.NETWORK)
+
+  if (!network) { return null }
+  console.log(network[0].id)
   const { data, error } = await supabaseClient
     .from('farms')
     .select('*,liquidity_tokens(address, token0(address,symbol,logo,coingecko_id), token1(address,symbol,logo,coingecko_id)),rewards:tokens(address)')
+    .eq('network_id', network[0].id)
+
+  CHAIN_NAME = network[0].name
+  RPC = network[0].rpc
+  CHAIN_ID = network[0].chain_id
+  MULTICALL_ADDR = network[0].multicall_addr
 
   if (error) {
     console.log(error)
@@ -86,9 +103,9 @@ export async function getAllFarms(): Promise<Farm[] | null> {
 }
 
 export async function composeData(farms: Farm[] | null, address: any): Promise<FarmHoldings | null> {
-  const provider = new ethers.providers.JsonRpcProvider("https://api-testnet2.trust.one", {
-    chainId: 15557,
-    name: "testnet_eos_evm",
+  const provider = new ethers.providers.JsonRpcProvider(RPC, {
+    chainId: CHAIN_ID,
+    name: CHAIN_NAME,
     // url: network.rpc
   })
 
@@ -207,7 +224,7 @@ export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
   // if (!farms) { return null }
 
   const multicall = new Multicall({
-    multicallCustomContractAddress: process.env.NEXT_PUBLIC_MULTICALL_CONTRACT,
+    multicallCustomContractAddress: MULTICALL_ADDR,
     ethersProvider: provider,
     tryAggregate: true
   })
