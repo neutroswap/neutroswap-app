@@ -350,7 +350,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                 <div className="flex justify-between">
                   <div>Available:</div>
                   <div>
-                    {Number(formatEther(lpTokenBalance!)).toFixed(2)} LP
+                    {!!lpTokenBalance && Number(formatEther(lpTokenBalance)).toFixed(2)} LP
                   </div>
                 </div>
                 <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
