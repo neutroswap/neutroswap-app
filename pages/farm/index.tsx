@@ -22,6 +22,7 @@ import { NEXT_PUBLIC_FARM_CONTRACT } from "@/shared/helpers/constants";
 import { ERC20_ABI, NEUTRO_FARM_ABI } from "@/shared/abi";
 import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
 import debounce from "lodash/debounce";
+import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 
 // const inter = Inter({ subsets: ['latin'] })
 
@@ -228,8 +229,8 @@ const Comp = ({ data }: { data: FarmResponse }) => {
 
   const [isLpTokenApproved, setIsLpTokenApproved] = useState(false);
 
-  const [stakeAmount, setStakeAmount] = useState<string>("0");
-  const [unstakeAmount, setUnstakeAmount] = useState<string>("0");
+  const [stakeAmount, setStakeAmount] = useState<string>();
+  const [unstakeAmount, setUnstakeAmount] = useState<string>();
 
   const { data: lpTokenBalance } = useContractRead({
     address: data.lpToken,
@@ -295,7 +296,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
     abi: NEUTRO_FARM_ABI,
     chainId: 15557,
     functionName: "deposit",
-    args: [BigNumber.from(data.pid), BigNumber.from(parseEther(stakeAmount!))],
+    args: [BigNumber.from(data.pid), parseBigNumber(stakeAmount!)],
     onError(error) {
       console.log("Error", error);
     },
@@ -312,10 +313,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
     functionName: "withdraw",
-    args: [
-      BigNumber.from(data.pid),
-      BigNumber.from(parseEther(unstakeAmount!)),
-    ],
+    args: [BigNumber.from(data.pid), parseBigNumber(unstakeAmount!)],
   });
 
   const { write: unstake } = useContractWrite(withdraw);
