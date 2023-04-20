@@ -65,6 +65,7 @@ import Head from "next/head";
 import {
   NEXT_PUBLIC_CHAIN_ID,
   NEXT_PUBLIC_FACTORY_CONTRACT,
+  NEXT_PUBLIC_FARM_CONTRACT,
   NEXT_PUBLIC_MULTICALL_CONTRACT,
   NEXT_PUBLIC_ROUTER_CONTRACT,
   NEXT_PUBLIC_WEOS_ADDRESS,
@@ -186,6 +187,7 @@ export default function Home() {
       // if (token1 === tokens[0]) {
       //   setBalance1(eosBalance);
       // } else {
+      console.log("readBalance1", value);
       setBalance1({
         decimal: value[2].toNumber(),
         raw: value[0],
@@ -198,6 +200,13 @@ export default function Home() {
     },
   });
 
+  console.log(
+    "Decimals token0",
+    balance0.decimal,
+    "Decimals token1",
+    balance1.decimal
+  );
+
   useEffect(() => {
     console.log("Uniswap Factory =", uniswapFactory);
     console.log("Pairs =", pairs);
@@ -209,10 +218,20 @@ export default function Home() {
     address: NEXT_PUBLIC_FACTORY_CONTRACT as `0x${string}`,
     abi: NEUTRO_FACTORY_ABI,
     functionName: "getPair",
-    chainId: 15557,
+    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     args: [token0.address, token1.address],
   });
 
+  console.log(
+    "Multicall Contract",
+    NEXT_PUBLIC_MULTICALL_CONTRACT,
+    "Router",
+    NEXT_PUBLIC_ROUTER_CONTRACT,
+    "factory",
+    NEXT_PUBLIC_FACTORY_CONTRACT,
+    "farm",
+    NEXT_PUBLIC_FARM_CONTRACT
+  );
   let customNetworkData = useMemo(
     () => ({
       nameNetwork: "EOS EVM",
