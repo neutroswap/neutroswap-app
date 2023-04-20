@@ -215,7 +215,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                                   <div className="flex space-x-4 items-center w-full">
                                     <img
                                       alt={`${token.name} Icon`}
-                                      src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${token.symbol.toLowerCase()}.svg`}
+                                      src={token.logo}
                                       className="h-8 rounded-full"
                                       onError={(e) => {
                                         handleImageFallback(token.symbol, e);

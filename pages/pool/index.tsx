@@ -284,7 +284,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                 </p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
+                  src={selectedToken.logo}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
                     event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
@@ -319,7 +319,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                 </p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
+                  src={selectedToken.logo}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
                     event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;

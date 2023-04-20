@@ -1,17 +1,14 @@
 import { SupportedChainID } from "../types/chain.types"
 import { Token } from "../types/tokens.types"
 
+/**
+ * index0: Native token (with wrapped token address)
+ * index1: Default token0
+ * index2: Default token1
+ */
 export const tokens: Record<SupportedChainID, Array<Token>> = {
   // NOTE: EOS Mainnet
   "17777": [
-    {
-      network_id: "17777",
-      symbol: "NEUTRO",
-      logo: "https://cdn.moralis.io/eth/0x6b175474e89094c44da98b954eedeac495271d0f.png",
-      name: "Neutroswap Token",
-      address: "0xF4bd487A8190211E62925435963D996b59a860C0",
-      decimal: 18,
-    },
     {
       network_id: "17777",
       symbol: "EOS",
@@ -52,6 +49,14 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       address: "0xeFAeeE334F0Fd1712f9a8cc375f427D9Cdd40d73",
       decimal: 18,
     },
+    {
+      network_id: "17777",
+      symbol: "NEUTRO",
+      logo: "/logo/neutro_token.svg",
+      name: "Neutroswap Token",
+      address: "0xF4bd487A8190211E62925435963D996b59a860C0",
+      decimal: 18,
+    },
   ],
   // NOTE: EOS Testnet
   "15557": [
@@ -74,7 +79,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
     {
       network_id: "15557",
       symbol: "NEUTRO",
-      logo: "https://cdn.moralis.io/eth/0x6b175474e89094c44da98b954eedeac495271d0f.png",
+      logo: "/logo/neutro_token.svg",
       name: "Neutroswap Token",
       address: "0x4D0BfAF503fE1e229b1B4F8E4FC1952803ec843f",
       decimal: 18,
