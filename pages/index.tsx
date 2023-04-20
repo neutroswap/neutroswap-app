@@ -952,33 +952,12 @@ export default function Home() {
                         {txHash !== "" && (
                           <>
                             <div className="flex justify-center items-center py-20 mb-5 ">
-                              {tokenName0 === "WEOS" && (
-                                <div className="mr-2 text-black dark:text-white">
-                                  You sold {tokenAmount0} EOS for{" "}
-                                  {parseFloat(tokenAmount1)
-                                    .toFixed(3)
-                                    .toString()}{" "}
-                                  {tokenName1}
-                                </div>
-                              )}
-                              {tokenName1 === "WEOS" && (
-                                <div className="mr-2 text-black dark:text-white">
-                                  You sold {tokenAmount0} EOS for{" "}
-                                  {parseFloat(tokenAmount1)
-                                    .toFixed(3)
-                                    .toString()}{" "}
-                                  EOS
-                                </div>
-                              )}
-                              {/* {tokenName0 !== "WEOS" && (
-                                <div className="mr-2 text-black dark:text-white">
-                                  You sold {tokenAmount0} {tokenName0} for{" "}
-                                  {parseFloat(tokenAmount1)
-                                    .toFixed(3)
-                                    .toString()}{" "}
-                                  {tokenName1}
-                                </div>
-                              )} */}
+                              <div className="mr-2 text-black dark:text-white">
+                                You sold {tokenAmount0}{" "}
+                                {tokenName0 === "WEOS" ? "EOS" : tokenName0} for{" "}
+                                {parseFloat(tokenAmount1).toFixed(3).toString()}{" "}
+                                {tokenName1 === "WEOS" ? "EOS" : tokenName1}
+                              </div>
                               <Link
                                 href={`https://explorer-testnet2.trust.one/tx/${txHash}`}
                                 target="_blank"
