@@ -26,7 +26,7 @@ import {
   appendEthToContractAddress,
   TradeDirection,
 } from "simple-uniswap-sdk";
-import { useAccount, useContractReads, useSigner } from "wagmi";
+import { useAccount, useBalance, useContractReads, useSigner } from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
@@ -50,6 +50,7 @@ import { Currency } from "@/shared/types/currency.types";
 import { BigNumber } from "ethers";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { useRouter } from "next/router";
+import { currencyFormat } from "@/shared/helpers/currencyFormat";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -64,7 +65,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
-  const [isPreferNative, setIsPreferNative] = useState(true);
+  const [isPreferNative, setIsPreferNative] = useState(false);
   // const [isBalanceEnough, setIsBalanceEnough] = useState(true);
 
   const [balance0, setBalance0] = useState<Currency>({
@@ -96,16 +97,10 @@ export default function Home() {
   const [direction, setDirection] = useState<"input" | "output">("input");
   const [txHash, setTxHash] = useState<string>("");
 
-  // useBalance({
-  //   address: address,
-  //   onSuccess(value) {
-  //     setEosBalance({
-  //       decimal: value.decimals,
-  //       raw: value.value,
-  //       formatted: parseFloat(value.formatted).toFixed(5),
-  //     });
-  //   },
-  // });
+  const { data: balance, refetch: refetchBalanceETH } = useBalance({
+    enabled: Boolean(address),
+    address,
+  });
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
@@ -132,7 +127,7 @@ export default function Home() {
       setBalance0({
         decimal: value[2].toNumber(),
         raw: value[0],
-        formatted: Number(formatEther(value[0])).toFixed(5).toString(),
+        formatted: Number(formatEther(value[0])).toFixed(3).toString(),
       });
       setTokenName0(value[1]);
       // }
@@ -164,7 +159,7 @@ export default function Home() {
       setBalance1({
         decimal: value[2].toNumber(),
         raw: value[0],
-        formatted: Number(formatEther(value[0])).toFixed(5).toString(),
+        formatted: Number(formatEther(value[0])).toFixed(3).toString(),
       });
       setTokenName1(value[1]);
       // }
@@ -405,6 +400,14 @@ export default function Home() {
   return (
     <>
       <div className="flex flex-col items-center justify-center min-h-[80%] pt-16">
+        <div>
+          <Text h2 height={3} className="text-center">
+            Swap
+          </Text>
+          <Text type="secondary" p className="text-center !mt-0">
+            Trade your tokens
+          </Text>
+        </div>
         <div className="w-full max-w-lg">
           <div className="mt-8 rounded-xl border border-neutral-200/60 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg p-4">
             <div className="flex justify-between items-center mb-2">
@@ -488,8 +491,13 @@ export default function Home() {
                   className="flex items-center cursor-pointer"
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount0(formatEther(balance0.raw));
-                    debouncedToken0(formatEther(balance0.raw));
+                    if (tokenName0 !== "WEOS") {
+                      setTokenAmount0(formatEther(balance0.raw));
+                      debouncedToken0(formatEther(balance0.raw));
+                    } else {
+                      setTokenAmount0(formatEther(balance!.formatted));
+                      debouncedToken0(formatEther(balance!.formatted));
+                    }
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
@@ -497,9 +505,17 @@ export default function Home() {
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance0 && (
-                    <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                      {balance0.formatted} {tokenName0}
-                    </p>
+                    <div className="flex space-x-1">
+                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
+                        {tokenName0 !== "WEOS" && balance0.formatted}
+                        {tokenName0 === "WEOS" &&
+                          Number(balance!.formatted).toFixed(3)}
+                      </p>
+                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
+                        {tokenName0 !== "WEOS" && tokenName0}
+                        {tokenName0 === "WEOS" && "EOS"}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -516,7 +532,7 @@ export default function Home() {
                       onChange={handleToken0Change}
                     />
                   )}
-                  {Number(tokenAmount0) > +formatEther(balance0.raw) && (
+                  {Number(tokenAmount0) > +balance!.formatted && (
                     <small className="mt-1 text-red-500">
                       Insufficient balance
                     </small>
@@ -582,8 +598,13 @@ export default function Home() {
                   className="flex items-center cursor-pointer "
                   onClick={() => {
                     if (!address) return;
-                    setTokenAmount1(formatEther(balance1.raw));
-                    debouncedToken1(formatEther(balance1.raw));
+                    if (tokenName1 !== "WEOS") {
+                      setTokenAmount1(formatEther(balance0.raw));
+                      debouncedToken1(formatEther(balance0.raw));
+                    } else {
+                      setTokenAmount1(formatEther(balance!.formatted));
+                      debouncedToken1(formatEther(balance!.formatted));
+                    }
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
@@ -591,9 +612,17 @@ export default function Home() {
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance1 && (
-                    <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                      {balance1.formatted} {tokenName1}
-                    </p>
+                    <div className="flex space-x-1 text-neutral-500 hover:dark:text-neutral-700">
+                      <p className="text-sm">
+                        {tokenName1 !== "WEOS" && balance1.formatted}
+                        {tokenName1 === "WEOS" &&
+                          Number(balance!.formatted).toFixed(3)}
+                      </p>
+                      <p className="text-sm ">
+                        {tokenName1 !== "WEOS" && tokenName1}
+                        {tokenName1 === "WEOS" && "EOS"}
+                      </p>
+                    </div>
                   )}
                 </div>
               </div>
@@ -772,7 +801,7 @@ export default function Home() {
                                 <div className="text-2xl mb-1 font-medium text-black dark:text-white">
                                   Buy{" "}
                                   {parseFloat(tokenAmount1)
-                                    .toFixed(5)
+                                    .toFixed(3)
                                     .toString()}{" "}
                                   {tokenName1}
                                 </div>
@@ -811,7 +840,7 @@ export default function Home() {
                                   </div>
                                 </div>
                                 <div className="text-black dark:text-neutral-300">
-                                  {parseFloat(tokenMin1).toFixed(5).toString()}{" "}
+                                  {parseFloat(tokenMin1).toFixed(3).toString()}{" "}
                                   ${tokenName1}
                                 </div>
                               </div>
@@ -823,8 +852,9 @@ export default function Home() {
                                 </div>
                               </div>
                               <Link
-                                href={`https://explorer-testnet2.trust.one/address/${address as string
-                                  }`}
+                                href={`https://explorer-testnet2.trust.one/address/${
+                                  address as string
+                                }`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
@@ -872,7 +902,7 @@ export default function Home() {
                             <div className="flex justify-center items-center py-20 mb-5 ">
                               <div className="mr-2 text-black dark:text-white">
                                 You sold {tokenAmount0} {tokenName0} for{" "}
-                                {parseFloat(tokenAmount1).toFixed(5).toString()}{" "}
+                                {parseFloat(tokenAmount1).toFixed(3).toString()}{" "}
                                 {tokenName1}
                               </div>
                               <Link
