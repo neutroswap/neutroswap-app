@@ -1,26 +1,11 @@
-import { Dispatch, Fragment, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import { classNames } from '@/shared/helpers/classNamer'
-
-const tokens = [
-  {
-    network_id: "15557",
-    symbol: "EOS",
-    logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
-    name: "EOS",
-    address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
-    decimal: 18,
-  },
-  {
-    network_id: "15557",
-    symbol: "WEOS",
-    logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
-    name: "WEOS",
-    address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
-    decimal: 18,
-  },
-]
+import { useNetwork } from 'wagmi'
+import { DEFAULT_CHAIN_ID, SupportedChainID, supportedChainID } from '@/shared/types/chain.types'
+import { tokens } from '@/shared/statics/tokenList'
+import { Token } from '@/shared/types/tokens.types'
 
 type NativeTokenPicker = {
   handlePreferNative: Dispatch<SetStateAction<boolean>>;
@@ -28,7 +13,26 @@ type NativeTokenPicker = {
 
 const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
   const { handlePreferNative } = props;
-  const [selected, setSelected] = useState(tokens[0])
+  const { chain } = useNetwork()
+
+  // TODO: MOVE THIS HOOKS
+  const chainSpecificTokens = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
+    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID]
+  }, [chain]);
+
+  const wrappedAndNativeToken: [Token, Token] = useMemo(() => {
+    return [
+      chainSpecificTokens[0],
+      {
+        ...chainSpecificTokens[0],
+        name: "W" + chainSpecificTokens[0].name
+      }
+    ]
+  }, [chainSpecificTokens])
+
+  const [selected, setSelected] = useState(wrappedAndNativeToken[0])
 
   useEffect(() => {
     handlePreferNative(selected.symbol === "EOS")
@@ -72,25 +76,25 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
             // "ring-1 ring-black ring-opacity-5 focus:outline-none",
           )}
           >
-            {tokens.map((person, personIdx) => (
+            {wrappedAndNativeToken.map((token, index) => (
               <Listbox.Option
-                key={personIdx}
+                key={index}
                 className={({ active }) => classNames(
                   "relative cursor-pointer select-none py-2 px-2 mb-0 mx-1 rounded-lg before:hidden transition group",
                   active && "bg-orange-100/50 dark:bg-orange-400/[.08]",
                   !active && "text-gray-900"
                 )}
-                value={person}
+                value={token}
               >
                 {({ selected }) => (
                   <div className="flex justify-between items-center">
                     <div className="flex space-x-2 items-center">
                       <img
-                        alt={`${person.symbol} Icon`}
-                        src={person.logo}
+                        alt={`${token.symbol} Icon`}
+                        src={token.logo}
                         className={classNames(
                           "h-6 rounded-full",
-                          person.symbol !== "EOS" && "invert"
+                          token.symbol !== "EOS" && "invert"
                         )}
                       />
                       <span
@@ -100,7 +104,7 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
                           !selected && 'text-neutral-500',
                         )}
                       >
-                        {person.name}
+                        {token.name}
                       </span>
                     </div>
                     {selected ? (
