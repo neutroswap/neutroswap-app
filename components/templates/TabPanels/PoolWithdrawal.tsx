@@ -4,8 +4,8 @@ import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
 import { formatEther, getAddress, parseEther } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
-import { useAccount, useContractRead, useContractReads, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useEffect, useMemo, useState } from "react";
+import { useAccount, useContractRead, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input } from "@geist-ui/core";
@@ -14,6 +14,7 @@ import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
 import { tokens } from "@/shared/statics/tokenList";
 import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
+import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
 
 type PoolWithdrawalPanelProps = {
   balances: Currency[],
@@ -28,21 +29,32 @@ type PoolWithdrawalPanelProps = {
 
 // TODO: move slippage to state or store
 const SLIPPAGE = 50;
-const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 
 const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
   const { token0, token1, totalLPSupply, userLPBalance, poolBalances, refetchAllBalance, refetchUserBalances } = props;
 
   const router = useRouter();
   const { address } = useAccount();
-
-  const [isPreferNative, setIsPreferNative] = useState(true);
-  const [isLPTokenApproved, setIsLPTokenApproved] = useState(false);
+  const { chain } = useNetwork();
 
   const [token0Amount, setToken0Amount] = useState<string>();
   const [token1Amount, setToken1Amount] = useState<string>();
   const [percentage, setPercentage] = useState(33);
   const [amount, setAmount] = useState<BigNumber>(BigNumber.from(0));
+
+  const [isLPTokenApproved, setIsLPTokenApproved] = useState(false);
+
+  // TODO: MOVE THIS HOOKS
+  const nativeToken = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
+    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID][0];
+    return tokens[chain.id.toString() as SupportedChainID][0]
+  }, [chain]);
+
+  const [isPreferNative, setIsPreferNative] = useState(
+    token0.address === nativeToken.address ||
+    token1.address === nativeToken.address
+  );
 
   const { refetch: refetchAllowance } = useContractRead({
     enabled: Boolean(address && router.query.id),
@@ -105,10 +117,10 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     abi: NEUTRO_ROUTER_ABI,
     functionName: 'removeLiquidityETH',
     args: [
-      token0.address === NATIVE_TOKEN_ADDRESS ? token1.address : token0.address, // token
+      token0.address === nativeToken.address ? token1.address : token0.address, // token
       amount, // liquidity
-      token0.address === NATIVE_TOKEN_ADDRESS ? parseEther(token1Amount ?? "0") : parseEther(token0Amount ?? "0"), // amountTokenMin
-      token0.address === NATIVE_TOKEN_ADDRESS ? parseEther(token0Amount ?? "0") : parseEther(token1Amount ?? "0"), // amountETHMin
+      token0.address === nativeToken.address ? parseEther(token1Amount ?? "0") : parseEther(token0Amount ?? "0"), // amountTokenMin
+      token0.address === nativeToken.address ? parseEther(token0Amount ?? "0") : parseEther(token1Amount ?? "0"), // amountETHMin
       address!, // address
       BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
     ],
@@ -237,7 +249,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
           <div className="flex flex-col py-5 px-7 border border-neutral-200 dark:border-neutral-800 rounded-lg ">
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
-                {token0.address !== NATIVE_TOKEN_ADDRESS && (
+                {token0.address !== nativeToken.address && (
                   <>
                     <img
                       alt={`${token0.symbol} Icon`}
@@ -250,7 +262,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                     <p className="m-0 font-bold">{token0.symbol}</p>
                   </>
                 )}
-                {token0.address === NATIVE_TOKEN_ADDRESS && (
+                {token0.address === nativeToken.address && (
                   <NativeTokenPicker handlePreferNative={setIsPreferNative} />
                 )}
               </div>
@@ -266,7 +278,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
 
             <div className="flex items-center justify-between mt-6">
               <div className="flex space-x-2 items-center">
-                {token1.address !== NATIVE_TOKEN_ADDRESS && (
+                {token1.address !== nativeToken.address && (
                   <>
                     <img
                       alt={`${token1.symbol} Icon`}
@@ -279,7 +291,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                     <p className="m-0 font-bold">{token1.symbol}</p>
                   </>
                 )}
-                {token1.address === NATIVE_TOKEN_ADDRESS && (
+                {token1.address === nativeToken.address && (
                   <NativeTokenPicker handlePreferNative={setIsPreferNative} />
                 )}
               </div>
