@@ -4,7 +4,7 @@ import { getNetworkById, getNetworkByName, getTokenDetails } from './tokens'
 import { BigNumber, ethers, utils } from 'ethers'
 import { ERC20_ABI } from '@/shared/abi'
 import { supabaseClient } from '@/shared/helpers/supabaseClient'
-import { formatEther, parseEther } from "ethers/lib/utils.js";
+import { formatEther, formatUnits, parseEther } from "ethers/lib/utils.js";
 import {
   Multicall,
   ContractCallResults,
@@ -30,6 +30,10 @@ interface Farm {
   lpToken: string,
   token0: string,
   token1: string,
+  token0decimals: number,
+  token1decimals: number,
+  token0denominator: number,
+  token1denominator: number,
   token0Logo: string,
   token1Logo: string
   token0gecko: string,
@@ -38,6 +42,8 @@ interface Farm {
   token1price: number,
   reserves0: string,
   reserves1: string,
+  valueReserves0: string,
+  valueReserves1: string,
   valueOfLiquidity: string,
   reward: string,
   details: FarmDetails | null
@@ -64,7 +70,7 @@ export async function getAllFarms(): Promise<Farm[] | null> {
 
   const { data, error } = await supabaseClient
     .from('farms')
-    .select('*,liquidity_tokens(address, token0(address,symbol,logo,coingecko_id), token1(address,symbol,logo,coingecko_id)),rewards:tokens(address)')
+    .select('*,liquidity_tokens(address, token0(address,symbol,logo,coingecko_id,decimal), token1(address,symbol,logo,coingecko_id,decimal)),rewards:tokens(address)')
     .eq('network_id', network[0].id)
   if (!data) { return null }
 
@@ -86,6 +92,10 @@ export async function getAllFarms(): Promise<Farm[] | null> {
         lpToken: data[i].liquidity_tokens.address,
         token0: data[i].liquidity_tokens.token0.address,
         token1: data[i].liquidity_tokens.token1.address,
+        token0decimals: data[i].liquidity_tokens.token0.decimal,
+        token1decimals: data[i].liquidity_tokens.token1.decimal,
+        token0denominator: Math.max(1, 18 - data[i].liquidity_tokens.token0.decimal),
+        token1denominator: Math.max(1, 18 - data[i].liquidity_tokens.token1.decimal),
         token0Logo: data[i].liquidity_tokens.token0.logo,
         token1Logo: data[i].liquidity_tokens.token1.logo,
         token0gecko: data[i].liquidity_tokens.token0.coingecko_id,
@@ -94,6 +104,8 @@ export async function getAllFarms(): Promise<Farm[] | null> {
         token1price: 0,
         reserves0: "",
         reserves1: "",
+        valueReserves0: "",
+        valueReserves1: "",
         valueOfLiquidity: "",
         reward: data[i].rewards.address,
         details: null
@@ -283,18 +295,35 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
     const reserves1 = contractCalls.results[indexName + farm.lpToken].callsReturnContext[0].returnValues[1]
     const totalSupply = contractCalls.results[indexName + farm.lpToken].callsReturnContext[1].returnValues[0]
 
-    const denominator = utils.parseUnits("1", 18);
     farm.reserves0 = BigNumber.from(reserves0.hex).toString()
     farm.reserves1 = BigNumber.from(reserves1.hex).toString()
 
     const reserve0 = BigNumber.from(farm.reserves0)
     const reserve1 = BigNumber.from(farm.reserves1)
-    const price0 = BigNumber.from(utils.parseUnits(farm.token0price.toString(), 18))
-    const price1 = BigNumber.from(utils.parseUnits(farm.token1price.toString(), 18))
+    const price0 = BigNumber.from(utils.parseUnits(farm.token0price.toString(), farm.token0decimals))
+    const price1 = BigNumber.from(utils.parseUnits(farm.token1price.toString(), farm.token1decimals))
+    // const denominator = utils.parseUnits("1", 18);
+    const denominator0 = utils.parseUnits("1", farm.token0decimals)
+    const denominator1 = utils.parseUnits("1", farm.token1decimals)
 
-    const totalValueReserve0 = reserve0.mul(price0)
-    const totalValueReserve1 = reserve1.mul(price1)
-    farm.valueOfLiquidity = Number(formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())).toFixed(2).toString()
+    if (farm.token0decimals == 18) {
+      farm.valueReserves0 = formatEther(reserve0.mul(price0).div(denominator0)).toString()
+    } else {
+      farm.valueReserves0 = formatEther(reserve0.mul(price0).div(denominator0).mul(utils.parseUnits("1", farm.token0denominator))).toString()
+    }
+
+    if (farm.token1decimals == 18) {
+      farm.valueReserves1 = formatEther(reserve1.mul(price1).div(denominator1)).toString()
+    } else {
+      farm.valueReserves1 = formatEther(reserve1.mul(price1).div(denominator1).mul(utils.parseUnits("1", farm.token1denominator))).toString()
+    }
+    // farm.valueReserves0 = formatEther(reserve0.mul(price0).div(denominator0)).toString()
+    // farm.valueReserves1 = formatEther(reserve1.mul(price1).div(denominator1).mul(utils.parseUnits("1", farm.token1denominator))).toString()
+
+    // const totalValueReserve0 = reserve0.mul(price0)
+    // const totalValueReserve1 = reserve1.mul(price1)
+    farm.valueOfLiquidity = (parseFloat(farm.valueReserves0.toString()) + parseFloat(farm.valueReserves1.toString())).toFixed(2).toString()
+    // farm.valueOfLiquidity = (parseFloat(farm.valueReserves0.toString()) + parseFloat(farm.valueReserves1.toString())).toFixed(2).toString()
     if (!farm.details) { return }
     // farm.details.totalLiquidity = (parseFloat(formatEther(BigNumber.from(totalSupply.hex).toString())) * parseFloat(farm.valueOfLiquidity)).toString()
     farm.details.totalLiquidity = formatEther(BigNumber.from(totalSupply.hex).toString())
