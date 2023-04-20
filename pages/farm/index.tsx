@@ -219,8 +219,8 @@ const Comp = ({ data }: { data: FarmResponse }) => {
 
   const [isLpTokenApproved, setIsLpTokenApproved] = useState(false);
 
-  const [stakeAmount, setStakeAmount] = useState<string>("0");
-  const [unstakeAmount, setUnstakeAmount] = useState<string>("0");
+  const [stakeAmount, setStakeAmount] = useState<string>();
+  const [unstakeAmount, setUnstakeAmount] = useState<string>();
 
   const { data: lpTokenBalance } = useContractRead({
     address: data.lpToken,
