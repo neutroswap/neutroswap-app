@@ -62,6 +62,13 @@ import {
   SupportedChainID,
 } from "@/shared/types/chain.types";
 import Head from "next/head";
+import {
+  NEXT_PUBLIC_CHAIN_ID,
+  NEXT_PUBLIC_FACTORY_CONTRACT,
+  NEXT_PUBLIC_MULTICALL_CONTRACT,
+  NEXT_PUBLIC_ROUTER_CONTRACT,
+  NEXT_PUBLIC_WEOS_ADDRESS,
+} from "@/shared/helpers/constants";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -205,14 +212,14 @@ export default function Home() {
   let customNetworkData = useMemo(
     () => ({
       nameNetwork: "EOS EVM",
-      multicallContractAddress: "0x294bb4c48F762DC0AFfe9DA653E9C6E1A4011452",
+      multicallContractAddress: NEXT_PUBLIC_MULTICALL_CONTRACT as string,
       nativeCurrency: {
         name: "EOS",
         symbol: "EOS",
       },
       nativeWrappedTokenInfo: {
-        chainId: 15557,
-        contractAddress: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
+        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        contractAddress: NEXT_PUBLIC_WEOS_ADDRESS as string,
         decimals: 18,
         symbol: "WEOS",
         name: "Wrapped EOS",
@@ -223,8 +230,8 @@ export default function Home() {
 
   let cloneUniswapContractDetailsV2 = useMemo(
     () => ({
-      routerAddress: "0xa406053604bFBbE8BEc48313fB6edb5c5032A3ad",
-      factoryAddress: "0xa5AD06E9E70Fde3011489A4fbfa49Ce4cBd1D583",
+      routerAddress: NEXT_PUBLIC_ROUTER_CONTRACT as string,
+      factoryAddress: NEXT_PUBLIC_FACTORY_CONTRACT as string,
       pairAddress: pairs as string,
     }),
     [pairs]
@@ -254,7 +261,7 @@ export default function Home() {
         isPreferNative
       ),
       ethereumAddress: address as string,
-      chainId: 15557,
+      chainId: Number(NEXT_PUBLIC_CHAIN_ID),
       providerUrl: "https://api-testnet2.trust.one/",
       settings: new UniswapPairSettings({
         gasSettings: {
@@ -290,7 +297,7 @@ export default function Home() {
   ]);
 
   const { data: signer } = useSigner({
-    chainId: 15557,
+    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
   });
 
   useEffect(() => {
