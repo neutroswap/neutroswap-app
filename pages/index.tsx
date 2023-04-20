@@ -286,7 +286,7 @@ export default function Home() {
       ),
       ethereumAddress: address as string,
       chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      providerUrl: NEXT_PUBLIC_RPC,
+      providerUrl: NEXT_PUBLIC_RPC as string,
       settings: new UniswapPairSettings({
         gasSettings: {
           getGasPrice: async () => {
