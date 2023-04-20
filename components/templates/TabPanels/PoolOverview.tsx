@@ -1,7 +1,7 @@
 import { Button, useTheme } from "@geist-ui/core";
 import { ScaleIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import NoContentDark from "@/public/states/empty/dark.svg"
 import NoContentLight from "@/public/states/empty/light.svg"
@@ -12,6 +12,8 @@ import { Currency } from "@/shared/types/currency.types";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { formatEther, getAddress } from "ethers/lib/utils.js";
 import { tokens } from "@/shared/statics/tokenList";
+import { useNetwork } from "wagmi";
+import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
 
 type PoolOverviewPanelProps = {
   token0: Token,
@@ -22,14 +24,21 @@ type PoolOverviewPanelProps = {
   poolBalances: Currency[],
 };
 
-const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
   const { priceRatio, token0, token1, totalLPSupply, userLPBalance, poolBalances } = props;
 
   const router = useRouter();
   const theme = useTheme();
+  const { chain } = useNetwork();
 
   const [isPriceFlipped, setIsPriceFlipped] = useState(false);
+
+  // TODO: MOVE THIS HOOKS
+  const nativeToken = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
+    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID][0];
+    return tokens[chain.id.toString() as SupportedChainID][0]
+  }, [chain]);
 
   return (
     <div className="">
@@ -101,7 +110,7 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
                 <div className="flex space-x-2 items-center">
                   <img
                     alt={`${token1.symbol} Icon`}
-                    src={token1.address === NATIVE_TOKEN_ADDRESS ? tokens[0].logo : token1.logo}
+                    src={token1.address === nativeToken.address ? nativeToken.logo : token1.logo}
                     className="h-5 rounded-full"
                     onError={(e) => {
                       handleImageFallback(token1.symbol, e);

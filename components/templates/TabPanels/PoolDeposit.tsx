@@ -4,7 +4,7 @@ import {
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, getAddress, parseEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther } from "ethers/lib/utils.js";
 import { ChangeEvent, useMemo, useState } from "react";
 import {
   useAccount,
@@ -12,6 +12,7 @@ import {
   useContract,
   useContractReads,
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
   useSigner,
 } from "wagmi";
@@ -24,6 +25,7 @@ import dayjs from "dayjs";
 import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { tokens } from "@/shared/statics/tokenList";
+import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
 
 type PoolDepositPanelProps = {
   balances: Currency[],
@@ -36,7 +38,6 @@ type PoolDepositPanelProps = {
   isNewPool: boolean;
 };
 
-const NATIVE_TOKEN_ADDRESS = getAddress(tokens[0].address);
 const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const {
     balances,
@@ -50,6 +51,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   } = props;
 
   const signer = useSigner();
+  const { chain } = useNetwork();
   const { address } = useAccount();
 
   const [token0Amount, setToken0Amount] = useState<string>();
@@ -57,14 +59,22 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [token0Min, setToken0Min] = useState(BigNumber.from(0));
   const [token1Min, setToken1Min] = useState(BigNumber.from(0));
 
-  const [isPreferNative, setIsPreferNative] = useState(
-    token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS
-  );
   const [isToken0Approved, setIsToken0Approved] = useState(false);
   const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
+  // TODO: MOVE THIS HOOKS
+  const nativeToken = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
+    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID][0];
+    return tokens[chain.id.toString() as SupportedChainID][0]
+  }, [chain]);
+
+  const [isPreferNative, setIsPreferNative] = useState(
+    token0.address === nativeToken.address ||
+    token1.address === nativeToken.address
+  );
 
   const parseBigNumber = (value?: string): BigNumber => {
     const parsedValue = (!!value && !!Number(value)) ? value : "0"
@@ -191,7 +201,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const { config: addLiquidityETHConfig, isFetching: isSimulatingAddLiquidityETH } =
     usePrepareContractWrite({
       enabled: Boolean(
-        (token0.address === NATIVE_TOKEN_ADDRESS || token1.address === NATIVE_TOKEN_ADDRESS) && // do not enable if none of the addr is WEOS
+        (token0.address === nativeToken.address || token1.address === nativeToken.address) && // do not enable if none of the addr is WEOS
         // Boolean(Number(token0Amount)) &&
         // Boolean(Number(token1Amount)) &&
         isPreferNative
@@ -339,14 +349,14 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   }
 
   const isToken0NeedApproval = useMemo(() => {
-    if (isPreferNative && (token0.address === NATIVE_TOKEN_ADDRESS)) return false;
+    if (isPreferNative && (token0.address === nativeToken.address)) return false;
     return !isToken0Approved;
-  }, [token0.address, isToken0Approved, isPreferNative])
+  }, [token0.address, isToken0Approved, isPreferNative, nativeToken])
 
   const isToken1NeedApproval = useMemo(() => {
-    if (isPreferNative && (token1.address === NATIVE_TOKEN_ADDRESS)) return false;
+    if (isPreferNative && (token1.address === nativeToken.address)) return false;
     return !isToken1Approved;
-  }, [token1.address, isToken1Approved, isPreferNative])
+  }, [token1.address, isToken1Approved, isPreferNative, nativeToken])
 
   return (
     <div className="">
@@ -537,8 +547,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               {JSON.stringify({
                 isPreferNative: isPreferNative,
                 slippage: SLIPPAGE + "%",
-                isToken0WEOS: token0.address === NATIVE_TOKEN_ADDRESS,
-                isToken1WEOS: token1.address === NATIVE_TOKEN_ADDRESS,
+                isToken0WEOS: token0.address === nativeToken.address,
+                isToken1WEOS: token1.address === nativeToken.address,
                 token0Amount: token0Amount,
                 token1Amount: token1Amount,
                 token0Min: formatEther(token0Min),

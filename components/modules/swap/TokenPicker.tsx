@@ -4,7 +4,7 @@ import {
   ModalOpenButton,
 } from "@/components/elements/Modal";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
-import React, { ChangeEvent, FC, SyntheticEvent, useRef, useState } from "react";
+import React, { ChangeEvent, FC, SyntheticEvent, useMemo, useRef, useState } from "react";
 import { classNames } from "@/shared/helpers/classNamer";
 import { RadioGroup } from "@headlessui/react";
 import { XCircleIcon } from "@heroicons/react/24/solid";
@@ -19,6 +19,8 @@ import { Code, Spinner, useTheme } from "@geist-ui/core";
 import { ThemeType } from "@/shared/hooks/usePrefers";
 import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
+import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
+import { useNetwork } from "wagmi";
 
 type TokenPickerProps = {
   ticker?: string;
@@ -36,10 +38,19 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
 
   const theme = useTheme();
   const searchRef = useRef<any>(null);
+  const { chain } = useNetwork();
 
   const [query, setQuery] = useState<string>("");
-  const [tokenList, setTokenList] = useState<Token[]>(tokens);
   const [isSearching, setIsSearching] = useState<boolean>(false);
+
+  // TODO: MOVE THIS HOOKS
+  const chainSpecificTokens = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
+    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID]
+  }, [chain]);
+
+  const [tokenList, setTokenList] = useState<Token[]>(chainSpecificTokens);
 
   const handleChange = (value: Token) => {
     setSelectedToken(value);
@@ -54,7 +65,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
 
   const resetTokenList = () => {
     setQuery('')
-    setTokenList(tokens)
+    setTokenList(chainSpecificTokens)
     searchRef.current.value = ""
   };
 
