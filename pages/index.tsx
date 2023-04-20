@@ -38,7 +38,7 @@ import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
 import debounce from "lodash/debounce";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import {
@@ -53,7 +53,7 @@ import {
 import WalletIcon from "@/public/icons/wallet.svg";
 import Link from "next/link";
 import { Currency } from "@/shared/types/currency.types";
-import { BigNumber } from "ethers";
+import { BigNumber, ethers } from "ethers";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { useRouter } from "next/router";
 import {
@@ -155,7 +155,9 @@ export default function Home() {
       setBalance0({
         decimal: value[2].toNumber(),
         raw: value[0],
-        formatted: Number(formatEther(value[0])).toFixed(3).toString(),
+        formatted: parseFloat(
+          formatUnits(value[0].toString(), value[2].toNumber()).toString()
+        ).toFixed(3),
       });
       setTokenName0(value[1]);
       // }
@@ -187,7 +189,9 @@ export default function Home() {
       setBalance1({
         decimal: value[2].toNumber(),
         raw: value[0],
-        formatted: Number(formatEther(value[0])).toFixed(3).toString(),
+        formatted: parseFloat(
+          formatUnits(value[0].toString(), value[2].toNumber()).toString()
+        ).toFixed(3),
       });
       setTokenName1(value[1]);
       // }
@@ -202,7 +206,7 @@ export default function Home() {
   }, [uniswapFactory, tradeContext]);
 
   const { data: pairs } = useContractRead({
-    address: "0xA5d8c59Fbd225eAb42D41164281c1e9Cee57415a",
+    address: NEXT_PUBLIC_FACTORY_CONTRACT as `0x${string}`,
     abi: NEUTRO_FACTORY_ABI,
     functionName: "getPair",
     chainId: 15557,
