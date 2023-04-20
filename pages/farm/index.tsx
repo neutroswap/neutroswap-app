@@ -18,7 +18,10 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
-import { NEXT_PUBLIC_FARM_CONTRACT } from "@/shared/helpers/constants";
+import {
+  NEXT_PUBLIC_CHAIN_ID,
+  NEXT_PUBLIC_FARM_CONTRACT,
+} from "@/shared/helpers/constants";
 import { ERC20_ABI, NEUTRO_FARM_ABI } from "@/shared/abi";
 import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
 import debounce from "lodash/debounce";
@@ -122,7 +125,7 @@ export default function Farm() {
   const { config: harvestMany } = usePrepareContractWrite({
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
-    chainId: 15557,
+    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "harvestMany",
     args: [[BigNumber.from(0), BigNumber.from(2)]],
   });
@@ -286,7 +289,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
   const { config: stakeConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
-    chainId: 15557,
+    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "deposit",
     args: [BigNumber.from(data.pid), parseBigNumber(stakeAmount!)],
     onError(error) {
@@ -313,7 +316,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
   const { config: harvestConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
-    chainId: 15557,
+    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "deposit",
     args: [BigNumber.from(data.pid), BigNumber.from(0)],
   });
