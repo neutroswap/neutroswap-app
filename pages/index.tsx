@@ -26,7 +26,7 @@ import {
   appendEthToContractAddress,
   TradeDirection,
 } from "simple-uniswap-sdk";
-import { useAccount, useBalance, useContractReads, useSigner } from "wagmi";
+import { useAccount, useContractReads, useNetwork, useSigner } from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
@@ -50,13 +50,18 @@ import { Currency } from "@/shared/types/currency.types";
 import { BigNumber } from "ethers";
 import { useIsMounted } from "@/shared/hooks/useIsMounted";
 import { useRouter } from "next/router";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import {
+  DEFAULT_CHAIN_ID,
+  supportedChainID,
+  SupportedChainID,
+} from "@/shared/types/chain.types";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
 export default function Home() {
   const router = useRouter();
   const isMounted = useIsMounted();
+  const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
 
   const [slippage, setSlippage] = useState("0.5");
@@ -89,18 +94,33 @@ export default function Home() {
   const [tokenAmount1, setTokenAmount1] = useState("0");
   const [tokenMin1, setTokenMin1] = useState("0");
   const [tokenEst1, setTokenEst1] = useState("0");
-  const [token0, setToken0] = useState<Token>(tokens[0]);
-  const [token1, setToken1] = useState<Token>(tokens[1]);
 
   const [tradeContext, setTradeContext] = useState<TradeContext>();
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
   const [txHash, setTxHash] = useState<string>("");
 
-  const { data: balance, refetch: refetchBalanceETH } = useBalance({
-    enabled: Boolean(address),
-    address,
-  });
+  // TODO: MOVE THIS HOOKS
+  const chainSpecificTokens = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
+    if (!supportedChainID.includes(chain.id.toString() as any))
+      return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID];
+  }, [chain]);
+
+  const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
+  const [token1, setToken1] = useState<Token>(chainSpecificTokens[1]);
+
+  // useBalance({
+  //   address: address,
+  //   onSuccess(value) {
+  //     setEosBalance({
+  //       decimal: value.decimals,
+  //       raw: value.value,
+  //       formatted: parseFloat(value.formatted).toFixed(5),
+  //     });
+  //   },
+  // });
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),

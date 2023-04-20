@@ -1,5 +1,5 @@
 import { Text, Button, Loading, useTheme } from "@geist-ui/core";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
 import { Disclosure } from "@headlessui/react";
@@ -19,7 +19,7 @@ import {
 } from "@/components/elements/Modal";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
-import { useAccount, useContract, useContractRead, useContractWrite, usePrepareContractWrite } from "wagmi";
+import { useAccount, useContract, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
@@ -28,6 +28,7 @@ import { tokens } from "@/shared/statics/tokenList";
 import { decimalFormat } from "@/shared/helpers/decimalFormat";
 import Link from "next/link";
 import { ThemeType } from "@/shared/hooks/usePrefers";
+import { DEFAULT_CHAIN_ID, SupportedChainID, supportedChainID } from "@/shared/types/chain.types";
 
 type PositionsResponse = {
   network_id: string;
@@ -206,8 +207,17 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
   handleClose,
 }) => {
   const router = useRouter();
-  const [token0, setToken0] = useState<Token>(tokens[0]);
-  const [token1, setToken1] = useState<Token>(tokens[1]);
+  const { chain } = useNetwork();
+
+  // TODO: MOVE THIS HOOKS
+  const chainSpecificTokens = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
+    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID]
+  }, [chain]);
+
+  const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
+  const [token1, setToken1] = useState<Token>(chainSpecificTokens[1]);
 
   const {
     data: existingPool,
@@ -274,7 +284,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                 </p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
+                  src={selectedToken.logo}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
                     event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
@@ -309,7 +319,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                 </p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
+                  src={selectedToken.logo}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
                     event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { ethers } from 'ethers';
 
-const INIT_CODE_HASH = "0x1c126d6f175a5b42705c51aba8396e629db291786fcf04ffa3fd8654ce2f9f7c";
+const INIT_CODE_HASH = "0x6a80408f2fbd97a46b0c2e32cb9eff95f524b97949d4565904684a5568eed6bc";
 
 interface PairAddressQuery {
   factoryAddress: string;
