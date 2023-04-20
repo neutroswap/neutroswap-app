@@ -141,6 +141,7 @@ export default function Home() {
         address: token0.address,
         abi: ERC20_ABI,
         functionName: "balanceOf",
+        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
         args: [address!],
       },
       { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
@@ -148,13 +149,13 @@ export default function Home() {
         address: token0.address,
         abi: ERC20_ABI,
         functionName: "decimals",
+        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
       },
     ],
     onSuccess(value) {
       // if (token0 === tokens[0]) {
       //   setBalance0(eosBalance);
       // } else {
-      console.log("token0 decimals =", value[2]);
       setBalance0({
         decimal: value[2].toNumber(),
         raw: value[0],
@@ -163,6 +164,16 @@ export default function Home() {
         ).toFixed(3),
       });
       setTokenName0(value[1]);
+      console.log(
+        "balance0",
+        balance0,
+        "decimal",
+        value[2],
+        "raw",
+        value[0],
+        "formatted",
+        balance0.formatted
+      );
       // }
     },
   });
@@ -177,19 +188,20 @@ export default function Home() {
         abi: ERC20_ABI,
         functionName: "balanceOf",
         args: [address!],
+        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
       },
       { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
       {
         address: token0.address,
         abi: ERC20_ABI,
         functionName: "decimals",
+        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
       },
     ],
     onSuccess(value) {
       // if (token1 === tokens[0]) {
       //   setBalance1(eosBalance);
       // } else {
-      console.log("readBalance1", value);
       setBalance1({
         decimal: value[2].toNumber(),
         raw: value[0],
@@ -198,6 +210,16 @@ export default function Home() {
         ).toFixed(3),
       });
       setTokenName1(value[1]);
+      console.log(
+        "balance1",
+        balance1,
+        "decimal",
+        value[2],
+        "raw",
+        value[0],
+        "formatted",
+        balance1.formatted
+      );
       // }
     },
   });
