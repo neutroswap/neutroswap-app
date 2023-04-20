@@ -61,6 +61,7 @@ import {
   supportedChainID,
   SupportedChainID,
 } from "@/shared/types/chain.types";
+import Head from "next/head";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -419,6 +420,16 @@ export default function Home() {
 
   return (
     <>
+      <Head>
+        <title>Neutroswap</title>
+        <meta
+          name="description"
+          content="Audited community-driven AMM and Launchpad on EOS EVM blockchain."
+        />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+
       <div className="flex flex-col items-center justify-center min-h-[80%] pt-16">
         <div>
           <Text h2 height={3} className="text-center">
