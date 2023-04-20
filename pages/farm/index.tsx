@@ -167,6 +167,7 @@ export default function Farm() {
         </Button>
       </div>
 
+      {/* Farm Section & Search Bar */}
       {/* <div className="flex min-w-[80%] justify-between mb-10">
         <RadioGroup>
           <div className="flex w-full relative space-x-3">
@@ -276,8 +277,9 @@ const Comp = ({ data }: { data: FarmResponse }) => {
   const { isLoading: isApprovingLpToken, write: approveLpToken } =
     useContractWrite({
       ...approveLpTokenConfig,
-      onSuccess(result) {
+      onSuccess: async (result) => {
         result.wait().then((receipt) => console.log(receipt));
+        await refetchAllowance();
       },
     });
 

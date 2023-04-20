@@ -26,7 +26,13 @@ import {
   appendEthToContractAddress,
   TradeDirection,
 } from "simple-uniswap-sdk";
-import { useAccount, useContractReads, useNetwork, useSigner } from "wagmi";
+import {
+  useAccount,
+  useContractReads,
+  useNetwork,
+  useSigner,
+  useBalance,
+} from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
@@ -70,7 +76,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
-  const [isPreferNative, setIsPreferNative] = useState(false);
+  const [isPreferNative, setIsPreferNative] = useState(true);
   // const [isBalanceEnough, setIsBalanceEnough] = useState(true);
 
   const [balance0, setBalance0] = useState<Currency>({
@@ -111,16 +117,10 @@ export default function Home() {
   const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
   const [token1, setToken1] = useState<Token>(chainSpecificTokens[1]);
 
-  // useBalance({
-  //   address: address,
-  //   onSuccess(value) {
-  //     setEosBalance({
-  //       decimal: value.decimals,
-  //       raw: value.value,
-  //       formatted: parseFloat(value.formatted).toFixed(5),
-  //     });
-  //   },
-  // });
+  const { data: balance, refetch: refetchBalanceETH } = useBalance({
+    enabled: Boolean(address),
+    address,
+  });
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
@@ -511,13 +511,23 @@ export default function Home() {
                   className="flex items-center cursor-pointer"
                   onClick={() => {
                     if (!address) return;
-                    if (tokenName0 !== "WEOS") {
-                      setTokenAmount0(formatEther(balance0.raw));
-                      debouncedToken0(formatEther(balance0.raw));
-                    } else {
-                      setTokenAmount0(formatEther(balance!.formatted));
-                      debouncedToken0(formatEther(balance!.formatted));
-                    }
+                    const value =
+                      balance && tokenName0 === "WEOS"
+                        ? balance.value
+                        : balance0.raw;
+                    setTokenAmount0(formatEther(value));
+                    debouncedToken0(formatEther(value));
+                    // if (tokenName0 !== "WEOS") {
+                    //   setTokenAmount0(formatEther(balance0.raw));
+                    //   debouncedToken0(formatEther(balance0.raw));
+                    // } else {
+                    //   setTokenAmount0(
+                    //     BigNumber.from(balance?.value).toString()
+                    //   );
+                    //   debouncedToken0(
+                    //     BigNumber.from(balance?.value).toString()
+                    //   );
+                    // }
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
@@ -552,11 +562,11 @@ export default function Home() {
                       onChange={handleToken0Change}
                     />
                   )}
-                  {Number(tokenAmount0) > +balance!.formatted && (
+                  {/* {Number(tokenAmount0) > +balance0!.formatted && (
                     <small className="mt-1 text-red-500">
                       Insufficient balance
                     </small>
-                  )}
+                  )} */}
                 </div>
                 <TokenPicker
                   selectedToken={token0}
@@ -618,13 +628,23 @@ export default function Home() {
                   className="flex items-center cursor-pointer "
                   onClick={() => {
                     if (!address) return;
-                    if (tokenName1 !== "WEOS") {
-                      setTokenAmount1(formatEther(balance0.raw));
-                      debouncedToken1(formatEther(balance0.raw));
-                    } else {
-                      setTokenAmount1(formatEther(balance!.formatted));
-                      debouncedToken1(formatEther(balance!.formatted));
-                    }
+                    const value =
+                      balance && tokenName1 === "WEOS"
+                        ? balance.value
+                        : balance1.raw;
+                    setTokenAmount1(formatEther(value));
+                    debouncedToken1(formatEther(value));
+                    // if (tokenName1 !== "WEOS") {
+                    //   setTokenAmount1(formatEther(balance1.raw));
+                    //   debouncedToken1(formatEther(balance1.raw));
+                    // } else {
+                    //   setTokenAmount1(
+                    //     BigNumber.from(balance?.value).toString()
+                    //   );
+                    //   debouncedToken1(
+                    //     BigNumber.from(balance?.value).toString()
+                    //   );
+                    // }
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
@@ -636,7 +656,7 @@ export default function Home() {
                       <p className="text-sm">
                         {tokenName1 !== "WEOS" && balance1.formatted}
                         {tokenName1 === "WEOS" &&
-                          Number(balance!.formatted).toFixed(3)}
+                          Number(balance?.formatted).toFixed(3)}
                       </p>
                       <p className="text-sm ">
                         {tokenName1 !== "WEOS" && tokenName1}
@@ -823,10 +843,11 @@ export default function Home() {
                                   {parseFloat(tokenAmount1)
                                     .toFixed(3)
                                     .toString()}{" "}
-                                  {tokenName1}
+                                  {tokenName1 === "WEOS" ? "EOS" : tokenName1}
                                 </div>
                                 <div className="text-lg text-black/60 dark:text-neutral-400 font-medium">
-                                  Sell {tokenAmount0} {tokenName0}
+                                  Sell {tokenAmount0}{" "}
+                                  {tokenName0 === "WEOS" ? "EOS" : tokenName0}
                                 </div>
                               </div>
                               <img
@@ -920,11 +941,33 @@ export default function Home() {
                         {txHash !== "" && (
                           <>
                             <div className="flex justify-center items-center py-20 mb-5 ">
-                              <div className="mr-2 text-black dark:text-white">
-                                You sold {tokenAmount0} {tokenName0} for{" "}
-                                {parseFloat(tokenAmount1).toFixed(3).toString()}{" "}
-                                {tokenName1}
-                              </div>
+                              {tokenName0 === "WEOS" && (
+                                <div className="mr-2 text-black dark:text-white">
+                                  You sold {tokenAmount0} EOS for{" "}
+                                  {parseFloat(tokenAmount1)
+                                    .toFixed(3)
+                                    .toString()}{" "}
+                                  {tokenName1}
+                                </div>
+                              )}
+                              {tokenName1 === "WEOS" && (
+                                <div className="mr-2 text-black dark:text-white">
+                                  You sold {tokenAmount0} EOS for{" "}
+                                  {parseFloat(tokenAmount1)
+                                    .toFixed(3)
+                                    .toString()}{" "}
+                                  EOS
+                                </div>
+                              )}
+                              {/* {tokenName0 !== "WEOS" && (
+                                <div className="mr-2 text-black dark:text-white">
+                                  You sold {tokenAmount0} {tokenName0} for{" "}
+                                  {parseFloat(tokenAmount1)
+                                    .toFixed(3)
+                                    .toString()}{" "}
+                                  {tokenName1}
+                                </div>
+                              )} */}
                               <Link
                                 href={`https://explorer-testnet2.trust.one/tx/${txHash}`}
                                 target="_blank"
