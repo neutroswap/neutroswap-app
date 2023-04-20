@@ -219,8 +219,8 @@ const Comp = ({ data }: { data: FarmResponse }) => {
 
   const [isLpTokenApproved, setIsLpTokenApproved] = useState(false);
 
-  const [stakeAmount, setStakeAmount] = useState<string>();
-  const [unstakeAmount, setUnstakeAmount] = useState<string>();
+  const [stakeAmount, setStakeAmount] = useState<string>("0");
+  const [unstakeAmount, setUnstakeAmount] = useState<string>("0");
 
   const { data: lpTokenBalance } = useContractRead({
     address: data.lpToken,
@@ -350,7 +350,9 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                 <div className="flex justify-between">
                   <div>Available:</div>
                   <div>
-                    {!!lpTokenBalance && Number(formatEther(lpTokenBalance)).toFixed(2)} LP
+                    {!!lpTokenBalance &&
+                      Number(formatEther(lpTokenBalance)).toFixed(2)}{" "}
+                    LP
                   </div>
                 </div>
                 <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
@@ -421,8 +423,8 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                     MAX
                   </div>
                 </div>
-
                 <Button
+                  disabled={!unstake}
                   onClick={() => {
                     unstake?.();
                   }}
@@ -430,7 +432,8 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
                     "text-white dark:text-amber-600",
                     "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
                   )}
                 >
                   Unstake LP Tokens
@@ -443,6 +446,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
                   {parseFloat(data.reward).toFixed(3)} $NEUTRO
                 </div>
                 <Button
+                  disabled={!harvest}
                   onClick={() => {
                     harvest?.();
                   }}
