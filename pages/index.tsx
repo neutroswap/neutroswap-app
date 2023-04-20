@@ -154,6 +154,7 @@ export default function Home() {
       // if (token0 === tokens[0]) {
       //   setBalance0(eosBalance);
       // } else {
+      console.log("token0 decimals =", value[2]);
       setBalance0({
         decimal: value[2].toNumber(),
         raw: value[0],
@@ -223,16 +224,6 @@ export default function Home() {
     args: [token0.address, token1.address],
   });
 
-  console.log(
-    "Multicall Contract",
-    NEXT_PUBLIC_MULTICALL_CONTRACT,
-    "Router",
-    NEXT_PUBLIC_ROUTER_CONTRACT,
-    "factory",
-    NEXT_PUBLIC_FACTORY_CONTRACT,
-    "farm",
-    NEXT_PUBLIC_FARM_CONTRACT
-  );
   let customNetworkData = useMemo(
     () => ({
       nameNetwork: "EOS EVM",
@@ -935,7 +926,7 @@ export default function Home() {
                                 </div>
                               </div>
                               <Link
-                                href={`https://explorer-testnet2.trust.one/address/${
+                                href={`https://explorer.evm.eosnetwork.com/address/${
                                   address as string
                                 }`}
                                 target="_blank"
@@ -990,7 +981,7 @@ export default function Home() {
                                 {tokenName1 === "WEOS" ? "EOS" : tokenName1}
                               </div>
                               <Link
-                                href={`https://explorer-testnet2.trust.one/tx/${txHash}`}
+                                href={`https://explorer.evm.eosnetwork.com/tx/${txHash}`}
                                 target="_blank"
                                 rel="noreferrer"
                               >
