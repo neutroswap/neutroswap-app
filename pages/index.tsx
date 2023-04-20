@@ -68,6 +68,7 @@ import {
   NEXT_PUBLIC_FARM_CONTRACT,
   NEXT_PUBLIC_MULTICALL_CONTRACT,
   NEXT_PUBLIC_ROUTER_CONTRACT,
+  NEXT_PUBLIC_RPC,
   NEXT_PUBLIC_WEOS_ADDRESS,
 } from "@/shared/helpers/constants";
 
@@ -285,7 +286,7 @@ export default function Home() {
       ),
       ethereumAddress: address as string,
       chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      providerUrl: "https://api-testnet2.trust.one/",
+      providerUrl: NEXT_PUBLIC_RPC,
       settings: new UniswapPairSettings({
         gasSettings: {
           getGasPrice: async () => {
