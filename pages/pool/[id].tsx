@@ -114,12 +114,12 @@ export default function PoolDetails() {
       const [balance0, balance1, name0, name1, symbol0, symbol1, decimal0, decimal1] = value;
       setBalances([
         {
-          decimal: decimal0.toNumber(),
+          decimal: +formatUnits(balance0, decimal0),
           raw: balance0,
           formatted: Number(formatUnits(balance0, decimal0)).toFixed(2),
         },
         {
-          decimal: decimal1.toNumber(),
+          decimal: +formatUnits(balance1, decimal1),
           raw: balance1,
           formatted: Number(formatUnits(balance1, decimal1)).toFixed(2),
         },
