@@ -14,6 +14,8 @@ import { NEUTRO_FARM_ABI } from '@/shared/abi'
 import { CallContext } from 'ethereum-multicall/dist/esm/models'
 import { CoinGeckoClient, SimplePriceResponse } from 'coingecko-api-v3'
 
+let NEUTRO_PRICE = process.env.NEUTRO_PRICE;
+
 const coingecko = new CoinGeckoClient({
   timeout: 10000,
   autoRetry: true
@@ -231,6 +233,9 @@ export async function addTokenPrice(farmHoldings: FarmHoldings): Promise<FarmHol
 }
 
 export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
+  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
+  const neutroPrice = parseFloat(NEUTRO_PRICE)
+
   const provider = new ethers.providers.JsonRpcProvider(RPC, {
     chainId: CHAIN_ID,
     name: CHAIN_NAME,
@@ -294,7 +299,7 @@ export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
       totalStaked: farm.details.totalStaked,
       totalStakedInUsd: (parseFloat(farm.details.totalStaked) * parseFloat(farm.lpPrice)).toString(),
       pendingTokens: farm.details.pendingTokens,
-      pendingTokensInUsd: (parseFloat(farm.details.pendingTokens) * parseFloat("0.01")).toFixed(2).toString()
+      pendingTokensInUsd: (parseFloat(farm.details.pendingTokens) * neutroPrice).toFixed(2).toString()
     }
     holdings += parseFloat(farm.details.totalStakedInUsd)
     totalPendingTokenInUsd += parseFloat(farm.details.pendingTokensInUsd)
@@ -313,8 +318,10 @@ export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
 
 
 export async function getPrice(id: string): Promise<number> {
+  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
+  const neutroPrice = parseFloat(NEUTRO_PRICE)
   if (id === "neutro") {
-    return 0.01;
+    return neutroPrice
   }
 
   const tokenPrice = await coingecko.simplePrice({

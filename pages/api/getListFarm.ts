@@ -14,6 +14,8 @@ import { NEUTRO_FARM_ABI, NEUTRO_POOL_ABI } from '@/shared/abi'
 import { CallContext } from 'ethereum-multicall/dist/esm/models'
 import { CoinGeckoClient, SimplePriceResponse } from 'coingecko-api-v3'
 
+let NEUTRO_PRICE = process.env.NEUTRO_PRICE;
+
 const coingecko = new CoinGeckoClient({
   timeout: 10000,
   autoRetry: true
@@ -342,7 +344,8 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
 
 export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
   const SEC_IN_YEAR = parseFloat("31536000")
-  const neutroPrice = parseFloat("0.01")
+  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
+  const neutroPrice = parseFloat(NEUTRO_PRICE)
 
   for (const farm of yieldFarm.farms) {
     if (!farm.details?.rps) { throw Error }
@@ -362,8 +365,10 @@ export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
 }
 
 export async function getPrice(id: string): Promise<number> {
+  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
+  const neutroPrice = parseFloat(NEUTRO_PRICE)
   if (id === "neutro") {
-    return 0.01;
+    return neutroPrice
   }
 
   const tokenPrice = await coingecko.simplePrice({
