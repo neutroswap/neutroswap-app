@@ -192,7 +192,7 @@ export default function Home() {
       },
       { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
       {
-        address: token0.address,
+        address: token1.address,
         abi: ERC20_ABI,
         functionName: "decimals",
         chainId: Number(NEXT_PUBLIC_CHAIN_ID),
