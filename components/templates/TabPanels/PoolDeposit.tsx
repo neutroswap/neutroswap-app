@@ -26,6 +26,7 @@ import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { tokens } from "@/shared/statics/tokenList";
 import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
+import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 
 type PoolDepositPanelProps = {
   balances: Currency[],
@@ -75,12 +76,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     token0.address === nativeToken.address ||
     token1.address === nativeToken.address
   );
-
-  const parseBigNumber = (value?: string, decimal?: number): BigNumber => {
-    const parsedValue = (!!value && !!Number(value)) ? value : "0"
-    console.log('decimal', decimal, 'value', parsedValue);
-    return parseUnits(parsedValue, decimal ?? 18);
-  }
 
   // TODO: move slippage to state or store
   const SLIPPAGE = 0.5; // in percent

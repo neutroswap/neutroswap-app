@@ -2,7 +2,7 @@ import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, getAddress, parseEther } from "ethers/lib/utils.js";
+import { formatEther, formatUnits, getAddress, parseEther } from "ethers/lib/utils.js";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { useAccount, useContractRead, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
@@ -15,6 +15,7 @@ import dayjs from "dayjs";
 import { tokens } from "@/shared/statics/tokenList";
 import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
+import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 
 type PoolWithdrawalPanelProps = {
   balances: Currency[],
@@ -79,8 +80,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
   })
   const { isLoading: isApprovingLPToken, write: approveLPToken } = useContractWrite({
     ...approveLPTokenConfig,
-    onSuccess(result) {
-      result.wait().then(() => refetchAllowance())
+    onSuccess: async (result) => {
+      await result.wait();
+      await refetchAllowance();
     }
   })
 
@@ -93,8 +95,10 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
       token0.address, // tokenA
       token1.address, // tokenB
       amount, // liquidity
-      !!token0Amount ? parseEther(token0Amount!) : parseEther("0"), // amountAMin
-      !!token1Amount ? parseEther(token1Amount!) : parseEther("0"), // amountBMin
+      parseBigNumber(token0Amount, token0.decimal), // amountAMin
+      parseBigNumber(token1Amount, token1.decimal), // amountAMin
+      // !!token0Amount ? parseEther(token0Amount!) : parseEther("0"), // amountAMin
+      // !!token1Amount ? parseEther(token1Amount!) : parseEther("0"), // amountBMin
       address!, // address
       BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
     ],
@@ -119,8 +123,8 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     args: [
       token0.address === nativeToken.address ? token1.address : token0.address, // token
       amount, // liquidity
-      token0.address === nativeToken.address ? parseEther(token1Amount ?? "0") : parseEther(token0Amount ?? "0"), // amountTokenMin
-      token0.address === nativeToken.address ? parseEther(token0Amount ?? "0") : parseEther(token1Amount ?? "0"), // amountETHMin
+      token0.address === nativeToken.address ? parseBigNumber(token1Amount, token1.decimal) : parseBigNumber(token0Amount, token0.decimal), // amountTokenMin
+      token0.address === nativeToken.address ? parseBigNumber(token0Amount, token0.decimal) : parseBigNumber(token1Amount, token1.decimal), // amountETHMin
       address!, // address
       BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
     ],
@@ -139,11 +143,11 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
 
   useEffect(() => {
     if (amount.isZero() || totalLPSupply.isZero()) return;
-    const token0 = amount.mul(poolBalances[0].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
-    const token1 = amount.mul(poolBalances[1].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
-    setToken0Amount(formatEther(token0));
-    setToken1Amount(formatEther(token1));
-  }, [amount, poolBalances, totalLPSupply])
+    const token0Value = amount.mul(poolBalances[0].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
+    const token1Value = amount.mul(poolBalances[1].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
+    setToken0Amount(formatUnits(token0Value, token0.decimal));
+    setToken1Amount(formatUnits(token1Value, token1.decimal));
+  }, [token0, token1, amount, poolBalances, totalLPSupply])
 
   // NOTE: Enable for debugging only
   // useEffect(() => {
@@ -347,10 +351,21 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
             </div>
           </div>
         </div>
-        <div className="hidden w-full mt-4 col-span-5">
-          <div className="flex flex-col space-y-2 p-7 border border-neutral-200 dark:border-neutral-800 rounded-lg ">
+        {/*  NOTE: FOR DEBUGGING ONLY */}
+        {process.env.NODE_ENV !== 'production' && (
+          <div className="w-full mt-4 col-span-5">
+            <pre>
+              {JSON.stringify({
+                isPreferNative: isPreferNative,
+                slippage: SLIPPAGE + "%",
+                isToken0WEOS: token0.address === nativeToken.address,
+                isToken1WEOS: token1.address === nativeToken.address,
+                token0Amount: token0Amount,
+                token1Amount: token1Amount,
+              }, null, 4)}
+            </pre>
           </div>
-        </div>
+        )}
       </div>
     </div >
   )
