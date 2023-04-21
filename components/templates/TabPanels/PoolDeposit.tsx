@@ -4,7 +4,7 @@ import {
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, parseEther } from "ethers/lib/utils.js";
+import { formatEther, formatUnits, parseEther, parseUnits } from "ethers/lib/utils.js";
 import { ChangeEvent, useMemo, useState } from "react";
 import {
   useAccount,
@@ -76,9 +76,10 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     token1.address === nativeToken.address
   );
 
-  const parseBigNumber = (value?: string): BigNumber => {
+  const parseBigNumber = (value?: string, decimal?: number): BigNumber => {
     const parsedValue = (!!value && !!Number(value)) ? value : "0"
-    return parseEther(parsedValue);
+    console.log('decimal', decimal, 'value', parsedValue);
+    return parseUnits(parsedValue, decimal ?? 18);
   }
 
   // TODO: move slippage to state or store
@@ -113,8 +114,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     ],
     onSuccess(value) {
       // console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
-      setIsToken0Approved(+formatEther(value[0]) > balances[0].decimal);
-      setIsToken1Approved(+formatEther(value[1]) > balances[1].decimal);
+      setIsToken0Approved(+formatUnits(value[0], token0.decimal) > balances[0].decimal);
+      setIsToken1Approved(+formatUnits(value[1], token1.decimal) > balances[1].decimal);
     },
   });
 
@@ -174,8 +175,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       args: [
         token0.address,
         token1.address,
-        parseBigNumber(token0Amount),
-        parseBigNumber(token1Amount),
+        parseBigNumber(token0Amount, token0.decimal),
+        parseBigNumber(token1Amount, token1.decimal),
         token0Min,
         token1Min,
         address!,
@@ -211,14 +212,14 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       functionName: "addLiquidityETH",
       args: [
         token0.symbol === "WEOS" ? token1.address : token0.address, // token (address)
-        token0.symbol === "WEOS" ? parseBigNumber(token1Amount) : parseBigNumber(token0Amount), // amountTokenDesired
+        token0.symbol === "WEOS" ? parseBigNumber(token1Amount, token1.decimal) : parseBigNumber(token0Amount, token0.decimal), // amountTokenDesired
         token0.symbol === "WEOS" ? token1Min : token0Min, // amountTokenMin
         token0.symbol === "WEOS" ? token0Min : token1Min, // amountETHMin
         address!, // to
         BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
       ],
       overrides: {
-        value: token0.symbol === "WEOS" ? parseBigNumber(token0Amount) : parseBigNumber(token1Amount),
+        value: token0.symbol === "WEOS" ? parseBigNumber(token0Amount, token0.decimal) : parseBigNumber(token1Amount, token1.decimal),
       },
       onError(error) {
         console.log('Error', error)
@@ -253,12 +254,12 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     setIsFetchingToken1Price(true);
     try {
       // (r0 / r1) * amount0
-      const amount = (priceRatio[1] * Number(nextValue)).toString();
+      const amount = (priceRatio[1] * Number(nextValue)).toFixed(token1.decimal);
       setToken1Amount(amount)
 
       // calculate token0Min
       const amountsOut0 = await neutroRouter?.getAmountsOut(
-        parseEther(amount),
+        parseUnits(amount, token0.decimal),
         [token1.address, token0.address]
       )
       if (!amountsOut0) throw new Error("Fail getAmountsOut0");
@@ -267,7 +268,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
       // calculate token1Min
       const amountsOut1 = await neutroRouter?.getAmountsOut(
-        parseEther(nextValue),
+        parseUnits(nextValue, token1.decimal),
         [token0.address, token1.address]
       )
       if (!amountsOut1) throw new Error("Fail getAmountsOut1");
@@ -294,11 +295,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     setIsFetchingToken0Price(true);
     try {
       // (r1 / r0) * amount1
-      const amount = (priceRatio[0] * Number(nextValue)).toString();
+      const amount = (priceRatio[0] * Number(nextValue)).toFixed(token0.decimal);
       setToken0Amount(amount)
       // calculate token0Min
       const amountsOut0 = await neutroRouter?.getAmountsOut(
-        parseEther(nextValue),
+        parseUnits(nextValue, token0.decimal),
         [token1.address, token0.address]
       )
       if (!amountsOut0) throw new Error("Fail getAmountsOut0");
@@ -307,7 +308,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
       // calculate token1Min
       const amountsOut1 = await neutroRouter?.getAmountsOut(
-        parseEther(amount),
+        parseUnits(amount, token1.decimal),
         [token0.address, token1.address]
       )
       if (!amountsOut1) throw new Error("Fail getAmountsOut1");
@@ -338,14 +339,14 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     let value: BigNumber;
     if (isPreferNative && token0.symbol === "WEOS" && balance) value = balance.value;
     else value = balances[0].raw
-    return Number(token0Amount) > +formatEther(value)
+    return Number(token0Amount) > +formatUnits(value, token0.decimal)
   }
 
   const isAmount1Invalid = () => {
     let value: BigNumber;
     if (isPreferNative && token1.symbol === "WEOS" && balance) value = balance.value;
     else value = balances[1].raw
-    return Number(token1Amount) > +formatEther(value)
+    return Number(token1Amount) > +formatUnits(value, token1.decimal)
   }
 
   const isToken0NeedApproval = useMemo(() => {
@@ -414,8 +415,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                   onClick={() => {
                     if (!balances) return;
                     const value = (balance && isPreferNative && token0.symbol === "WEOS") ? balance.value : balances[0].raw
-                    setToken0Amount(formatEther(value));
-                    debouncedToken0(formatEther(value));
+                    setToken0Amount(formatUnits(value, token0.decimal));
+                    debouncedToken0(formatUnits(value, token0.decimal));
                   }}
                 >
                   MAX
@@ -472,8 +473,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                   onClick={() => {
                     if (!balances) return;
                     const value = (balance && isPreferNative && token1.symbol === "WEOS") ? balance.value : balances[1].raw;
-                    setToken1Amount(formatEther(value));
-                    debouncedToken1(formatEther(value));
+                    setToken1Amount(formatUnits(value, token1.decimal));
+                    debouncedToken1(formatUnits(value, token1.decimal));
                   }}
                 >
                   MAX
@@ -551,8 +552,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 isToken1WEOS: token1.address === nativeToken.address,
                 token0Amount: token0Amount,
                 token1Amount: token1Amount,
-                token0Min: formatEther(token0Min),
-                token1Min: formatEther(token1Min),
+                token0Min: formatUnits(token0Min, token0.decimal),
+                token1Min: formatUnits(token1Min, token1.decimal),
               }, null, 4)}
             </pre>
           </div>

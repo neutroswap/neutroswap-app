@@ -6,7 +6,7 @@ import { classNames } from "@/shared/helpers/classNamer";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 
 import { Token } from "@/shared/types/tokens.types";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther, formatUnits } from "ethers/lib/utils.js";
 import { useAccount, useContractRead, useContractReads } from "wagmi";
 import { ERC20_ABI, NEUTRO_POOL_ABI } from "@/shared/abi";
 
@@ -70,6 +70,7 @@ export default function PoolDetails() {
   });
 
   const { refetch: refetchReserves } = useContractRead({
+    enabled: Boolean(token0 && token1),
     address: router.query.id as `0x${string}`,
     abi: NEUTRO_POOL_ABI,
     functionName: "getReserves",
@@ -81,8 +82,8 @@ export default function PoolDetails() {
       };
       setIsNewPool(false);
       setPriceRatio([
-        +formatEther(response._reserve0) / +formatEther(response._reserve1), // amount0 * ratio0 = quote1
-        +formatEther(response._reserve1) / +formatEther(response._reserve0) // amount1 * ratio1 = quote0
+        +formatUnits(response._reserve0, token0?.decimal) / +formatUnits(response._reserve1, token1?.decimal), // amount0 * ratio0 = quote1
+        +formatUnits(response._reserve1, token1?.decimal) / +formatUnits(response._reserve0, token0?.decimal) // amount1 * ratio1 = quote0
       ])
     }
   });
@@ -110,33 +111,34 @@ export default function PoolDetails() {
       { address: pairs?.[1], abi: ERC20_ABI, functionName: "decimals" },
     ],
     onSuccess(value) {
+      const [balance0, balance1, name0, name1, symbol0, symbol1, decimal0, decimal1] = value;
       setBalances([
         {
-          decimal: value[7].toNumber(),
-          raw: value[0],
-          formatted: Number(formatEther(value[0])).toFixed(2),
+          decimal: decimal0.toNumber(),
+          raw: balance0,
+          formatted: Number(formatUnits(balance0, decimal0)).toFixed(2),
         },
         {
-          decimal: value[7].toNumber(),
-          raw: value[1],
-          formatted: Number(formatEther(value[1])).toFixed(2),
+          decimal: decimal1.toNumber(),
+          raw: balance1,
+          formatted: Number(formatUnits(balance1, decimal1)).toFixed(2),
         },
       ]);
       setToken0({
         network_id: "15557",
-        name: value[2],
+        name: name0,
         address: pairs?.[0]!,
-        symbol: value[4],
-        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${value[4].toLowerCase()}.svg`,
-        decimal: Number(formatEther(value[6])),
+        symbol: symbol0,
+        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol0.toLowerCase()}.svg`,
+        decimal: decimal0.toNumber(),
       });
       setToken1({
         network_id: "15557",
         address: pairs?.[1]!,
-        name: value[3],
-        symbol: value[5],
-        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${value[5].toLowerCase()}.svg`,
-        decimal: Number(formatEther(value[7])),
+        name: name1,
+        symbol: symbol1,
+        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol1.toLowerCase()}.svg`,
+        decimal: decimal1.toNumber(),
       });
     },
   });
@@ -167,6 +169,16 @@ export default function PoolDetails() {
         functionName: 'balanceOf',
         args: [router.query.id as `0x${string}`]
       },
+      {
+        address: token0?.address,
+        abi: ERC20_ABI,
+        functionName: 'decimals',
+      },
+      {
+        address: token1?.address,
+        abi: ERC20_ABI,
+        functionName: 'decimals',
+      },
     ],
     onSuccess: (value) => {
       setUserLPBalance({
@@ -177,14 +189,18 @@ export default function PoolDetails() {
       setTotalLPSupply(value[1])
       setPoolBalances([
         {
-          decimal: 18,
+          decimal: value[4].toNumber(),
           raw: value[2],
-          formatted: Number(formatEther(value[2])).toFixed(2)
+          formatted: Number(
+            formatUnits(value[2], value[4].toNumber())
+          ).toFixed(2)
         },
         {
-          decimal: 18,
+          decimal: value[5].toNumber(),
           raw: value[3],
-          formatted: Number(formatEther(value[3])).toFixed(2)
+          formatted: Number(
+            formatUnits(value[3], value[5].toNumber())
+          ).toFixed(2)
         }
       ])
     }
