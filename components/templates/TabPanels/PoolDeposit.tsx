@@ -259,7 +259,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
       // calculate token0Min
       const amountsOut0 = await neutroRouter?.getAmountsOut(
-        parseUnits(amount, token0.decimal),
+        parseUnits(amount, token1.decimal),
         [token1.address, token0.address]
       )
       if (!amountsOut0) throw new Error("Fail getAmountsOut0");
@@ -268,7 +268,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
       // calculate token1Min
       const amountsOut1 = await neutroRouter?.getAmountsOut(
-        parseUnits(nextValue, token1.decimal),
+        parseUnits(nextValue, token0.decimal),
         [token0.address, token1.address]
       )
       if (!amountsOut1) throw new Error("Fail getAmountsOut1");
@@ -299,7 +299,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       setToken0Amount(amount)
       // calculate token0Min
       const amountsOut0 = await neutroRouter?.getAmountsOut(
-        parseUnits(nextValue, token0.decimal),
+        parseUnits(nextValue, token1.decimal),
         [token1.address, token0.address]
       )
       if (!amountsOut0) throw new Error("Fail getAmountsOut0");
@@ -308,7 +308,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
       // calculate token1Min
       const amountsOut1 = await neutroRouter?.getAmountsOut(
-        parseUnits(amount, token1.decimal),
+        parseUnits(amount, token0.decimal),
         [token0.address, token1.address]
       )
       if (!amountsOut1) throw new Error("Fail getAmountsOut1");
