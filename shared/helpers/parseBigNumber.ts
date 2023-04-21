@@ -1,7 +1,7 @@
 import { BigNumber } from "ethers";
-import { parseEther } from "ethers/lib/utils.js";
+import { parseUnits } from "ethers/lib/utils.js";
 
-export const parseBigNumber = (value?: string): BigNumber => {
+export const parseBigNumber = (value?: string, decimal?: number): BigNumber => {
   const parsedValue = (!!value && !!Number(value)) ? value : "0"
-  return parseEther(parsedValue);
+  return parseUnits(parsedValue, decimal ?? 18);
 }
