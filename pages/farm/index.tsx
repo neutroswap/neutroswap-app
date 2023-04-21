@@ -101,7 +101,6 @@ export default function Farm() {
       setUserFarms(data);
       setTotalStaked(totalStaked);
       setPendingReward(pendingReward);
-      console.log("getUserFarm Data = ", data);
     }
     loadUserFarm();
   }, [address]);
@@ -116,7 +115,6 @@ export default function Farm() {
         )
       );
       setCombinedData(combinedData);
-      console.log("Combined Data =", combinedData);
     }
     combineData();
   }, [farms, userFarms]);

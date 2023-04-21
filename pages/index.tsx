@@ -87,7 +87,6 @@ export default function Home() {
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
   const [isPreferNative, setIsPreferNative] = useState(true);
-  // const [isBalanceEnough, setIsBalanceEnough] = useState(true);
 
   const [balance0, setBalance0] = useState<Currency>({
     decimal: 18,
@@ -134,8 +133,6 @@ export default function Home() {
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address),
-    // &&
-    // token0.address !== "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     contracts: [
       {
         address: token0.address,
@@ -153,9 +150,6 @@ export default function Home() {
       },
     ],
     onSuccess(value) {
-      // if (token0 === tokens[0]) {
-      //   setBalance0(eosBalance);
-      // } else {
       setBalance0({
         decimal: value[2].toNumber(),
         raw: value[0],
@@ -164,24 +158,11 @@ export default function Home() {
         ).toFixed(3),
       });
       setTokenName0(value[1]);
-      console.log(
-        "balance0",
-        balance0,
-        "decimal",
-        value[2],
-        "raw",
-        value[0],
-        "formatted",
-        balance0.formatted
-      );
-      // }
     },
   });
 
   const { isFetching: isFetchingBalance1 } = useContractReads({
     enabled: Boolean(address),
-    // &&
-    // token1.address !== "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
     contracts: [
       {
         address: token1.address,
@@ -199,9 +180,6 @@ export default function Home() {
       },
     ],
     onSuccess(value) {
-      // if (token1 === tokens[0]) {
-      //   setBalance1(eosBalance);
-      // } else {
       setBalance1({
         decimal: value[2].toNumber(),
         raw: value[0],
@@ -210,33 +188,15 @@ export default function Home() {
         ).toFixed(3),
       });
       setTokenName1(value[1]);
-      console.log(
-        "balance1",
-        balance1,
-        "decimal",
-        value[2],
-        "raw",
-        value[0],
-        "formatted",
-        balance1.formatted
-      );
-      // }
     },
   });
 
-  console.log(
-    "Decimals token0",
-    balance0.decimal,
-    "Decimals token1",
-    balance1.decimal
-  );
-
-  useEffect(() => {
-    console.log("Uniswap Factory =", uniswapFactory);
-    console.log("Pairs =", pairs);
-    console.log("Trade context = ", tradeContext);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [uniswapFactory, tradeContext]);
+  // useEffect(() => {
+  //   console.log("Uniswap Factory =", uniswapFactory);
+  //   console.log("Pairs =", pairs);
+  //   console.log("Trade context = ", tradeContext);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [uniswapFactory, tradeContext]);
 
   const { data: pairs } = useContractRead({
     address: NEXT_PUBLIC_FACTORY_CONTRACT as `0x${string}`,
@@ -352,16 +312,10 @@ export default function Home() {
     if (isNaN(+value)) return;
     setTokenAmount0(value);
     debouncedToken0(value);
-    // if (value < balance0.raw.toString()) {
-    //   setIsBalanceEnough(false);
-    // }
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
-    console.log("Called");
     if (!uniswapFactory) throw new Error("No Uniswap Pair Factory");
-    // if (!tradeContext) throw new Error("No TradeContext found");
-
     setIsFetchingToken1Price(true);
     const trade = await uniswapFactory.trade(nextValue, TradeDirection.input);
     setTokenAmount1(trade.expectedConvertQuote);
@@ -377,9 +331,6 @@ export default function Home() {
     if (isNaN(+value) || !+value) return;
     setTokenAmount1(value);
     debouncedToken1(value);
-    // if (value < balance1.raw.toString()) {
-    //   setIsBalanceEnough(false);
-    // }
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
@@ -419,9 +370,9 @@ export default function Home() {
       const approved = await signer.sendTransaction(
         tradeContext.approvalTransaction
       );
-      console.log("approved txHash", approved.hash);
+
       const approvedReceipt = await approved.wait();
-      console.log("approved receipt", approvedReceipt);
+
       setIsLoading(false);
       setIsApproved(true);
     }
@@ -432,29 +383,18 @@ export default function Home() {
     if (!tradeContext) return new Error("No TradeContext found");
     if (!signer) throw new Error("No signer");
 
-    // if (tradeContext.approvalTransaction) {
-    //   const approved = await signer.sendTransaction(
-    //     tradeContext.approvalTransaction
-    //   );
-    //   console.log("approved txHash", approved.hash);
-    //   const approvedReceipt = await approved.wait();
-    //   console.log("approved receipt", approvedReceipt);
-    //   setIsLoading(false);
-    // }
-
     try {
       const tradeTransaction = await signer.sendTransaction(
         tradeContext.transaction
       );
-      console.log("trade txHash", tradeTransaction.hash);
+
       setTxHash(tradeTransaction.hash);
       const tradeReceipt = await tradeTransaction.wait();
-      console.log("trade receipt", tradeReceipt);
       setIsLoading(false);
-      tradeContext.destroy(); //Coba dulu
+      tradeContext.destroy();
     } catch (error) {
       setIsLoading(false);
-      tradeContext.destroy(); //Coba dulu
+      tradeContext.destroy();
     }
   };
 
@@ -572,17 +512,6 @@ export default function Home() {
                         : balance0.raw;
                     setTokenAmount0(formatEther(value));
                     debouncedToken0(formatEther(value));
-                    // if (tokenName0 !== "WEOS") {
-                    //   setTokenAmount0(formatEther(balance0.raw));
-                    //   debouncedToken0(formatEther(balance0.raw));
-                    // } else {
-                    //   setTokenAmount0(
-                    //     BigNumber.from(balance?.value).toString()
-                    //   );
-                    //   debouncedToken0(
-                    //     BigNumber.from(balance?.value).toString()
-                    //   );
-                    // }
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
@@ -689,17 +618,6 @@ export default function Home() {
                         : balance1.raw;
                     setTokenAmount1(formatEther(value));
                     debouncedToken1(formatEther(value));
-                    // if (tokenName1 !== "WEOS") {
-                    //   setTokenAmount1(formatEther(balance1.raw));
-                    //   debouncedToken1(formatEther(balance1.raw));
-                    // } else {
-                    //   setTokenAmount1(
-                    //     BigNumber.from(balance?.value).toString()
-                    //   );
-                    //   debouncedToken1(
-                    //     BigNumber.from(balance?.value).toString()
-                    //   );
-                    // }
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
