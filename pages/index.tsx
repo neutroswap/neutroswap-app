@@ -307,6 +307,14 @@ export default function Home() {
     } else setIsApproved(false);
   }, [tradeContext]);
 
+  const isAmount0Invalid = () => {
+    let value: BigNumber;
+    if (isPreferNative && token0.symbol === "WEOS" && balance)
+      value = balance.value;
+    else value = balance0.raw;
+    return Number(tokenAmount0) > +formatUnits(value, token0.decimal);
+  };
+
   const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
@@ -510,8 +518,8 @@ export default function Home() {
                       balance && tokenName0 === "WEOS"
                         ? balance.value
                         : balance0.raw;
-                    setTokenAmount0(formatEther(value));
-                    debouncedToken0(formatEther(value));
+                    setTokenAmount0(formatUnits(value, token0.decimal));
+                    debouncedToken0(formatUnits(value, token0.decimal));
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
@@ -546,11 +554,11 @@ export default function Home() {
                       onChange={handleToken0Change}
                     />
                   )}
-                  {/* {Number(tokenAmount0) > +balance0!.formatted && (
+                  {isAmount0Invalid() && (
                     <small className="mt-1 text-red-500">
                       Insufficient balance
                     </small>
-                  )} */}
+                  )}
                 </div>
                 <TokenPicker
                   selectedToken={token0}
@@ -616,8 +624,8 @@ export default function Home() {
                       balance && tokenName1 === "WEOS"
                         ? balance.value
                         : balance1.raw;
-                    setTokenAmount1(formatEther(value));
-                    debouncedToken1(formatEther(value));
+                    setTokenAmount1(formatUnits(value, token1.decimal));
+                    debouncedToken1(formatUnits(value, token1.decimal));
                   }}
                 >
                   <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
