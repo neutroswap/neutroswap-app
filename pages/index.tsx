@@ -309,8 +309,7 @@ export default function Home() {
 
   const isAmount0Invalid = () => {
     let value: BigNumber;
-    if (isPreferNative && token0.symbol === "WEOS" && balance)
-      value = balance.value;
+    if (tokenName0 === "WEOS" && balance) value = balance.value;
     else value = balance0.raw;
     return Number(tokenAmount0) > +formatUnits(value, token0.decimal);
   };
