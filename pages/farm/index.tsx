@@ -560,7 +560,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
               </div>
             </div>
             <div className="flex items-center justify-between text-neutral-500">
-              <div className="text-xs font-bold uppercase">Deposited</div>
+              <div className="text-xs font-bold uppercase">Deposited:</div>
               <div className="text-sm space-x-2">
                 <span>{parseFloat(selectedRow.details.totalStaked!).toFixed(10)} LP</span>
                 <span className="font-semibold">~ ${Number(selectedRow.details.totalStakedInUsd).toFixed(2)}</span>
