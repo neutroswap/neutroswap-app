@@ -1,5 +1,5 @@
 // import { Inter } from 'next/font/google'
-import { Button, Input, Page, Text } from "@geist-ui/core";
+import { Button, Input, Loading, Modal, Page, Table, Tabs, Text, useModal } from "@geist-ui/core";
 import WalletIcon from "@/public/icons/wallet.svg";
 import { Disclosure, RadioGroup } from "@headlessui/react";
 import {
@@ -8,7 +8,7 @@ import {
   PlusIcon,
   TrashIcon,
 } from "@heroicons/react/24/solid";
-import { ChangeEvent, Fragment, useEffect, useState } from "react";
+import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
 import { BigNumber } from "ethers";
 import { classNames } from "@/shared/helpers/classNamer";
 import NumberInput from "@/components/elements/NumberInput";
@@ -26,95 +26,112 @@ import { ERC20_ABI, NEUTRO_FARM_ABI } from "@/shared/abi";
 import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
 import debounce from "lodash/debounce";
 import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
+import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
+import useFarmList, { AvailableFarm } from "@/shared/hooks/fetcher/farms/useFarmList";
+import useUserFarms, { OwnedFarm } from "@/shared/hooks/fetcher/farms/useUserFarms";
+import { Farm } from "@/shared/types/farm.types";
+import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { TableColumnRender } from "@geist-ui/core/esm/table";
+import OffloadedModal from "@/components/modules/OffloadedModal";
+import { BanknotesIcon } from "@heroicons/react/24/outline";
+import JsonSearch from "search-array";
 
 // const inter = Inter({ subsets: ['latin'] })
 
 const TABS = ["All Farms", "My Farms"];
 
-type FarmResponse = {
-  name: string;
-  totalLiq: string;
-  rps: string;
-  apr: string;
-  pid: 0;
-  logo0: string;
-  logo1: string;
-  lpToken: `0x${string}`;
-  staked: string;
-  reward: string;
-  stakedInUsd: string;
-  totalLiqInUsd: string;
-  totalStaked: string;
-  tvl: string;
-  holdings: string;
-};
+type MergedFarm = Farm & {
+  details: {
+    totalStaked?: string;
+    totalStakedInUsd?: string;
+    pendingTokens?: string;
+    pendingTokensInUsd?: string;
+    totalLiquidity: string;
+    apr: string;
+    rps: string;
+  };
+}
 
-export default function Farm() {
+export default function FarmPage() {
   const { address } = useAccount();
+  const searchRef = useRef<any>(null);
 
-  const [farms, setFarms] = useState<any>([]);
-  const [userFarms, setUserFarms] = useState<any>([]);
-  const [combinedData, setCombinedData] = useState<FarmResponse[]>([]);
-  const [tvl, setTvl] = useState<string>("");
-  const [totalStaked, setTotalStaked] = useState<string>("");
-  const [pendingReward, setPendingReward] = useState<string>("");
-  // const [allPid, setAllPid] = useState([]);
+  // const [farms, setFarms] = useState<any>([]);
+  // const [userFarms, setUserFarms] = useState<any>([]);
+  // const [tvl, setTvl] = useState<string>("");
+  // const [totalStaked, setTotalStaked] = useState<string>("");
+  // const [pendingReward, setPendingReward] = useState<string>("");
 
-  useEffect(() => {
-    async function loadListFarm() {
-      const response = await fetch("/api/getListFarm");
-      const fetched = await response.json();
-      const tvl = fetched.data.tvl as string;
-      const data = fetched.data.farms.map((details: any) => ({
-        name: details.name,
-        totalLiq: details.details.totalLiquidity,
-        totalLiqInUsd: details.valueOfLiquidity,
-        rps: details.details.rps,
-        apr: details.details.apr,
-        pid: details.pid,
-        logo0: details.token0Logo,
-        logo1: details.token1Logo,
-        lpToken: details.lpToken,
-      }));
-      setFarms(data);
-      setTvl(tvl);
-      // setAllPid(data.pid);
-    }
-    loadListFarm();
-  }, []);
+  const [query, setQuery] = useState<string>('');
+  const [data, setData] = useState<Array<MergedFarm>>([]);
+  const [mergedData, setMergedData] = useState<Array<MergedFarm>>([]);
+  const [selectedRow, setSelectedRow] = useState<MergedFarm>();
 
-  useEffect(() => {
-    async function loadUserFarm() {
-      const response = await fetch(`/api/getUserFarm?userAddress=${address}`);
-      // const response = await fetch(
-      //   `/api/getUserFarm?userAddress=0x222Da5f13D800Ff94947C20e8714E103822Ff716`,
-      //   {
-      const fetched = await response.json();
-      const totalStaked = fetched.data.holdings as string;
-      const pendingReward = fetched.data.totalPendingTokenInUsd as string;
-      const data = fetched.data.farms.map((details: any) => ({
-        name: details.name,
-        staked: details.details.totalStaked,
-        reward: details.details.pendingTokens,
-        stakedInUsd: details.details.totalStakedInUsd,
-      }));
-      setUserFarms(data);
-      setTotalStaked(totalStaked);
-      setPendingReward(pendingReward);
-    }
-    loadUserFarm();
-  }, [address]);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+
+  const { data: farms, isLoading: isFarmsLoading, error: isFarmsError } = useFarmList()
+  const { data: userFarms, isLoading: isUserFarmsLoading, error: isUserFarmsError } = useUserFarms(address)
+
+  // useEffect(() => {
+  //   async function loadListFarm() {
+  //     const response = await fetch("/api/getListFarm");
+  //     const fetched = await response.json();
+  //     const tvl = fetched.data.tvl as string;
+  //     const data = fetched.data.farms.map((details: any) => ({
+  //       name: details.name,
+  //       totalLiq: details.details.totalLiquidity,
+  //       totalLiqInUsd: details.valueOfLiquidity,
+  //       rps: details.details.rps,
+  //       apr: details.details.apr,
+  //       pid: details.pid,
+  //       logo0: details.token0Logo,
+  //       logo1: details.token1Logo,
+  //       lpToken: details.lpToken,
+  //     }));
+  //     setFarms(data);
+  //     setTvl(tvl);
+  //   }
+  //   loadListFarm();
+  // }, []);
+
+  // useEffect(() => {
+  //   async function loadUserFarm() {
+  //     const response = await fetch(`/api/getUserFarm?userAddress=${address}`);
+  //     // const response = await fetch(
+  //     //   `/api/getUserFarm?userAddress=0x222Da5f13D800Ff94947C20e8714E103822Ff716`,
+  //     //   {
+  //     const fetched = await response.json();
+  //     const totalStaked = fetched.data.holdings as string;
+  //     const pendingReward = fetched.data.totalPendingTokenInUsd as string;
+  //     const data = fetched.data.farms.map((details: any) => ({
+  //       name: details.name,
+  //       staked: details.details.totalStaked,
+  //       reward: details.details.pendingTokens,
+  //       stakedInUsd: details.details.totalStakedInUsd,
+  //     }));
+  //     setUserFarms(data);
+  //     setTotalStaked(totalStaked);
+  //     setPendingReward(pendingReward);
+  //   }
+  //   loadUserFarm();
+  // }, [address]);
 
   useEffect(() => {
     function combineData() {
-      const combinedData = farms.map((farm: any) =>
-        Object.assign(
-          {},
-          farm,
-          userFarms.find((userFarm: any) => farm.name === userFarm.name)
-        )
-      );
-      setCombinedData(combinedData);
+      if (!farms) return;
+      if (!userFarms) return;
+      // console.log('farms', farms);
+      // console.log('userFarms', userFarms);
+      const combinedData = farms.farms.map((farm: AvailableFarm) => {
+        const userExactFarm = userFarms.farms.find((userFarm: any) => farm.name === userFarm.name)
+        const temp = Object.assign({}, farm, userExactFarm);
+        const farmDetails = { ...farm.details, ...userExactFarm?.details }
+        return { ...temp, details: farmDetails }
+      });
+      // console.log('combinedData', combinedData);
+      setMergedData(combinedData);
+      setData(combinedData);
     }
     combineData();
   }, [farms, userFarms]);
@@ -130,8 +147,58 @@ export default function Farm() {
 
   const { write: harvestAll } = useContractWrite(harvestMany);
 
+  const resetMergedData = () => {
+    setQuery('');
+    setData(mergedData);
+    searchRef.current.value = "";
+  }
+
+  const handleSearch = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
+    setIsSearching(true);
+
+    if (!Boolean(e.target.value)) {
+      resetMergedData();
+      return setIsSearching(false);
+    };
+
+    setQuery(e.target.value);
+    // farm data lookup based on e.target.value
+    const fullTextSearch = new JsonSearch(mergedData);
+    const results: MergedFarm[] = fullTextSearch.query(e.target.value)
+    setData(results);
+    return setIsSearching(false);
+  })
+
+  const farmNameColumnHandler: TableColumnRender<MergedFarm> = (value, rowData, index) => {
+    return (
+      <div className="flex space-x-3 items-center my-5">
+        <div className="flex -space-x-2 relative z-0">
+          <img
+            src={rowData.token0Logo}
+            className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
+            onError={(e) => {
+              handleImageFallback(rowData.token0Logo, e);
+            }}
+          />
+          <img
+            src={rowData.token1Logo}
+            className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
+            onError={(e) => {
+              handleImageFallback(rowData.token1Logo, e);
+            }}
+          />
+        </div>
+        <div className="space-x-1 font-semibold text-neutral-800 dark:text-neutral-200">
+          <span>{rowData.name.split('-')[0]}</span>
+          <span className="text-neutral-400 dark:text-neutral-600">/</span>
+          <span>{rowData.name.split('-')[1]}</span>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-[80%] py-10">
+    <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-10">
       <div>
         <Text h2 height={3} className="text-center">
           Yield Farming
@@ -141,82 +208,125 @@ export default function Farm() {
         </Text>
       </div>
 
-      <div className="flex justify-between items-center min-w-[80%] mt-5 mb-10">
-        <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
-          <div className="mb-2 text-lg font-medium">Total Value Locked</div>
-          <div className="text-center text-amber-600">${tvl}</div>
+      <div className="flex w-full mt-5 mb-10 box-border">
+        <div className="w-full px-10 py-7 rounded-l-xl border border-neutral-200/80 dark:border-neutral-800/80">
+          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Total Value Locked</div>
+          <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+farms?.tvl!)}</div>
         </div>
-        <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
-          <div className="mb-2 text-lg font-medium">Your Staked Assets</div>
-          <div className="text-center text-amber-600">${totalStaked}</div>
+        <div className="w-full px-10 py-7 border-t border-b border-neutral-200/80 dark:border-neutral-800/80">
+          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Your Staked Assets</div>
+          <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.holdings!)}</div>
         </div>
-        <div className="flex flex-col px-10 py-7 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg shadow">
-          <div className="mb-2 text-lg font-medium">Unclaimed Rewards</div>
-          <div className="text-center text-amber-600">${pendingReward}</div>
+        <div className="w-full px-10 py-7 rounded-r-xl border border-neutral-200/80 dark:border-neutral-800/80">
+          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Unclaimed Rewards</div>
+          <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.totalPendingTokenInUsd!)}</div>
         </div>
+      </div>
 
-        <Button
-          onClick={() => harvestAll?.()}
-          className={classNames(
-            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm !text-base",
-            "text-white dark:text-amber-600",
-            "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-            "!border !border-orange-600/50 dark:border-orange-400/[.12]"
-          )}
+      <div className="relative flex w-full justify-between mb-4">
+        <Tabs
+          initialValue="1"
+          className="w-full"
+          hideDivider
+          hideBorder
+          activeClassName="font-semibold"
         >
-          Harvest All
-        </Button>
-      </div>
-
-      {/* Farm Section & Search Bar */}
-      {/* <div className="flex min-w-[80%] justify-between mb-10">
-        <RadioGroup>
-          <div className="flex w-full relative space-x-3">
-            <>
-              {TABS.map((tab, i) => (
-                <RadioGroup.Option as={Fragment} key={i} value={tab}>
-                  {({ checked }) => (
-                    <div
-                      className={classNames(
-                        checked
-                          ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 shadow"
-                          : "text-black dark:text-neutral-400 hover:bg-neutral-100 hover:dark:bg-white/[0.04]",
-                        "z-[1] relative rounded-lg text-md h-8 px-3 py-1 text-center font-medium flex flex-grow items-center justify-center cursor-pointer"
-                      )}
-                    >
-                      {tab}
-                    </div>
-                  )}
-                </RadioGroup.Option>
-              ))}
-            </>
+          <Tabs.Item label="All Farms" value="1">
+            {!Boolean(data.length) && (
+              <div className="my-5">
+                <Loading spaceRatio={2.5} />
+              </div>
+            )}
+            {Boolean(data.length) && (
+              <Table
+                data={data}
+                rowClassName={() => "cursor-pointer"}
+                emptyText="Loading..."
+                onRow={(rowData) => {
+                  setIsOpen(true);
+                  setSelectedRow(rowData);
+                }}
+              >
+                <Table.Column
+                  prop="name"
+                  label="farm"
+                  render={farmNameColumnHandler}
+                  width={280}
+                />
+                <Table.Column
+                  prop="valueOfLiquidity"
+                  label="TVL"
+                  render={(value) => <span>$ {currencyFormat(+value)}</span>}
+                />
+                <Table.Column
+                  prop="details"
+                  label="Rewards 24h"
+                  render={(value) => <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>}
+                />
+                <Table.Column
+                  prop="apr"
+                  label="APR"
+                  render={(_value, rowData: MergedFarm | any) => <span>{currencyFormat(+rowData.details.apr)} %</span>}
+                />
+                <Table.Column
+                  prop="apr"
+                  label="APR"
+                  render={(value, rowData: MergedFarm | any) => <span>{currencyFormat(+rowData.details.apr)} %</span>}
+                />
+              </Table>
+            )}
+          </Tabs.Item>
+          <Tabs.Item label="My Farms" value="2" disabled>
+          </Tabs.Item>
+        </Tabs>
+        <div className="absolute top-0 right-0 flex items-center space-x-4">
+          <div className="flex items-center bg-neutral-50 dark:bg-neutral-900/80 rounded-lg px-2 border border-neutral-200/80 dark:border-transparent">
+            <input
+              type="text"
+              ref={searchRef}
+              placeholder="Search by farm, name, symbol or address"
+              className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
+              onChange={handleSearch}
+            />
+            {!query && <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />}
+            {query && (
+              <button
+                onClick={() => resetMergedData()}
+                className="flex items-center inset-0 p-1 text-neutral-500 text-xs font-semibold uppercase hover:scale-105 transition"
+              >
+                clear
+              </button>
+            )}
           </div>
-        </RadioGroup>
-        <div className="flex items-center w-1/3 bg-white dark:bg-neutral-800 shadow rounded-lg px-2">
-          <input
-            type="text"
-            placeholder="Search by farm, name, symbol or address"
-            className="bg-transparent p-2 rounded-md w-full placeholder-black dark:placeholder-neutral-600"
-          />
-          <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />
+          <Button
+            auto
+            scale={0.8}
+            onClick={() => harvestAll?.()}
+            className={classNames(
+              "!flex !items-center !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+              "text-white dark:text-amber-600",
+              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+            )}
+          >
+            Harvest All
+          </Button>
         </div>
-      </div> */}
-
-      <div className="flex mb-4 min-w-[80%] justify-between items-center px-2">
-        <div className="ml-4 mr-10">Farm</div>
-        <div>TVL</div>
-        <div>Rewards</div>
-        <div className="mr-4">APR</div>
       </div>
 
-      {combinedData.map((data) => (
-        <Comp key={data.pid} data={data} />
-      ))}
+      <OffloadedModal
+        isOpen={isOpen}
+        onClose={() => {
+          setSelectedRow(undefined);
+          setIsOpen(false)
+        }}>
+        {selectedRow && <FarmRow selectedRow={selectedRow} />}
+      </OffloadedModal>
     </div>
   );
 }
 
-const Comp = ({ data }: { data: FarmResponse }) => {
+const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
   const { address, isConnected } = useAccount();
 
   const [isLpTokenApproved, setIsLpTokenApproved] = useState(false);
@@ -225,7 +335,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
   const [unstakeAmount, setUnstakeAmount] = useState<string>();
 
   const { data: lpTokenBalance } = useContractRead({
-    address: data.lpToken,
+    address: selectedRow.lpToken,
     abi: ERC20_ABI,
     functionName: "balanceOf",
     args: [address as `0x${string}`],
@@ -255,7 +365,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
   // }, 500);
 
   const { refetch: refetchAllowance } = useContractRead({
-    address: data.lpToken,
+    address: selectedRow.lpToken,
     abi: ERC20_ABI,
     functionName: "allowance",
     args: [address!, NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`],
@@ -265,7 +375,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
   });
 
   const { config: approveLpTokenConfig } = usePrepareContractWrite({
-    address: data.lpToken,
+    address: selectedRow.lpToken,
     abi: ERC20_ABI,
     functionName: "approve",
     args: [
@@ -289,7 +399,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
     abi: NEUTRO_FARM_ABI,
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "deposit",
-    args: [BigNumber.from(data.pid), parseBigNumber(stakeAmount!)],
+    args: [BigNumber.from(selectedRow.pid), parseBigNumber(stakeAmount!)],
     onError(error) {
       console.log("Error", error);
     },
@@ -306,7 +416,7 @@ const Comp = ({ data }: { data: FarmResponse }) => {
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
     functionName: "withdraw",
-    args: [BigNumber.from(data.pid), parseBigNumber(unstakeAmount!)],
+    args: [BigNumber.from(selectedRow.pid), parseBigNumber(unstakeAmount!)],
   });
 
   const { write: unstake } = useContractWrite(withdraw);
@@ -316,157 +426,159 @@ const Comp = ({ data }: { data: FarmResponse }) => {
     abi: NEUTRO_FARM_ABI,
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "deposit",
-    args: [BigNumber.from(data.pid), BigNumber.from(0)],
+    args: [BigNumber.from(selectedRow.pid), BigNumber.from(0)],
   });
   const { write: harvest } = useContractWrite(harvestConfig);
 
   return (
-    <Disclosure key={data.name}>
-      {({ open }) => (
-        <div className="mb-4 min-w-[80%]">
-          <Disclosure.Button
-            className={classNames(
-              "flex items-center py-2 w-full bg-neutral-200 dark:bg-neutral-900 rounded-lg",
-              open && "rounded-b-none"
-            )}
-          >
-            <div className="flex items-center w-full justify-between ml-4">
-              <div className="flex space-x-1 items-center">
-                <img src={data.logo0} alt="logo0" className="h-7" />
-                <img src={data.logo1} alt="logo1" className="h-7" />
-                <div>{data.name}</div>
-              </div>
-              <div>${data.totalLiqInUsd}</div>
-              <div>{(Number(data.rps) * 86400).toFixed(2)} NEUTRO / day</div>
-              <div className="mr-4">{data.apr}%</div>
-              {/* <ChevronUpIcon
-                className={`${
-                  open ? "rotate-180 transform" : ""
-                } h-5 w-5 text-orange-400 mr-4`}
-              /> */}
-            </div>
-          </Disclosure.Button>
-
-          <Disclosure.Panel className="p-4 pt-6  rounded-md rounded-t-none border border-neutral-200 dark:border-neutral-900">
-            <div className="flex w-full space-x-5">
-              <div className="flex flex-col justify-between w-full space-y-3">
-                <div className="flex justify-between">
-                  <div>Available:</div>
-                  <div>
-                    {!!lpTokenBalance &&
-                      Number(formatEther(lpTokenBalance)).toFixed(2)}{" "}
-                    LP
-                  </div>
-                </div>
-                <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
-                  <input
-                    value={stakeAmount}
-                    onChange={handleStakeAmountChange}
-                    placeholder="0.0"
-                    className="bg-transparent !px-3 !py-2 !rounded-lg"
-                  ></input>
-                  <div
-                    className="mr-3 text-sm text-amber-600 cursor-pointer"
-                    onClick={() => setStakeAmount(formatEther(lpTokenBalance!))}
-                  >
-                    MAX
-                  </div>
-                </div>
-                {!isLpTokenApproved && (
-                  <Button
-                    disabled={!approveLpToken}
-                    onClick={() => approveLpToken?.()}
-                    className={classNames(
-                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                      "text-white dark:text-amber-600",
-                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
-                    )}
-                  >
-                    Approve LP Tokens
-                  </Button>
-                )}
-                {isLpTokenApproved && (
-                  <Button
-                    disabled={!stake}
-                    onClick={() => stake?.()}
-                    className={classNames(
-                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                      "text-white dark:text-amber-600",
-                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                      "disabled:opacity-50 disabled:cursor-not-allowed"
-                    )}
-                  >
-                    Stake LP Tokens
-                  </Button>
-                )}
-              </div>
-
-              <div className="flex flex-col justify-between w-full ">
-                <div className="flex justify-between">
-                  <div>Deposited:</div>
-                  <div>
-                    {parseFloat(data.staked).toFixed(2)} LP ($
-                    {Number(data.stakedInUsd).toFixed(2)})
-                  </div>
-                </div>
-                <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
-                  <input
-                    value={unstakeAmount}
-                    onChange={handleUnstakeAmountChange}
-                    placeholder="0.0"
-                    className="bg-transparent !px-3 !py-2 !rounded-lg"
-                  ></input>
-                  <div
-                    className="mr-3 text-sm text-amber-600 cursor-pointer"
-                    onClick={() => setUnstakeAmount(data.staked)}
-                  >
-                    MAX
-                  </div>
-                </div>
-                <Button
-                  disabled={!unstake}
-                  onClick={() => {
-                    unstake?.();
-                  }}
-                  className={classNames(
-                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                    "disabled:opacity-50 disabled:cursor-not-allowed"
-                  )}
-                >
-                  Unstake LP Tokens
-                </Button>
-              </div>
-
-              <div className="flex flex-col justify-between w-full">
-                <div>Earned rewards:</div>
-                <div className="flex justify-center">
-                  {parseFloat(data.reward).toFixed(3)} $NEUTRO
-                </div>
-                <Button
-                  disabled={!harvest}
-                  onClick={() => {
-                    harvest?.();
-                  }}
-                  className={classNames(
-                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
-                  )}
-                >
-                  Harvest
-                </Button>
-              </div>
-            </div>
-          </Disclosure.Panel>
+    <div className="flex flex-col w-full">
+      <div className="flex space-x-3 items-center">
+        <div className="flex -space-x-2 relative z-0">
+          <img
+            src={selectedRow.token0Logo}
+            className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
+            onError={(e) => {
+              handleImageFallback(selectedRow.token0Logo, e);
+            }}
+          />
+          <img
+            src={selectedRow.token1Logo}
+            className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
+            onError={(e) => {
+              handleImageFallback(selectedRow.token1Logo, e);
+            }}
+          />
         </div>
-      )}
-    </Disclosure>
+        <div className="space-x-1 font-semibold text-neutral-800 dark:text-neutral-200 text-lg">
+          <span>{selectedRow.name.split('-')[0]}</span>
+          <span className="text-neutral-400 dark:text-neutral-600">/</span>
+          <span>{selectedRow.name.split('-')[1]}</span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between w-full mt-10">
+        <div className="space-y-1 mb-5">
+          <span className="text-xs font-bold uppercase text-neutral-500">Earned Rewards</span>
+          <div className="flex space-x-2 items-end justify-center text-3xl">
+            <span className="font-bold text-black dark:text-white">{parseFloat(selectedRow.reward).toFixed(6)}</span>
+            <span className="text-base text-neutral-500">$NEUTRO</span>
+          </div>
+        </div>
+        <Button
+          auto
+          disabled={!harvest}
+          onClick={() => {
+            harvest?.();
+          }}
+          iconRight={<BanknotesIcon className="w-4 h-4 opacity-90" />}
+          className={classNames(
+            "border-neutral-300 dark:border-neutral-800 hover:border-neutral-700 bg-transparent",
+          )}
+        >
+          Harvest
+        </Button>
+      </div>
+
+      <Tabs
+        initialValue="1"
+        className="w-full mt-6"
+        activeClassName="font-semibold"
+      >
+        <Tabs.Item label="Add" value="1">
+          <div className="flex flex-col justify-between w-full space-y-2.5 mt-1">
+            <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+              <input
+                value={stakeAmount}
+                onChange={handleStakeAmountChange}
+                placeholder="0.0"
+                className="bg-transparent !px-4 !py-3 !rounded-lg !box-border"
+              ></input>
+              <div
+                className="mr-3 text-sm text-amber-600 cursor-pointer"
+                onClick={() => setStakeAmount(formatEther(lpTokenBalance!))}
+              >
+                MAX
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-neutral-500">
+              <div className="text-xs font-bold uppercase">Available:</div>
+              <div className="text-sm space-x-2">
+                <span>{!!lpTokenBalance && Number(formatEther(lpTokenBalance)).toFixed(10)}{" "} LP</span>
+              </div>
+            </div>
+            {!isLpTokenApproved && (
+              <Button
+                disabled={!approveLpToken}
+                onClick={() => approveLpToken?.()}
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+              >
+                Approve LP Tokens
+              </Button>
+            )}
+            {isLpTokenApproved && (
+              <Button
+                disabled={!stake}
+                onClick={() => stake?.()}
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50 disabled:cursor-not-allowed"
+                )}
+              >
+                Stake LP Tokens
+              </Button>
+            )}
+          </div>
+        </Tabs.Item>
+        <Tabs.Item label="Remove" value="2">
+          <div className="flex flex-col justify-between w-full space-y-2.5 mt-1">
+            <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+              <input
+                value={unstakeAmount}
+                onChange={handleUnstakeAmountChange}
+                placeholder="0.0"
+                className="bg-transparent !px-4 !py-3 !rounded-lg !box-border"
+              ></input>
+              <div
+                className="mr-3 text-sm text-amber-600 cursor-pointer"
+                onClick={() => setUnstakeAmount(selectedRow.details.totalStaked)}
+              >
+                MAX
+              </div>
+            </div>
+            <div className="flex items-center justify-between text-neutral-500">
+              <div className="text-xs font-bold uppercase">Deposited</div>
+              <div className="text-sm space-x-2">
+                <span>{parseFloat(selectedRow.details.totalStaked!).toFixed(10)} LP</span>
+                <span className="font-semibold">~ ${Number(selectedRow.details.totalStakedInUsd).toFixed(2)}</span>
+              </div>
+            </div>
+            <Button
+              disabled={!unstake}
+              onClick={() => {
+                unstake?.();
+              }}
+              className={classNames(
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-amber-600",
+                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50 disabled:cursor-not-allowed"
+              )}
+            >
+              Unstake LP Tokens
+            </Button>
+          </div>
+        </Tabs.Item>
+      </Tabs>
+    </div>
   );
 };
