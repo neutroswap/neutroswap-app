@@ -36,6 +36,8 @@ import OffloadedModal from "@/components/modules/OffloadedModal";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import JsonSearch from "search-array";
 
+import LeafIcon from "@/public/icons/leaf.svg"
+
 // const inter = Inter({ subsets: ['latin'] })
 
 const TABS = ["All Farms", "My Farms"];
@@ -200,12 +202,15 @@ export default function FarmPage() {
   return (
     <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-10">
       <div>
-        <Text h2 height={3} className="text-center">
-          Yield Farming
-        </Text>
-        <Text type="secondary" p className="text-center !mt-0">
+        <div className="flex items-center space-x-4 -ml-10">
+          <LeafIcon className="w-10 h-10 text-neutral-700 dark:text-neutral-300 mt-1" />
+          <p className="m-0 text-center text-4xl font-semibold">
+            Yield Farming
+          </p>
+        </div>
+        <p className="m-0 text-center text-base text-neutral-400 mt-2">
           Earn yield by staking your LP Tokens
-        </Text>
+        </p>
       </div>
 
       <div className="flex w-full mt-5 mb-10 box-border">
