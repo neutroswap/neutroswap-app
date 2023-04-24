@@ -200,36 +200,35 @@ export async function composeData(farms: Farm[] | null, address: any): Promise<F
 }
 
 export async function addTokenPrice(farmHoldings: FarmHoldings): Promise<FarmHoldings> {
-  let promises = [];
+  const NEUTRO_PRICE = Number(process.env.NEUTRO_PRICE) || 0.01;
 
-  for (const farm of farmHoldings.farms) {
-    const token0Price = getPrice(farm.token0gecko);
-    const token1Price = getPrice(farm.token1gecko);
-    promises.push(token0Price, token1Price);
-  }
+  // Construct an array of all the token symbols to fetch prices for
+  const tokens = farmHoldings.farms
+    .map((farm) => [farm.token0gecko, farm.token1gecko])
+    .flat()
+    .filter((token) => token !== 'neutro');
 
-  let tokenPrices = await Promise.all(promises);
+  // Fetch the token prices for all the tokens
+  // console.log(tokens)
+  const tokenPrices = await getPrice(tokens.join(','));
+  // console.log(tokenPrices)
 
-  // Update the farms with the token prices and calculate the APR for each farm
-  // let aprs: BigNumber[] = [];
-  let farms: Farm[] = [];
-  for (let i = 0; i < farmHoldings.farms.length; i++) {
-    let farm = farmHoldings.farms[i];
-    farm.token0price = tokenPrices[i * 2];
-    farm.token1price = tokenPrices[i * 2 + 1];
+  // Update the token prices on each farm
+  const farmsWithPrices = farmHoldings.farms.map((farm) => {
+    if (farm.token0gecko !== 'neutro') {
+      farm.token0price = tokenPrices[farm.token0gecko]?.usd || NEUTRO_PRICE;
+    } else {
+      farm.token0price = NEUTRO_PRICE;
+    }
+    if (farm.token1gecko !== 'neutro') {
+      farm.token1price = tokenPrices[farm.token1gecko]?.usd || NEUTRO_PRICE;
+    } else {
+      farm.token1price = NEUTRO_PRICE;
+    }
+    return farm;
+  });
 
-    farms.push(farm);
-  }
-
-  // return { apr: aprs, updatedFarms: yieldFarm.farms };
-  const result: FarmHoldings = {
-    holdings: farmHoldings.holdings,
-    totalPendingTokens: farmHoldings.totalPendingTokens,
-    totalPendingTokenInUsd: farmHoldings.totalPendingTokenInUsd,
-    farms
-  }
-
-  return result
+  return { ...farmHoldings, farms: farmsWithPrices };
 }
 
 export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
@@ -317,18 +316,12 @@ export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
 }
 
 
-export async function getPrice(id: string): Promise<number> {
-  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
-  const neutroPrice = parseFloat(NEUTRO_PRICE)
-  if (id === "neutro") {
-    return neutroPrice
-  }
-
+export async function getPrice(id: string): Promise<any> {
   const tokenPrice = await coingecko.simplePrice({
     ids: id,
     vs_currencies: 'usd'
   })
-  return tokenPrice[id].usd
+  return tokenPrice
 }
 
 export default async function handler(
