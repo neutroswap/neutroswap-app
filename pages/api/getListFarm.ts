@@ -194,62 +194,35 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
 
 // export async function calculateApr(yieldFarm: YieldFarm, rps: BigNumber, totalLiqiudity: BigNumber): Promise<{ apr: BigNumber[], updatedFarms: Farm[] }> {
 export async function addTokenPrice(yieldFarm: YieldFarm): Promise<YieldFarm> {
-  let promises = [];
+  const NEUTRO_PRICE = Number(process.env.NEUTRO_PRICE) || 0.01;
 
-  for (const farm of yieldFarm.farms) {
-    const token0Price = getPrice(farm.token0gecko);
-    const token1Price = getPrice(farm.token1gecko);
-    promises.push(token0Price, token1Price);
-  }
+  // Construct an array of all the token symbols to fetch prices for
+  const tokens = yieldFarm.farms
+    .map((farm) => [farm.token0gecko, farm.token1gecko])
+    .flat()
+    .filter((token) => token !== 'neutro');
 
-  let tokenPrices = await Promise.all(promises);
+  // Fetch the token prices for all the tokens
+  // console.log(tokens)
+  const tokenPrices = await getPrice(tokens.join(','));
+  // console.log(tokenPrices)
 
-  // Update the farms with the token prices and calculate the APR for each farm
-  // let aprs: BigNumber[] = [];
-  let farms: Farm[] = [];
-  for (let i = 0; i < yieldFarm.farms.length; i++) {
-    let farm = yieldFarm.farms[i];
-    farm.token0price = tokenPrices[i * 2];
-    farm.token1price = tokenPrices[i * 2 + 1];
+  // Update the token prices on each farm
+  const farmsWithPrices = yieldFarm.farms.map((farm) => {
+    if (farm.token0gecko !== 'neutro') {
+      farm.token0price = tokenPrices[farm.token0gecko]?.usd || NEUTRO_PRICE;
+    } else {
+      farm.token0price = NEUTRO_PRICE;
+    }
+    if (farm.token1gecko !== 'neutro') {
+      farm.token1price = tokenPrices[farm.token1gecko]?.usd || NEUTRO_PRICE;
+    } else {
+      farm.token1price = NEUTRO_PRICE;
+    }
+    return farm;
+  });
 
-    //   const farmTokenPrice = BigNumber.from(utils.parseUnits(farm.token0price.toString(), 18)).add(BigNumber.from(utils.parseUnits(farm.token1price.toString(), 18)));
-    //   if (farm.details) {
-    //     // convert to decimals 18 to prevent u/o flow
-    //     const rps = BigNumber.from(utils.parseUnits(farm.details.rps.toString(), 18))
-    //     // const valueOfLiquidityPool = BigNumber.from(utils.parseUnits(farm.details.totalLiquidity, 18))
-    //     // const totalLiquidityPool = BigNumber.from(utils.parseUnits(farm.details.totalLiquidity.toString(), 18))
-    //     const neutroPrice = BigNumber.from(utils.parseUnits("1", 18))
-    //     const denominator = BigNumber.from(utils.parseUnits("1", 18))
-    //     const totalLiquidity = BigNumber.from(utils.parseUnits("5", 18))
-    //     const totalValueOfLiquidity = farmTokenPrice.div(totalLiquidity)
-    //     console.log("rps", rps.toString())
-    //     console.log("totalLiquidity", totalLiquidity.toString())
-    //     console.log("liquidity", totalValueOfLiquidity.toString())
-    //     console.log("farmTokenPrice", farmTokenPrice.toString())
-
-    //     const apr = rps.mul(ONE_YEAR).mul(1).div(totalValueOfLiquidity).mul(100).div(denominator)
-
-    //     // const apr = (
-    //     //   BigNumber.from(utils.parseUnits(farm.details.rps.toString(), 18))
-    //     //     .mul(ONE_YEAR)
-    //     //     .mul(farmTokenPrice.toString())
-    //     //     .div(BigNumber.from(farmTokenPrice.toString()).div(BigNumber.from(utils.parseUnits(farm.details.totalLiquidity, 18)))))
-    //     //   .mul(BigNumber.from("100").toString())
-    //     //   .div(utils.parseUnits(BigNumber.from("1").toString(), 18));
-    //     farm.details.apr = apr.toString();
-    //     // aprs.push(apr);
-    //   }
-    //   // aprs.push(apr);
-    farms.push(farm);
-  }
-
-  // return { apr: aprs, updatedFarms: yieldFarm.farms };
-  const result: YieldFarm = {
-    tvl: yieldFarm.tvl,
-    farms
-  }
-
-  return result
+  return { ...yieldFarm, farms: farmsWithPrices };
 }
 
 // Total value of liquidity pool = (10,000 * $1) + (5,000 * $2) = $20,000
@@ -364,18 +337,12 @@ export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
   return result
 }
 
-export async function getPrice(id: string): Promise<number> {
-  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
-  const neutroPrice = parseFloat(NEUTRO_PRICE)
-  if (id === "neutro") {
-    return neutroPrice
-  }
-
+export async function getPrice(id: string): Promise<any> {
   const tokenPrice = await coingecko.simplePrice({
     ids: id,
     vs_currencies: 'usd'
   })
-  return tokenPrice[id].usd
+  return tokenPrice
 }
 
 export default async function handler(
