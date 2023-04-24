@@ -496,7 +496,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
                 value={stakeAmount}
                 onChange={handleStakeAmountChange}
                 placeholder="0.0"
-                className="bg-transparent !px-4 !py-3 !rounded-lg !box-border"
+                className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
                 className="mr-3 text-sm text-amber-600 cursor-pointer"
@@ -550,7 +550,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
                 value={unstakeAmount}
                 onChange={handleUnstakeAmountChange}
                 placeholder="0.0"
-                className="bg-transparent !px-4 !py-3 !rounded-lg !box-border"
+                className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
                 className="mr-3 text-sm text-amber-600 cursor-pointer"
