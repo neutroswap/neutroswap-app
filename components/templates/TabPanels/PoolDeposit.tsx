@@ -78,7 +78,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   );
 
   // TODO: move slippage to state or store
-  const SLIPPAGE = 0.5; // in percent
+  const SLIPPAGE = 500; // 1.5%
 
   const { data: balance, refetch: refetchBalanceETH } = useBalance({
     enabled: Boolean(address),
@@ -198,8 +198,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     usePrepareContractWrite({
       enabled: Boolean(
         (token0.address === nativeToken.address || token1.address === nativeToken.address) && // do not enable if none of the addr is WEOS
-        // Boolean(Number(token0Amount)) &&
-        // Boolean(Number(token1Amount)) &&
         isPreferNative
       ),
       address: ROUTER_CONTRACT,
@@ -239,7 +237,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     if (isNaN(+value)) return;
     setToken0Amount(value);
 
-    if (isNewPool) return setToken0Min(parseEther(!!value ? value : "0"));
+    if (isNewPool) return setToken0Min(parseUnits(!!value ? value : "0", token0.decimal).mul(10000 - SLIPPAGE).div(10000));
+    // if (isNewPool) return setToken0Min(parseEther("0"));
     else debouncedToken0(value);
   };
 
@@ -280,7 +279,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     if (isNaN(+value)) return;
     setToken1Amount(value);
 
-    if (isNewPool) return setToken1Min(parseEther(!!value ? value : "0"));
+    if (isNewPool) return setToken1Min(parseUnits(!!value ? value : "0", token1.decimal).mul(10000 - SLIPPAGE).div(10000));
+    // if (isNewPool) return setToken1Min(parseEther("0"));
     else debouncedToken1(value);
   };
 
@@ -542,7 +542,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
             <pre>
               {JSON.stringify({
                 isPreferNative: isPreferNative,
-                slippage: SLIPPAGE + "%",
+                slippage: ((SLIPPAGE / 10000) * 100) + "%",
                 isToken0WEOS: token0.address === nativeToken.address,
                 isToken1WEOS: token1.address === nativeToken.address,
                 token0Amount: token0Amount,

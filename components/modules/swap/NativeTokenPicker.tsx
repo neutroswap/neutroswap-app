@@ -27,7 +27,8 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
       chainSpecificTokens[0],
       {
         ...chainSpecificTokens[0],
-        name: "W" + chainSpecificTokens[0].name
+        name: "W" + chainSpecificTokens[0].name,
+        symbol: "W" + chainSpecificTokens[0].name
       }
     ]
   }, [chainSpecificTokens])
