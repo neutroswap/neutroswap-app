@@ -109,8 +109,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     ],
     onSuccess(value) {
       // console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
-      setIsToken0Approved(+formatUnits(value[0], token0.decimal) > balances[0].decimal);
-      setIsToken1Approved(+formatUnits(value[1], token1.decimal) > balances[1].decimal);
+      setIsToken0Approved(+formatUnits(value[0], token0.decimal) >= balances[0].decimal);
+      setIsToken1Approved(+formatUnits(value[1], token1.decimal) >= balances[1].decimal);
     },
   });
 
