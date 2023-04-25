@@ -109,8 +109,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     ],
     onSuccess(value) {
       // console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
-      setIsToken0Approved(+formatUnits(value[0], token0.decimal) > balances[0].decimal);
-      setIsToken1Approved(+formatUnits(value[1], token1.decimal) > balances[1].decimal);
+      setIsToken0Approved(+formatUnits(value[0], token0.decimal) >= balances[0].decimal);
+      setIsToken1Approved(+formatUnits(value[1], token1.decimal) >= balances[1].decimal);
     },
   });
 
@@ -238,7 +238,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     setToken0Amount(value);
 
     if (isNewPool) return setToken0Min(parseUnits(!!value ? value : "0", token0.decimal).mul(10000 - SLIPPAGE).div(10000));
-    // if (isNewPool) return setToken0Min(parseEther("0"));
     else debouncedToken0(value);
   };
 
@@ -280,7 +279,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     setToken1Amount(value);
 
     if (isNewPool) return setToken1Min(parseUnits(!!value ? value : "0", token1.decimal).mul(10000 - SLIPPAGE).div(10000));
-    // if (isNewPool) return setToken1Min(parseEther("0"));
     else debouncedToken1(value);
   };
 
@@ -411,7 +409,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                     if (!balances) return;
                     const value = (balance && isPreferNative && token0.symbol === "WEOS") ? balance.value : balances[0].raw
                     setToken0Amount(formatUnits(value, token0.decimal));
-                    debouncedToken0(formatUnits(value, token0.decimal));
+                    if (!isNewPool) debouncedToken0(formatUnits(value, token0.decimal));
                   }}
                 >
                   MAX
@@ -469,7 +467,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                     if (!balances) return;
                     const value = (balance && isPreferNative && token1.symbol === "WEOS") ? balance.value : balances[1].raw;
                     setToken1Amount(formatUnits(value, token1.decimal));
-                    debouncedToken1(formatUnits(value, token1.decimal));
+                    if (!isNewPool) debouncedToken1(formatUnits(value, token1.decimal));
                   }}
                 >
                   MAX
