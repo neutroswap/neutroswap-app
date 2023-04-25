@@ -65,7 +65,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       symbol: "EOS",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
       name: "EOS",
-      address: "0x6ccc5ad199bf1c64b50f6e7dd530d71402402eb6",
+      address: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
       decimal: 18,
     },
     {
