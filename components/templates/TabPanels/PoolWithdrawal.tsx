@@ -64,7 +64,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     functionName: 'allowance',
     args: [address!, ROUTER_CONTRACT],
     onSuccess(value) {
-      setIsLPTokenApproved(+formatEther(value) > 0);
+      setIsLPTokenApproved(+formatEther(value) >= userLPBalance.decimal);
     },
   })
 
