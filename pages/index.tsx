@@ -248,6 +248,8 @@ export default function Home() {
   useEffect(() => {
     if (!pairs) return;
     if (!address) return;
+    console.log('token0', token0);
+    console.log('token1', token1);
     const uniswapPair = new UniswapPair({
       fromTokenContractAddress: formatWrappedToken(
         token0.address,
@@ -281,6 +283,11 @@ export default function Home() {
       setUniswapFactory(x);
     };
     fac(uniswapPair);
+
+    return () => {
+      setTokenAmount0("");
+      setTokenAmount1("");
+    }
   }, [
     address,
     cloneUniswapContractDetailsV2,
@@ -318,7 +325,7 @@ export default function Home() {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setTokenAmount0(value);
-    debouncedToken0(value);
+    if (+value) debouncedToken0(value);
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
@@ -335,9 +342,9 @@ export default function Home() {
 
   const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (isNaN(+value) || !+value) return;
+    if (isNaN(+value)) return;
     setTokenAmount1(value);
-    debouncedToken1(value);
+    if (+value) debouncedToken1(value);
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
@@ -873,9 +880,8 @@ export default function Home() {
                                 </div>
                               </div>
                               <Link
-                                href={`https://explorer.evm.eosnetwork.com/address/${
-                                  address as string
-                                }`}
+                                href={`https://explorer.evm.eosnetwork.com/address/${address as string
+                                  }`}
                                 target="_blank"
                                 rel="noreferrer"
                               >

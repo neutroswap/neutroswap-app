@@ -1,5 +1,5 @@
 // import { Inter } from 'next/font/google'
-import { Button, Input, Loading, Modal, Page, Table, Tabs, Text, useModal } from "@geist-ui/core";
+import { Button, Code, Input, Loading, Modal, Page, Table, Tabs, Text, useModal, useTheme } from "@geist-ui/core";
 import WalletIcon from "@/public/icons/wallet.svg";
 import { Disclosure, RadioGroup } from "@headlessui/react";
 import {
@@ -37,10 +37,9 @@ import { BanknotesIcon } from "@heroicons/react/24/outline";
 import JsonSearch from "search-array";
 
 import LeafIcon from "@/public/icons/leaf.svg"
-
-// const inter = Inter({ subsets: ['latin'] })
-
-const TABS = ["All Farms", "My Farms"];
+import NoContentDark from "@/public/states/empty/dark.svg";
+import NoContentLight from "@/public/states/empty/light.svg";
+import { ThemeType } from "@/shared/hooks/usePrefers";
 
 type MergedFarm = Farm & {
   details: {
@@ -55,14 +54,9 @@ type MergedFarm = Farm & {
 }
 
 export default function FarmPage() {
+  const theme = useTheme();
   const { address } = useAccount();
   const searchRef = useRef<any>(null);
-
-  // const [farms, setFarms] = useState<any>([]);
-  // const [userFarms, setUserFarms] = useState<any>([]);
-  // const [tvl, setTvl] = useState<string>("");
-  // const [totalStaked, setTotalStaked] = useState<string>("");
-  // const [pendingReward, setPendingReward] = useState<string>("");
 
   const [query, setQuery] = useState<string>('');
   const [data, setData] = useState<Array<MergedFarm>>([]);
@@ -75,63 +69,16 @@ export default function FarmPage() {
   const { data: farms, isLoading: isFarmsLoading, error: isFarmsError } = useFarmList()
   const { data: userFarms, isLoading: isUserFarmsLoading, error: isUserFarmsError } = useUserFarms(address)
 
-  // useEffect(() => {
-  //   async function loadListFarm() {
-  //     const response = await fetch("/api/getListFarm");
-  //     const fetched = await response.json();
-  //     const tvl = fetched.data.tvl as string;
-  //     const data = fetched.data.farms.map((details: any) => ({
-  //       name: details.name,
-  //       totalLiq: details.details.totalLiquidity,
-  //       totalLiqInUsd: details.valueOfLiquidity,
-  //       rps: details.details.rps,
-  //       apr: details.details.apr,
-  //       pid: details.pid,
-  //       logo0: details.token0Logo,
-  //       logo1: details.token1Logo,
-  //       lpToken: details.lpToken,
-  //     }));
-  //     setFarms(data);
-  //     setTvl(tvl);
-  //   }
-  //   loadListFarm();
-  // }, []);
-
-  // useEffect(() => {
-  //   async function loadUserFarm() {
-  //     const response = await fetch(`/api/getUserFarm?userAddress=${address}`);
-  //     // const response = await fetch(
-  //     //   `/api/getUserFarm?userAddress=0x222Da5f13D800Ff94947C20e8714E103822Ff716`,
-  //     //   {
-  //     const fetched = await response.json();
-  //     const totalStaked = fetched.data.holdings as string;
-  //     const pendingReward = fetched.data.totalPendingTokenInUsd as string;
-  //     const data = fetched.data.farms.map((details: any) => ({
-  //       name: details.name,
-  //       staked: details.details.totalStaked,
-  //       reward: details.details.pendingTokens,
-  //       stakedInUsd: details.details.totalStakedInUsd,
-  //     }));
-  //     setUserFarms(data);
-  //     setTotalStaked(totalStaked);
-  //     setPendingReward(pendingReward);
-  //   }
-  //   loadUserFarm();
-  // }, [address]);
-
   useEffect(() => {
     function combineData() {
       if (!farms) return;
       if (!userFarms) return;
-      // console.log('farms', farms);
-      // console.log('userFarms', userFarms);
       const combinedData = farms.farms.map((farm: AvailableFarm) => {
         const userExactFarm = userFarms.farms.find((userFarm: any) => farm.name === userFarm.name)
         const temp = Object.assign({}, farm, userExactFarm);
         const farmDetails = { ...farm.details, ...userExactFarm?.details }
         return { ...temp, details: farmDetails }
       });
-      // console.log('combinedData', combinedData);
       setMergedData(combinedData);
       setData(combinedData);
     }
@@ -237,7 +184,20 @@ export default function FarmPage() {
           activeClassName="font-semibold"
         >
           <Tabs.Item label="All Farms" value="1">
-            {!Boolean(data.length) && (
+            {(!Boolean(data.length) && !(isFarmsLoading || isUserFarmsLoading || isSearching)) && (
+              <div className="flex flex-col items-center w-full p-8">
+                {theme.type as ThemeType === "nlight" && (
+                  <NoContentLight className="w-40 h-40 opacity-75" />
+                )}
+                {theme.type as ThemeType === "ndark" && (
+                  <NoContentDark className="w-40 h-40 opacity-75" />
+                )}
+                <p className="text-neutral-500 w-3/4 text-center">
+                  No farms with <Code>{query}</Code> found. Try to use search with contract address instead of token name.
+                </p>
+              </div>
+            )}
+            {(isFarmsLoading || isUserFarmsLoading || isSearching) && (
               <div className="my-5">
                 <Loading spaceRatio={2.5} />
               </div>
