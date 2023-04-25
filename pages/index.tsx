@@ -724,7 +724,6 @@ export default function Home() {
               </div>
             </div>
 
-            {/* {(!!tokenAmount1 && (calcPriceImpact > 3)) && ( */}
 
             {((!!tokenAmount1 && !isFetchingBalance0 && !isFetchingBalance1) && calcPriceImpact < -2) && (
               <div

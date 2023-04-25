@@ -539,6 +539,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
           <div className="w-full mt-4 col-span-5">
             <pre>
               {JSON.stringify({
+                token0: token0.address,
+                token1: token1.address,
                 isPreferNative: isPreferNative,
                 slippage: ((SLIPPAGE / 10000) * 100) + "%",
                 isToken0WEOS: token0.address === nativeToken.address,
