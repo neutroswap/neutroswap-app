@@ -7,7 +7,7 @@ import React, {
   ChangeEvent,
   useCallback,
 } from "react";
-import { Button, Spinner, Text } from "@geist-ui/core";
+import { Button, Note, Spinner, Text } from "@geist-ui/core";
 import {
   ChevronDownIcon,
   AdjustmentsHorizontalIcon,
@@ -33,7 +33,7 @@ import {
   useSigner,
   useBalance,
 } from "wagmi";
-import { ERC20_ABI, NEUTRO_FACTORY_ABI } from "@/shared/abi";
+import { ERC20_ABI, NEUTRO_FACTORY_ABI, NEUTRO_POOL_ABI } from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
@@ -114,6 +114,7 @@ export default function Home() {
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
   const [txHash, setTxHash] = useState<string>("");
+  const [marketPrice, setMarketPrice] = useState(0);
 
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
@@ -204,6 +205,27 @@ export default function Home() {
     functionName: "getPair",
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     args: [token0.address, token1.address],
+  });
+
+  const poolContract = {
+    address: pairs as `0x${string}`,
+    abi: NEUTRO_POOL_ABI,
+  };
+
+  const { refetch: refetchReserves } = useContractReads({
+    enabled: Boolean(token0 && token1 && pairs),
+    contracts: [
+      { ...poolContract, functionName: "token0" },
+      { ...poolContract, functionName: "token1" },
+      { ...poolContract, functionName: "getReserves" }
+    ],
+    onSuccess(response) {
+      const [t0, t1, reserves] = response;
+      if (token0.address === t0) setMarketPrice(+formatUnits(reserves._reserve1, token1.decimal) / +formatUnits(reserves._reserve0, token0.decimal))
+      if (token0.address === t1) setMarketPrice(+formatUnits(reserves._reserve0, token0.decimal) / +formatUnits(reserves._reserve1, token1.decimal))
+
+      // console.log('constants product', +formatUnits(reserves._reserve0, token0.decimal) * +formatUnits(reserves._reserve1, token1.decimal))
+    }
   });
 
   let customNetworkData = useMemo(
@@ -361,11 +383,12 @@ export default function Home() {
     setIsFetchingToken0Price(false);
   }, 500);
 
-  const handleSwitchTokens = () => {
+  const handleSwitchTokens = async () => {
     setToken0(token1);
     setToken1(token0);
     setTokenAmount0(tokenAmount1);
     setTokenAmount1(tokenAmount0);
+    await refetchReserves();
   };
 
   const handleSwapAgain = () => {
@@ -409,6 +432,10 @@ export default function Home() {
       tradeContext.destroy();
     }
   };
+
+  const calcPriceImpact = useMemo(() => {
+    return (1 - (+tokenAmount0 * marketPrice / +tokenAmount1)) * 100
+  }, [tokenAmount0, marketPrice, tokenAmount1])
 
   if (!isMounted) {
     return <Spinner />;
@@ -696,6 +723,21 @@ export default function Home() {
                 </TokenPicker>
               </div>
             </div>
+
+            {/* {(!!tokenAmount1 && (calcPriceImpact > 3)) && ( */}
+
+            {((!!tokenAmount1 && !isFetchingBalance0 && !isFetchingBalance1) && calcPriceImpact < -2) && (
+              <div
+                className={classNames(
+                  "flex mt-4 text-sm border border-red-500 p-2 justify-between animate-pulse rounded-lg",
+                  "text-red-500 font-medium"
+                )}
+              >
+                <span>Price impact warning </span>
+                <span>{calcPriceImpact < -100 ? "> -100" : calcPriceImpact.toFixed(2)}%</span>
+                {/* <span>{calcPriceImpact.toFixed(2)}%</span> */}
+              </div>
+            )}
 
             <div className="flex mt-3 justify-center">
               {!isConnected && (
