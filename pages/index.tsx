@@ -248,8 +248,6 @@ export default function Home() {
   useEffect(() => {
     if (!pairs) return;
     if (!address) return;
-    console.log('token0', token0);
-    console.log('token1', token1);
     const uniswapPair = new UniswapPair({
       fromTokenContractAddress: formatWrappedToken(
         token0.address,
