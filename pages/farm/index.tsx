@@ -216,7 +216,7 @@ export default function FarmPage() {
         >
           <Tabs.Item label="All Farms" value="1">
             {(!Boolean(allFarm.length) && !(isFarmsLoading || isUserFarmsLoading || isSearching)) && (
-              <div className="flex flex-col items-center w-full p-8">
+              <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
                 {theme.type as ThemeType === "nlight" && (
                   <NoContentLight className="w-40 h-40 opacity-75" />
                 )}
@@ -269,7 +269,7 @@ export default function FarmPage() {
           </Tabs.Item>
           <Tabs.Item label="My Farms" value="2">
             {(!Boolean(ownedFarm.length) && !(isUserFarmsLoading || isSearching)) && (
-              <div className="flex flex-col items-center w-full p-8">
+              <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
                 {theme.type as ThemeType === "nlight" && (
                   <NoContentLight className="w-40 h-40 opacity-75" />
                 )}
@@ -281,7 +281,7 @@ export default function FarmPage() {
                     <span>No farms with <Code>{query}</Code> found. Try to use search with contract address instead of token name.</span>
                   )}
                   {!query && (
-                    <span>No owned farms found, add LP to start farming.</span>
+                    <span>No owned farm found, add LP to start farming.</span>
                   )}
                 </p>
               </div>
@@ -482,7 +482,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     args: [BigNumber.from(selectedRow.pid), parseBigNumber(unstakeAmount!)],
   });
 
-  const { write: unstake } = useContractWrite({
+  const { write: unstake, isLoading: isUnstaking } = useContractWrite({
     ...unstakeConfig,
     onSuccess: async (result) => {
       await result.wait();
@@ -636,9 +636,8 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
             </div>
             <Button
               disabled={!unstake}
-              onClick={() => {
-                unstake?.();
-              }}
+              loading={isUnstaking}
+              onClick={() => unstake?.()}
               className={classNames(
                 "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
                 "text-white dark:text-amber-600",
