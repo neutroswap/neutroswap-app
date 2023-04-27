@@ -94,7 +94,12 @@ export default function FarmPage() {
     args: [[BigNumber.from(0), BigNumber.from(2)]],
   });
 
-  const { write: harvestAll } = useContractWrite(harvestMany);
+  const { write: harvestAll, isLoading: isHarvestingAll } = useContractWrite({
+    ...harvestMany,
+    onSuccess: async (result) => {
+      await result.wait();
+    },
+  });
 
   const resetMergedData = () => {
     setQuery('');
@@ -231,17 +236,68 @@ export default function FarmPage() {
                 <Table.Column
                   prop="apr"
                   label="APR"
-                  render={(_value, rowData: MergedFarm | any) => <span>{currencyFormat(+rowData.details.apr)} %</span>}
-                />
-                <Table.Column
-                  prop="apr"
-                  label="APR"
-                  render={(value, rowData: MergedFarm | any) => <span>{currencyFormat(+rowData.details.apr)} %</span>}
+                  render={(_value, rowData: MergedFarm | any) => <span>{+rowData.details.apr} %</span>}
                 />
               </Table>
             )}
           </Tabs.Item>
-          <Tabs.Item label="My Farms" value="2" disabled>
+          <Tabs.Item label="My Farms" value="2">
+            {(!Boolean(userFarms?.farms.length) && !(isUserFarmsLoading || isSearching)) && (
+              <div className="flex flex-col items-center w-full p-8">
+                {theme.type as ThemeType === "nlight" && (
+                  <NoContentLight className="w-40 h-40 opacity-75" />
+                )}
+                {theme.type as ThemeType === "ndark" && (
+                  <NoContentDark className="w-40 h-40 opacity-75" />
+                )}
+                <p className="text-neutral-500 w-3/4 text-center">
+                  {!!query && (
+                    <span>No farms with <Code>{query}</Code> found. Try to use search with contract address instead of token name.</span>
+                  )}
+                  {!query && (
+                    <span>No owned farms found, add LP to start farming.</span>
+                  )}
+                </p>
+              </div>
+            )}
+            {(isUserFarmsLoading || isSearching) && (
+              <div className="my-5">
+                <Loading spaceRatio={2.5} />
+              </div>
+            )}
+            {(!!userFarms && !!userFarms.farms.length) && (
+              <Table
+                data={userFarms.farms}
+                rowClassName={() => "cursor-pointer"}
+                emptyText="Loading..."
+                onRow={(rowData) => {
+                  setIsOpen(true);
+                  setSelectedRow(rowData as any);
+                }}
+              >
+                <Table.Column
+                  prop="name"
+                  label="farm"
+                  render={farmNameColumnHandler}
+                  width={280}
+                />
+                <Table.Column
+                  prop="valueOfLiquidity"
+                  label="TVL"
+                  render={(value) => <span>$ {currencyFormat(+value)}</span>}
+                />
+                <Table.Column
+                  prop="pending"
+                  label="Total Staked"
+                  render={(_value, rowData: any) => <span>{currencyFormat(Number(rowData.details.totalStaked))} LP</span>}
+                />
+                <Table.Column
+                  prop="details"
+                  label="Pending Reward"
+                  render={(_value, rowData) => <span>{currencyFormat(Number(rowData.details.pendingTokens))} NEUTRO</span>}
+                />
+              </Table>
+            )}
           </Tabs.Item>
         </Tabs>
         <div className="absolute top-0 right-0 flex items-center space-x-4">
@@ -266,6 +322,8 @@ export default function FarmPage() {
           <Button
             auto
             scale={0.8}
+            disabled={!harvestAll}
+            loading={isHarvestingAll}
             onClick={() => harvestAll?.()}
             className={classNames(
               "!flex !items-center !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
@@ -330,12 +388,13 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
   // }, 500);
 
   const { refetch: refetchAllowance } = useContractRead({
+    enabled: Boolean(lpTokenBalance),
     address: selectedRow.lpToken,
     abi: ERC20_ABI,
     functionName: "allowance",
     args: [address!, NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`],
     onSuccess(value) {
-      setIsLpTokenApproved(+formatEther(value) > 0);
+      setIsLpTokenApproved(+formatEther(value) >= +formatEther(lpTokenBalance!));
     },
   });
 
@@ -354,7 +413,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     useContractWrite({
       ...approveLpTokenConfig,
       onSuccess: async (result) => {
-        result.wait().then((receipt) => console.log(receipt));
+        await result.wait();
         await refetchAllowance();
       },
     });
@@ -370,30 +429,39 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     },
   });
 
-  const { write: stake } = useContractWrite({
+  const { write: stake, isLoading: isStaking } = useContractWrite({
     ...stakeConfig,
-    onError(error) {
-      console.log("Error", error);
+    onSuccess: async (result) => {
+      await result.wait();
     },
   });
 
-  const { config: withdraw } = usePrepareContractWrite({
+  const { config: unstakeConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
     functionName: "withdraw",
     args: [BigNumber.from(selectedRow.pid), parseBigNumber(unstakeAmount!)],
   });
 
-  const { write: unstake } = useContractWrite(withdraw);
+  const { write: unstake } = useContractWrite({
+    ...unstakeConfig,
+    onSuccess: async (result) => {
+      await result.wait();
+    },
+  });
 
   const { config: harvestConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
-    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "deposit",
     args: [BigNumber.from(selectedRow.pid), BigNumber.from(0)],
   });
-  const { write: harvest } = useContractWrite(harvestConfig);
+  const { write: harvest, isLoading: isHarvesting } = useContractWrite({
+    ...harvestConfig,
+    onSuccess: async (result) => {
+      await result.wait();
+    },
+  });
 
   return (
     <div className="flex flex-col w-full">
@@ -425,19 +493,18 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
         <div className="space-y-1 mb-5">
           <span className="text-xs font-bold uppercase text-neutral-500">Earned Rewards</span>
           <div className="flex space-x-2 items-end justify-center text-3xl">
-            <span className="font-bold text-black dark:text-white">{parseFloat(selectedRow.reward).toFixed(6)}</span>
+            <span className="font-bold text-black dark:text-white">{parseFloat(selectedRow.details.pendingTokens ?? "0").toFixed(2)}</span>
             <span className="text-base text-neutral-500">$NEUTRO</span>
           </div>
         </div>
         <Button
           auto
           disabled={!harvest}
-          onClick={() => {
-            harvest?.();
-          }}
+          onClick={() => harvest?.()}
+          loading={isHarvesting}
           iconRight={<BanknotesIcon className="w-4 h-4 opacity-90" />}
           className={classNames(
-            "border-neutral-300 dark:border-neutral-800 hover:border-neutral-700 bg-transparent",
+            "border-neutral-300 dark:border-neutral-800 hover:border-neutral-700 bg-transparent text-black dark:text-neutral-200 disabled:opacity-50",
           )}
         >
           Harvest
@@ -451,7 +518,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
       >
         <Tabs.Item label="Add" value="1">
           <div className="flex flex-col justify-between w-full space-y-2.5 mt-1">
-            <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+            <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
               <input
                 value={stakeAmount}
                 onChange={handleStakeAmountChange}
@@ -459,7 +526,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
                 className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
-                className="mr-3 text-sm text-amber-600 cursor-pointer"
+                className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
                 onClick={() => setStakeAmount(formatEther(lpTokenBalance!))}
               >
                 MAX
@@ -474,6 +541,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
             {!isLpTokenApproved && (
               <Button
                 disabled={!approveLpToken}
+                loading={isApprovingLpToken}
                 onClick={() => approveLpToken?.()}
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
@@ -490,6 +558,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
               <Button
                 disabled={!stake}
                 onClick={() => stake?.()}
+                loading={isStaking}
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
                   "text-white dark:text-amber-600",
@@ -505,7 +574,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
         </Tabs.Item>
         <Tabs.Item label="Remove" value="2">
           <div className="flex flex-col justify-between w-full space-y-2.5 mt-1">
-            <div className="flex justify-between items-center bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+            <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
               <input
                 value={unstakeAmount}
                 onChange={handleUnstakeAmountChange}
@@ -513,7 +582,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
                 className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
-                className="mr-3 text-sm text-amber-600 cursor-pointer"
+                className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
                 onClick={() => setUnstakeAmount(selectedRow.details.totalStaked)}
               >
                 MAX
