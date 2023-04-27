@@ -8,8 +8,8 @@ import Logo from "@/public/logo.svg";
 
 export default function Launchpad() {
   return (
-    <div className="flex flex-col h-screen justify-center items-center">
-      <Text h1 className="text-white">
+    <div className="flex flex-col h-[80vh] justify-center items-center">
+      <Text h1>
         Coming Soon
       </Text>
     </div>
