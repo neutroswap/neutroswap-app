@@ -58,8 +58,10 @@ export default function FarmPage() {
   const { address } = useAccount();
   const searchRef = useRef<any>(null);
 
+  const [activeTab, setActiveTab] = useState("1");
   const [query, setQuery] = useState<string>('');
-  const [data, setData] = useState<Array<MergedFarm>>([]);
+  const [allFarm, setAllFarm] = useState<Array<MergedFarm>>([]);
+  const [ownedFarm, setOwnedFarm] = useState<Array<OwnedFarm>>([]);
   const [mergedData, setMergedData] = useState<Array<MergedFarm>>([]);
   const [selectedRow, setSelectedRow] = useState<MergedFarm>();
 
@@ -80,7 +82,7 @@ export default function FarmPage() {
         return { ...temp, details: farmDetails }
       });
       setMergedData(combinedData);
-      setData(combinedData);
+      setAllFarm(combinedData);
     }
     combineData();
   }, [farms, userFarms]);
@@ -101,25 +103,44 @@ export default function FarmPage() {
     },
   });
 
-  const resetMergedData = () => {
+  const resetAllFarm = () => {
     setQuery('');
-    setData(mergedData);
+    setAllFarm(mergedData);
     searchRef.current.value = "";
   }
 
-  const handleSearch = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
-    setIsSearching(true);
+  const resetOwnedFarm = () => {
+    if (!userFarms) throw new Error("No user farms data");
+    setQuery('');
+    setOwnedFarm(userFarms.farms);
+    searchRef.current.value = "";
+  }
 
+  const handleSearchAll = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
+    setIsSearching(true);
     if (!Boolean(e.target.value)) {
-      resetMergedData();
+      resetAllFarm();
       return setIsSearching(false);
     };
-
     setQuery(e.target.value);
     // farm data lookup based on e.target.value
     const fullTextSearch = new JsonSearch(mergedData);
     const results: MergedFarm[] = fullTextSearch.query(e.target.value)
-    setData(results);
+    setAllFarm(results);
+    return setIsSearching(false);
+  })
+
+  const handleSearchOwnedFarm = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
+    setIsSearching(true);
+    if (!Boolean(e.target.value)) {
+      resetOwnedFarm();
+      return setIsSearching(false);
+    };
+    setQuery(e.target.value);
+    // farm data lookup based on e.target.value
+    const fullTextSearch = new JsonSearch(userFarms?.farms);
+    const results: OwnedFarm[] = fullTextSearch.query(e.target.value)
+    setOwnedFarm(results);
     return setIsSearching(false);
   })
 
@@ -182,14 +203,19 @@ export default function FarmPage() {
 
       <div className="relative flex w-full justify-between mb-4">
         <Tabs
-          initialValue="1"
+          initialValue={activeTab}
           className="w-full"
           hideDivider
           hideBorder
           activeClassName="font-semibold"
+          onChange={(value) => {
+            setActiveTab(value)
+            resetOwnedFarm()
+            resetAllFarm()
+          }}
         >
           <Tabs.Item label="All Farms" value="1">
-            {(!Boolean(data.length) && !(isFarmsLoading || isUserFarmsLoading || isSearching)) && (
+            {(!Boolean(allFarm.length) && !(isFarmsLoading || isUserFarmsLoading || isSearching)) && (
               <div className="flex flex-col items-center w-full p-8">
                 {theme.type as ThemeType === "nlight" && (
                   <NoContentLight className="w-40 h-40 opacity-75" />
@@ -207,9 +233,9 @@ export default function FarmPage() {
                 <Loading spaceRatio={2.5} />
               </div>
             )}
-            {Boolean(data.length) && (
+            {Boolean(allFarm.length) && (
               <Table
-                data={data}
+                data={allFarm}
                 rowClassName={() => "cursor-pointer"}
                 emptyText="Loading..."
                 onRow={(rowData) => {
@@ -242,7 +268,7 @@ export default function FarmPage() {
             )}
           </Tabs.Item>
           <Tabs.Item label="My Farms" value="2">
-            {(!Boolean(userFarms?.farms.length) && !(isUserFarmsLoading || isSearching)) && (
+            {(!Boolean(ownedFarm.length) && !(isUserFarmsLoading || isSearching)) && (
               <div className="flex flex-col items-center w-full p-8">
                 {theme.type as ThemeType === "nlight" && (
                   <NoContentLight className="w-40 h-40 opacity-75" />
@@ -265,9 +291,9 @@ export default function FarmPage() {
                 <Loading spaceRatio={2.5} />
               </div>
             )}
-            {(!!userFarms && !!userFarms.farms.length) && (
+            {!!ownedFarm.length && (
               <Table
-                data={userFarms.farms}
+                data={ownedFarm}
                 rowClassName={() => "cursor-pointer"}
                 emptyText="Loading..."
                 onRow={(rowData) => {
@@ -302,17 +328,30 @@ export default function FarmPage() {
         </Tabs>
         <div className="absolute top-0 right-0 flex items-center space-x-4">
           <div className="flex items-center bg-neutral-50 dark:bg-neutral-900/80 rounded-lg px-2 border border-neutral-200/80 dark:border-transparent">
-            <input
-              type="text"
-              ref={searchRef}
-              placeholder="Search by farm, name, symbol or address"
-              className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
-              onChange={handleSearch}
-            />
+            {activeTab === "1" && (
+              <input
+                type="text"
+                ref={searchRef}
+                placeholder="Search by farm, name, symbol or address"
+                className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
+                onChange={handleSearchAll}
+              />
+            )}
+
+            {activeTab === "2" && (
+              <input
+                type="text"
+                ref={searchRef}
+                placeholder="Search by farm, name, symbol or address"
+                className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
+                onChange={handleSearchOwnedFarm}
+              />
+            )}
+
             {!query && <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />}
             {query && (
               <button
-                onClick={() => resetMergedData()}
+                onClick={() => resetAllFarm()}
                 className="flex items-center inset-0 p-1 text-neutral-500 text-xs font-semibold uppercase hover:scale-105 transition"
               >
                 clear
