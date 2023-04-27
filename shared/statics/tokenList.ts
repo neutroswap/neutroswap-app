@@ -74,7 +74,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdc.svg",
       name: "USD Circle",
       address: "0x4ceaC0A4104D29f9d5f97F34B1060A98A5eAf21d",
-      decimal: 6,
+      decimal: 18,
     },
     {
       network_id: "15557",
