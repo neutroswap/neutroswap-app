@@ -1,5 +1,5 @@
 // import { Inter } from 'next/font/google'
-import { Button, Code, Input, Loading, Modal, Page, Table, Tabs, Text, useModal, useTheme } from "@geist-ui/core";
+import { Button, Code, Input, Loading, Modal, Page, Spinner, Table, Tabs, Text, useModal, useTheme } from "@geist-ui/core";
 import WalletIcon from "@/public/icons/wallet.svg";
 import { Disclosure, RadioGroup } from "@headlessui/react";
 import {
@@ -189,15 +189,30 @@ export default function FarmPage() {
       <div className="flex w-full mt-5 mb-10 box-border">
         <div className="w-full px-10 py-7 rounded-l-xl border border-neutral-200/80 dark:border-neutral-800/80">
           <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Total Value Locked</div>
-          <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+farms?.tvl!)}</div>
+          {(!isUserFarmsLoading && !isFarmsLoading) && (
+            <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+farms?.tvl!)}</div>
+          )}
+          {(isUserFarmsLoading && isFarmsLoading) && (
+            <Spinner className="mt-5" />
+          )}
         </div>
         <div className="w-full px-10 py-7 border-t border-b border-neutral-200/80 dark:border-neutral-800/80">
           <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Your Staked Assets</div>
-          <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.holdings!)}</div>
+          {(!isUserFarmsLoading && !isFarmsLoading) && (
+            <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.holdings!)}</div>
+          )}
+          {(isUserFarmsLoading && isFarmsLoading) && (
+            <Spinner className="mt-5" />
+          )}
         </div>
         <div className="w-full px-10 py-7 rounded-r-xl border border-neutral-200/80 dark:border-neutral-800/80">
           <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Unclaimed Rewards</div>
-          <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.totalPendingTokenInUsd!)}</div>
+          {(!isUserFarmsLoading && !isFarmsLoading) && (
+            <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.totalPendingTokenInUsd!)}</div>
+          )}
+          {(isUserFarmsLoading && isFarmsLoading) && (
+            <Spinner className="mt-5" />
+          )}
         </div>
       </div>
 
