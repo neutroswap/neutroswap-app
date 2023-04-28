@@ -25,6 +25,7 @@ import {
   TradeContext,
   appendEthToContractAddress,
   TradeDirection,
+  getAddress,
 } from "simple-uniswap-sdk";
 import {
   useAccount,
@@ -258,7 +259,7 @@ export default function Home() {
 
   let formatWrappedToken = useCallback(
     (token: `0x${string}`, isPreferNative: boolean) => {
-      if (token !== customNetworkData.nativeWrappedTokenInfo.contractAddress)
+      if (getAddress(token) !== getAddress(customNetworkData.nativeWrappedTokenInfo.contractAddress))
         return token;
       if (!isPreferNative) return token;
       let appendedToken = appendEthToContractAddress(token);
@@ -329,10 +330,9 @@ export default function Home() {
     setTokenMin1(tradeContext.minAmountConvertQuote as string);
     setTokenEst1(tradeContext.expectedConvertQuote as string);
 
-    if (tradeContext.hasEnoughAllowance === true) {
-      setIsApproved(true);
-    } else setIsApproved(false);
-  }, [tradeContext]);
+    if (tradeContext.hasEnoughAllowance || isPreferNative) setIsApproved(true)
+    else setIsApproved(false)
+  }, [tradeContext, isPreferNative]);
 
   const isAmount0Invalid = () => {
     let value: BigNumber;
@@ -860,7 +860,7 @@ export default function Home() {
                         </div>
                         {txHash === "" && (
                           <>
-                            <div className="flex items-center justify-between ">
+                            <div className="text-left flex items-center justify-between ">
                               <div className="flex flex-col ">
                                 <div className="text-2xl mb-1 font-medium text-black dark:text-white">
                                   Buy{" "}
@@ -880,7 +880,7 @@ export default function Home() {
                                 className="h-16"
                               />
                             </div>
-                            <div className="p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-zinc-900 rounded-lg">
+                            <div className="text-left p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-zinc-900 rounded-lg">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex flex-col max-w-xs">
                                   <div className="font-medium text-black dark:text-neutral-300">
