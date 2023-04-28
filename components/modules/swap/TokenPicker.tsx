@@ -79,7 +79,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
     };
     setQuery(e.target.value);
     // tokenList lookup based on e.target.value
-    const fullTextSearch = new JsonSearch(tokens);
+    const fullTextSearch = new JsonSearch(chainSpecificTokens);
     const results: Token[] = fullTextSearch.query(e.target.value)
     // if found results from tokenlist update tokens
     if (!!results.length) {
