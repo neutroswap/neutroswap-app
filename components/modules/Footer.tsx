@@ -25,17 +25,15 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
           borderColor: theme.palette.border,
         }}
       >
-        <div className="flex items-center justify-between max-w-7xl mx-auto  submenu__inner">
-          <p className="text-sm text-neutral-400 dark:text-neutral-600 md:m-0 p-0">
+        <div className="flex flex-col-reverse md:flex-row items-center justify-between max-w-7xl mx-auto  submenu__inner">
+          <p className="text-sm text-center text-neutral-400 dark:text-neutral-600 mt-4 md:!m-0 !p-0">
             Copyright &copy; {new Date().getFullYear()} Neutroswap, LLC. All
             rights reserved.
           </p>
-          <div></div>
           <div className="flex space-x-2">
             <Button
               auto
               onClick={handleThemeSwitch}
-              className="!hidden lg:!block"
               icon={
                 <>
                   {theme.type as ThemeType === "ndark" && <MoonIcon className="w-4 h-4" />}
@@ -44,7 +42,7 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
               }
               scale={2 / 3}
               px={0.6}
-            ></Button>
+            >{theme.type.slice(1)}</Button>
           </div>
         </div>
       </div>
