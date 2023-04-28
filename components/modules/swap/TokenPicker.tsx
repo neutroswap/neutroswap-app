@@ -132,7 +132,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
       <ModalOpenButton>{children({ selectedToken })}</ModalOpenButton>
       <ModalContents>
         {({ close }) => (
-          <div className="flex">
+          <div className="flex box-border">
             <div className="flex flex-col w-screen">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xl font-bold text-black dark:text-white">
@@ -224,7 +224,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
                                     <div className="flex flex-col">
                                       <RadioGroup.Label
                                         as="p"
-                                        className="font-medium m-0 text-black dark:text-white"
+                                        className="font-medium m-0 text-black dark:text-white text-left"
                                       >
                                         {token.symbol}
                                       </RadioGroup.Label>

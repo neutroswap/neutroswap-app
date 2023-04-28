@@ -8,6 +8,7 @@ import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
+import { useMemo } from "react";
 
 interface Props { }
 
@@ -15,32 +16,65 @@ const Navbar: React.FC<Props> = () => {
   const router = useRouter();
   const theme = useTheme();
 
+  const tabs = useMemo(() => {
+    return [
+      {
+        label: "Swap",
+        value: "/",
+        hidden: false
+      },
+      {
+        label: "Pool",
+        value: "/pool",
+        hidden: false
+      },
+      {
+        label: "Farm",
+        value: "/farm",
+        hidden: false
+      },
+      {
+        label: "Vault",
+        value: "/vault",
+        hidden: false
+      },
+      {
+        label: "Launchpad",
+        value: "/launchpad",
+        hidden: false
+      },
+      {
+        label: "Analytics",
+        value: "/analytics",
+        hidden: false
+      },
+      {
+        label: "Presales",
+        value: "/presales",
+        hidden: process.env.NODE_ENV !== "production"
+      }
+    ]
+  }, [])
+
   return (
     <>
       <div
-        className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-md z-10 p-0"
+        className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-lg z-10 p-0"
       >
-        <div className="flex items-center justify-between max-w-7xl mx-auto py-3 px-4 lg:px-0  submenu__inner">
+        <div className="flex items-center justify-between max-w-7xl mx-auto pt-3 md:py-3 px-4 lg:px-0  submenu__inner">
           <Link href="/">
-            <Logo className="h-5 lg:h-6 text-black dark:text-white mr-4" />
+            <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
           </Link>
           <Tabs
             hideDivider
             hideBorder
             onChange={(route) => router.push(route)}
             className="hidden lg:block !w-full"
+            initialValue={"/" + router.asPath.split("/")[1]}
           >
-            {/* <Tabs.Item label="Home" value="/" /> */}
-            <Tabs.Item label="Swap" value="/" />
-            <Tabs.Item label="Pool" value="/pool" />
-            <Tabs.Item label="Farm" value="/farm" />
-            <Tabs.Item label="Vault" value="/vault" />
-            <Tabs.Item label="Launchpad" value="/launchpad" />
-            <Tabs.Item label="Analytics" value="/analytics" />
-
-            {process.env.NODE_ENV !== "production" && (
-              <Tabs.Item label="Presales" value="/presales" />
-            )}
+            {tabs.map((tab) => (
+              <Tabs.Item key={tab.label} label={tab.label} value={tab.value} hidden={tab.hidden} />
+            ))}
           </Tabs>
           <div className="flex space-x-2">
             <ConnectButton.Custom>
@@ -167,6 +201,19 @@ const Navbar: React.FC<Props> = () => {
               }}
             </ConnectButton.Custom>
           </div>
+        </div>
+
+        <div className="submenu__inner">
+          <Tabs
+            hideDivider
+            onChange={(route) => router.push(route)}
+            className="block lg:hidden !w-full"
+            initialValue={"/" + router.asPath.split("/")[1]}
+          >
+            {tabs.map((tab) => (
+              <Tabs.Item key={tab.label} label={tab.label} value={tab.value} hidden={tab.hidden} className="!p-0" />
+            ))}
+          </Tabs>
         </div>
       </div>
       <style jsx>

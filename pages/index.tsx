@@ -454,16 +454,12 @@ export default function Home() {
       </Head>
 
       <div className="flex flex-col items-center justify-center min-h-[80%] pt-16">
-        <div>
-          <Text h2 height={3} className="text-center">
-            Swap
-          </Text>
-          <Text type="secondary" p className="text-center !mt-0">
-            Trade your tokens
-          </Text>
-        </div>
         <div className="w-full max-w-lg">
-          <div className="mt-8 rounded-xl border border-neutral-200/60 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg p-4">
+          <div className={classNames(
+            "mt-8 rounded-xl p-0 md:p-4",
+            "shadow-none md:shadow-dark-sm md:dark:shadow-dark-lg",
+            "border-0 md:border border-neutral-200/60 dark:border-neutral-800/50"
+          )}>
             <div className="flex justify-between items-center mb-2">
               <span className="text-lg font-semibold"> Swap </span>
               <Popover className="relative flex items-center">
@@ -536,7 +532,12 @@ export default function Home() {
               </Popover>
             </div>
 
-            <div className="p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+            <div
+              className={classNames(
+                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
+              )}
+            >
               <div className="flex justify-between">
                 <div className="flex items-center">
                   <p className="text-sm text-neutral-500 mr-2">You Sell</p>
@@ -553,7 +554,7 @@ export default function Home() {
                     debouncedToken0(formatUnits(value, token0.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
                   {isFetchingBalance0 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
@@ -579,7 +580,7 @@ export default function Home() {
                   )}
                   {!isFetchingToken0Price && (
                     <input
-                      className="text-2xl bg-transparent focus:outline-none"
+                      className="w-full text-2xl bg-transparent focus:outline-none"
                       placeholder="0.0"
                       value={tokenAmount0}
                       onChange={handleToken0Change}
@@ -606,17 +607,13 @@ export default function Home() {
                         "border border-neutral-200 dark:border-transparent"
                       )}
                     >
-                      <div className="flex items-center">
-                        <img
-                          src={selectedToken.logo}
-                          alt="Selected Token 0"
-                          className="h-6 mr-2"
-                        />
-                        <span className="text-sm">{selectedToken.symbol}</span>
-                      </div>
-                      <div>
-                        <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
-                      </div>
+                      <img
+                        src={selectedToken.logo}
+                        alt="Selected Token 0"
+                        className="h-6 mr-2"
+                      />
+                      <span className="text-sm">{selectedToken.symbol}</span>
+                      <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
                     </button>
                   )}
                 </TokenPicker>
@@ -629,20 +626,25 @@ export default function Home() {
                 type="button"
                 className={classNames(
                   "z-10 group p-2 transition-all rounded-lg cursor-pointer",
-                  "bg-neutral-200/50 hover:bg-neutral-300/70 dark:bg-neutral-800/75 hover:dark:bg-neutral-800/50",
+                  "bg-[#EFEEEE] hover:bg-neutral-300/60 dark:bg-neutral-800/75 hover:dark:bg-neutral-800/50",
                   "ring-4 ring-white dark:ring-black"
                 )}
               >
                 <div className="transition-transform rotate-0 group-hover:rotate-180">
                   <ArrowDownIcon
                     strokeWidth={3}
-                    className="w-5 h-5 text-neutral-600 dark:text-neutral-100"
+                    className="w-5 h-5 text-neutral-700 dark:text-neutral-100"
                   />
                 </div>
               </button>
             </div>
 
-            <div className="p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+            <div
+              className={classNames(
+                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
+              )}
+            >
               <div className="flex justify-between">
                 <div className="flex items-center">
                   <p className="text-sm text-neutral-500 mr-2">You Buy</p>
@@ -659,7 +661,7 @@ export default function Home() {
                     debouncedToken1(formatUnits(value, token1.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
                   {isFetchingBalance1 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
@@ -685,7 +687,7 @@ export default function Home() {
                   )}
                   {!isFetchingToken1Price && (
                     <input
-                      className="text-2xl bg-transparent focus:outline-none"
+                      className="w-full text-2xl bg-transparent focus:outline-none"
                       placeholder="0.0"
                       value={tokenAmount1}
                       onChange={handleToken1Change}
@@ -707,17 +709,13 @@ export default function Home() {
                         "border border-neutral-200 dark:border-transparent"
                       )}
                     >
-                      <div className="flex items-center">
-                        <img
-                          src={selectedToken.logo}
-                          alt="Selected Token 1"
-                          className="h-6 mr-2"
-                        />
-                        <span className="text-sm">{selectedToken.symbol}</span>
-                      </div>
-                      <div>
-                        <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
-                      </div>
+                      <img
+                        src={selectedToken.logo}
+                        alt="Selected Token 1"
+                        className="h-6 mr-2"
+                      />
+                      <span className="text-sm">{selectedToken.symbol}</span>
+                      <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
                     </button>
                   )}
                 </TokenPicker>
