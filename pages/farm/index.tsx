@@ -93,7 +93,7 @@ export default function FarmPage() {
     abi: NEUTRO_FARM_ABI,
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "harvestMany",
-    args: [[BigNumber.from(0), BigNumber.from(2)]],
+    args: [mergedData.map((item) => BigNumber.from(item.pid))],
   });
 
   const { write: harvestAll, isLoading: isHarvestingAll } = useContractWrite({
