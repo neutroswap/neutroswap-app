@@ -251,10 +251,10 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
     });
 
   return (
-    <div>
+    <div className="w-full">
       <div className="flex items-center justify-between text-black dark:text-white mb-8">
         <div>
-          <p className="text-xl font-semibold m-0">Add Liquidity</p>
+          <p className="text-left text-xl font-semibold m-0">Add Liquidity</p>
           <p className="text-sm m-0 opacity-50">
             Select token pair to add liquidty
           </p>
