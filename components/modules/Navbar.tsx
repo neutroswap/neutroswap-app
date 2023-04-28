@@ -59,9 +59,9 @@ const Navbar: React.FC<Props> = () => {
   return (
     <>
       <div
-        className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-md z-10 p-0"
+        className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-lg z-10 p-0"
       >
-        <div className="flex items-center justify-between max-w-7xl mx-auto pt-3 px-4 lg:px-0  submenu__inner">
+        <div className="flex items-center justify-between max-w-7xl mx-auto pt-3 md:py-3 px-4 lg:px-0  submenu__inner">
           <Link href="/">
             <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
           </Link>
