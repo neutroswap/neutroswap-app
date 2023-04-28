@@ -86,7 +86,7 @@ const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
                 className={classNames(
                   "relative transform rounded-lg bg-white dark:bg-[#0C0C0C] px-4 pt-5 pb-4 text-left text-white transition-all",
                   "border border-neutral-300/80 dark:border-neutral-900",
-                  "sm:my-8 sm:max-w-xl sm:p-6"
+                  "w-full sm:my-8 sm:max-w-md sm:p-6"
                 )}
               >
                 {props.children}
