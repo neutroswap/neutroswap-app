@@ -50,7 +50,7 @@ const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
 
   if (isMobile) {
     return (
-      <Drawer visible={isOpen} placement="bottom">
+      <Drawer visible={isOpen} placement="bottom" onClose={() => setIsOpen(false)}>
         {props.children}
       </Drawer>
     )
