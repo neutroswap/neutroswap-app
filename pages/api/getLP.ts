@@ -15,7 +15,7 @@ type Data = {
   data: any
 }
 
-export async function getAllLPs () {
+export async function getAllLPs() {
   const { data: liquidityTokens, error } = await supabaseClient
     .from('liquidity_tokens')
     .select('network_id,address,decimal,name,symbol,logo')
@@ -23,7 +23,7 @@ export async function getAllLPs () {
   return liquidityTokens
 }
 
-export async function getLPInfo (
+export async function getLPInfo(
   networkName: string,
   lpAddress: string,
   userAddress: string
@@ -101,33 +101,33 @@ export async function getLPInfo (
       supabaseClient
         .from('tokens')
         .select('address,decimal,name,symbol,logo')
-        .eq('address', token0)
+        .ilike('address', token0.returnValues[0])
     )
     promises.push(
       supabaseClient
         .from('tokens')
         .select('address,decimal,name,symbol,logo')
-        .eq('address', token1)
+        .ilike('address', token1.returnValues[0])
     )
-    let tokens:any = await Promise.all(promises)
+    let tokens: any = await Promise.all(promises)
 
     let response = {
       ...lp,
       userBalance: balanceBN,
       totalSupply: totalSupply.returnValues[0],
       poolShare: poolShare,
-      token0: tokens.data[0],
-      token1: tokens.data[1],
+      token0: tokens[0].data[0],
+      token1: tokens[1].data[1],
       reserves: {
         r0: reserves.returnValues[0],
         r1: reserves.returnValues[1]
       }
     }
     return response;
-  } catch (err) {}
+  } catch (err) { }
 }
 
-export async function getUserLP (userAddress: any) {
+export async function getUserLP(userAddress: any) {
   try {
     let lps: any = await getAllLPs()
     console.log('lps ', lps)
@@ -248,10 +248,10 @@ export async function getUserLP (userAddress: any) {
     for (let i = 0; i < tokens.length; i += 2) {
       //assign ke userLP terkait. Karena tiap LP ada 2, makanya dibagi 2 buat dapet index nya
       const token0 = tokens[i];
-      const token1 = tokens[i+1];
+      const token1 = tokens[i + 1];
       if (!token0.data || !token1.data) return;
-      userLPs[i/2].token0 = token0.data[0]; 
-      userLPs[i/2].token1 = token1.data[0];
+      userLPs[i / 2].token0 = token0.data[0];
+      userLPs[i / 2].token1 = token1.data[0];
     }
     console.log('Data ', userLPs)
     return userLPs
@@ -261,7 +261,7 @@ export async function getUserLP (userAddress: any) {
   }
 }
 
-export default async function handler (
+export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {

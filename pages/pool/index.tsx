@@ -1,5 +1,5 @@
 import { Text, Button, Loading, useTheme } from "@geist-ui/core";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
 import { Disclosure } from "@headlessui/react";
@@ -8,7 +8,7 @@ import {
   ChevronUpIcon,
   XCircleIcon,
 } from "@heroicons/react/20/solid";
-import { BigNumberish } from "ethers";
+import { BigNumberish, ethers } from "ethers";
 import { formatEther } from "ethers/lib/utils.js";
 import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
@@ -19,7 +19,7 @@ import {
 } from "@/components/elements/Modal";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
-import { useAccount, useContractRead } from "wagmi";
+import { useAccount, useContract, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
@@ -28,6 +28,7 @@ import { tokens } from "@/shared/statics/tokenList";
 import { decimalFormat } from "@/shared/helpers/decimalFormat";
 import Link from "next/link";
 import { ThemeType } from "@/shared/hooks/usePrefers";
+import { DEFAULT_CHAIN_ID, SupportedChainID, supportedChainID } from "@/shared/types/chain.types";
 
 type PositionsResponse = {
   network_id: string;
@@ -206,8 +207,17 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
   handleClose,
 }) => {
   const router = useRouter();
-  const [token0, setToken0] = useState<Token>(tokens[0]);
-  const [token1, setToken1] = useState<Token>(tokens[1]);
+  const { chain } = useNetwork();
+
+  // TODO: MOVE THIS HOOKS
+  const chainSpecificTokens = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
+    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID]
+  }, [chain]);
+
+  const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
+  const [token1, setToken1] = useState<Token>(chainSpecificTokens[1]);
 
   const {
     data: existingPool,
@@ -219,6 +229,26 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
     functionName: "getPair",
     args: [token0.address, token1.address],
   });
+
+  const { config: createPairConfig } = usePrepareContractWrite({
+    address: FACTORY_CONTRACT,
+    abi: NEUTRO_FACTORY_ABI,
+    functionName: "createPair",
+    args: [token0.address, token1.address],
+  });
+  const { isLoading: isCreatingPair, write: createPair } =
+    useContractWrite({
+      ...createPairConfig,
+      address: token1.address,
+      onSuccess: async (result) => {
+        const tx = await result.wait();
+        const decodedResult = ethers.utils.defaultAbiCoder.decode(
+          ['address', 'uint256'],
+          tx.logs[0].data
+        )
+        router.push(`/pool/${decodedResult[0]}`);
+      },
+    });
 
   return (
     <div>
@@ -243,18 +273,18 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           <div
             className={classNames(
               "py-1 px-4 rounded-2xl rounded-b-none cursor-pointer transition-colors group",
-              "bg-neutral-50 dark:bg-neutral-900",
-              "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
+              "bg-neutral-100 dark:bg-neutral-900",
+              "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-600">
+                <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   1
                 </p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
+                  src={selectedToken.logo}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
                     event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
@@ -264,7 +294,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                   {selectedToken.symbol}
                 </span>
               </div>
-              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all text-black dark:text-white" />
             </div>
           </div>
         )}
@@ -278,18 +308,18 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           <div
             className={classNames(
               "py-1 px-4 rounded-2xl rounded-t-none cursor-pointer transition-colors group",
-              "bg-neutral-50 dark:bg-neutral-900",
-              "hover:bg-neutral-100 hover:dark:bg-neutral-800/60"
+              "bg-neutral-100 dark:bg-neutral-900",
+              "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-600 dark:text-neutral-600">
+                <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   2
                 </p>
                 <img
                   alt={`${selectedToken.name} Icon`}
-                  src={`https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${selectedToken.symbol.toLowerCase()}.svg`}
+                  src={selectedToken.logo}
                   className="h-7 mr-2 rounded-full"
                   onError={(event) => {
                     event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
@@ -299,7 +329,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
                   {selectedToken.symbol}
                 </span>
               </div>
-              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all" />
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all text-black dark:text-white" />
             </div>
           </div>
         )}
@@ -336,6 +366,9 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
               "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
               "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
             )}
+            disabled={!createPair}
+            loading={isCreatingPair}
+            onClick={() => createPair?.()}
           >
             <PlusIcon className="w-4 h-4 mr-2" />
             <span>Start adding liquidity</span>

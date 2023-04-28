@@ -9,7 +9,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
 
-interface Props {}
+interface Props { }
 
 const Navbar: React.FC<Props> = () => {
   const router = useRouter();
@@ -18,13 +18,10 @@ const Navbar: React.FC<Props> = () => {
   return (
     <>
       <div
-        className="fixed top-0 w-full border-b-[0.5px] border-white/25 bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-md z-10 p-0"
-        style={{
-          borderColor: theme.palette.border,
-        }}
+        className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-md z-10 p-0"
       >
         <div className="flex items-center justify-between max-w-7xl mx-auto py-3 px-4 lg:px-0  submenu__inner">
-          <Link href="/swap">
+          <Link href="/">
             <Logo className="h-5 lg:h-6 text-black dark:text-white mr-4" />
           </Link>
           <Tabs
@@ -34,7 +31,7 @@ const Navbar: React.FC<Props> = () => {
             className="hidden lg:block !w-full"
           >
             {/* <Tabs.Item label="Home" value="/" /> */}
-            <Tabs.Item label="Swap" value="/swap" />
+            <Tabs.Item label="Swap" value="/" />
             <Tabs.Item label="Pool" value="/pool" />
             <Tabs.Item label="Farm" value="/farm" />
             <Tabs.Item label="Vault" value="/vault" />

@@ -4,7 +4,12 @@ import "@/styles/filepond.css";
 import "@rainbow-me/rainbowkit/styles.css";
 
 import type { AppProps } from "next/app";
-import { GeistProvider, CssBaseline, Themes, GeistUIThemes } from "@geist-ui/core";
+import {
+  GeistProvider,
+  CssBaseline,
+  Themes,
+  GeistUIThemes,
+} from "@geist-ui/core";
 import Navbar from "@/components/modules/Navbar";
 import { useCallback, useEffect, useState } from "react";
 import { PrefersContext, themes, ThemeType } from "@/shared/hooks/usePrefers";
@@ -17,36 +22,45 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import Footer from "@/components/modules/Footer";
-import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
+import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import colors from 'tailwindcss/colors'
+import colors from "tailwindcss/colors";
+import {
+  NEXT_PUBLIC_BLOCK_EXPLORER,
+  NEXT_PUBLIC_CHAIN_ID,
+  NEXT_PUBLIC_RPC,
+} from "@/shared/helpers/constants";
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 
 const eosChain: any = {
-  id: 15557,
-  name: 'EOS EVM',
-  network: 'eos',
-  iconUrl: 'https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg',
-  iconBackground: '#fff',
+  id: Number(NEXT_PUBLIC_CHAIN_ID),
+  name: "EOS EVM",
+  network: "eos",
+  iconUrl:
+    "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
+  iconBackground: "#fff",
   nativeCurrency: {
     decimals: 18,
-    name: 'EOS',
-    symbol: 'EOS',
+    name: "EOS",
+    symbol: "EOS",
   },
   rpcUrls: {
     default: {
-      http: ['https://api-testnet2.trust.one/'],
+      http: [NEXT_PUBLIC_RPC],
     },
     public: {
-      http: ['https://api-testnet2.trust.one/'],
+      http: [NEXT_PUBLIC_RPC],
     },
   },
   blockExplorers: {
-    default: { name: 'TrustOne', url: 'https://explorer-testnet2.trust.one/' },
-    etherscan: { name: 'TrustOne', url: 'https://explorer-testnet2.trust.one/' },
+    default: { name: "TrustOne", url: NEXT_PUBLIC_BLOCK_EXPLORER },
+    etherscan: {
+      name: "TrustOne",
+      url: NEXT_PUBLIC_BLOCK_EXPLORER,
+    },
   },
   testnet: false,
 };
@@ -55,13 +69,13 @@ const { chains, provider } = configureChains(
   [eosChain],
   [
     jsonRpcProvider({
-      rpc: chain => ({ http: chain.rpcUrls.default.http[0] }),
+      rpc: (chain) => ({ http: chain.rpcUrls.default.http[0] }),
     }),
   ]
 );
 
 const { connectors } = getDefaultWallets({
-  appName: "Neutroswap App",
+  appName: "Neutroswap",
   chains,
 });
 
@@ -70,7 +84,6 @@ const wagmiClient = createClient({
   connectors,
   provider,
 });
-
 
 export default function App({ Component, pageProps }: AppProps) {
   const [themeType, setThemeType] = useState<ThemeType>("nlight");
@@ -95,17 +108,16 @@ export default function App({ Component, pageProps }: AppProps) {
     if (themes.includes(theme)) switchTheme(theme);
   }, [switchTheme]);
 
-
   const geistLightTheme = Themes.createFromLight({
-    type: 'nlight',
-  })
+    type: "nlight",
+  });
   const geistDarkTheme: GeistUIThemes = Themes.createFromDark({
-    type: 'ndark',
+    type: "ndark",
     palette: {
       error: colors.red[500],
-      selection: `hsl(15deg 55.99% 15.48%)`
+      selection: `hsl(15deg 55.99% 15.48%)`,
     },
-  })
+  });
 
   return (
     // <GeistProvider themes={[myTheme1]} themeType={'coolTheme'}>
@@ -114,7 +126,10 @@ export default function App({ Component, pageProps }: AppProps) {
         chains={chains}
         theme={themeType === "ndark" ? midnightTheme() : lightTheme()}
       >
-        <GeistProvider themes={[geistDarkTheme, geistLightTheme]} themeType={themeType}>
+        <GeistProvider
+          themes={[geistDarkTheme, geistLightTheme]}
+          themeType={themeType}
+        >
           <CssBaseline />
           <PrefersContext.Provider value={{ themeType, switchTheme }}>
             <Navbar />
