@@ -343,9 +343,10 @@ export default function Home() {
     setTokenMin1(tradeContext.minAmountConvertQuote as string);
     setTokenEst1(tradeContext.expectedConvertQuote as string);
 
-    if (tradeContext.hasEnoughAllowance || isPreferNative) setIsApproved(true)
-    else setIsApproved(false)
-  }, [tradeContext, isPreferNative]);
+    const isToken0WrappedNative = getAddress(token0.address) === getAddress(NEXT_PUBLIC_WEOS_ADDRESS!);
+    if (isPreferNative && isToken0WrappedNative) return setIsApproved(true)
+    return setIsApproved(tradeContext.hasEnoughAllowance)
+  }, [tradeContext, isPreferNative, token0]);
 
   const isAmount0Invalid = () => {
     let value: BigNumber;
