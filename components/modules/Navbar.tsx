@@ -51,7 +51,7 @@ const Navbar: React.FC<Props> = () => {
       {
         label: "Presales",
         value: "/presales",
-        hidden: process.env.NODE_ENV !== "production"
+        hidden: true
       }
     ]
   }, [])
@@ -72,9 +72,10 @@ const Navbar: React.FC<Props> = () => {
             className="hidden lg:block !w-full"
             initialValue={"/" + router.asPath.split("/")[1]}
           >
-            {tabs.map((tab) => (
-              <Tabs.Item key={tab.label} label={tab.label} value={tab.value} hidden={tab.hidden} />
-            ))}
+            {tabs.map((tab) => {
+              if (tab.hidden) return null
+              return <Tabs.Item key={tab.label} label={tab.label} value={tab.value} />
+            })}
           </Tabs>
           <div className="flex space-x-2">
             <ConnectButton.Custom>
