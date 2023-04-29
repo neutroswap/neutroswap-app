@@ -211,9 +211,10 @@ const Navbar: React.FC<Props> = () => {
             className="block lg:hidden !w-full"
             initialValue={"/" + router.asPath.split("/")[1]}
           >
-            {tabs.map((tab) => (
-              <Tabs.Item key={tab.label} label={tab.label} value={tab.value} hidden={tab.hidden} className="!p-0" />
-            ))}
+            {tabs.map((tab) => {
+              if (tab.hidden) return null
+              return <Tabs.Item key={tab.label} label={tab.label} value={tab.value} className="!p-0" />
+            })}
           </Tabs>
         </div>
       </div>
