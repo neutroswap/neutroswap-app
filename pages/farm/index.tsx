@@ -1,17 +1,11 @@
 // import { Inter } from 'next/font/google'
 import { Button, Code, Input, Loading, Modal, Page, Spinner, Table, Tabs, Text, useModal, useTheme } from "@geist-ui/core";
-import WalletIcon from "@/public/icons/wallet.svg";
-import { Disclosure, RadioGroup } from "@headlessui/react";
 import {
-  ChevronUpIcon,
   MagnifyingGlassIcon,
-  PlusIcon,
-  TrashIcon,
 } from "@heroicons/react/24/solid";
-import { ChangeEvent, Fragment, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { BigNumber } from "ethers";
 import { classNames } from "@/shared/helpers/classNamer";
-import NumberInput from "@/components/elements/NumberInput";
 import {
   useAccount,
   useContractRead,
@@ -23,7 +17,7 @@ import {
   NEXT_PUBLIC_FARM_CONTRACT,
 } from "@/shared/helpers/constants";
 import { ERC20_ABI, NEUTRO_FARM_ABI } from "@/shared/abi";
-import { formatEther, parseEther, parseUnits } from "ethers/lib/utils.js";
+import { formatEther } from "ethers/lib/utils.js";
 import debounce from "lodash/debounce";
 import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
@@ -173,11 +167,11 @@ export default function FarmPage() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-10">
+    <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-16">
       <div>
-        <div className="flex items-center space-x-4 -ml-10">
-          <LeafIcon className="w-10 h-10 text-neutral-700 dark:text-neutral-300 mt-1" />
-          <p className="m-0 text-center text-4xl font-semibold">
+        <div className="flex items-center space-x-3">
+          <LeafIcon className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />
+          <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
             Yield Farming
           </p>
         </div>
@@ -186,29 +180,29 @@ export default function FarmPage() {
         </p>
       </div>
 
-      <div className="flex w-full mt-5 mb-10 box-border">
-        <div className="w-full px-10 py-7 rounded-l-xl border border-neutral-200/80 dark:border-neutral-800/80">
+      <div className="w-full grid grid-cols-2 md:grid-cols-3 my-10 box-border">
+        <div className="w-full px-1 py-3 md:px-10 md:py-7 rounded-l-xl md:border border-neutral-200/80 dark:border-neutral-800/80">
           <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Total Value Locked</div>
           {(!isUserFarmsLoading && !isFarmsLoading) && (
-            <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+farms?.tvl!)}</div>
+            <div className="text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+farms?.tvl!)}</div>
           )}
           {(isUserFarmsLoading && isFarmsLoading) && (
             <Spinner className="mt-5" />
           )}
         </div>
-        <div className="w-full px-10 py-7 border-t border-b border-neutral-200/80 dark:border-neutral-800/80">
+        <div className="w-full px-1 py-3 md:px-10 md:py-7 md:border-t md:border-b border-neutral-200/80 dark:border-neutral-800/80 text-right md:text-left">
           <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Your Staked Assets</div>
           {(!isUserFarmsLoading && !isFarmsLoading) && (
-            <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.holdings!)}</div>
+            <div className="text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.holdings!)}</div>
           )}
           {(isUserFarmsLoading && isFarmsLoading) && (
             <Spinner className="mt-5" />
           )}
         </div>
-        <div className="w-full px-10 py-7 rounded-r-xl border border-neutral-200/80 dark:border-neutral-800/80">
+        <div className="w-full px-1 py-3 md:px-10 md:py-7 rounded-r-xl md:border border-neutral-200/80 dark:border-neutral-800/80">
           <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Unclaimed Rewards</div>
           {(!isUserFarmsLoading && !isFarmsLoading) && (
-            <div className="text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.totalPendingTokenInUsd!)}</div>
+            <div className="text-2xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-yellow-500 font-bold">$ {currencyFormat(+userFarms?.totalPendingTokenInUsd!)}</div>
           )}
           {(isUserFarmsLoading && isFarmsLoading) && (
             <Spinner className="mt-5" />
@@ -229,6 +223,54 @@ export default function FarmPage() {
             resetAllFarm()
           }}
         >
+          <div className="flex items-center justify-between md:justify-end space-x-4 w-full mt-0 md:-mt-14 mb-4">
+            <div className="flex w-full md:max-w-max items-center bg-neutral-50 dark:bg-neutral-900/80 rounded-lg px-2 border border-neutral-200/80 dark:border-transparent">
+              {activeTab === "1" && (
+                <input
+                  type="text"
+                  ref={searchRef}
+                  placeholder="Search by farm, name, symbol or address"
+                  className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
+                  onChange={handleSearchAll}
+                />
+              )}
+
+              {activeTab === "2" && (
+                <input
+                  type="text"
+                  ref={searchRef}
+                  placeholder="Search by farm, name, symbol or address"
+                  className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
+                  onChange={handleSearchOwnedFarm}
+                />
+              )}
+
+              {!query && <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />}
+              {query && (
+                <button
+                  onClick={() => resetAllFarm()}
+                  className="flex items-center inset-0 p-1 text-neutral-500 text-xs font-semibold uppercase hover:scale-105 transition"
+                >
+                  clear
+                </button>
+              )}
+            </div>
+            <Button
+              auto
+              scale={0.8}
+              disabled={!harvestAll}
+              loading={isHarvestingAll}
+              onClick={() => harvestAll?.()}
+              className={classNames(
+                "!flex !items-center !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                "text-white dark:text-amber-600",
+                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+              )}
+            >
+              Harvest All
+            </Button>
+          </div>
           <Tabs.Item label="All Farms" value="1">
             {(!Boolean(allFarm.length) && !(isFarmsLoading || isUserFarmsLoading || isSearching)) && (
               <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
@@ -249,37 +291,40 @@ export default function FarmPage() {
               </div>
             )}
             {Boolean(allFarm.length) && (
-              <Table
-                data={allFarm}
-                rowClassName={() => "cursor-pointer"}
-                emptyText="Loading..."
-                onRow={(rowData) => {
-                  setIsOpen(true);
-                  setSelectedRow(rowData);
-                }}
-              >
-                <Table.Column
-                  prop="name"
-                  label="farm"
-                  render={farmNameColumnHandler}
-                  width={280}
-                />
-                <Table.Column
-                  prop="valueOfLiquidity"
-                  label="TVL"
-                  render={(value) => <span>$ {currencyFormat(+value)}</span>}
-                />
-                <Table.Column
-                  prop="details"
-                  label="Rewards 24h"
-                  render={(value) => <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>}
-                />
-                <Table.Column
-                  prop="apr"
-                  label="APR"
-                  render={(_value, rowData: MergedFarm | any) => <span>{+rowData.details.apr} %</span>}
-                />
-              </Table>
+              <div className="overflow-x-scroll">
+                <Table
+                  data={allFarm}
+                  rowClassName={() => "cursor-pointer"}
+                  className="min-w-max"
+                  emptyText="Loading..."
+                  onRow={(rowData) => {
+                    setIsOpen(true);
+                    setSelectedRow(rowData);
+                  }}
+                >
+                  <Table.Column
+                    prop="name"
+                    label="farm"
+                    render={farmNameColumnHandler}
+                    width={280}
+                  />
+                  <Table.Column
+                    prop="valueOfLiquidity"
+                    label="TVL"
+                    render={(value) => <span>$ {currencyFormat(+value)}</span>}
+                  />
+                  <Table.Column
+                    prop="details"
+                    label="Rewards 24h"
+                    render={(value) => <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>}
+                  />
+                  <Table.Column
+                    prop="apr"
+                    label="APR"
+                    render={(_value, rowData: MergedFarm | any) => <span>{+rowData.details.apr} %</span>}
+                  />
+                </Table>
+              </div>
             )}
           </Tabs.Item>
           <Tabs.Item label="My Farms" value="2">
@@ -307,88 +352,43 @@ export default function FarmPage() {
               </div>
             )}
             {!!ownedFarm.length && (
-              <Table
-                data={ownedFarm}
-                rowClassName={() => "cursor-pointer"}
-                emptyText="Loading..."
-                onRow={(rowData) => {
-                  setIsOpen(true);
-                  setSelectedRow(rowData as any);
-                }}
-              >
-                <Table.Column
-                  prop="name"
-                  label="farm"
-                  render={farmNameColumnHandler}
-                  width={280}
-                />
-                <Table.Column
-                  prop="valueOfLiquidity"
-                  label="TVL"
-                  render={(value) => <span>$ {currencyFormat(+value)}</span>}
-                />
-                <Table.Column
-                  prop="pending"
-                  label="Total Staked"
-                  render={(_value, rowData: any) => <span>{currencyFormat(Number(rowData.details.totalStaked))} LP</span>}
-                />
-                <Table.Column
-                  prop="details"
-                  label="Pending Reward"
-                  render={(_value, rowData) => <span>{currencyFormat(Number(rowData.details.pendingTokens))} NEUTRO</span>}
-                />
-              </Table>
+              <div className="overflow-x-scroll">
+                <Table
+                  data={ownedFarm}
+                  rowClassName={() => "cursor-pointer"}
+                  className="min-w-max"
+                  emptyText="Loading..."
+                  onRow={(rowData) => {
+                    setIsOpen(true);
+                    setSelectedRow(rowData as any);
+                  }}
+                >
+                  <Table.Column
+                    prop="name"
+                    label="farm"
+                    render={farmNameColumnHandler}
+                    width={280}
+                  />
+                  <Table.Column
+                    prop="valueOfLiquidity"
+                    label="TVL"
+                    render={(value) => <span>$ {currencyFormat(+value)}</span>}
+                  />
+                  <Table.Column
+                    prop="pending"
+                    label="Total Staked"
+                    render={(_value, rowData: any) => <span>{currencyFormat(Number(rowData.details.totalStaked))} LP</span>}
+                  />
+                  <Table.Column
+                    prop="details"
+                    label="Pending Reward"
+                    render={(_value, rowData) => <span>{currencyFormat(Number(rowData.details.pendingTokens))} NEUTRO</span>}
+                  />
+                </Table>
+              </div>
             )}
           </Tabs.Item>
         </Tabs>
-        <div className="absolute top-0 right-0 flex items-center space-x-4">
-          <div className="flex items-center bg-neutral-50 dark:bg-neutral-900/80 rounded-lg px-2 border border-neutral-200/80 dark:border-transparent">
-            {activeTab === "1" && (
-              <input
-                type="text"
-                ref={searchRef}
-                placeholder="Search by farm, name, symbol or address"
-                className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
-                onChange={handleSearchAll}
-              />
-            )}
-
-            {activeTab === "2" && (
-              <input
-                type="text"
-                ref={searchRef}
-                placeholder="Search by farm, name, symbol or address"
-                className="bg-transparent p-2 rounded-md w-full placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
-                onChange={handleSearchOwnedFarm}
-              />
-            )}
-
-            {!query && <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />}
-            {query && (
-              <button
-                onClick={() => resetAllFarm()}
-                className="flex items-center inset-0 p-1 text-neutral-500 text-xs font-semibold uppercase hover:scale-105 transition"
-              >
-                clear
-              </button>
-            )}
-          </div>
-          <Button
-            auto
-            scale={0.8}
-            disabled={!harvestAll}
-            loading={isHarvestingAll}
-            onClick={() => harvestAll?.()}
-            className={classNames(
-              "!flex !items-center !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-              "text-white dark:text-amber-600",
-              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-              "!border !border-orange-600/50 dark:border-orange-400/[.12]"
-            )}
-          >
-            Harvest All
-          </Button>
-        </div>
       </div>
 
       <OffloadedModal
