@@ -30,6 +30,8 @@ import Link from "next/link";
 import { ThemeType } from "@/shared/hooks/usePrefers";
 import { DEFAULT_CHAIN_ID, SupportedChainID, supportedChainID } from "@/shared/types/chain.types";
 
+import PoolIcon from "@/public/icons/pool.svg"
+
 type PositionsResponse = {
   network_id: string;
   address: `0x${string}`;
@@ -57,24 +59,28 @@ export default function Pool() {
       const req = await fetch(`/api/getUserLP?userAddress=${address}`)
       // const req = await fetch(`/api/getUserLP?userAddress=0x222da5f13d800ff94947c20e8714e103822ff716`);
       const response = await req.json();
-      console.log(response.data);
       setPositions(response.data);
       setIsFetchingPool(false);
     })();
   }, [address]);
 
   return (
-    <div className="py-10">
-      <div className="max-w-7xl mx-auto text-center">
-        <Text h2 height={2.5}>
-          Liquidity Pool
-        </Text>
-        <Text type="secondary">Add or Remove liquidity to Neutroswap pool</Text>
+    <div className="py-16">
+      <div>
+        <div className="flex justify-center items-center space-x-3">
+          <PoolIcon className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />
+          <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
+            Liquidity Pool
+          </p>
+        </div>
+        <p className="m-0 text-center text-base text-neutral-400 mt-2">
+          Add or Remove liquidity to Neutroswap pool
+        </p>
       </div>
       <div className="flex justify-center items-center">
-        <div className="mt-8 flex items-center text-center rounded-lg border border-neutral-200 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg w-full max-w-3xl">
+        <div className="mt-8 flex items-center text-center rounded-lg md:border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full max-w-3xl">
           {!positions.length && !isFetchingPool && (
-            <div className="flex flex-col items-center w-full p-8">
+            <div className="flex flex-col items-center w-full md:p-8">
               {theme.type as ThemeType === "nlight" && (
                 <NoContentLight className="w-40 h-40 opacity-75" />
               )}
@@ -104,7 +110,7 @@ export default function Pool() {
           )}
 
           {!!positions.length && (
-            <div className="p-8 w-full">
+            <div className="md:p-8 w-full">
               {positions.map((position) => (
                 <Link key={position.address} href={`/pool/${position.address}`}>
                   <div
