@@ -454,12 +454,12 @@ export default function Home() {
     const newToken1Reserve = constantProduct / newToken0Reserve;
     const newMarketPrice = newToken0Reserve / newToken1Reserve;
 
-    console.log('newToken0Reserve', newToken0Reserve);
-    console.log('newToken1Reserve', newToken1Reserve);
-    console.log('newMarketPrice', newMarketPrice);
-    console.log('marketPrice', marketPrice);
-    console.log('cp', constantProduct);
-    console.log('impact', (1 - (marketPrice / newMarketPrice)) * 100);
+    // console.log('newToken0Reserve', newToken0Reserve);
+    // console.log('newToken1Reserve', newToken1Reserve);
+    // console.log('newMarketPrice', newMarketPrice);
+    // console.log('marketPrice', marketPrice);
+    // console.log('cp', constantProduct);
+    // console.log('impact', (1 - (marketPrice / newMarketPrice)) * 100);
 
     return (1 - (marketPrice / newMarketPrice)) * 100
   }, [tokenAmount0, marketPrice, constantProduct, reserves])
