@@ -590,7 +590,7 @@ export default function Home() {
                       <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
                         {tokenName0 !== "WEOS" && balance0.formatted}
                         {tokenName0 === "WEOS" &&
-                          Number(balance!.formatted).toFixed(3)}
+                          Number(balance ? balance.formatted : "0").toFixed(3)}
                       </p>
                       <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
                         {tokenName0 !== "WEOS" && tokenName0}
