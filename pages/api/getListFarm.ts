@@ -46,13 +46,16 @@ interface Farm {
   reserves1: string,
   valueReserves0: string,
   valueReserves1: string,
-  valueOfLiquidity: string,
+  totalValueOfLiquidity: string,
+  valueOfLiquidity: string, // liquidity in farm (change name later)
+  totalSupplyLpToken: string,
+  totalStaked: string,
+  lpPrice: string,
   reward: string,
   details: FarmDetails | null
 }
 
 interface FarmDetails {
-  totalLiquidity: string,
   rps: string,
   apr: string
 }
@@ -108,7 +111,11 @@ export async function getAllFarms(): Promise<Farm[] | null> {
         reserves1: "",
         valueReserves0: "",
         valueReserves1: "",
+        totalSupplyLpToken: "",
+        totalStaked: "",
+        totalValueOfLiquidity: "",
         valueOfLiquidity: "",
+        lpPrice: "",
         reward: data[i].rewards.address,
         details: null
       }
@@ -127,15 +134,8 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
 
   if (!farms) { return null }
 
-  let calls = []
-  // // get all pids
-  // const totalLps: CallContext[] = farms.map(farm => ({
-  //   reference: 'totalLp',
-  //   methodName: 'poolTotalLp',
-  //   methodParameters: [farm.pid]
-  //   // methodParameters: [1]
-  // }));
-  // calls.push(...totalLps)
+  let rpcCalls = []
+  let totalLpCalls = []
 
   // get all pids
   const rps: CallContext[] = farms.map(farm => ({
@@ -143,7 +143,16 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
     methodName: 'poolRewardsPerSec',
     methodParameters: [farm.pid]
   }));
-  calls.push(...rps)
+  rpcCalls.push(...rps)
+
+  // get all pids
+  const totalLps: CallContext[] = farms.map(farm => ({
+    reference: 'totalLp',
+    methodName: 'poolTotalLp',
+    methodParameters: [farm.pid]
+    // methodParameters: [1]
+  }));
+  totalLpCalls.push(...totalLps)
 
   const multicall = new Multicall({
     multicallCustomContractAddress: MULTICALL_ADDR,
@@ -152,12 +161,20 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
   })
 
   let contractCallContext: ContractCallContext[] = []
-  let indexName = 'data'
+  let call1 = 'rpcCalls'
   contractCallContext.push({
-    reference: indexName,
+    reference: call1,
     contractAddress: FARM_CONTRACT,
     abi: NEUTRO_FARM_ABI as any,
-    calls
+    calls: rpcCalls
+  })
+
+  let call2 = 'totalLpCalls'
+  contractCallContext.push({
+    reference: call2,
+    contractAddress: FARM_CONTRACT,
+    abi: NEUTRO_FARM_ABI as any,
+    calls: totalLpCalls
   })
 
   const contractCalls: ContractCallResults = await multicall.call(
@@ -166,19 +183,22 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
 
   let tvl = 0;
   for (const farm of farms) {
-    const result = contractCalls.results[indexName].callsReturnContext.filter(res => res.methodParameters[0] === farm.pid);
+    const rpsResult = contractCalls.results[call1].callsReturnContext.filter(res => res.methodParameters[0] === farm.pid);
+    const stakedResult = contractCalls.results[call2].callsReturnContext.filter(res => res.methodParameters[0] === farm.pid);
 
-    if (result) {
+    if (rpsResult) {
       // const liquidity = result[0].returnValues;
-      const rps = result[0].returnValues[3];
+      const rps = rpsResult[0].returnValues[3];
+      const totalStaked = stakedResult[0].returnValues[0];
+      farm.totalStaked = formatEther(BigNumber.from(totalStaked)),
 
-      farm.details = {
-        totalLiquidity: "0",
-        apr: BigNumber.from(1).toString(),
-        // apr: await calculateApr(rps[0].hex, liquidity[0].hex),
-        // rps: parseEther(BigNumber.from(rps[0].hex).toString()).toNumber().toFixed(2)
-        rps: formatEther(BigNumber.from(rps[0].hex))
-      };
+        farm.details = {
+          // totalSupplyLpToken: "0",
+          apr: BigNumber.from(1).toString(),
+          // apr: await calculateApr(rps[0].hex, liquidity[0].hex),
+          // rps: parseEther(BigNumber.from(rps[0].hex).toString()).toNumber().toFixed(2)
+          rps: formatEther(BigNumber.from(rps[0].hex))
+        };
     }
     // const totalLiquidity = parseFloat(farm.details?.totalLiquidity ?? '0');
     // tvl += totalLiquidity;
@@ -297,13 +317,15 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
 
     // const totalValueReserve0 = reserve0.mul(price0)
     // const totalValueReserve1 = reserve1.mul(price1)
-    farm.valueOfLiquidity = (parseFloat(farm.valueReserves0.toString()) + parseFloat(farm.valueReserves1.toString())).toFixed(2).toString()
+    farm.totalValueOfLiquidity = (parseFloat(farm.valueReserves0.toString()) + parseFloat(farm.valueReserves1.toString())).toFixed(2).toString()
     // farm.valueOfLiquidity = (parseFloat(farm.valueReserves0.toString()) + parseFloat(farm.valueReserves1.toString())).toFixed(2).toString()
-    if (!farm.details) { return }
+    // if (!farm.details) { return }
     // farm.details.totalLiquidity = (parseFloat(formatEther(BigNumber.from(totalSupply.hex).toString())) * parseFloat(farm.valueOfLiquidity)).toString()
-    farm.details.totalLiquidity = formatEther(BigNumber.from(totalSupply.hex).toString())
+    farm.totalSupplyLpToken = formatEther(BigNumber.from(totalSupply.hex).toString())
+    farm.lpPrice = (parseFloat(farm.totalValueOfLiquidity.toString()) / parseFloat(farm.totalSupplyLpToken.toString())).toFixed(6).toString()
+    farm.valueOfLiquidity = (parseFloat(farm.totalStaked) * parseFloat(farm.lpPrice)).toFixed(2).toString()
     // tvl += parseFloat(farm.valueOfLiquidity) * parseFloat(farm.details?.totalLiquidity ?? '0');
-    tvl += parseFloat(farm.valueOfLiquidity)
+    tvl += parseFloat(farm.totalValueOfLiquidity)
     // console.log(Number(formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())).toFixed(2))
   }
 
