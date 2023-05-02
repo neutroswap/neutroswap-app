@@ -544,7 +544,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
       </div>
 
       <div className="flex items-center justify-between w-full mt-10">
-        <div className="space-y-1 mb-5">
+        <div className="space-y-1 mb-5 text-left">
           <span className="text-xs font-bold uppercase text-neutral-500">Earned Rewards</span>
           <div className="flex space-x-2 items-end justify-center text-3xl">
             <span className="font-bold text-black dark:text-white">{parseFloat(selectedRow.details.pendingTokens ?? "0").toFixed(2)}</span>
