@@ -71,7 +71,7 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg px-4 py-6 box-border">
           <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">Owned LP</p>
           <p className="m-0 text-2xl font-semibold">{(+formatEther(userLPBalance.raw)).toFixed(8)} NLP</p>
@@ -83,7 +83,7 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
       </div>
 
       <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg">
-        <div className="p-6 grid grid-cols-3">
+        <div className="p-6 grid grid-cols-1 md:grid-cols-3">
           <div>
             <p className="m-0 text-neutral-500 text-sm">Assets in Pool</p>
             <div className="space-y-3 mt-4">

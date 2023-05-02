@@ -1,15 +1,25 @@
 import { classNames } from "@/shared/helpers/classNamer";
+import { Drawer, useMediaQuery } from "@geist-ui/core";
 import { Dialog, FocusTrap, Transition } from "@headlessui/react";
 import { Dispatch, Fragment, ReactNode, SetStateAction, useState } from "react";
 
 type Props = {
   isOpen: boolean;
   children: React.ReactNode;
-  onClose: (value: boolean) => void;
+  onClose: () => void;
 }
 
 const OffloadedModal: React.FC<Props> = (props) => {
   const { isOpen, onClose } = props;
+  const isMobile = useMediaQuery("mobile");
+
+  if (isMobile) {
+    return (
+      <Drawer visible={isOpen} placement="bottom" onClose={onClose}>
+        {props.children}
+      </Drawer>
+    )
+  }
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-20" onClose={onClose}>

@@ -32,6 +32,7 @@ import {
   NEXT_PUBLIC_CHAIN_ID,
   NEXT_PUBLIC_RPC,
 } from "@/shared/helpers/constants";
+import { usePrefersColorScheme } from "@/shared/hooks/usePreferColorScheme";
 
 dayjs.extend(relativeTime);
 
@@ -87,6 +88,7 @@ const wagmiClient = createClient({
 
 export default function App({ Component, pageProps }: AppProps) {
   const [themeType, setThemeType] = useState<ThemeType>("nlight");
+  const preferredColorScheme = usePrefersColorScheme();
 
   const switchTheme = useCallback((theme: ThemeType) => {
     setThemeType(theme);
@@ -105,8 +107,9 @@ export default function App({ Component, pageProps }: AppProps) {
     document.body.removeAttribute("style");
 
     const theme = window.localStorage.getItem("theme") as ThemeType;
-    if (themes.includes(theme)) switchTheme(theme);
-  }, [switchTheme]);
+    if (themes.includes(theme)) return switchTheme(theme);
+    if (preferredColorScheme === "dark") return switchTheme("ndark");
+  }, [switchTheme, preferredColorScheme]);
 
   const geistLightTheme = Themes.createFromLight({
     type: "nlight",

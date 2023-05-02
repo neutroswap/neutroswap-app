@@ -4,7 +4,7 @@ import {
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, formatUnits, parseEther, parseUnits } from "ethers/lib/utils.js";
+import { formatUnits, parseUnits } from "ethers/lib/utils.js";
 import { ChangeEvent, useMemo, useState } from "react";
 import {
   useAccount,
@@ -60,8 +60,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const [token0Min, setToken0Min] = useState(BigNumber.from(0));
   const [token1Min, setToken1Min] = useState(BigNumber.from(0));
 
-  const [isToken0Approved, setIsToken0Approved] = useState(false);
-  const [isToken1Approved, setIsToken1Approved] = useState(false);
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
 
@@ -91,7 +89,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     signerOrProvider: signer.data
   })
 
-  const { refetch: refetchAllowance } = useContractReads({
+  const { data: allowances, refetch: refetchAllowance } = useContractReads({
     enabled: Boolean(address),
     contracts: [
       {
@@ -107,11 +105,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
         args: [address!, ROUTER_CONTRACT],
       },
     ],
-    onSuccess(value) {
-      // console.log('allowance', [formatEther(value[0]), formatEther(value[1])])
-      setIsToken0Approved(+formatUnits(value[0], token0.decimal) >= balances[0].decimal);
-      setIsToken1Approved(+formatUnits(value[1], token1.decimal) >= balances[1].decimal);
-    },
   });
 
   const { config: approveConfig0 } = usePrepareContractWrite({
@@ -344,13 +337,15 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
   const isToken0NeedApproval = useMemo(() => {
     if (isPreferNative && (token0.address === nativeToken.address)) return false;
-    return !isToken0Approved;
-  }, [token0.address, isToken0Approved, isPreferNative, nativeToken])
+    if (!allowances) return true;
+    return +formatUnits(allowances[0], token0.decimal) < Number(token0Amount);
+  }, [token0, isPreferNative, nativeToken, allowances, token0Amount])
 
   const isToken1NeedApproval = useMemo(() => {
     if (isPreferNative && (token1.address === nativeToken.address)) return false;
-    return !isToken1Approved;
-  }, [token1.address, isToken1Approved, isPreferNative, nativeToken])
+    if (!allowances) return true;
+    return +formatUnits(allowances[1], token1.decimal) < Number(token1Amount);
+  }, [token1, isPreferNative, nativeToken, allowances, token1Amount])
 
   return (
     <div className="">
@@ -500,7 +495,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 >
                   {isToken0NeedApproval
                     ? `Approve ${token0.symbol}`
-                    : !isToken1Approved && `Approve ${token1.symbol}`}
+                    : !isToken1NeedApproval && `Approve ${token1.symbol}`}
                 </Button>
               )}
               {!isToken0NeedApproval && !isToken1NeedApproval && (
@@ -540,7 +535,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
             <pre>
               {JSON.stringify({
                 token0: token0.address,
+                token0_allowance: +formatUnits(allowances ? allowances[0] : "0", token0.decimal),
+                isToken0NeedApproval: isToken0NeedApproval,
                 token1: token1.address,
+                token1_allowance: +formatUnits(allowances ? allowances[1] : "0", token1.decimal),
+                isToken1NeedApproval: isToken1NeedApproval,
                 isPreferNative: isPreferNative,
                 slippage: ((SLIPPAGE / 10000) * 100) + "%",
                 isToken0WEOS: token0.address === nativeToken.address,

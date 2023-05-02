@@ -25,6 +25,7 @@ import {
   TradeContext,
   appendEthToContractAddress,
   TradeDirection,
+  getAddress,
 } from "simple-uniswap-sdk";
 import {
   useAccount,
@@ -114,7 +115,10 @@ export default function Home() {
   const [uniswapFactory, setUniswapFactory] = useState<UniswapPairFactory>();
   const [direction, setDirection] = useState<"input" | "output">("input");
   const [txHash, setTxHash] = useState<string>("");
+
   const [marketPrice, setMarketPrice] = useState(0);
+  const [constantProduct, setConstantProduct] = useState(0);
+  const [reserves, setReserves] = useState([0, 0]);
 
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
@@ -221,10 +225,20 @@ export default function Home() {
     ],
     onSuccess(response) {
       const [t0, t1, reserves] = response;
-      if (token0.address === t0) setMarketPrice(+formatUnits(reserves._reserve1, token1.decimal) / +formatUnits(reserves._reserve0, token0.decimal))
-      if (token0.address === t1) setMarketPrice(+formatUnits(reserves._reserve0, token0.decimal) / +formatUnits(reserves._reserve1, token1.decimal))
-
-      // console.log('constants product', +formatUnits(reserves._reserve0, token0.decimal) * +formatUnits(reserves._reserve1, token1.decimal))
+      const cp = +formatUnits(reserves._reserve0, token0.decimal) * +formatUnits(reserves._reserve1, token1.decimal)
+      setConstantProduct(cp);
+      if (token0.address === t0) {
+        const r0 = +formatUnits(reserves._reserve0, token0.decimal);
+        const r1 = +formatUnits(reserves._reserve1, token1.decimal);
+        setReserves([r0, cp / r0]);
+        setMarketPrice(r0 / r1); // reserve0 as quotient
+      }
+      if (token0.address === t1) { // reverse reserve number
+        const r0 = +formatUnits(reserves._reserve1, token0.decimal);
+        const r1 = +formatUnits(reserves._reserve0, token1.decimal);
+        setReserves([r0, cp / r0]);
+        setMarketPrice(r0 / r1) // reserve0 as quotient
+      }
     }
   });
 
@@ -258,7 +272,7 @@ export default function Home() {
 
   let formatWrappedToken = useCallback(
     (token: `0x${string}`, isPreferNative: boolean) => {
-      if (token !== customNetworkData.nativeWrappedTokenInfo.contractAddress)
+      if (getAddress(token) !== getAddress(customNetworkData.nativeWrappedTokenInfo.contractAddress))
         return token;
       if (!isPreferNative) return token;
       let appendedToken = appendEthToContractAddress(token);
@@ -329,10 +343,10 @@ export default function Home() {
     setTokenMin1(tradeContext.minAmountConvertQuote as string);
     setTokenEst1(tradeContext.expectedConvertQuote as string);
 
-    if (tradeContext.hasEnoughAllowance === true) {
-      setIsApproved(true);
-    } else setIsApproved(false);
-  }, [tradeContext]);
+    const isToken0WrappedNative = getAddress(token0.address) === getAddress(NEXT_PUBLIC_WEOS_ADDRESS!);
+    if (isPreferNative && isToken0WrappedNative) return setIsApproved(true)
+    return setIsApproved(tradeContext.hasEnoughAllowance)
+  }, [tradeContext, isPreferNative, token0]);
 
   const isAmount0Invalid = () => {
     let value: BigNumber;
@@ -434,8 +448,21 @@ export default function Home() {
   };
 
   const calcPriceImpact = useMemo(() => {
-    return (1 - (+tokenAmount0 * marketPrice / +tokenAmount1)) * 100
-  }, [tokenAmount0, marketPrice, tokenAmount1])
+    // console.log(marketPrice);
+    if (!reserves) return 0;
+    const newToken0Reserve = reserves[0] + Number(tokenAmount0);
+    const newToken1Reserve = constantProduct / newToken0Reserve;
+    const newMarketPrice = newToken0Reserve / newToken1Reserve;
+
+    // console.log('newToken0Reserve', newToken0Reserve);
+    // console.log('newToken1Reserve', newToken1Reserve);
+    // console.log('newMarketPrice', newMarketPrice);
+    // console.log('marketPrice', marketPrice);
+    // console.log('cp', constantProduct);
+    // console.log('impact', (1 - (marketPrice / newMarketPrice)) * 100);
+
+    return (1 - (marketPrice / newMarketPrice)) * 100
+  }, [tokenAmount0, marketPrice, constantProduct, reserves])
 
   if (!isMounted) {
     return <Spinner />;
@@ -454,16 +481,12 @@ export default function Home() {
       </Head>
 
       <div className="flex flex-col items-center justify-center min-h-[80%] pt-16">
-        <div>
-          <Text h2 height={3} className="text-center">
-            Swap
-          </Text>
-          <Text type="secondary" p className="text-center !mt-0">
-            Trade your tokens
-          </Text>
-        </div>
         <div className="w-full max-w-lg">
-          <div className="mt-8 rounded-xl border border-neutral-200/60 dark:border-neutral-800/50 shadow-dark-sm dark:shadow-dark-lg p-4">
+          <div className={classNames(
+            "mt-8 rounded-xl p-0 md:p-4",
+            "shadow-none md:shadow-dark-sm md:dark:shadow-dark-lg",
+            "border-0 md:border border-neutral-200/60 dark:border-neutral-800/50"
+          )}>
             <div className="flex justify-between items-center mb-2">
               <span className="text-lg font-semibold"> Swap </span>
               <Popover className="relative flex items-center">
@@ -536,7 +559,12 @@ export default function Home() {
               </Popover>
             </div>
 
-            <div className="p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+            <div
+              className={classNames(
+                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
+              )}
+            >
               <div className="flex justify-between">
                 <div className="flex items-center">
                   <p className="text-sm text-neutral-500 mr-2">You Sell</p>
@@ -553,7 +581,7 @@ export default function Home() {
                     debouncedToken0(formatUnits(value, token0.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
                   {isFetchingBalance0 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
@@ -562,7 +590,7 @@ export default function Home() {
                       <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
                         {tokenName0 !== "WEOS" && balance0.formatted}
                         {tokenName0 === "WEOS" &&
-                          Number(balance!.formatted).toFixed(3)}
+                          Number(balance ? balance.formatted : "0").toFixed(3)}
                       </p>
                       <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
                         {tokenName0 !== "WEOS" && tokenName0}
@@ -579,7 +607,7 @@ export default function Home() {
                   )}
                   {!isFetchingToken0Price && (
                     <input
-                      className="text-2xl bg-transparent focus:outline-none"
+                      className="w-full text-2xl bg-transparent focus:outline-none"
                       placeholder="0.0"
                       value={tokenAmount0}
                       onChange={handleToken0Change}
@@ -606,17 +634,13 @@ export default function Home() {
                         "border border-neutral-200 dark:border-transparent"
                       )}
                     >
-                      <div className="flex items-center">
-                        <img
-                          src={selectedToken.logo}
-                          alt="Selected Token 0"
-                          className="h-6 mr-2"
-                        />
-                        <span className="text-sm">{selectedToken.symbol}</span>
-                      </div>
-                      <div>
-                        <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
-                      </div>
+                      <img
+                        src={selectedToken.logo}
+                        alt="Selected Token 0"
+                        className="h-6 mr-2"
+                      />
+                      <span className="text-sm">{selectedToken.symbol}</span>
+                      <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
                     </button>
                   )}
                 </TokenPicker>
@@ -629,20 +653,25 @@ export default function Home() {
                 type="button"
                 className={classNames(
                   "z-10 group p-2 transition-all rounded-lg cursor-pointer",
-                  "bg-neutral-200/50 hover:bg-neutral-300/70 dark:bg-neutral-800/75 hover:dark:bg-neutral-800/50",
+                  "bg-[#EFEEEE] hover:bg-neutral-300/60 dark:bg-neutral-800/75 hover:dark:bg-neutral-800/50",
                   "ring-4 ring-white dark:ring-black"
                 )}
               >
                 <div className="transition-transform rotate-0 group-hover:rotate-180">
                   <ArrowDownIcon
                     strokeWidth={3}
-                    className="w-5 h-5 text-neutral-600 dark:text-neutral-100"
+                    className="w-5 h-5 text-neutral-700 dark:text-neutral-100"
                   />
                 </div>
               </button>
             </div>
 
-            <div className="p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg">
+            <div
+              className={classNames(
+                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
+              )}
+            >
               <div className="flex justify-between">
                 <div className="flex items-center">
                   <p className="text-sm text-neutral-500 mr-2">You Buy</p>
@@ -659,7 +688,7 @@ export default function Home() {
                     debouncedToken1(formatUnits(value, token1.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-5 h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
                   {isFetchingBalance1 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
@@ -685,7 +714,7 @@ export default function Home() {
                   )}
                   {!isFetchingToken1Price && (
                     <input
-                      className="text-2xl bg-transparent focus:outline-none"
+                      className="w-full text-2xl bg-transparent focus:outline-none"
                       placeholder="0.0"
                       value={tokenAmount1}
                       onChange={handleToken1Change}
@@ -707,17 +736,13 @@ export default function Home() {
                         "border border-neutral-200 dark:border-transparent"
                       )}
                     >
-                      <div className="flex items-center">
-                        <img
-                          src={selectedToken.logo}
-                          alt="Selected Token 1"
-                          className="h-6 mr-2"
-                        />
-                        <span className="text-sm">{selectedToken.symbol}</span>
-                      </div>
-                      <div>
-                        <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
-                      </div>
+                      <img
+                        src={selectedToken.logo}
+                        alt="Selected Token 1"
+                        className="h-6 mr-2"
+                      />
+                      <span className="text-sm">{selectedToken.symbol}</span>
+                      <ChevronDownIcon strokeWidth={3} className="w-4 h-4" />
                     </button>
                   )}
                 </TokenPicker>
@@ -725,7 +750,7 @@ export default function Home() {
             </div>
 
 
-            {((!!tokenAmount1 && !isFetchingBalance0 && !isFetchingBalance1) && calcPriceImpact < -2) && (
+            {((!!tokenAmount1 && !isFetchingBalance0 && !isFetchingBalance1) && calcPriceImpact > 2) && (
               <div
                 className={classNames(
                   "flex mt-4 text-sm border border-red-500 p-2 justify-between animate-pulse rounded-lg",
@@ -733,8 +758,7 @@ export default function Home() {
                 )}
               >
                 <span>Price impact warning </span>
-                <span>{calcPriceImpact < -100 ? "> -100" : calcPriceImpact.toFixed(2)}%</span>
-                {/* <span>{calcPriceImpact.toFixed(2)}%</span> */}
+                <span>-{calcPriceImpact.toFixed(2)}%</span>
               </div>
             )}
 
@@ -862,7 +886,7 @@ export default function Home() {
                         </div>
                         {txHash === "" && (
                           <>
-                            <div className="flex items-center justify-between ">
+                            <div className="text-left flex items-center justify-between ">
                               <div className="flex flex-col ">
                                 <div className="text-2xl mb-1 font-medium text-black dark:text-white">
                                   Buy{" "}
@@ -882,7 +906,7 @@ export default function Home() {
                                 className="h-16"
                               />
                             </div>
-                            <div className="p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-zinc-900 rounded-lg">
+                            <div className="text-left p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-zinc-900 rounded-lg">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex flex-col max-w-xs">
                                   <div className="font-medium text-black dark:text-neutral-300">

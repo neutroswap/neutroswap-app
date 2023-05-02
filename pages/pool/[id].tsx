@@ -207,20 +207,23 @@ export default function PoolDetails() {
   })
 
   return (
-    <div className="flex py-4 sm:py-10">
+    <div className="flex py-16">
       <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
         <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-14">
-          <Tab.List className="w-full md:col-span-2">
-            <Link href="/pool" className="group text-black dark:text-white">
-              <div className="flex space-x-1 items-center mb-4">
+          <Tab.List className={classNames(
+            "w-full md:col-span-2 rounded-lg p-0.5",
+            "bg-neutral-100 dark:bg-neutral-900/50 md:bg-transparent md:dark:bg-transparent",
+          )}>
+            <Link href="/pool" className="hidden md:block group text-black dark:text-white mb-6">
+              <div className="flex space-x-1 items-center">
                 <ChevronLeftIcon className="w-5 h-5 group-hover:-translate-x-0.5 transition-all" />
                 <span>Pool</span>
               </div>
             </Link>
             <div className="flex flex-row md:flex-col gap-y-2">
               <Tab disabled={isNewPool} className={({ selected }) => classNames(
-                selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                selected && "!text-neutral-800 dark:!text-neutral-300",
+                selected && "bg-white dark:bg-neutral-900 shadow-sm",
+                selected && "!text-neutral-900 dark:!text-neutral-300 font-medium",
                 "flex w-full rounded-lg text-neutral-500",
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
@@ -231,7 +234,7 @@ export default function PoolDetails() {
               </Tab>
               <Tab className={({ selected }) => classNames(
                 selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                selected && "!text-neutral-800 dark:!text-neutral-300",
+                selected && "!text-neutral-900 dark:!text-neutral-300 font-medium",
                 "flex w-full rounded-lg text-neutral-500",
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}
@@ -242,7 +245,7 @@ export default function PoolDetails() {
               </Tab>
               <Tab disabled={isNewPool} className={({ selected }) => classNames(
                 selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                selected && "!text-neutral-800 dark:!text-neutral-300",
+                selected && "!text-neutral-900 dark:!text-neutral-300 font-medium",
                 "flex w-full rounded-lg text-neutral-500",
                 "disabled:opacity-50 disabled:cursor-not-allowed"
               )}

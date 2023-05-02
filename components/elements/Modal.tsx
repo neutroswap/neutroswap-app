@@ -9,11 +9,12 @@ import {
 } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { classNames } from "../../shared/helpers/classNamer";
+import { Drawer, useMediaQuery } from "@geist-ui/core";
 
 const callAll =
   (...fns: any) =>
-  (...args: any) =>
-    fns.forEach((fn: any) => fn && fn(...args));
+    (...args: any) =>
+      fns.forEach((fn: any) => fn && fn(...args));
 const ModalContext = createContext<
   [boolean, Dispatch<SetStateAction<boolean>>] | any
 >([]);
@@ -45,6 +46,16 @@ const ModalOpenButton: React.FC<{ children: React.ReactElement }> = ({
 
 const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
   const [isOpen, setIsOpen, onClose] = useContext(ModalContext);
+  const isMobile = useMediaQuery("mobile");
+
+  if (isMobile) {
+    return (
+      <Drawer visible={isOpen} placement="bottom" onClose={() => setIsOpen(false)}>
+        {props.children}
+      </Drawer>
+    )
+  }
+
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-20" onClose={onClose}>
@@ -75,7 +86,7 @@ const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
                 className={classNames(
                   "relative transform rounded-lg bg-white dark:bg-[#0C0C0C] px-4 pt-5 pb-4 text-left text-white transition-all",
                   "border border-neutral-300/80 dark:border-neutral-900",
-                  "sm:my-8 min-w-[28rem] sm:max-w-xl sm:p-6"
+                  "w-full sm:my-8 sm:max-w-md sm:p-6"
                 )}
               >
                 {props.children}

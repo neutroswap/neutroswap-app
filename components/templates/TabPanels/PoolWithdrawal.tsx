@@ -57,14 +57,14 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     token1.address === nativeToken.address
   );
 
-  const { refetch: refetchAllowance } = useContractRead({
+  const { data: allowance, refetch: refetchAllowance } = useContractRead({
     enabled: Boolean(address && router.query.id),
     address: router.query.id as `0x${string}`,
     abi: ERC20_ABI,
     functionName: 'allowance',
     args: [address!, ROUTER_CONTRACT],
     onSuccess(value) {
-      setIsLPTokenApproved(+formatEther(value) >= userLPBalance.decimal);
+      setIsLPTokenApproved(+formatEther(value) >= +formatEther(userLPBalance.raw));
     },
   })
 
@@ -362,6 +362,8 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 isToken1WEOS: token1.address === nativeToken.address,
                 token0Amount: token0Amount,
                 token1Amount: token1Amount,
+                LPbalance: formatEther(userLPBalance.raw),
+                LPAllowance: formatEther(allowance ?? "0")
               }, null, 4)}
             </pre>
           </div>
