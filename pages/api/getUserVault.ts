@@ -32,7 +32,7 @@ interface Vault {
   pendingTokensInUsd: string
 }
 
-let NEUTRO_PRICE = process.env.NEUTRO_PRICE;
+let NEUTRO_PRICE: any;
 let CHAIN_NAME: string;
 let RPC: string;
 let CHAIN_ID: any;
@@ -74,7 +74,9 @@ export async function getAllVaults(): Promise<Vault[] | null> {
 }
 
 export async function composeData(address: any, vaults: Vault[] | null): Promise<Vaults | null> {
-  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
+  let tokenPrice = await getPrice("neutroswap")
+  NEUTRO_PRICE = tokenPrice["neutroswap"].usd
+
   const provider = new ethers.providers.JsonRpcProvider(RPC, {
     chainId: CHAIN_ID,
     name: CHAIN_NAME,

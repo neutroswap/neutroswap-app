@@ -223,7 +223,6 @@ export async function addTokenPrice(yieldFarm: YieldFarm): Promise<YieldFarm> {
   // Fetch the token prices for all the tokens
   // console.log(tokens)
   const tokenPrices = await getPrice(tokens.join(','));
-  console.log(tokenPrices)
   NEUTRO_PRICE = tokenPrices["neutroswap"].usd
 
   // Update the token prices on each farm
@@ -330,7 +329,6 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
 
 export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
   const SEC_IN_YEAR = parseFloat("31536000")
-  console.log(NEUTRO_PRICE)
   const neutroPrice = parseFloat(NEUTRO_PRICE)
 
   for (const farm of yieldFarm.farms) {
