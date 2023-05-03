@@ -116,7 +116,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
         address: getAddress(e.target.value),
         symbol: data[1],
         logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${data[1].toLowerCase()}.svg`,
-        decimal: Number(formatEther(data[2])),
+        decimal: data[2].toNumber(),
       }])
       setIsSearching(false);
     } catch (error) {

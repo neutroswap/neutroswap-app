@@ -88,6 +88,7 @@ export default function Home() {
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
   const [isPreferNative, setIsPreferNative] = useState(true);
+  const [isInsufficientLiquidity, setInsufficientLiquidity] = useState(false);
 
   const [balance0, setBalance0] = useState<Currency>({
     decimal: 18,
@@ -217,7 +218,7 @@ export default function Home() {
   };
 
   const { refetch: refetchReserves } = useContractReads({
-    enabled: Boolean(token0 && token1 && pairs),
+    enabled: Boolean(token0 && token1 && (pairs !== '0x0000000000000000000000000000000000000000')),
     contracts: [
       { ...poolContract, functionName: "token0" },
       { ...poolContract, functionName: "token1" },
@@ -312,11 +313,19 @@ export default function Home() {
         customNetwork: customNetworkData,
       }),
     });
-    const fac = async (uni: any) => {
-      let x = await uni.createFactory();
-      setUniswapFactory(x);
+    const getFactoryAndSimulate = async (uni: any) => {
+      try {
+        let factory = await uni.createFactory();
+        //simulate trade to see if liquidity is available
+        await factory.trade("1", TradeDirection.input);
+        setUniswapFactory(factory);
+        setInsufficientLiquidity(false);
+      } catch (error) {
+        setUniswapFactory(undefined)
+        setInsufficientLiquidity(true);
+      }
     };
-    fac(uniswapPair);
+    getFactoryAndSimulate(uniswapPair);
 
     return () => {
       setTokenAmount0("");
@@ -363,7 +372,7 @@ export default function Home() {
   };
 
   const debouncedToken0 = debounce(async (nextValue) => {
-    if (!uniswapFactory) throw new Error("No Uniswap Pair Factory");
+    if (!uniswapFactory) throw new Error("No Pair Found");
     setIsFetchingToken1Price(true);
     const trade = await uniswapFactory.trade(nextValue, TradeDirection.input);
     setTokenAmount1(trade.expectedConvertQuote);
@@ -382,9 +391,7 @@ export default function Home() {
   };
 
   const debouncedToken1 = debounce(async (nextValue) => {
-    if (!uniswapFactory) return new Error("No Uniswap Pair Factory");
-    // if (!tradeContext) return new Error("No TradeContext found");
-
+    if (!uniswapFactory) return new Error("No Pair Found");
     setIsFetchingToken0Price(true);
     const trade = await uniswapFactory.trade(nextValue, TradeDirection.output);
     setTokenAmount0(trade.expectedConvertQuote);
@@ -869,10 +876,13 @@ export default function Home() {
                         "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
                         "text-white dark:text-amber-600",
                         "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                        "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                        "disabled:opacity-50",
                       )}
+                      disabled={isInsufficientLiquidity}
                     >
-                      Swap
+                      {isInsufficientLiquidity && "Insufficient Liquidity"}
+                      {!isInsufficientLiquidity && "Swap"}
                     </Button>
                   </ModalOpenButton>
                   <ModalContents>
