@@ -49,6 +49,7 @@ import {
 } from "@/components/elements/Modal";
 import {
   ArrowLeftIcon,
+  ArrowSmallLeftIcon,
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/solid";
 import WalletIcon from "@/public/icons/wallet.svg";
@@ -412,9 +413,10 @@ export default function Home() {
     await refetchReserves();
   };
 
-  const handleSwapAgain = () => {
+  const resetAllSwapField = () => {
     setTxHash("");
-    router.reload();
+    setTokenAmount0("");
+    setTokenAmount1("");
   };
 
   const approve = async () => {
@@ -426,9 +428,7 @@ export default function Home() {
       const approved = await signer.sendTransaction(
         tradeContext.approvalTransaction
       );
-
-      const approvedReceipt = await approved.wait();
-
+      await approved.wait();
       setIsLoading(false);
       setIsApproved(true);
     }
@@ -443,9 +443,8 @@ export default function Home() {
       const tradeTransaction = await signer.sendTransaction(
         tradeContext.transaction
       );
-
-      setTxHash(tradeTransaction.hash);
       const tradeReceipt = await tradeTransaction.wait();
+      setTxHash(tradeReceipt.transactionHash);
       setIsLoading(false);
       tradeContext.destroy();
     } catch (error) {
@@ -869,7 +868,7 @@ export default function Home() {
               )}
 
               {isConnected && (
-                <Modal>
+                <Modal onClose={resetAllSwapField}>
                   <ModalOpenButton>
                     <Button
                       className={classNames(
@@ -888,13 +887,13 @@ export default function Home() {
                   <ModalContents>
                     {({ close }) => (
                       <div>
-                        <div className="w-full flex mb-5">
-                          <ArrowLeftIcon
-                            className="h-7 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500"
-                            onClick={close}
+                        <button className="w-full flex items-center space-x-2 mb-5 group" onClick={close}>
+                          <ArrowSmallLeftIcon
+                            className="h-4 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500 group-hover:-translate-x-0.5 transition"
                           />
-                        </div>
-                        {txHash === "" && (
+                          <p className="m-0 text-neutral-600 dark:text-neutral-400">Back</p>
+                        </button>
+                        {!txHash && (
                           <>
                             <div className="text-left flex items-center justify-between ">
                               <div className="flex flex-col ">
@@ -916,13 +915,13 @@ export default function Home() {
                                 className="h-16"
                               />
                             </div>
-                            <div className="text-left p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-zinc-900 rounded-lg">
+                            <div className="text-left p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-neutral-900/75 rounded-lg">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex flex-col max-w-xs">
                                   <div className="font-medium text-black dark:text-neutral-300">
                                     Slippage
                                   </div>
-                                  <div className="font-light text-sm text-black/60 dark:text-neutral-300">
+                                  <div className="font-light text-sm text-black/60 dark:text-neutral-400">
                                     The slippage you set for the trade
                                   </div>
                                 </div>
@@ -935,7 +934,7 @@ export default function Home() {
                                   <div className="font-medium text-black dark:text-neutral-300">
                                     Minimal received
                                   </div>
-                                  <div className="font-light text-sm text-black/60 dark:text-neutral-300">
+                                  <div className="font-light text-sm text-black/60 dark:text-neutral-400">
                                     The minimum amount you are <br />{" "}
                                     guaranteeed to receive
                                   </div>
@@ -946,7 +945,7 @@ export default function Home() {
                                 </div>
                               </div>
                             </div>
-                            <div className="p-3 my-5 flex bg-neutral-100/75 dark:bg-zinc-900 rounded-lg items-center justify-between">
+                            <div className="p-3 my-5 flex bg-neutral-100/75 dark:bg-neutral-900/75 rounded-lg items-center justify-between">
                               <div className="flex flex-col max-w-xs">
                                 <div className="font-medium text-black dark:text-neutral-300">
                                   Recipient
@@ -957,6 +956,7 @@ export default function Home() {
                                   }`}
                                 target="_blank"
                                 rel="noreferrer"
+                                className="text-sm"
                               >
                                 {truncateEthAddress(address as string)}
                               </Link>
@@ -997,7 +997,7 @@ export default function Home() {
                             </div>
                           </>
                         )}
-                        {txHash !== "" && (
+                        {txHash && (
                           <>
                             <div className="flex justify-center items-center py-20 mb-5 ">
                               <div className="mr-2 text-black dark:text-white">
@@ -1015,7 +1015,7 @@ export default function Home() {
                               </Link>
                             </div>
                             <Button
-                              onClick={handleSwapAgain}
+                              onClick={resetAllSwapField}
                               className={classNames(
                                 "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
                                 "text-white dark:text-amber-600",
