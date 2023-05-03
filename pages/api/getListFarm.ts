@@ -14,8 +14,6 @@ import { NEUTRO_FARM_ABI, NEUTRO_POOL_ABI } from '@/shared/abi'
 import { CallContext } from 'ethereum-multicall/dist/esm/models'
 import { CoinGeckoClient, SimplePriceResponse } from 'coingecko-api-v3'
 
-let NEUTRO_PRICE = process.env.NEUTRO_PRICE;
-
 const coingecko = new CoinGeckoClient({
   timeout: 10000,
   autoRetry: true
@@ -65,6 +63,7 @@ let RPC: string;
 let CHAIN_ID: any;
 let MULTICALL_ADDR: string;
 let FARM_CONTRACT: string;
+let NEUTRO_PRICE: any
 
 export async function getAllFarms(): Promise<Farm[] | null> {
   const { data: network, } = await supabaseClient
@@ -214,31 +213,23 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
 
 // export async function calculateApr(yieldFarm: YieldFarm, rps: BigNumber, totalLiqiudity: BigNumber): Promise<{ apr: BigNumber[], updatedFarms: Farm[] }> {
 export async function addTokenPrice(yieldFarm: YieldFarm): Promise<YieldFarm> {
-  const NEUTRO_PRICE = Number(process.env.NEUTRO_PRICE) || 0.01;
+  // const NEUTRO_PRICE = Number(process.env.NEUTRO_PRICE) || 0.01;
 
   // Construct an array of all the token symbols to fetch prices for
   const tokens = yieldFarm.farms
     .map((farm) => [farm.token0gecko, farm.token1gecko])
     .flat()
-    .filter((token) => token !== 'neutro');
 
   // Fetch the token prices for all the tokens
   // console.log(tokens)
   const tokenPrices = await getPrice(tokens.join(','));
-  // console.log(tokenPrices)
+  console.log(tokenPrices)
+  NEUTRO_PRICE = tokenPrices["neutroswap"].usd
 
   // Update the token prices on each farm
   const farmsWithPrices = yieldFarm.farms.map((farm) => {
-    if (farm.token0gecko !== 'neutro') {
-      farm.token0price = tokenPrices[farm.token0gecko]?.usd || NEUTRO_PRICE;
-    } else {
-      farm.token0price = NEUTRO_PRICE;
-    }
-    if (farm.token1gecko !== 'neutro') {
-      farm.token1price = tokenPrices[farm.token1gecko]?.usd || NEUTRO_PRICE;
-    } else {
-      farm.token1price = NEUTRO_PRICE;
-    }
+    farm.token0price = tokenPrices[farm.token0gecko]?.usd;
+    farm.token1price = tokenPrices[farm.token1gecko]?.usd;
     return farm;
   });
 
@@ -339,7 +330,7 @@ export async function totalValueOfLiquidity(yieldFarm: YieldFarm) {
 
 export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
   const SEC_IN_YEAR = parseFloat("31536000")
-  if (!NEUTRO_PRICE) { NEUTRO_PRICE = "0.01" }
+  console.log(NEUTRO_PRICE)
   const neutroPrice = parseFloat(NEUTRO_PRICE)
 
   for (const farm of yieldFarm.farms) {
