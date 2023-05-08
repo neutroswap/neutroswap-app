@@ -139,7 +139,7 @@ export default function Home() {
   });
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
-    enabled: Boolean(address),
+    enabled: Boolean(address || chain?.unsupported),
     contracts: [
       {
         address: token0.address,
@@ -157,19 +157,21 @@ export default function Home() {
       },
     ],
     onSuccess(value) {
+      const [token0Balance, token0Symbol, token0Decimals] = value;
+      if (!token0Balance || !token0Symbol || !token0Decimals) return;
       setBalance0({
-        decimal: value[2].toNumber(),
-        raw: value[0],
+        decimal: token0Decimals.toNumber(),
+        raw: token0Balance,
         formatted: parseFloat(
-          formatUnits(value[0].toString(), value[2].toNumber()).toString()
+          formatUnits(token0Balance.toString(), token0Decimals.toNumber()).toString()
         ).toFixed(3),
       });
-      setTokenName0(value[1]);
+      setTokenName0(token0Symbol);
     },
   });
 
   const { isFetching: isFetchingBalance1 } = useContractReads({
-    enabled: Boolean(address),
+    enabled: Boolean(address || chain?.unsupported),
     contracts: [
       {
         address: token1.address,
@@ -187,14 +189,16 @@ export default function Home() {
       },
     ],
     onSuccess(value) {
+      const [token1Balance, token1Symbol, token1Decimals] = value;
+      if (!token1Balance || !token1Symbol || !token1Decimals) return;
       setBalance1({
-        decimal: value[2].toNumber(),
-        raw: value[0],
+        decimal: token1Decimals.toNumber(),
+        raw: token1Balance,
         formatted: parseFloat(
-          formatUnits(value[0].toString(), value[2].toNumber()).toString()
+          formatUnits(token1Balance.toString(), token1Decimals.toNumber()).toString()
         ).toFixed(3),
       });
-      setTokenName1(value[1]);
+      setTokenName1(token1Symbol);
     },
   });
 
@@ -283,37 +287,45 @@ export default function Home() {
     [customNetworkData]
   );
 
+  const uniswapPair = useMemo(() => new UniswapPair({
+    fromTokenContractAddress: formatWrappedToken(
+      token0.address,
+      isPreferNative
+    ),
+    toTokenContractAddress: formatWrappedToken(
+      token1.address,
+      isPreferNative
+    ),
+    ethereumAddress: address as string | undefined ?? "0x0000000000000000000000000000000000000000",
+    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+    providerUrl: NEXT_PUBLIC_RPC as string,
+    settings: new UniswapPairSettings({
+      gasSettings: {
+        getGasPrice: async () => {
+          return "GWEI_GAS_PRICE";
+        },
+      },
+      slippage: Number(slippage) / 100,
+      deadlineMinutes: 15,
+      disableMultihops: true,
+      cloneUniswapContractDetails: {
+        v2Override: cloneUniswapContractDetailsV2,
+      },
+      uniswapVersions: [UniswapVersion.v2],
+      customNetwork: customNetworkData,
+    }),
+  }), [
+    token0.address,
+    token1.address,
+    address,
+    cloneUniswapContractDetailsV2,
+    customNetworkData,
+    formatWrappedToken,
+    isPreferNative,
+    slippage
+  ]);
+
   useEffect(() => {
-    if (!pairs) return;
-    if (!address) return;
-    const uniswapPair = new UniswapPair({
-      fromTokenContractAddress: formatWrappedToken(
-        token0.address,
-        isPreferNative
-      ),
-      toTokenContractAddress: formatWrappedToken(
-        token1.address,
-        isPreferNative
-      ),
-      ethereumAddress: address as string,
-      chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      providerUrl: NEXT_PUBLIC_RPC as string,
-      settings: new UniswapPairSettings({
-        gasSettings: {
-          getGasPrice: async () => {
-            return "GWEI_GAS_PRICE";
-          },
-        },
-        slippage: Number(slippage) / 100,
-        deadlineMinutes: 15,
-        disableMultihops: true,
-        cloneUniswapContractDetails: {
-          v2Override: cloneUniswapContractDetailsV2,
-        },
-        uniswapVersions: [UniswapVersion.v2],
-        customNetwork: customNetworkData,
-      }),
-    });
     const getFactoryAndSimulate = async (uni: any) => {
       try {
         let factory = await uni.createFactory();
@@ -332,17 +344,7 @@ export default function Home() {
       setTokenAmount0("");
       setTokenAmount1("");
     }
-  }, [
-    address,
-    cloneUniswapContractDetailsV2,
-    customNetworkData,
-    formatWrappedToken,
-    isPreferNative,
-    pairs,
-    slippage,
-    token0,
-    token1,
-  ]);
+  }, [uniswapPair]);
 
   const { data: signer } = useSigner({
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
