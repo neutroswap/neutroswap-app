@@ -21,6 +21,7 @@ interface Vaults {
   holdings: string,
   totalHoldingsInUsd: string,
   totalPendingTokens: string,
+  totalPendingTokensInUsd: string,
   vaults: Vault[]
 }
 
@@ -125,6 +126,7 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
   let totalHoldings = 0;
   let totalHoldingsInUsd = 0;
   let totalPendingTokens = 0;
+  let totalPendingTokensInUsd = 0;
   for (const vault of vaults) {
     const result = contractCalls.results[indexName].callsReturnContext.filter(res => res.methodParameters[0] === vault.pid);
 
@@ -141,14 +143,17 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
     totalHoldings += holdings;
     const pendingTokens = parseFloat(vault?.pendingTokens ?? '0');
     totalPendingTokens += pendingTokens
+    const pendingTokensInUsd = parseFloat(vault?.pendingTokensInUsd ?? '0');
+    totalPendingTokensInUsd += pendingTokensInUsd
     const holdingsInUsd = parseFloat(vault?.totalStakedInUsd ?? '0');
     totalHoldingsInUsd += holdingsInUsd
   }
 
   let result: Vaults = {
     holdings: totalHoldings.toString(),
-    totalHoldingsInUsd: totalHoldingsInUsd.toString(),
+    totalHoldingsInUsd: totalHoldingsInUsd.toFixed(2).toString(),
     totalPendingTokens: totalPendingTokens.toString(),
+    totalPendingTokensInUsd: totalPendingTokensInUsd.toFixed(2).toString(),
     vaults
   }
 
