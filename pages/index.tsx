@@ -16,7 +16,6 @@ import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import NumberInput from "@/components/elements/NumberInput";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   UniswapPair,
   UniswapVersion,
@@ -73,6 +72,7 @@ import {
   NEXT_PUBLIC_RPC,
   NEXT_PUBLIC_WEOS_ADDRESS,
 } from "@/shared/helpers/constants";
+import ConnectButton from "@/components/modules/ConnectButton";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -771,103 +771,7 @@ export default function Home() {
             )}
 
             <div className="flex mt-3 justify-center">
-              {!isConnected && (
-                <ConnectButton.Custom>
-                  {({
-                    account,
-                    chain,
-                    openAccountModal,
-                    openChainModal,
-                    openConnectModal,
-                    authenticationStatus,
-                    mounted,
-                  }) => {
-                    const ready = mounted && authenticationStatus !== "loading";
-                    const connected =
-                      ready &&
-                      account &&
-                      chain &&
-                      (!authenticationStatus ||
-                        authenticationStatus === "authenticated");
-
-                    return (
-                      <div
-                        className="flex flex-col w-full"
-                        {...(!ready && {
-                          "aria-hidden": true,
-                          style: {
-                            opacity: 0,
-                            pointerEvents: "none",
-                            userSelect: "none",
-                          },
-                        })}
-                      >
-                        {(() => {
-                          if (!connected) {
-                            return (
-                              <button
-                                onClick={openConnectModal}
-                                className="flex items-center space-x-2 z-10 group bg-white hover:bg-white hover:dark:bg-[#2D3036]/50 dark:bg-[#2D3036] border-white transition-all rounded-lg cursor-pointer w-full justify-center"
-                              >
-                                <div className="p-2">Connect Wallet</div>
-                              </button>
-                            );
-                          }
-
-                          if (chain.unsupported) {
-                            return (
-                              <button onClick={openChainModal} type="button">
-                                Wrong network
-                              </button>
-                            );
-                          }
-
-                          return (
-                            <div style={{ display: "flex", gap: 12 }}>
-                              <button
-                                onClick={openChainModal}
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                }}
-                                type="button"
-                              >
-                                {chain.hasIcon && (
-                                  <div
-                                    style={{
-                                      background: chain.iconBackground,
-                                      width: 12,
-                                      height: 12,
-                                      borderRadius: 999,
-                                      overflow: "hidden",
-                                      marginRight: 4,
-                                    }}
-                                  >
-                                    {chain.iconUrl && (
-                                      <img
-                                        alt={chain.name ?? "Chain icon"}
-                                        src={chain.iconUrl}
-                                        style={{ width: 12, height: 12 }}
-                                      />
-                                    )}
-                                  </div>
-                                )}
-                                {chain.name}
-                              </button>
-                              <button onClick={openAccountModal} type="button">
-                                {account.displayName}
-                                {account.displayBalance
-                                  ? ` (${account.displayBalance})`
-                                  : ""}
-                              </button>
-                            </div>
-                          );
-                        })()}
-                      </div>
-                    );
-                  }}
-                </ConnectButton.Custom>
-              )}
+              {!isConnected && <ConnectButton />}
 
               {isConnected && (
                 <Modal onClose={resetAllSwapField}>
