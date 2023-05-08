@@ -27,8 +27,8 @@ interface Vaults {
 
 interface Vault {
   pid: number,
-  totalStaked: string,
-  totalStakedInUsd: string,
+  totalDeposit: string,
+  totalDepostInUsd: string,
   pendingTokens: string,
   pendingTokensInUsd: string
 }
@@ -63,8 +63,8 @@ export async function getAllVaults(): Promise<Vault[] | null> {
     for (let i = 0; i < 4; i++) {
       let vault: Vault = {
         pid: i,
-        totalStaked: "",
-        totalStakedInUsd: "",
+        totalDeposit: "",
+        totalDepostInUsd: "",
         pendingTokens: "",
         pendingTokensInUsd: ""
       }
@@ -134,18 +134,18 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
       const totalStaked = result[0].returnValues[0];
       const pendingTokens = result[1].returnValues[3];
 
-      vault.totalStaked = formatEther(BigNumber.from(totalStaked.hex))
-      vault.totalStakedInUsd = (parseFloat(vault.totalStaked) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
+      vault.totalDeposit = formatEther(BigNumber.from(totalStaked.hex))
+      vault.totalDepostInUsd = (parseFloat(vault.totalDeposit) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
       vault.pendingTokens = formatEther(BigNumber.from(pendingTokens[0].hex))
       vault.pendingTokensInUsd = (parseFloat(vault.pendingTokens) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
     }
-    const holdings = parseFloat(vault?.totalStaked ?? '0');
+    const holdings = parseFloat(vault?.totalDeposit ?? '0');
     totalHoldings += holdings;
     const pendingTokens = parseFloat(vault?.pendingTokens ?? '0');
     totalPendingTokens += pendingTokens
     const pendingTokensInUsd = parseFloat(vault?.pendingTokensInUsd ?? '0');
     totalPendingTokensInUsd += pendingTokensInUsd
-    const holdingsInUsd = parseFloat(vault?.totalStakedInUsd ?? '0');
+    const holdingsInUsd = parseFloat(vault?.totalDepostInUsd ?? '0');
     totalHoldingsInUsd += holdingsInUsd
   }
 
