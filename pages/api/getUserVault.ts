@@ -31,6 +31,7 @@ interface Vault {
   totalDepostInUsd: string,
   pendingTokens: string,
   pendingTokensInUsd: string
+  unlockAt: string
 }
 
 let NEUTRO_PRICE: any;
@@ -66,7 +67,8 @@ export async function getAllVaults(): Promise<Vault[] | null> {
         totalDeposit: "",
         totalDepostInUsd: "",
         pendingTokens: "",
-        pendingTokensInUsd: ""
+        pendingTokensInUsd: "",
+        unlockAt: ""
       }
       result.push(vault)
     }
@@ -87,6 +89,7 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
   if (!vaults) { return null }
 
   let calls = []
+
   // get all pids
   const userInfo: CallContext[] = vaults.map(vault => ({
     reference: 'info',
@@ -103,6 +106,14 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
     methodParameters: [vault.pid, address]
   }));
   calls.push(...pendingTokens)
+
+  // get all pids
+  const unlockAt: CallContext[] = vaults.map(vault => ({
+    reference: 'unlockAt',
+    methodName: 'userLockedUntil',
+    methodParameters: [vault.pid, address]
+  }));
+  calls.push(...unlockAt)
 
   const multicall = new Multicall({
     multicallCustomContractAddress: MULTICALL_ADDR,
@@ -133,12 +144,15 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
     if (result) {
       const totalStaked = result[0].returnValues[0];
       const pendingTokens = result[1].returnValues[3];
+      const unlockTime = BigNumber.from(result[2].returnValues[0].hex).toString();
 
       vault.totalDeposit = formatEther(BigNumber.from(totalStaked.hex))
       vault.totalDepostInUsd = (parseFloat(vault.totalDeposit) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
       vault.pendingTokens = formatEther(BigNumber.from(pendingTokens[0].hex))
       vault.pendingTokensInUsd = (parseFloat(vault.pendingTokens) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
+      vault.unlockAt = unlockTime
     }
+
     const holdings = parseFloat(vault?.totalDeposit ?? '0');
     totalHoldings += holdings;
     const pendingTokens = parseFloat(vault?.pendingTokens ?? '0');
