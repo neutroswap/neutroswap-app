@@ -502,7 +502,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Available:</div>
               <div className="text-sm space-x-2">
-                <span>{!!neutroTokenBalance && Number(formatEther(neutroTokenBalance)).toFixed(10)}{" "} NEUTRO</span>
+                <span>{!!neutroTokenBalance && Number(formatEther(neutroTokenBalance)).toFixed(2)}{" "} NEUTRO</span>
               </div>
             </div>
             {!isNeutroTokenApproved && (
