@@ -146,7 +146,7 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
       const pendingTokens = result[1].returnValues[3];
       const unlockTime = BigNumber.from(result[2].returnValues[0].hex).toString();
 
-      vault.totalDeposit = formatEther(BigNumber.from(totalStaked.hex))
+      vault.totalDeposit = parseFloat(formatEther(BigNumber.from(totalStaked.hex))).toFixed(2)
       vault.totalDepositInUsd = (parseFloat(vault.totalDeposit) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
       vault.pendingTokens = formatEther(BigNumber.from(pendingTokens[0].hex))
       vault.pendingTokensInUsd = (parseFloat(vault.pendingTokens) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
