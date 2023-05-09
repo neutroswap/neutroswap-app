@@ -565,7 +565,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Unlock At:</div>
               <div className="text-sm space-x-2">
-              <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('DD/MM/YYYY')}</span>
+              <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('DD/MM/YYYY HH:mm')}</span>
               </div>
             </div>
             <Button
