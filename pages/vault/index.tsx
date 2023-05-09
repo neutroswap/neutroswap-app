@@ -558,7 +558,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Deposited:</div>
               <div className="text-sm space-x-2">
-                <span>{parseFloat(selectedRow.totalDeposit!).toFixed(10)} NEUTRO</span>
+                <span>{parseFloat(selectedRow.totalDeposit!).toFixed(2)} NEUTRO</span>
                 <span className="font-semibold">~ ${Number(selectedRow.totalDepositInUsd).toFixed(2)}</span>
               </div>
             </div>
