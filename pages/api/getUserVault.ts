@@ -21,15 +21,17 @@ interface Vaults {
   holdings: string,
   totalHoldingsInUsd: string,
   totalPendingTokens: string,
+  totalPendingTokensInUsd: string,
   vaults: Vault[]
 }
 
 interface Vault {
   pid: number,
-  totalStaked: string,
-  totalStakedInUsd: string,
+  totalDeposit: string,
+  totalDepositInUsd: string,
   pendingTokens: string,
   pendingTokensInUsd: string
+  unlockAt: string
 }
 
 let NEUTRO_PRICE: any;
@@ -62,10 +64,11 @@ export async function getAllVaults(): Promise<Vault[] | null> {
     for (let i = 0; i < 4; i++) {
       let vault: Vault = {
         pid: i,
-        totalStaked: "",
-        totalStakedInUsd: "",
+        totalDeposit: "",
+        totalDepositInUsd: "",
         pendingTokens: "",
-        pendingTokensInUsd: ""
+        pendingTokensInUsd: "",
+        unlockAt: ""
       }
       result.push(vault)
     }
@@ -86,6 +89,7 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
   if (!vaults) { return null }
 
   let calls = []
+
   // get all pids
   const userInfo: CallContext[] = vaults.map(vault => ({
     reference: 'info',
@@ -102,6 +106,14 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
     methodParameters: [vault.pid, address]
   }));
   calls.push(...pendingTokens)
+
+  // get all pids
+  const unlockAt: CallContext[] = vaults.map(vault => ({
+    reference: 'unlockAt',
+    methodName: 'userLockedUntil',
+    methodParameters: [vault.pid, address]
+  }));
+  calls.push(...unlockAt)
 
   const multicall = new Multicall({
     multicallCustomContractAddress: MULTICALL_ADDR,
@@ -125,30 +137,37 @@ export async function composeData(address: any, vaults: Vault[] | null): Promise
   let totalHoldings = 0;
   let totalHoldingsInUsd = 0;
   let totalPendingTokens = 0;
+  let totalPendingTokensInUsd = 0;
   for (const vault of vaults) {
     const result = contractCalls.results[indexName].callsReturnContext.filter(res => res.methodParameters[0] === vault.pid);
 
     if (result) {
       const totalStaked = result[0].returnValues[0];
       const pendingTokens = result[1].returnValues[3];
+      const unlockTime = BigNumber.from(result[2].returnValues[0].hex).toString();
 
-      vault.totalStaked = formatEther(BigNumber.from(totalStaked.hex))
-      vault.totalStakedInUsd = (parseFloat(vault.totalStaked) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
+      vault.totalDeposit = formatEther(BigNumber.from(totalStaked.hex))
+      vault.totalDepositInUsd = (parseFloat(vault.totalDeposit) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
       vault.pendingTokens = formatEther(BigNumber.from(pendingTokens[0].hex))
       vault.pendingTokensInUsd = (parseFloat(vault.pendingTokens) * parseFloat(NEUTRO_PRICE)).toFixed(2).toString()
+      vault.unlockAt = unlockTime
     }
-    const holdings = parseFloat(vault?.totalStaked ?? '0');
+
+    const holdings = parseFloat(vault?.totalDeposit ?? '0');
     totalHoldings += holdings;
     const pendingTokens = parseFloat(vault?.pendingTokens ?? '0');
     totalPendingTokens += pendingTokens
-    const holdingsInUsd = parseFloat(vault?.totalStakedInUsd ?? '0');
+    const pendingTokensInUsd = parseFloat(vault?.pendingTokensInUsd ?? '0');
+    totalPendingTokensInUsd += pendingTokensInUsd
+    const holdingsInUsd = parseFloat(vault?.totalDepositInUsd ?? '0');
     totalHoldingsInUsd += holdingsInUsd
   }
 
   let result: Vaults = {
     holdings: totalHoldings.toString(),
-    totalHoldingsInUsd: totalHoldingsInUsd.toString(),
+    totalHoldingsInUsd: totalHoldingsInUsd.toFixed(2).toString(),
     totalPendingTokens: totalPendingTokens.toString(),
+    totalPendingTokensInUsd: totalPendingTokensInUsd.toFixed(2).toString(),
     vaults
   }
 

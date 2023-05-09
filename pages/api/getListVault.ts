@@ -157,6 +157,7 @@ export async function composeData(vaults: Vault[] | null): Promise<Vaults | null
         apr: calculateApr(formatEther(BigNumber.from(rps[0].hex)), vault.valueOfVault),
         rps: formatEther(BigNumber.from(rps[0].hex))
       };
+      totalVaultValue += parseFloat(vault.valueOfVault)
     }
   }
 
