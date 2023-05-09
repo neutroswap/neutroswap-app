@@ -3,15 +3,14 @@ import { Vault } from '@/shared/types/vault.types';
 
 export type AvailableVault = Vault & {
   details: {
-    totalLiquidity: string,
     apr: string,
     rps: string
   }
 }
 
 type GetListVaultsResponse = {
-  farms: AvailableVault[],
-  tvl: string
+  totalVaultValue: string,
+  vaults: AvailableVault[],
 }
 
 const fetcher = (
@@ -23,6 +22,6 @@ const fetcher = (
 })
 
 export default function useVaultList() {
-  const swr = useSWR<GetListVaultsResponse>('/api/getVaultFarm', fetcher)
+  const swr = useSWR<GetListVaultsResponse>('/api/getListVault', fetcher)
   return swr
 }

@@ -2,18 +2,20 @@ import useSWR from 'swr';
 import { Vault } from '@/shared/types/vault.types';
 
 export type OwnedVault = Vault & {
-  details: {
-    totalStaked: string,
-    totalStakedInUsd: string,
-    pendingTokens: string,
-    pendingTokensInUsd: string
+  vaults: {
+  totalDeposit: string,
+  totalDepositInUsd: string,
+  pendingTokens: string,
+  pendingTokensInUsd: string,
+  unlockAt: string
   }
 }
 
 type GetUserVaultsResponse = {
   holdings: string,
+  totalHoldingsInUsd: string,
   totalPendingTokens: string,
-  totalPendingTokenInUsd: string,
+  totalPendingTokensInUsd: string,
   vaults: OwnedVault[],
 }
 
@@ -22,10 +24,10 @@ const fetcher = (
   init?: RequestInit | undefined
 ) => fetch(input, init).then(async (res) => {
   const { data }: { data: GetUserVaultsResponse } = await res.json();
-  const filteredFarm = data.vaults.filter((vault) => {
-    return +vault.details.totalStaked > 0
-  })
-  return { ...data, farms: filteredFarm }
+  // const filteredVault = data.vaults.filter((vault) => {
+  //   return +vault.details.totalStaked > 0
+  // })
+  return data
 })
 
 export default function useUserVaults(address?: `0x${string}`) {
