@@ -5,7 +5,6 @@ import React, {
   Fragment,
   useMemo,
   ChangeEvent,
-  useCallback,
 } from "react";
 import { Button, Note, Spinner, Text } from "@geist-ui/core";
 import {
@@ -17,12 +16,8 @@ import { ArrowDownIcon } from "@heroicons/react/20/solid";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import NumberInput from "@/components/elements/NumberInput";
 import {
-  UniswapPair,
-  UniswapVersion,
-  UniswapPairSettings,
   UniswapPairFactory,
   TradeContext,
-  appendEthToContractAddress,
   TradeDirection,
   getAddress,
 } from "simple-uniswap-sdk";
@@ -38,7 +33,7 @@ import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
 import debounce from "lodash/debounce";
-import { formatEther, formatUnits, parseUnits } from "ethers/lib/utils.js";
+import { formatUnits } from "ethers/lib/utils.js";
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import {
@@ -47,7 +42,6 @@ import {
   ModalOpenButton,
 } from "@/components/elements/Modal";
 import {
-  ArrowLeftIcon,
   ArrowSmallLeftIcon,
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/solid";
@@ -66,13 +60,10 @@ import Head from "next/head";
 import {
   NEXT_PUBLIC_CHAIN_ID,
   NEXT_PUBLIC_FACTORY_CONTRACT,
-  NEXT_PUBLIC_FARM_CONTRACT,
-  NEXT_PUBLIC_MULTICALL_CONTRACT,
-  NEXT_PUBLIC_ROUTER_CONTRACT,
-  NEXT_PUBLIC_RPC,
   NEXT_PUBLIC_WEOS_ADDRESS,
 } from "@/shared/helpers/constants";
 import ConnectButton from "@/components/modules/ConnectButton";
+import useUniswapPairFactory from "@/shared/hooks/useUniswapPairFactory";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -138,6 +129,23 @@ export default function Home() {
     address,
   });
 
+  const { data: pairs } = useContractRead({
+    address: NEXT_PUBLIC_FACTORY_CONTRACT as `0x${string}`,
+    abi: NEUTRO_FACTORY_ABI,
+    functionName: "getPair",
+    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+    args: [token0.address, token1.address],
+  });
+
+  const uniswapPair = useUniswapPairFactory({
+    token0: token0.address,
+    token1: token1.address,
+    pairs: pairs,
+    isNative: isPreferNative,
+    slippage: slippage,
+    address: address,
+  })
+
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address || chain?.unsupported),
     contracts: [
@@ -202,21 +210,6 @@ export default function Home() {
     },
   });
 
-  // useEffect(() => {
-  //   console.log("Uniswap Factory =", uniswapFactory);
-  //   console.log("Pairs =", pairs);
-  //   console.log("Trade context = ", tradeContext);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [uniswapFactory, tradeContext]);
-
-  const { data: pairs } = useContractRead({
-    address: NEXT_PUBLIC_FACTORY_CONTRACT as `0x${string}`,
-    abi: NEUTRO_FACTORY_ABI,
-    functionName: "getPair",
-    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-    args: [token0.address, token1.address],
-  });
-
   const poolContract = {
     address: pairs as `0x${string}`,
     abi: NEUTRO_POOL_ABI,
@@ -247,83 +240,6 @@ export default function Home() {
       }
     }
   });
-
-  let customNetworkData = useMemo(
-    () => ({
-      nameNetwork: "EOS EVM",
-      multicallContractAddress: NEXT_PUBLIC_MULTICALL_CONTRACT as string,
-      nativeCurrency: {
-        name: "EOS",
-        symbol: "EOS",
-      },
-      nativeWrappedTokenInfo: {
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-        contractAddress: NEXT_PUBLIC_WEOS_ADDRESS as string,
-        decimals: 18,
-        symbol: "WEOS",
-        name: "Wrapped EOS",
-      },
-    }),
-    []
-  );
-
-  let cloneUniswapContractDetailsV2 = useMemo(
-    () => ({
-      routerAddress: NEXT_PUBLIC_ROUTER_CONTRACT as string,
-      factoryAddress: NEXT_PUBLIC_FACTORY_CONTRACT as string,
-      pairAddress: pairs as string,
-    }),
-    [pairs]
-  );
-
-  let formatWrappedToken = useCallback(
-    (token: `0x${string}`, isPreferNative: boolean) => {
-      if (getAddress(token) !== getAddress(customNetworkData.nativeWrappedTokenInfo.contractAddress))
-        return token;
-      if (!isPreferNative) return token;
-      let appendedToken = appendEthToContractAddress(token);
-      return appendedToken as `0x${string}`;
-    },
-    [customNetworkData]
-  );
-
-  const uniswapPair = useMemo(() => new UniswapPair({
-    fromTokenContractAddress: formatWrappedToken(
-      token0.address,
-      isPreferNative
-    ),
-    toTokenContractAddress: formatWrappedToken(
-      token1.address,
-      isPreferNative
-    ),
-    ethereumAddress: address as string | undefined ?? "0x0000000000000000000000000000000000000000",
-    chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-    providerUrl: NEXT_PUBLIC_RPC as string,
-    settings: new UniswapPairSettings({
-      gasSettings: {
-        getGasPrice: async () => {
-          return "GWEI_GAS_PRICE";
-        },
-      },
-      slippage: Number(slippage) / 100,
-      deadlineMinutes: 15,
-      disableMultihops: true,
-      cloneUniswapContractDetails: {
-        v2Override: cloneUniswapContractDetailsV2,
-      },
-      uniswapVersions: [UniswapVersion.v2],
-      customNetwork: customNetworkData,
-    }),
-  }), [
-    token0.address,
-    token1.address,
-    address,
-    cloneUniswapContractDetailsV2,
-    customNetworkData,
-    formatWrappedToken,
-    isPreferNative,
-    slippage
-  ]);
 
   useEffect(() => {
     const getFactoryAndSimulate = async (uni: any) => {
