@@ -551,7 +551,24 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Unlock At:</div>
               <div className="text-sm space-x-2">
-              <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('DD/MM/YYYY HH:mm')}</span>
+              <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}</span>
+              {/* <span>
+                {selectedRow.unlockAt &&
+                  (() => {
+                    const unlockDate = dayjs(parseFloat(selectedRow.unlockAt) * 1000);
+                    const currentDate = dayjs();
+
+                    const remainingDays = unlockDate.diff(currentDate, 'day');
+                    const formattedDate = unlockDate.format('MM/DD/YYYY HH:mm');
+                    const displayText = remainingDays > 0 ? `(in ${remainingDays} days)` : '';
+
+                    return (
+                      <>
+                        {formattedDate} {displayText}
+                      </>
+                    );
+                  })()}
+              </span> */}
               </div>
             </div>
             <Button
