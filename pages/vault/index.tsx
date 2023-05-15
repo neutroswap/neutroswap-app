@@ -79,7 +79,6 @@ export default function VaultPage() {
       setMergedData(combinedData);
       setAllVault(combinedData);
     }
-    console.log("td",selectedRow?.totalDeposit)
     combineData();
   }, [vaults, userVaults]);
 
@@ -443,7 +442,13 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
         </div>
       </div>
 
-      <div className="flex items-center justify-between w-full mt-10">
+      <div className="flex items-center justify-between mt-5">
+        <div className="text-left">
+          <span className="text-xs font-bold uppercase text-amber-600">&#9432; Everytime you stake, your lock time renews.</span>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between w-full mt-5">
         <div className="space-y-1 mb-5 text-left">
           <span className="text-xs font-bold uppercase text-neutral-500">Earned Rewards</span>
           <div className="flex space-x-2 items-end justify-center text-3xl">
