@@ -552,34 +552,20 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
                 <span className="font-semibold">~ ${Number(selectedRow.totalDepositInUsd).toFixed(2)}</span>
               </div>
             </div>
-              {selectedRow.unlockAt && selectedRow.totalDeposit !== "0.00" && (
+            {selectedRow.unlockAt && selectedRow.totalDeposit !== "0.00" ? (
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Unlock At:</div>
               <div className="text-sm space-x-2">
-              <span>
-                {dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}
-              </span>
-              {/* <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}</span> */}
-              {/* <span>
-                {selectedRow.unlockAt &&
-                  (() => {
-                    const unlockDate = dayjs(parseFloat(selectedRow.unlockAt) * 1000);
-                    const currentDate = dayjs();
-
-                    const remainingDays = unlockDate.diff(currentDate, 'day');
-                    const formattedDate = unlockDate.format('MM/DD/YYYY HH:mm');
-                    const displayText = remainingDays > 0 ? `(in ${remainingDays} days)` : '';
-
-                    return (
-                      <>
-                        {formattedDate} {displayText}
-                      </>
-                    );
-                  })()}
-              </span> */}
+                {selectedRow.pid !== 0 ? (
+                  <span>
+                    {dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}
+                  </span>
+                ) : (
+                  <span>No lockup</span>
+                )}
               </div>
             </div>
-              )}
+          ) : null}
             <Button
               disabled={!unstake}
               loading={isUnstaking}
