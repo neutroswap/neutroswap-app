@@ -57,8 +57,6 @@ export default function VaultPage() {
   const [ownedVault, setOwnedVault] = useState<Array<OwnedVault>>([]);
   const [mergedData, setMergedData] = useState<Array<MergedVault>>([]);
   const [selectedRow, setSelectedRow] = useState<MergedVault>();
-  // console.log("sr", selectedRow)
-  // console.log("md", mergedData)
 
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -253,19 +251,7 @@ export default function VaultPage() {
             Harvest All
           </Button>
         </div>
-        {/* {(!Boolean(allVault.length) && !(isVaultsLoading || isUserVaultsLoading || isSearching)) && (
-            <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
-              {theme.type as ThemeType === "nlight" && (
-                <NoContentLight className="w-40 h-40 opacity-75" />
-              )}
-              {theme.type as ThemeType === "ndark" && (
-                <NoContentDark className="w-40 h-40 opacity-75" />
-              )}
-              <p className="text-neutral-500 w-3/4 text-center">
-                No vaults with <Code>{query}</Code> found. Try to use search with contract address instead of token name.
-              </p>
-            </div>
-        )} */}
+        
         {(isVaultsLoading || isUserVaultsLoading || isSearching) && (
           <div className="my-5">
             <Loading spaceRatio={2.5} />
@@ -565,7 +551,24 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Unlock At:</div>
               <div className="text-sm space-x-2">
-              <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('DD/MM/YYYY HH:mm')}</span>
+              <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}</span>
+              {/* <span>
+                {selectedRow.unlockAt &&
+                  (() => {
+                    const unlockDate = dayjs(parseFloat(selectedRow.unlockAt) * 1000);
+                    const currentDate = dayjs();
+
+                    const remainingDays = unlockDate.diff(currentDate, 'day');
+                    const formattedDate = unlockDate.format('MM/DD/YYYY HH:mm');
+                    const displayText = remainingDays > 0 ? `(in ${remainingDays} days)` : '';
+
+                    return (
+                      <>
+                        {formattedDate} {displayText}
+                      </>
+                    );
+                  })()}
+              </span> */}
               </div>
             </div>
             <Button
