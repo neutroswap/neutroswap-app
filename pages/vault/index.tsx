@@ -79,6 +79,7 @@ export default function VaultPage() {
       setMergedData(combinedData);
       setAllVault(combinedData);
     }
+    console.log("td",selectedRow?.totalDeposit)
     combineData();
   }, [vaults, userVaults]);
 
@@ -548,10 +549,14 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
                 <span className="font-semibold">~ ${Number(selectedRow.totalDepositInUsd).toFixed(2)}</span>
               </div>
             </div>
+              {selectedRow.unlockAt && selectedRow.totalDeposit !== "0.0" && (
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Unlock At:</div>
               <div className="text-sm space-x-2">
-              <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}</span>
+              <span>
+                {dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}
+              </span>
+              {/* <span>{selectedRow.unlockAt && dayjs(parseFloat(selectedRow.unlockAt) * 1000).format('MM/DD/YYYY HH:mm')}</span> */}
               {/* <span>
                 {selectedRow.unlockAt &&
                   (() => {
@@ -571,6 +576,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
               </span> */}
               </div>
             </div>
+              )}
             <Button
               disabled={!unstake}
               loading={isUnstaking}
