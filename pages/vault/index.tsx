@@ -70,15 +70,12 @@ export default function VaultPage() {
       if (!userVaults) return;
       const combinedData = vaults.vaults.map((vault: AvailableVault) => {
         const userExactVault = userVaults.vaults.find((userVault: any) => vault.pid === userVault.pid)
-        console.log("userexactvault", userExactVault)
         const temp = Object.assign({}, vault, userExactVault);
-        console.log("vault", vault)
         const vaultDetails = { ...vault.details, ...userExactVault}
         return { ...temp, details: vaultDetails }
       });
       setMergedData(combinedData);
       setAllVault(combinedData);
-      console.log("td", selectedRow?.totalDeposit);
     }
     combineData();
   }, [vaults, userVaults]);
