@@ -249,13 +249,25 @@ export default function VaultPage() {
             Harvest All
           </Button>
         </div>
-        
+        {(!Boolean(allVault.length) && !(isVaultsLoading || isUserVaultsLoading || isSearching)) && (
+              <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
+                {theme.type as ThemeType === "nlight" && (
+                  <NoContentLight className="w-40 h-40 opacity-75" />
+                )}
+                {theme.type as ThemeType === "ndark" && (
+                  <NoContentDark className="w-40 h-40 opacity-75" />
+                )}
+                <p className="text-neutral-500 w-3/4 text-center">
+                  No vaults with <Code>{query}</Code> found. Try to use search with contract address instead of token name.
+                </p>
+              </div>
+            )}
         {(isVaultsLoading || isUserVaultsLoading || isSearching) && (
           <div className="my-5">
             <Loading spaceRatio={2.5} />
           </div>
         )}
-        {Boolean(vaults?.vaults.length) && (
+        {Boolean(allVault.length) && (
           <div className="overflow-x-scroll">
             <Table
               data={allVault}
