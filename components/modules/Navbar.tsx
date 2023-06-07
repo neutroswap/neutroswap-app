@@ -10,7 +10,7 @@ import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import { useMemo } from "react";
 
-interface Props { }
+interface Props {}
 
 const Navbar: React.FC<Props> = () => {
   const router = useRouter();
@@ -21,46 +21,49 @@ const Navbar: React.FC<Props> = () => {
       {
         label: "Swap",
         value: "/",
-        hidden: false
+        hidden: false,
       },
       {
         label: "Pool",
         value: "/pool",
-        hidden: false
+        hidden: false,
       },
       {
         label: "Farm",
         value: "/farm",
-        hidden: false
+        hidden: false,
       },
       {
         label: "Vault",
         value: "/vault",
-        hidden: false
+        hidden: false,
       },
       {
         label: "Launchpad",
         value: "/launchpad",
-        hidden: false
+        hidden: false,
+      },
+      {
+        label: "Dividend",
+        value: "/dividend",
+        hidden: false,
       },
       {
         label: "Analytics",
         value: "/analytics",
-        hidden: false
+        hidden: false,
       },
       {
         label: "Presales",
         value: "/presales",
-        hidden: true
-      }
-    ]
-  }, [])
+        hidden: true,
+      },
+    ];
+  }, []);
 
   return (
     <>
-      <div
-        className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-lg z-10 p-0"
-      >
+      <div className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-lg z-10 p-0">
         <div className="flex items-center justify-between max-w-7xl mx-auto pt-3 md:py-3 px-4 lg:px-0  submenu__inner">
           <Link href="/">
             <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
@@ -73,8 +76,14 @@ const Navbar: React.FC<Props> = () => {
             initialValue={"/" + router.asPath.split("/")[1]}
           >
             {tabs.map((tab) => {
-              if (tab.hidden) return null
-              return <Tabs.Item key={tab.label} label={tab.label} value={tab.value} />
+              if (tab.hidden) return null;
+              return (
+                <Tabs.Item
+                  key={tab.label}
+                  label={tab.label}
+                  value={tab.value}
+                />
+              );
             })}
           </Tabs>
           <div className="flex space-x-2">
@@ -212,8 +221,15 @@ const Navbar: React.FC<Props> = () => {
             initialValue={"/" + router.asPath.split("/")[1]}
           >
             {tabs.map((tab) => {
-              if (tab.hidden) return null
-              return <Tabs.Item key={tab.label} label={tab.label} value={tab.value} className="!p-0" />
+              if (tab.hidden) return null;
+              return (
+                <Tabs.Item
+                  key={tab.label}
+                  label={tab.label}
+                  value={tab.value}
+                  className="!p-0"
+                />
+              );
             })}
           </Tabs>
         </div>
