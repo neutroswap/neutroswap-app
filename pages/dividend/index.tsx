@@ -4,6 +4,10 @@ import Navbar from "@/components/modules/Navbar";
 import { Button, Page, Text } from "@geist-ui/core";
 import EthLogo from "@/public/logo/eth.svg";
 import NeutroLogo from "@/public/logo/neutro_token.svg";
+import EpochLogo from "@/public/logo/epoch.svg";
+import DeallocationLogo from "@/public/logo/deallocation.svg";
+import APYLogo from "@/public/logo/apy.svg";
+import AllocationLogo from "@/public/logo/allocation.svg";
 // const inter = Inter({ subsets: ['latin'] })
 
 export default function Dividend() {
@@ -24,33 +28,65 @@ export default function Dividend() {
         <div className="grid grid-cols-12 w-full box-border space-x-3">
           <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
             <div className="px-2 py-1">
-              <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                Total Allocations
-              </span>
+              <div className="flex justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                    Total Allocation
+                  </span>
+                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                    0
+                  </span>
+                </div>
+                <AllocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+              </div>
             </div>
           </div>
 
           <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
             <div className="px-2 py-1">
-              <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                Current Epochs
-              </span>
+              <div className="flex justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                    Current Epochs
+                  </span>
+                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                    0
+                  </span>
+                </div>
+                <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+              </div>
             </div>
           </div>
 
           <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
             <div className="px-2 py-1">
-              <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                APY
-              </span>
+              <div className="flex justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                    APY
+                  </span>
+                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                    0
+                  </span>
+                </div>
+                <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+              </div>
             </div>
           </div>
 
           <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
             <div className="px-2 py-1">
-              <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                Deallocation Fee
-              </span>
+              <div className="flex justify-between">
+                <div className="flex flex-col">
+                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                    Deallocation Fee
+                  </span>
+                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                    0
+                  </span>
+                </div>
+                <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+              </div>
             </div>
           </div>
         </div>
@@ -64,11 +100,6 @@ export default function Dividend() {
                 <p className="m-0 text-left font-semibold whitespace-nowrap">
                   Current epoch
                 </p>
-                <div className="flex space-x-4">
-                  <button className="border px-3 py-1 text-xs text-neutral-500 font-semibold">
-                    Calculator
-                  </button>
-                </div>
               </div>
               <div className="flex flex-col md:pl-8 m-0">
                 <div className="flex">
