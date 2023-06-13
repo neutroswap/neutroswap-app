@@ -10,6 +10,13 @@ import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 // const inter = Inter({ subsets: ['latin'] })
 
+const data = {
+  totalAllocation: 1000,
+  currentEpoch: 1000,
+  APY: 24.57,
+  deallocationFee: 0,
+};
+
 export default function Dividend() {
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -33,9 +40,14 @@ export default function Dividend() {
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
                     Total Allocation
                   </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    0
-                  </span>
+                  <div className="flex space-x-1">
+                    <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                      {data.totalAllocation}
+                    </span>
+                    <span className="text-sm text-neutral-500 mt-3">
+                      xGRAIL
+                    </span>
+                  </div>
                 </div>
                 <AllocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
               </div>
@@ -50,7 +62,7 @@ export default function Dividend() {
                     Current Epochs
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    0
+                    ${data.currentEpoch}
                   </span>
                 </div>
                 <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -66,7 +78,7 @@ export default function Dividend() {
                     APY
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    0
+                    {data.APY}%
                   </span>
                 </div>
                 <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -82,7 +94,7 @@ export default function Dividend() {
                     Deallocation Fee
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    0
+                    {data.deallocationFee}%
                   </span>
                 </div>
                 <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
