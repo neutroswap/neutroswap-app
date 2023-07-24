@@ -162,7 +162,7 @@ export default function Dividend() {
           </div>
         </div>
 
-        <div className="col-span-5 w-full mt-8 px-6 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
+        <div className="col-span-5 mt-8 px-6 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
           <div>
             <div className="flex flex-row items-center w-full md:p-8 justify-between">
               <p className="m-0 text-left font-semibold whitespace-nowrap">
