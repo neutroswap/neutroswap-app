@@ -21,9 +21,31 @@ const data = {
 
 export default function Dividend() {
   const [activeTab, setActiveTab] = useState("Convert");
+  const [months, setMonths] = useState(0);
+  const [days, setDays] = useState(15);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
+  };
+
+  const handleDecrement = () => {
+    if (months > 0 || days > 15) {
+      if (days === 0) {
+        setMonths((prevMonths) => prevMonths - 1);
+        setDays(30);
+      } else {
+        setDays((prevDays) => prevDays - 1);
+      }
+    }
+  };
+
+  const handleIncrement = () => {
+    if (days < 30) {
+      setDays((prevDays) => prevDays + 1);
+    } else {
+      setDays((prevDays) => prevDays - 30);
+      setMonths((prevMonths) => prevMonths + 1);
+    }
   };
 
   return (
@@ -219,12 +241,19 @@ export default function Dividend() {
                     </a>
                   </div>
                   <div className="flex flex-row items-center space-x-4">
-                    <button className="border w-8 h-8 font-semibold">-</button>
+                    <button
+                      className="border w-8 h-8 font-semibold"
+                      onClick={handleDecrement}
+                    >
+                      -
+                    </button>
                     <div className="text-xs text-neutral-500 mb-0">
                       Months
                       <br />
                       <input
                         type="number"
+                        value={months}
+                        onChange={(e) => setMonths(parseInt(e.target.value))}
                         className="w-6 h-6 mt-1 bg-transparent text-neutral-500 font-bold"
                         placeholder="0"
                       ></input>
@@ -234,15 +263,20 @@ export default function Dividend() {
                       <br />
                       <input
                         type="number"
+                        value={days}
+                        onChange={(e) => setDays(parseInt(e.target.value))}
                         className="w-6 h-6 mt-1 bg-transparent text-neutral-500 font-bold"
                         placeholder="15"
+                        min="15"
+                        max="30"
                       ></input>
                     </div>
-                    <div>
-                      <button className="border w-8 h-8 border-amber-500 text-amber-500 font-semibold">
-                        +
-                      </button>
-                    </div>
+                    <button
+                      className="border w-8 h-8 border-amber-500 text-amber-500 font-semibold"
+                      onClick={handleIncrement}
+                    >
+                      +
+                    </button>
                   </div>
                 </div>
 
@@ -254,6 +288,38 @@ export default function Dividend() {
                 </button>
               </div>
             )}
+          </div>
+          <div className="rounded border p-4 mt-4 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
+            <div className="text-xl font-bold m-3 flex flex-col">Vesting</div>
+
+            <div className=" uppercase font-thin m-3 mt-5">Claimable</div>
+            <div className="flex flex-row gap-1 justify-between -mt-3 items-center">
+              <span className="text-sm font-semibold m-3 sm:text-s">
+                <span className="text-gray-900"> 0.00001 </span>
+                <span className="text-gray-600"> xGRAIL </span>
+                <span className="text-gray-600"> &gt; </span>
+                <span className="text-gray-900"> 0.00001 </span>
+                <span className="text-gray-600"> GRAIL </span>
+              </span>
+              <button className="border border-neutral-200 dark:border-neutral-800 mr-6">
+                <span className="px-3 py-1 text-amber-500 text-sm font-semibold">
+                  Claim
+                </span>
+              </button>
+            </div>
+
+            <div className=" uppercase font-thin m-3 mt-5">Pending</div>
+            <div className="flex flex-row space-x-10 justify-between -mt-3">
+              <span className="text-sm font-semibold m-3 sm:text-s">
+                <span className="text-gray-900">0.000001</span>
+                <span className="text-gray-600"> xGRAIL</span>
+                <span className="text-gray-600">&nbsp; &gt; &nbsp;</span>
+                <span className="text-gray-900">14d20h</span>
+                <span className="text-gray-600">&nbsp; &gt; &nbsp;</span>
+                <span className="text-gray-900">0.000001</span>
+                <span className="text-gray-600"> GRAIL</span>
+              </span>
+            </div>
           </div>
         </div>
 
