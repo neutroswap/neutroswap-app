@@ -10,6 +10,7 @@ import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 import WalletLogo from "@/public/icons/wallet.svg";
 import LockLogo from "@/public/logo/lock.svg";
+import LockedLogo from "@/public/logo/locked.svg";
 // const inter = Inter({ subsets: ['latin'] })
 
 const data = {
@@ -108,7 +109,7 @@ export default function Dividend() {
                     {data.APY}
                   </span>
                 </div>
-                <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                <LockedLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
               </div>
             </div>
           </div>
@@ -295,11 +296,11 @@ export default function Dividend() {
             <div className=" uppercase font-thin m-3 mt-5">Claimable</div>
             <div className="flex flex-row gap-1 justify-between -mt-3 items-center">
               <span className="text-sm font-semibold m-3 sm:text-s">
-                <span className="text-gray-900"> 0.00001 </span>
+                <span className="text-gray-900 dark:text-white"> 0.00001 </span>
                 <span className="text-gray-600"> xGRAIL </span>
-                <span className="text-gray-600"> &gt; </span>
-                <span className="text-gray-900"> 0.00001 </span>
-                <span className="text-gray-600"> GRAIL </span>
+                <span className="text-gray-600 "> &gt; </span>
+                <span className="text-gray-900 dark:text-white"> 0.00001 </span>
+                <span className="text-gray-600 "> GRAIL </span>
               </span>
               <button className="border border-neutral-200 dark:border-neutral-800 mr-6">
                 <span className="px-3 py-1 text-amber-500 text-sm font-semibold">
@@ -311,12 +312,12 @@ export default function Dividend() {
             <div className=" uppercase font-thin m-3 mt-5">Pending</div>
             <div className="flex flex-row space-x-10 justify-between -mt-3">
               <span className="text-sm font-semibold m-3 sm:text-s">
-                <span className="text-gray-900">0.000001</span>
+                <span className="text-gray-900 dark:text-white">0.000001</span>
                 <span className="text-gray-600"> xGRAIL</span>
                 <span className="text-gray-600">&nbsp; &gt; &nbsp;</span>
-                <span className="text-gray-900">14d20h</span>
+                <span className="text-gray-900 dark:text-white">14d20h</span>
                 <span className="text-gray-600">&nbsp; &gt; &nbsp;</span>
-                <span className="text-gray-900">0.000001</span>
+                <span className="text-gray-900 dark:text-white">0.000001</span>
                 <span className="text-gray-600"> GRAIL</span>
               </span>
             </div>
@@ -326,16 +327,21 @@ export default function Dividend() {
         {/* The other column */}
         <div className="col-span-8 mt-8 flex flex-col">
           {/* Dividends */}
-          <div className="border rounded h-60 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
+          <a
+            href="/dividend"
+            className="border rounded h-60 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
+          >
             <div className="flex justify-between items-center mt-2">
-              <EpochLogo className="w-7 h-7 m-4 mx-10" />
+              <EpochLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
               <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
                 <span className="text-amber-500 text-sm font-semibold">
                   Stake →
                 </span>
               </div>
             </div>
-            <div className="text-xl font-bold ml-9 mt-2">Dividends</div>
+            <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+              Dividends
+            </div>
             <span className="text-sm text-neutral-500 ml-9 mt-1">
               Earn yield from protocol earnings by staking your xGRAIL here.
             </span>
@@ -359,18 +365,23 @@ export default function Dividend() {
                 <div className="mt-1 text-sm text-neutral-400">0</div>
               </div>
             </div>
-          </div>
+          </a>
           {/* Yield Booster */}
-          <div className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
+          <a
+            href="/yieldbooster"
+            className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
+          >
             <div className="flex justify-between items-center mt-2">
-              <EpochLogo className="w-7 h-7 m-4 mx-10" />
+              <EpochLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
               <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
                 <span className="text-amber-500 text-sm font-semibold">
                   Stake →
                 </span>
               </div>
             </div>
-            <div className="text-xl font-bold ml-9 mt-2">Yield Booster</div>
+            <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+              Yield Booster
+            </div>
             <span className="text-sm text-neutral-500 ml-9 mt-1">
               Boost your staking yields by up to +100% by adding xGRAIL to any
               eligible position.
@@ -395,18 +406,23 @@ export default function Dividend() {
                 <div className="mt-1 text-sm text-neutral-400">0</div>
               </div>
             </div>
-          </div>
+          </a>
           {/* Launchpad */}
-          <div className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
+          <a
+            href="/launchpad"
+            className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
+          >
             <div className="flex justify-between items-center mt-2">
-              <EpochLogo className="w-7 h-7 m-4 mx-10" />
+              <EpochLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
               <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
                 <span className="text-amber-500 text-sm font-semibold">
                   Stake →
                 </span>
               </div>
             </div>
-            <div className="text-xl font-bold ml-9 mt-2">Launchpad</div>
+            <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+              Launchpad
+            </div>
             <span className="text-sm text-neutral-500 ml-9 mt-1">
               Get perks and benefits from every project on Camelot's launchpad
               by staking your xGRAIL here.
@@ -431,7 +447,7 @@ export default function Dividend() {
                 <div className="mt-1 text-sm text-neutral-400">0</div>
               </div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </div>
