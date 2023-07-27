@@ -169,8 +169,10 @@ export default function Dividend() {
                 Your allocation
               </p>
               <div className="flex space-x-4">
-                <button className="border px-3 py-1 font-semibold">-</button>
-                <button className="border px-3 py-1 border-amber-500 text-amber-500 font-semibold">
+                <button className="border rounded px-3 py-1 font-semibold">
+                  -
+                </button>
+                <button className="border rounded px-3 py-1 border-amber-500 text-black font-semibold bg-amber-500">
                   +
                 </button>
               </div>
