@@ -11,6 +11,9 @@ import AllocationLogo from "@/public/logo/allocation.svg";
 import WalletLogo from "@/public/icons/wallet.svg";
 import LockLogo from "@/public/logo/lock.svg";
 import LockedLogo from "@/public/logo/locked.svg";
+import DividendLogo from "@/public/logo/dividends.svg";
+import YieldboosterLogo from "@/public/logo/speedometer.svg";
+import LaunchpadLogo from "@/public/logo/rocket.svg";
 // const inter = Inter({ subsets: ['latin'] })
 
 const data = {
@@ -332,7 +335,7 @@ export default function Dividend() {
             className="border rounded h-60 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
           >
             <div className="flex justify-between items-center mt-2">
-              <EpochLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+              <DividendLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
               <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
                 <span className="text-amber-500 text-sm font-semibold">
                   Stake →
@@ -372,7 +375,7 @@ export default function Dividend() {
             className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
           >
             <div className="flex justify-between items-center mt-2">
-              <EpochLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+              <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
               <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
                 <span className="text-amber-500 text-sm font-semibold">
                   Stake →
@@ -413,7 +416,7 @@ export default function Dividend() {
             className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
           >
             <div className="flex justify-between items-center mt-2">
-              <EpochLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+              <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
               <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
                 <span className="text-amber-500 text-sm font-semibold">
                   Stake →
