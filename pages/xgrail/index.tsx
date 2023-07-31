@@ -1,5 +1,5 @@
 // import { Inter } from 'next/font/google'
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Page, Text } from "@geist-ui/core";
 import EthLogo from "@/public/logo/eth.svg";
@@ -27,30 +27,61 @@ export default function Dividend() {
   const [activeTab, setActiveTab] = useState("Convert");
   const [months, setMonths] = useState(0);
   const [days, setDays] = useState(15);
+  const [error, setError] = useState(false);
 
   const handleTabClick = (tab: string) => {
     setActiveTab(tab);
   };
 
   const handleDecrement = () => {
-    if (months > 0 || days > 15) {
-      if (days === 0) {
-        setMonths((prevMonths) => prevMonths - 1);
-        setDays(30);
-      } else {
-        setDays((prevDays) => prevDays - 1);
-      }
+    if (months === 0 && days === 0) {
+      // Don't decrement further as it will go below 15 days
+      setError(true); // Show the error message
+      return;
     }
+
+    if (days === 0) {
+      setMonths((prevMonths) => prevMonths - 1);
+      setDays(29);
+    } else {
+      setDays((prevDays) => prevDays - 1);
+    }
+
+    setError(false); // Reset the error state on decrement
   };
 
   const handleIncrement = () => {
-    if (days < 30) {
-      setDays((prevDays) => prevDays + 1);
+    if (months < 6 || (months === 6 && days < 30)) {
+      if (days === 29) {
+        setDays(0);
+        setMonths((prevMonths) => prevMonths + 1);
+      } else {
+        setDays((prevDays) => prevDays + 1);
+      }
+    }
+
+    if (months > 6 || (months === 6 && days >= 30)) {
+      setError(true);
     } else {
-      setDays((prevDays) => prevDays - 30);
-      setMonths((prevMonths) => prevMonths + 1);
+      setError(false);
     }
   };
+
+  const handleSetMax = () => {
+    setMonths(6);
+    setDays(0);
+    setError(false);
+  };
+
+  useEffect(() => {
+    if (months === 6 && days > 0) {
+      setError(true);
+    } else if (months === 0 && days < 15) {
+      setError(true);
+    } else {
+      setError(false);
+    }
+  }, [months, days]);
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -194,13 +225,12 @@ export default function Dividend() {
                     <span>0 GRAIL</span>
                   </div>
                 </div>
-
-                <button
+                <Button
                   className="items-center mt-8 px-4 py-2 w-11/12 m-1 bg-primary text-neutral-500 rounded border border-neutral-200 dark:border-neutral-800 justify-center flex mx-auto"
                   onClick={() => console.log("Approve clicked")}
                 >
                   Approve
-                </button>
+                </Button>
               </div>
             )}
 
@@ -240,7 +270,10 @@ export default function Dividend() {
                 <div className="flex justify-between m-4">
                   <div className="flex flex-col m-4">
                     <div className="font-xs font-semibold">Redeem duration</div>
-                    <a className="text-xs text-amber-500 items-start">
+                    <a
+                      className="text-xs text-amber-500 items-start"
+                      onClick={handleSetMax}
+                    >
                       Set max
                     </a>
                   </div>
@@ -283,13 +316,19 @@ export default function Dividend() {
                     </button>
                   </div>
                 </div>
-
-                <button
+                {error && (
+                  <div className="border border-red-500 bg-red-100 text-xs text-red-500 p-2 mt-4 mx-7">
+                    {months === 6
+                      ? "Error: redeem duration can't exceed 180 days."
+                      : "Error: redeem duration can't be set to less than 15 days."}
+                  </div>
+                )}
+                <Button
                   className="items-center mt-8 px-4 py-2 w-11/12 m-1 bg-primary text-neutral-500 rounded border border-neutral-200 dark:border-neutral-800 justify-center flex mx-auto"
                   onClick={() => console.log("Approve clicked")}
                 >
                   Redeem
-                </button>
+                </Button>
               </div>
             )}
           </div>
