@@ -48,12 +48,12 @@ const Button = (props: ButtonProps) => {
   } = props;
 
   const colorsMap = {
-    primary: "bg-blue-600 hover:bg-blue-700 disabled:hover:bg-blue-600",
+    primary: "bg-amber-500 hover:bg-amber-600 disabled:hover:bg-amber-500",
     danger: "bg-red-600 hover:bg-red-700 disabled:hover:bg-red-600",
   };
 
   const variantMap = {
-    solid: [`border-transparent text-gray-50`, colorsMap[colorScheme]],
+    solid: [`border-transparent text-neutral-500`, colorsMap[colorScheme]],
     outline: [
       "border-dark-gray-400 text-gray-100",
       "hover:bg-dark-gray-500/75",
@@ -76,7 +76,7 @@ const Button = (props: ButtonProps) => {
       type={type}
       data-active={active ? "true" : undefined}
       className={classNames(
-        "flex w-full items-center justify-center border transition-colors",
+        "flex mt-2 w-full items-center justify-center border transition-colors",
         "disabled:opacity-50 disabled:cursor-not-allowed",
         ...variantMap[variant],
         ...sizeMap[size],
