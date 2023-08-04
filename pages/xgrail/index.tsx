@@ -14,6 +14,10 @@ import LockedLogo from "@/public/logo/locked.svg";
 import DividendLogo from "@/public/logo/dividends.svg";
 import YieldboosterLogo from "@/public/logo/speedometer.svg";
 import LaunchpadLogo from "@/public/logo/rocket.svg";
+import RedeemForm from "@/components/modules/Form/RedeemForm";
+import ConvertForm from "@/components/modules/Form/ConvertForm";
+import { Card, CardContent, CardFooter } from "@/components/elements/Card";
+import { Tab } from "@headlessui/react";
 // const inter = Inter({ subsets: ['latin'] })
 
 const data = {
@@ -168,171 +172,30 @@ export default function Dividend() {
 
       <div className="grid grid-cols-12 w-full box-border space-x-3">
         <div className="col-span-4 mt-8 flex flex-col ">
-          <div className="rounded border p-4 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
-            <div className="flex justify-center items-center border-b border-neutral-200 dark:border-neutral-800 pb-2 mb-4 mt-2">
-              <button
-                className={`w-1/2 text-neutral-600 dark:text-neutral-400 font-medium focus:outline-none px-4 py-2 border-b-2 border-transparent hover:text-neutral-900 dark:hover:text-neutral-300 hover:border-neutral-600 dark:hover:border-neutral-300 ${
-                  activeTab === "Convert"
-                    ? "border-neutral-600 dark:border-neutral-300"
-                    : ""
-                }`}
-                onClick={() => handleTabClick("Convert")}
-              >
-                Convert
-              </button>
-              <button
-                className={`w-1/2 text-neutral-600 dark:text-neutral-400 font-medium focus:outline-none px-4 py-2 border-b-2 border-transparent hover:text-neutral-900 dark:hover:text-neutral-300 hover:border-neutral-600 dark:hover:border-neutral-300 ${
-                  activeTab === "Redeem"
-                    ? "border-neutral-600 dark:border-neutral-300"
-                    : ""
-                }`}
-                onClick={() => handleTabClick("Redeem")}
-              >
-                Redeem
-              </button>
-            </div>
+          <Card className="flex flex-col gap-4">
+            <CardContent>
+              <Tab.Group>
+                <Tab.List className="flex items-center gap-4 border-b border-neutral-300 dark:border-neutral-700">
+                  <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
+                    Convert
+                  </Tab>
+                  <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
+                    Redeem
+                  </Tab>
+                </Tab.List>
+                <Tab.Panels>
+                  <Tab.Panel>
+                    <ConvertForm />
+                  </Tab.Panel>
+                  <Tab.Panel>
+                    <RedeemForm />
+                  </Tab.Panel>
+                </Tab.Panels>
+              </Tab.Group>
+            </CardContent>
+          </Card>
 
-            {/* Tab content */}
-            {activeTab === "Convert" && (
-              <div
-                className={`tabcontent ${
-                  activeTab === "Convert" ? "active" : ""
-                }`}
-              >
-                <div className="text-xl font-bold m-7 flex flex-col">
-                  Get xGRAIL
-                  <span className="text-xs font-normal text-neutral-500 mt-1">
-                    Unlock bonus rewards and exclusive benefits by converting
-                    your GRAIL to xGRAIL.
-                  </span>
-                </div>
-                <div className="flex items-center mt-4 m-7">
-                  <input
-                    type="text"
-                    className="px-4 py-2 border bg-transparent border-neutral-300 dark:border-neutral-700 focus:border-primary focus:ring-1 ring-primary focus:ring-opacity-50 w-full"
-                    placeholder="0"
-                  />
-                  <button
-                    className="px-4 py-2 ml-2 bg-primary text-neutral-500 rounded"
-                    onClick={() => console.log("Max clicked")}
-                  >
-                    Max
-                  </button>
-                </div>
-                <div className="flex justify-end text-xs text-neutral-500 -mt-5 mr-4">
-                  <div>
-                    <span className="mr-2">balance:</span>
-                    <span>0 GRAIL</span>
-                  </div>
-                </div>
-                <Button
-                  className="items-center mt-8 px-4 py-2 w-11/12 m-1 bg-primary text-neutral-500 rounded border border-neutral-200 dark:border-neutral-800 justify-center flex mx-auto"
-                  onClick={() => console.log("Approve clicked")}
-                >
-                  Approve
-                </Button>
-              </div>
-            )}
-
-            {activeTab === "Redeem" && (
-              <div
-                className={`tabcontent ${
-                  activeTab === "Redeem" ? "active" : ""
-                }`}
-              >
-                {/* Your Redeem content goes here */}
-                <div className="text-xl font-bold m-7 flex flex-col">
-                  Redeem xGRAIL
-                  <span className="text-xs font-normal text-neutral-500 mt-1">
-                    Redeem your xGRAIL back into GRAIL over a vesting period of
-                    15 days (1 → 0.5 ratio) to 6 months (1 → 1 ratio).
-                  </span>
-                </div>
-                <div className="flex items-center mt-4 m-7">
-                  <input
-                    type="text"
-                    className="px-4 py-2 border bg-transparent border-neutral-300 dark:border-neutral-700 focus:border-primary focus:ring-1 ring-primary focus:ring-opacity-50 w-full"
-                    placeholder="0"
-                  />
-                  <button
-                    className="px-4 py-2 ml-2 bg-primary text-neutral-500 rounded"
-                    onClick={() => console.log("Max clicked")}
-                  >
-                    Max
-                  </button>
-                </div>
-                <div className="flex justify-end text-xs text-neutral-500 -mt-5 mr-4">
-                  <div>
-                    <span className="mr-2">wallet balance:</span>
-                    <span>0 GRAIL</span>
-                  </div>
-                </div>
-                <div className="flex justify-between m-4">
-                  <div className="flex flex-col m-4">
-                    <div className="font-xs font-semibold">Redeem duration</div>
-                    <a
-                      className="text-xs text-amber-500 items-start"
-                      onClick={handleSetMax}
-                    >
-                      Set max
-                    </a>
-                  </div>
-                  <div className="flex flex-row items-center space-x-4">
-                    <button
-                      className="border w-8 h-8 font-semibold"
-                      onClick={handleDecrement}
-                    >
-                      -
-                    </button>
-                    <div className="text-xs text-neutral-500 mb-0">
-                      Months
-                      <br />
-                      <input
-                        type="number"
-                        value={months}
-                        onChange={(e) => setMonths(parseInt(e.target.value))}
-                        className="w-6 h-6 mt-1 bg-transparent text-neutral-500 font-bold"
-                        placeholder="0"
-                      ></input>
-                    </div>
-                    <div className="text-xs text-neutral-500">
-                      Days
-                      <br />
-                      <input
-                        type="number"
-                        value={days}
-                        onChange={(e) => setDays(parseInt(e.target.value))}
-                        className="w-6 h-6 mt-1 bg-transparent text-neutral-500 font-bold"
-                        placeholder="15"
-                        min="15"
-                        max="30"
-                      ></input>
-                    </div>
-                    <button
-                      className="border w-8 h-8 border-amber-500 text-amber-500 font-semibold"
-                      onClick={handleIncrement}
-                    >
-                      +
-                    </button>
-                  </div>
-                </div>
-                {error && (
-                  <div className="border border-red-500 bg-red-100 text-xs text-red-500 p-2 mt-4 mx-7">
-                    {months === 6
-                      ? "Error: redeem duration can't exceed 180 days."
-                      : "Error: redeem duration can't be set to less than 15 days."}
-                  </div>
-                )}
-                <Button
-                  className="items-center mt-8 px-4 py-2 w-11/12 m-1 bg-primary text-neutral-500 rounded border border-neutral-200 dark:border-neutral-800 justify-center flex mx-auto"
-                  onClick={() => console.log("Approve clicked")}
-                >
-                  Redeem
-                </Button>
-              </div>
-            )}
-          </div>
-          <div className="rounded border p-4 mt-4 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
+          <Card className="p-4 mt-4">
             <div className="text-xl font-bold m-3 flex flex-col">Vesting</div>
 
             <div className=" uppercase font-thin m-3 mt-5">Claimable</div>
@@ -363,133 +226,130 @@ export default function Dividend() {
                 <span className="text-gray-600"> GRAIL</span>
               </span>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* The other column */}
         <div className="col-span-8 mt-8 flex flex-col">
           {/* Dividends */}
-          <a
-            href="/dividend"
-            className="border rounded h-60 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
-          >
-            <div className="flex justify-between items-center mt-2">
-              <DividendLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
-              <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                <span className="text-amber-500 text-sm font-semibold">
-                  Stake →
-                </span>
+          <Card>
+            <a href="/dividend">
+              <div className="flex justify-between items-center mt-2">
+                <DividendLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <span className="text-amber-500 text-sm font-semibold">
+                    Stake →
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
-              Dividends
-            </div>
-            <span className="text-sm text-neutral-500 ml-9 mt-1">
-              Earn yield from protocol earnings by staking your xGRAIL here.
-            </span>
-            <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
-              <div className="flex- grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Your Allocation
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
+              <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+                Dividends
               </div>
-              <div className="flex-grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Total Allocations
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
+              <span className="text-sm text-neutral-500 ml-9 mt-1">
+                Earn yield from protocol earnings by staking your xGRAIL here.
+              </span>
+              <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
+                <div className="flex- grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Your Allocation
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
+                <div className="flex-grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Total Allocations
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
+                <div className="flex-grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Deallocation Fee
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
               </div>
-              <div className="flex-grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Deallocation Fee
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
-              </div>
-            </div>
-          </a>
+            </a>
+          </Card>
           {/* Yield Booster */}
-          <a
-            href="/yieldbooster"
-            className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
-          >
-            <div className="flex justify-between items-center mt-2">
-              <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
-              <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                <span className="text-amber-500 text-sm font-semibold">
-                  Stake →
-                </span>
+          <Card className="mt-5">
+            <a href="/yieldbooster">
+              <div className="flex justify-between items-center mt-2">
+                <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <span className="text-amber-500 text-sm font-semibold">
+                    Stake →
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
-              Yield Booster
-            </div>
-            <span className="text-sm text-neutral-500 ml-9 mt-1">
-              Boost your staking yields by up to +100% by adding xGRAIL to any
-              eligible position.
-            </span>
-            <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
-              <div className="flex- grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Your Allocation
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
+              <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+                Yield Booster
               </div>
-              <div className="flex-grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Total Allocations
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
+              <span className="text-sm text-neutral-500 ml-9 mt-1">
+                Boost your staking yields by up to +100% by adding xGRAIL to any
+                eligible position.
+              </span>
+              <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
+                <div className="flex- grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Your Allocation
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
+                <div className="flex-grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Total Allocations
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
+                <div className="flex-grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Deallocation Fee
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
               </div>
-              <div className="flex-grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Deallocation Fee
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
-              </div>
-            </div>
-          </a>
+            </a>
+          </Card>
           {/* Launchpad */}
-          <a
-            href="/launchpad"
-            className="border rounded h-60 mt-5 border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg"
-          >
-            <div className="flex justify-between items-center mt-2">
-              <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
-              <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                <span className="text-amber-500 text-sm font-semibold">
-                  Stake →
-                </span>
+          <Card className="mt-5">
+            <a href="/launchpad">
+              <div className="flex justify-between items-center mt-2">
+                <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <span className="text-amber-500 text-sm font-semibold">
+                    Stake →
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
-              Launchpad
-            </div>
-            <span className="text-sm text-neutral-500 ml-9 mt-1">
-              Get perks and benefits from every project on Camelot's launchpad
-              by staking your xGRAIL here.
-            </span>
-            <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
-              <div className="flex- grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Your Allocation
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
+              <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+                Launchpad
               </div>
-              <div className="flex-grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Total Allocations
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
+              <span className="text-sm text-neutral-500 ml-9 mt-1">
+                Get perks and benefits from every project on Camelot's launchpad
+                by staking your xGRAIL here.
+              </span>
+              <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
+                <div className="flex- grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Your Allocation
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
+                <div className="flex-grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Total Allocations
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
+                <div className="flex-grow flex flex-col">
+                  <span className="text-xs text-neutral-500">
+                    Deallocation Fee
+                  </span>
+                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                </div>
               </div>
-              <div className="flex-grow flex flex-col">
-                <span className="text-xs text-neutral-500">
-                  Deallocation Fee
-                </span>
-                <div className="mt-1 text-sm text-neutral-400">0</div>
-              </div>
-            </div>
-          </a>
+            </a>
+          </Card>
         </div>
       </div>
     </div>
