@@ -1,4 +1,5 @@
 // import { Inter } from 'next/font/google'
+import React from "react";
 import { useState, useRef } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Page, Text } from "@geist-ui/core";
@@ -11,6 +12,15 @@ import AllocationLogo from "@/public/logo/allocation.svg";
 import WarningLogo from "@/public/logo/warning.svg";
 import { Table, Toggle, Spacer, Select } from "@geist-ui/core";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+} from "@/components/elements/DropdownMenu";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/solid";
+import Input from "@/components/elements/Input";
 // const inter = Inter({ subsets: ['latin'] })
 
 const data = {
@@ -24,10 +34,13 @@ export default function Dividend() {
   const searchRef = useRef<any>(null);
   const [showFilter, setShowFilter] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState("");
+  const columnLabel = isChecked ? "Active allocation → New allocation" : "APR";
+  const columnLabel1 = isChecked ? "Active mul. → New mul." : "Boost";
 
-  const handleToggle = () => {
-    setIsChecked((prevChecked) => !prevChecked);
-  };
+  const [yieldBearingChecked, setYieldBearingChecked] = React.useState(false);
+  const [lockedChecked, setLockedChecked] = React.useState(false);
+  const [boostedChecked, setBoostedChecked] = React.useState(false);
+  const [nitroChecked, setNitroChecked] = React.useState(false);
 
   const toggleFilter = () => {
     setShowFilter((prevShowFilter) => !prevShowFilter);
@@ -139,66 +152,66 @@ export default function Dividend() {
                 }`}
               ></span>
             </span> */}
-            <Toggle type="warning" initialChecked />
+            <Toggle
+              type="warning"
+              initialChecked={isChecked}
+              onChange={() => setIsChecked((prev) => !prev)}
+            />
           </label>
         </div>
-        <div className="flex items-center justify-between space-x-4 w-full">
-          <div className="flex flex-grow items-center px-6">
-            <input
+        <div className="flex items-center justify-between w-full">
+          <div className="flex flex-grow items-center px-6 space-x-4">
+            <Input
               type="text"
-              ref={searchRef}
+              // ref={searchRef}
               placeholder="Search"
-              className="bg-transparent w-full bg-neutral-50 dark:bg-neutral-900/80 px-2 border border-neutral-200/80 dark:border-transparent py-2 rounded-md placeholder-neutral-400 dark:placeholder-neutral-600 text-sm"
               // onChange={handleSearchAll}
             />
+
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="border border-neutral-200/80 dark:border-neutral-800/80 py-2 px-2 rounded-md flex space-x-2">
+                  <span className="text-sm text-neutral-500">Filters</span>
+                  <ChevronDownIcon className="w-4 h-4 mt-1 text-neutral-500" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuContent
+                  className="DropdownMenuContent"
+                  sideOffset={5}
+                >
+                  <DropdownMenuCheckboxItem
+                    className="DropdownMenuCheckboxItem"
+                    checked={yieldBearingChecked}
+                    onCheckedChange={setYieldBearingChecked}
+                  >
+                    Yield-bearing only
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    className="DropdownMenuCheckboxItem"
+                    checked={lockedChecked}
+                    onCheckedChange={setLockedChecked}
+                  >
+                    Locked only
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    className="DropdownMenuCheckboxItem"
+                    checked={boostedChecked}
+                    onCheckedChange={setBoostedChecked}
+                  >
+                    Boosted only
+                  </DropdownMenuCheckboxItem>
+                  <DropdownMenuCheckboxItem
+                    className="DropdownMenuCheckboxItem"
+                    checked={nitroChecked}
+                    onCheckedChange={setNitroChecked}
+                  >
+                    Nitro-staking only
+                  </DropdownMenuCheckboxItem>
+                </DropdownMenuContent>
+              </DropdownMenuPortal>
+            </DropdownMenu>
           </div>
-          {/* <div className="relative">
-            <button
-              onClick={toggleFilter}
-              className={`border border-neutral-200/80 dark:border-neutral-800/80 py-1 px-2 rounded-md mr-8 ${
-                showFilter ? "bg-transparent" : ""
-              }`}
-            >
-              <div className="flex flex-row space-x-3">
-                <span className="text-sm text-neutral-500">Filters</span>
-                <span> &#8964;</span>
-              </div>
-            </button>
-            {showFilter && (
-              <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-800/80 rounded-md shadow-lg">
-                <button
-                  className="block w-full text-left px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 focus:outline-none"
-                  onClick={() => handleFilterClick("Option 1")}
-                >
-                  Yield-bearing only
-                </button>
-                <button
-                  className="block w-full text-left px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 focus:outline-none"
-                  onClick={() => handleFilterClick("Option 2")}
-                >
-                  Locked only
-                </button>
-                <button
-                  className="block w-full text-left px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 focus:outline-none"
-                  onClick={() => handleFilterClick("Option 3")}
-                >
-                  Boosted only
-                </button>
-                <button
-                  className="block w-full text-left px-4 py-2 text-sm text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-900 focus:outline-none"
-                  onClick={() => handleFilterClick("Option 4")}
-                >
-                  Nitro-staking only
-                </button>
-              </div>
-            )}
-          </div> */}
-          {/* <Select placeholder="Filters" onChange={handler}>
-            <Select.Option value="1">Yield-bearing only</Select.Option>
-            <Select.Option value="2">Locked only</Select.Option>
-            <Select.Option value="1">Boosted only</Select.Option>
-            <Select.Option value="2">Nitro-staking only</Select.Option>
-          </Select> */}
         </div>
         <div className="flex space-x-3 p-4 m-3">
           <span className="text-neutral-500">Remaining available balance</span>
@@ -218,14 +231,7 @@ export default function Dividend() {
             </span>
           </div>
         </div>
-        {/* <div className="flex flex-row justify-between items-start m-5">
-          <span className="text-xs text-neutral-500">Token</span>
-          <span className="text-xs text-neutral-500">Amount</span>
-          <span className="text-xs text-neutral-500">Settings</span>
-          <span className="text-xs text-neutral-500">APR</span>
-          <span className="text-xs text-neutral-500">Boost</span>
-        </div> */}
-        {/* <div className="border-b border-neutral-200/80 dark:border-neutral-900/80 dark:bg-neutral-900/80 m-4 mb-4" /> */}
+
         <div className="overflow-x-scroll m-4 mt-4 p-0">
           <Table
             //   data={allFarm}
@@ -257,20 +263,20 @@ export default function Dividend() {
             />
             <Table.Column
               prop="apr"
-              label="APR"
+              label={columnLabel}
               // render={(_value, rowData: MergedFarm | any) => (
               //   <span>{+rowData.details.apr} %</span>
               // )}
             />
             <Table.Column
               prop="boost"
-              label="Boost"
+              label={columnLabel1}
               // render={(value) => (
               //   <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>
               // )}
             />
             <Table.Column
-              prop=""
+              prop="nothing"
               label=""
               // render={(value) => (
               //   <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>
