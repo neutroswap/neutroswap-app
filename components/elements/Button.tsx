@@ -57,7 +57,7 @@ const Button = (props: ButtonProps) => {
     outline: [
       "border-dark-gray-400 text-gray-100",
       "hover:bg-dark-gray-500/75",
-      "disabled:hover:bg-blue-600",
+      "disabled:hover:bg-amber-600",
     ],
   };
 
