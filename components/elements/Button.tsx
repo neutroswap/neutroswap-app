@@ -55,9 +55,9 @@ const Button = (props: ButtonProps) => {
   const variantMap = {
     solid: [`border-transparent text-neutral-500`, colorsMap[colorScheme]],
     outline: [
-      "border-dark-gray-400 text-gray-100",
+      "border-dark-gray-400 dark:text-gray-100",
       "hover:bg-dark-gray-500/75",
-      "disabled:hover:bg-amber-600",
+      "disabled:hover:bg-amber-600 disabled:hover:text-amber-100",
     ],
   };
 
