@@ -12,8 +12,8 @@ import {
 
 const callAll =
   (...fns: any) =>
-    (...args: any) =>
-      fns.forEach((fn: any) => fn && fn(...args));
+  (...args: any) =>
+    fns.forEach((fn: any) => fn && fn(...args));
 
 const Slider = React.forwardRef<
   React.ElementRef<typeof SliderPrimitive.Root>,
@@ -44,7 +44,7 @@ const Slider = React.forwardRef<
       <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-900">
         <SliderPrimitive.Range className="absolute h-full bg-orange-500 dark:bg-orange-800" />
       </SliderPrimitive.Track>
-      <span
+      {/* <span
         className={classNames(
           "px-2 py-1 text-xs font-medium bg-neutral-100 dark:bg-neutral-800 rounded-lg",
           "border border-neutral-200 dark:border-transparent",
@@ -59,7 +59,7 @@ const Slider = React.forwardRef<
         }}
       >
         {value}%
-      </span>
+      </span> */}
       <SliderPrimitive.Thumb
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
