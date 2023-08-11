@@ -17,9 +17,16 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
-import { useAccount, useContract, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
+import {
+  useAccount,
+  useContract,
+  useContractRead,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+} from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
@@ -28,9 +35,13 @@ import { tokens } from "@/shared/statics/tokenList";
 import { decimalFormat } from "@/shared/helpers/decimalFormat";
 import Link from "next/link";
 import { ThemeType } from "@/shared/hooks/usePrefers";
-import { DEFAULT_CHAIN_ID, SupportedChainID, supportedChainID } from "@/shared/types/chain.types";
+import {
+  DEFAULT_CHAIN_ID,
+  SupportedChainID,
+  supportedChainID,
+} from "@/shared/types/chain.types";
 
-import PoolIcon from "@/public/icons/pool.svg"
+import PoolIcon from "@/public/icons/pool.svg";
 
 type PositionsResponse = {
   network_id: string;
@@ -56,7 +67,7 @@ export default function Pool() {
     if (!address) return;
     (async () => {
       setIsFetchingPool(true);
-      const req = await fetch(`/api/getUserLP?userAddress=${address}`)
+      const req = await fetch(`/api/getUserLP?userAddress=${address}`);
       // const req = await fetch(`/api/getUserLP?userAddress=0x222da5f13d800ff94947c20e8714e103822ff716`);
       const response = await req.json();
       setPositions(response.data);
@@ -81,10 +92,10 @@ export default function Pool() {
         <div className="mt-8 flex items-center text-center rounded-lg md:border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full max-w-3xl">
           {!positions.length && !isFetchingPool && (
             <div className="flex flex-col items-center w-full md:p-8">
-              {theme.type as ThemeType === "nlight" && (
+              {(theme.type as ThemeType) === "nlight" && (
                 <NoContentLight className="w-40 h-40 opacity-75" />
               )}
-              {theme.type as ThemeType === "ndark" && (
+              {(theme.type as ThemeType) === "ndark" && (
                 <NoContentDark className="w-40 h-40 opacity-75" />
               )}
               <p className="text-neutral-500 w-3/4">
@@ -218,8 +229,9 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
     if (!chain) return tokens[DEFAULT_CHAIN_ID];
-    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID];
-    return tokens[chain.id.toString() as SupportedChainID]
+    if (!supportedChainID.includes(chain.id.toString() as any))
+      return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID];
   }, [chain]);
 
   const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
@@ -242,19 +254,18 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
     functionName: "createPair",
     args: [token0.address, token1.address],
   });
-  const { isLoading: isCreatingPair, write: createPair } =
-    useContractWrite({
-      ...createPairConfig,
-      address: token1.address,
-      onSuccess: async (result) => {
-        const tx = await result.wait();
-        const decodedResult = ethers.utils.defaultAbiCoder.decode(
-          ['address', 'uint256'],
-          tx.logs[0].data
-        )
-        router.push(`/pool/${decodedResult[0]}`);
-      },
-    });
+  const { isLoading: isCreatingPair, write: createPair } = useContractWrite({
+    ...createPairConfig,
+    address: token1.address,
+    onSuccess: async (result) => {
+      const tx = await result.wait();
+      const decodedResult = ethers.utils.defaultAbiCoder.decode(
+        ["address", "uint256"],
+        tx.logs[0].data
+      );
+      router.push(`/pool/${decodedResult[0]}`);
+    },
+  });
 
   return (
     <div className="w-full">
@@ -342,24 +353,24 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
       </TokenPicker>
       {(!existingPool ||
         existingPool !== "0x0000000000000000000000000000000000000000") && (
-          <Button
-            scale={1.25}
-            className={classNames(
-              "!w-full !mt-4 !bg-transparent !rounded-lg",
-              "!border-neutral-300 dark:!border-neutral-700",
-              "hover:!border-neutral-400 dark:hover:!border-neutral-600",
-              "focus:!border-neutral-400 dark:focus:!border-neutral-600",
-              "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
-              "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
-            )}
-            disabled={isError}
-            loading={isFetchingGetPair}
-            onClick={() => router.push(`/pool/${existingPool}`)}
-          >
-            <span>Enter pool</span>
-            <ArrowRightIcon className="w-4 h-4 ml-2" />
-          </Button>
-        )}
+        <Button
+          scale={1.25}
+          className={classNames(
+            "!w-full !mt-4 !bg-transparent !rounded-lg",
+            "!border-neutral-300 dark:!border-neutral-700",
+            "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+            "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+            "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+            "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+          )}
+          disabled={isError}
+          loading={isFetchingGetPair}
+          onClick={() => router.push(`/pool/${existingPool}`)}
+        >
+          <span>Enter pool</span>
+          <ArrowRightIcon className="w-4 h-4 ml-2" />
+        </Button>
+      )}
       {existingPool === "0x0000000000000000000000000000000000000000" && (
         <div>
           <Button

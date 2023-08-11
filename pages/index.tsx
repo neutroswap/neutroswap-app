@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
-import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
 import NumberInput from "@/components/elements/NumberInput";
 import {
   UniswapPairFactory,
@@ -144,7 +144,7 @@ export default function Home() {
     isNative: isPreferNative,
     slippage: slippage,
     address: address,
-  })
+  });
 
   const { isFetching: isFetchingBalance0 } = useContractReads({
     enabled: Boolean(address || chain?.unsupported),
@@ -171,7 +171,10 @@ export default function Home() {
         decimal: token0Decimals.toNumber(),
         raw: token0Balance,
         formatted: parseFloat(
-          formatUnits(token0Balance.toString(), token0Decimals.toNumber()).toString()
+          formatUnits(
+            token0Balance.toString(),
+            token0Decimals.toNumber()
+          ).toString()
         ).toFixed(3),
       });
       setTokenName0(token0Symbol);
@@ -203,7 +206,10 @@ export default function Home() {
         decimal: token1Decimals.toNumber(),
         raw: token1Balance,
         formatted: parseFloat(
-          formatUnits(token1Balance.toString(), token1Decimals.toNumber()).toString()
+          formatUnits(
+            token1Balance.toString(),
+            token1Decimals.toNumber()
+          ).toString()
         ).toFixed(3),
       });
       setTokenName1(token1Symbol);
@@ -216,15 +222,19 @@ export default function Home() {
   };
 
   const { refetch: refetchReserves } = useContractReads({
-    enabled: Boolean(token0 && token1 && (pairs !== '0x0000000000000000000000000000000000000000')),
+    enabled: Boolean(
+      token0 && token1 && pairs !== "0x0000000000000000000000000000000000000000"
+    ),
     contracts: [
       { ...poolContract, functionName: "token0" },
       { ...poolContract, functionName: "token1" },
-      { ...poolContract, functionName: "getReserves" }
+      { ...poolContract, functionName: "getReserves" },
     ],
     onSuccess(response) {
       const [t0, t1, reserves] = response;
-      const cp = +formatUnits(reserves._reserve0, token0.decimal) * +formatUnits(reserves._reserve1, token1.decimal)
+      const cp =
+        +formatUnits(reserves._reserve0, token0.decimal) *
+        +formatUnits(reserves._reserve1, token1.decimal);
       setConstantProduct(cp);
       if (token0.address === t0) {
         const r0 = +formatUnits(reserves._reserve0, token0.decimal);
@@ -232,13 +242,14 @@ export default function Home() {
         setReserves([r0, cp / r0]);
         setMarketPrice(r0 / r1); // reserve0 as quotient
       }
-      if (token0.address === t1) { // reverse reserve number
+      if (token0.address === t1) {
+        // reverse reserve number
         const r0 = +formatUnits(reserves._reserve1, token0.decimal);
         const r1 = +formatUnits(reserves._reserve0, token1.decimal);
         setReserves([r0, cp / r0]);
-        setMarketPrice(r0 / r1) // reserve0 as quotient
+        setMarketPrice(r0 / r1); // reserve0 as quotient
       }
-    }
+    },
   });
 
   useEffect(() => {
@@ -250,7 +261,7 @@ export default function Home() {
         setUniswapFactory(factory);
         setInsufficientLiquidity(false);
       } catch (error) {
-        setUniswapFactory(undefined)
+        setUniswapFactory(undefined);
         setInsufficientLiquidity(true);
       }
     };
@@ -259,7 +270,7 @@ export default function Home() {
     return () => {
       setTokenAmount0("");
       setTokenAmount1("");
-    }
+    };
   }, [uniswapPair]);
 
   const { data: signer } = useSigner({
@@ -271,9 +282,10 @@ export default function Home() {
     setTokenMin1(tradeContext.minAmountConvertQuote as string);
     setTokenEst1(tradeContext.expectedConvertQuote as string);
 
-    const isToken0WrappedNative = getAddress(token0.address) === getAddress(NEXT_PUBLIC_WEOS_ADDRESS!);
-    if (isPreferNative && isToken0WrappedNative) return setIsApproved(true)
-    return setIsApproved(tradeContext.hasEnoughAllowance)
+    const isToken0WrappedNative =
+      getAddress(token0.address) === getAddress(NEXT_PUBLIC_WEOS_ADDRESS!);
+    if (isPreferNative && isToken0WrappedNative) return setIsApproved(true);
+    return setIsApproved(tradeContext.hasEnoughAllowance);
   }, [tradeContext, isPreferNative, token0]);
 
   const isAmount0Invalid = () => {
@@ -385,8 +397,8 @@ export default function Home() {
     // console.log('cp', constantProduct);
     // console.log('impact', (1 - (marketPrice / newMarketPrice)) * 100);
 
-    return (1 - (marketPrice / newMarketPrice)) * 100
-  }, [tokenAmount0, marketPrice, constantProduct, reserves])
+    return (1 - marketPrice / newMarketPrice) * 100;
+  }, [tokenAmount0, marketPrice, constantProduct, reserves]);
 
   if (!isMounted) {
     return <Spinner />;
@@ -406,11 +418,13 @@ export default function Home() {
 
       <div className="flex flex-col items-center justify-center min-h-[80%] pt-16">
         <div className="w-full max-w-lg">
-          <div className={classNames(
-            "mt-8 rounded-xl p-0 md:p-4",
-            "shadow-none md:shadow-dark-sm md:dark:shadow-dark-lg",
-            "border-0 md:border border-neutral-200/60 dark:border-neutral-800/50"
-          )}>
+          <div
+            className={classNames(
+              "mt-8 rounded-xl p-0 md:p-4",
+              "shadow-none md:shadow-dark-sm md:dark:shadow-dark-lg",
+              "border-0 md:border border-neutral-200/60 dark:border-neutral-800/50"
+            )}
+          >
             <div className="flex justify-between items-center mb-2">
               <span className="text-lg font-semibold"> Swap </span>
               <Popover className="relative flex items-center">
@@ -673,18 +687,20 @@ export default function Home() {
               </div>
             </div>
 
-
-            {((!!tokenAmount1 && !isFetchingBalance0 && !isFetchingBalance1) && calcPriceImpact > 2) && (
-              <div
-                className={classNames(
-                  "flex mt-4 text-sm border border-red-500 p-2 justify-between animate-pulse rounded-lg",
-                  "text-red-500 font-medium"
-                )}
-              >
-                <span>Price impact warning </span>
-                <span>-{calcPriceImpact.toFixed(2)}%</span>
-              </div>
-            )}
+            {!!tokenAmount1 &&
+              !isFetchingBalance0 &&
+              !isFetchingBalance1 &&
+              calcPriceImpact > 2 && (
+                <div
+                  className={classNames(
+                    "flex mt-4 text-sm border border-red-500 p-2 justify-between animate-pulse rounded-lg",
+                    "text-red-500 font-medium"
+                  )}
+                >
+                  <span>Price impact warning </span>
+                  <span>-{calcPriceImpact.toFixed(2)}%</span>
+                </div>
+              )}
 
             <div className="flex mt-3 justify-center">
               {!isConnected && <ConnectButton />}
@@ -698,7 +714,7 @@ export default function Home() {
                         "text-white dark:text-amber-600",
                         "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                        "disabled:opacity-50",
+                        "disabled:opacity-50"
                       )}
                       disabled={isInsufficientLiquidity}
                     >
@@ -709,11 +725,14 @@ export default function Home() {
                   <ModalContents>
                     {({ close }) => (
                       <div>
-                        <button className="w-full flex items-center space-x-2 mb-5 group" onClick={close}>
-                          <ArrowSmallLeftIcon
-                            className="h-4 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500 group-hover:-translate-x-0.5 transition"
-                          />
-                          <p className="m-0 text-neutral-600 dark:text-neutral-400">Back</p>
+                        <button
+                          className="w-full flex items-center space-x-2 mb-5 group"
+                          onClick={close}
+                        >
+                          <ArrowSmallLeftIcon className="h-4 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500 group-hover:-translate-x-0.5 transition" />
+                          <p className="m-0 text-neutral-600 dark:text-neutral-400">
+                            Back
+                          </p>
                         </button>
                         {!txHash && (
                           <>
@@ -774,8 +793,9 @@ export default function Home() {
                                 </div>
                               </div>
                               <Link
-                                href={`https://explorer.evm.eosnetwork.com/address/${address as string
-                                  }`}
+                                href={`https://explorer.evm.eosnetwork.com/address/${
+                                  address as string
+                                }`}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-sm"
