@@ -4399,643 +4399,1375 @@ export const NEUTRO_VAULT_ABI = <const>[
 
 export const XGRAIL_ABI = <const>[
   {
-    type: "constructor",
     inputs: [
       {
-        type: "address",
-        name: "grailToken_",
         internalType: "contract IGrailTokenV2",
+        name: "grailToken_",
+        type: "address",
       },
     ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "MAX_DEALLOCATION_FEE",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "MAX_FIXED_RATIO",
-    inputs: [],
-  },
-  {
-    type: "function",
     stateMutability: "nonpayable",
-    outputs: [],
-    name: "allocate",
-    inputs: [
-      { type: "address", name: "usageAddress", internalType: "address" },
-      { type: "uint256", name: "amount", internalType: "uint256" },
-      { type: "bytes", name: "usageData", internalType: "bytes" },
-    ],
+    type: "constructor",
   },
   {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "allocateFromUsage",
-    inputs: [
-      { type: "address", name: "userAddress", internalType: "address" },
-      { type: "uint256", name: "amount", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "allowance",
-    inputs: [
-      { type: "address", name: "owner", internalType: "address" },
-      { type: "address", name: "spender", internalType: "address" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [{ type: "bool", name: "", internalType: "bool" }],
-    name: "approve",
-    inputs: [
-      { type: "address", name: "spender", internalType: "address" },
-      { type: "uint256", name: "amount", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "approveUsage",
+    anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
         type: "address",
-        name: "usage",
-        internalType: "contract IXGrailTokenUsage",
       },
-      { type: "uint256", name: "amount", internalType: "uint256" },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
     ],
+    name: "Allocate",
+    type: "event",
   },
   {
-    type: "function",
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "spender",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "value",
+        type: "uint256",
+      },
+    ],
+    name: "Approval",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "ApproveUsage",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "xGrailAmount",
+        type: "uint256",
+      },
+    ],
+    name: "CancelRedeem",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "Convert",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
+    ],
+    name: "Deallocate",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "xGrailAmount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "grailAmount",
+        type: "uint256",
+      },
+    ],
+    name: "FinalizeRedeem",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "xGrailAmount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "grailAmount",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "duration",
+        type: "uint256",
+      },
+    ],
+    name: "Redeem",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "add",
+        type: "bool",
+      },
+    ],
+    name: "SetTransferWhitelist",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "from",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "value",
+        type: "uint256",
+      },
+    ],
+    name: "Transfer",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
+    ],
+    name: "UpdateDeallocationFee",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "previousDividendsAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newDividendsAddress",
+        type: "address",
+      },
+    ],
+    name: "UpdateDividendsAddress",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "redeemIndex",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "previousDividendsAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newDividendsAddress",
+        type: "address",
+      },
+    ],
+    name: "UpdateRedeemDividendsAddress",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "minRedeemRatio",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "maxRedeemRatio",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "minRedeemDuration",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "maxRedeemDuration",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "redeemDividendsAdjustment",
+        type: "uint256",
+      },
+    ],
+    name: "UpdateRedeemSettings",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "MAX_DEALLOCATION_FEE",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MAX_FIXED_RATIO",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "usageData",
+        type: "bytes",
+      },
+    ],
+    name: "allocate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "allocateFromUsage",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "spender",
+        type: "address",
+      },
+    ],
+    name: "allowance",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "spender",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "approve",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IXGrailTokenUsage",
+        name: "usage",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "approveUsage",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
     name: "balanceOf",
-    inputs: [{ type: "address", name: "account", internalType: "address" }],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "redeemIndex",
+        type: "uint256",
+      },
+    ],
     name: "cancelRedeem",
-    inputs: [{ type: "uint256", name: "redeemIndex", internalType: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
     name: "convert",
-    inputs: [{ type: "uint256", name: "amount", internalType: "uint256" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "to",
+        type: "address",
+      },
+    ],
     name: "convertTo",
-    inputs: [
-      { type: "uint256", name: "amount", internalType: "uint256" },
-      { type: "address", name: "to", internalType: "address" },
-    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "usageData",
+        type: "bytes",
+      },
+    ],
     name: "deallocate",
-    inputs: [
-      { type: "address", name: "usageAddress", internalType: "address" },
-      { type: "uint256", name: "amount", internalType: "uint256" },
-      { type: "bytes", name: "usageData", internalType: "bytes" },
-    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
+    inputs: [
+      {
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
     name: "deallocateFromUsage",
-    inputs: [
-      { type: "address", name: "userAddress", internalType: "address" },
-      { type: "uint256", name: "amount", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint8", name: "", internalType: "uint8" }],
-    name: "decimals",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [{ type: "bool", name: "", internalType: "bool" }],
-    name: "decreaseAllowance",
-    inputs: [
-      { type: "address", name: "spender", internalType: "address" },
-      { type: "uint256", name: "subtractedValue", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [
-      { type: "address", name: "", internalType: "contract IXGrailTokenUsage" },
-    ],
-    name: "dividendsAddress",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
     outputs: [],
-    name: "finalizeRedeem",
-    inputs: [{ type: "uint256", name: "redeemIndex", internalType: "uint256" }],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "getGrailByVestingDuration",
-    inputs: [
-      { type: "uint256", name: "amount", internalType: "uint256" },
-      { type: "uint256", name: "duration", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "getUsageAllocation",
-    inputs: [
-      { type: "address", name: "userAddress", internalType: "address" },
-      { type: "address", name: "usageAddress", internalType: "address" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "getUsageApproval",
-    inputs: [
-      { type: "address", name: "userAddress", internalType: "address" },
-      { type: "address", name: "usageAddress", internalType: "address" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
+    inputs: [],
+    name: "decimals",
     outputs: [
-      { type: "uint256", name: "grailAmount", internalType: "uint256" },
-      { type: "uint256", name: "xGrailAmount", internalType: "uint256" },
-      { type: "uint256", name: "endTime", internalType: "uint256" },
-      { type: "address", name: "dividendsContract", internalType: "address" },
-      { type: "uint256", name: "dividendsAllocation", internalType: "uint256" },
+      {
+        internalType: "uint8",
+        name: "",
+        type: "uint8",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "spender",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "subtractedValue",
+        type: "uint256",
+      },
+    ],
+    name: "decreaseAllowance",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "dividendsAddress",
+    outputs: [
+      {
+        internalType: "contract IXGrailTokenUsage",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "redeemIndex",
+        type: "uint256",
+      },
+    ],
+    name: "finalizeRedeem",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "duration",
+        type: "uint256",
+      },
+    ],
+    name: "getGrailByVestingDuration",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+    ],
+    name: "getUsageAllocation",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+    ],
+    name: "getUsageApproval",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "redeemIndex",
+        type: "uint256",
+      },
     ],
     name: "getUserRedeem",
-    inputs: [
-      { type: "address", name: "userAddress", internalType: "address" },
-      { type: "uint256", name: "redeemIndex", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "getUserRedeemsLength",
-    inputs: [{ type: "address", name: "userAddress", internalType: "address" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
     outputs: [
-      { type: "uint256", name: "allocatedAmount", internalType: "uint256" },
-      { type: "uint256", name: "redeemingAmount", internalType: "uint256" },
+      {
+        internalType: "uint256",
+        name: "grailAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "xGrailAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "endTime",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "dividendsContract",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "dividendsAllocation",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
+    ],
+    name: "getUserRedeemsLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "userAddress",
+        type: "address",
+      },
     ],
     name: "getXGrailBalance",
-    inputs: [{ type: "address", name: "userAddress", internalType: "address" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
     outputs: [
-      { type: "address", name: "", internalType: "contract IGrailTokenV2" },
-    ],
-    name: "grailToken",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [{ type: "bool", name: "", internalType: "bool" }],
-    name: "increaseAllowance",
-    inputs: [
-      { type: "address", name: "spender", internalType: "address" },
-      { type: "uint256", name: "addedValue", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "bool", name: "", internalType: "bool" }],
-    name: "isTransferWhitelisted",
-    inputs: [{ type: "address", name: "account", internalType: "address" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "maxRedeemDuration",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "maxRedeemRatio",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "minRedeemDuration",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "minRedeemRatio",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "string", name: "", internalType: "string" }],
-    name: "name",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "owner",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "redeem",
-    inputs: [
-      { type: "uint256", name: "xGrailAmount", internalType: "uint256" },
-      { type: "uint256", name: "duration", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "redeemDividendsAdjustment",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "renounceOwnership",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "string", name: "", internalType: "string" }],
-    name: "symbol",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "totalSupply",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [{ type: "bool", name: "", internalType: "bool" }],
-    name: "transfer",
-    inputs: [
-      { type: "address", name: "recipient", internalType: "address" },
-      { type: "uint256", name: "amount", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [{ type: "bool", name: "", internalType: "bool" }],
-    name: "transferFrom",
-    inputs: [
-      { type: "address", name: "sender", internalType: "address" },
-      { type: "address", name: "recipient", internalType: "address" },
-      { type: "uint256", name: "amount", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "transferOwnership",
-    inputs: [{ type: "address", name: "newOwner", internalType: "address" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "transferWhitelist",
-    inputs: [{ type: "uint256", name: "index", internalType: "uint256" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "transferWhitelistLength",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "updateDeallocationFee",
-    inputs: [
-      { type: "address", name: "usageAddress", internalType: "address" },
-      { type: "uint256", name: "fee", internalType: "uint256" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "updateDividendsAddress",
-    inputs: [
       {
-        type: "address",
-        name: "dividendsAddress_",
-        internalType: "contract IXGrailTokenUsage",
-      },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "updateRedeemDividendsAddress",
-    inputs: [{ type: "uint256", name: "redeemIndex", internalType: "uint256" }],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "updateRedeemSettings",
-    inputs: [
-      { type: "uint256", name: "minRedeemRatio_", internalType: "uint256" },
-      { type: "uint256", name: "maxRedeemRatio_", internalType: "uint256" },
-      { type: "uint256", name: "minRedeemDuration_", internalType: "uint256" },
-      { type: "uint256", name: "maxRedeemDuration_", internalType: "uint256" },
-      {
-        type: "uint256",
-        name: "redeemDividendsAdjustment_",
         internalType: "uint256",
+        name: "allocatedAmount",
+        type: "uint256",
       },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "updateTransferWhitelist",
-    inputs: [
-      { type: "address", name: "account", internalType: "address" },
-      { type: "bool", name: "add", internalType: "bool" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "usageAllocations",
-    inputs: [
-      { type: "address", name: "", internalType: "address" },
-      { type: "address", name: "", internalType: "address" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "usageApprovals",
-    inputs: [
-      { type: "address", name: "", internalType: "address" },
-      { type: "address", name: "", internalType: "address" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "usagesDeallocationFee",
-    inputs: [{ type: "address", name: "", internalType: "address" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [
-      { type: "uint256", name: "grailAmount", internalType: "uint256" },
-      { type: "uint256", name: "xGrailAmount", internalType: "uint256" },
-      { type: "uint256", name: "endTime", internalType: "uint256" },
       {
-        type: "address",
-        name: "dividendsAddress",
-        internalType: "contract IXGrailTokenUsage",
+        internalType: "uint256",
+        name: "redeemingAmount",
+        type: "uint256",
       },
-      { type: "uint256", name: "dividendsAllocation", internalType: "uint256" },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "grailToken",
+    outputs: [
+      {
+        internalType: "contract IGrailTokenV2",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "spender",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "addedValue",
+        type: "uint256",
+      },
+    ],
+    name: "increaseAllowance",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "isTransferWhitelisted",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "maxRedeemDuration",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "maxRedeemRatio",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "minRedeemDuration",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "minRedeemRatio",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "name",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "xGrailAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "duration",
+        type: "uint256",
+      },
+    ],
+    name: "redeem",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "redeemDividendsAdjustment",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "symbol",
+    outputs: [
+      {
+        internalType: "string",
+        name: "",
+        type: "string",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalSupply",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "transfer",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "sender",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "recipient",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "transferFrom",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "index",
+        type: "uint256",
+      },
+    ],
+    name: "transferWhitelist",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "transferWhitelistLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "usageAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "fee",
+        type: "uint256",
+      },
+    ],
+    name: "updateDeallocationFee",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract IXGrailTokenUsage",
+        name: "dividendsAddress_",
+        type: "address",
+      },
+    ],
+    name: "updateDividendsAddress",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "redeemIndex",
+        type: "uint256",
+      },
+    ],
+    name: "updateRedeemDividendsAddress",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "minRedeemRatio_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "maxRedeemRatio_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "minRedeemDuration_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "maxRedeemDuration_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "redeemDividendsAdjustment_",
+        type: "uint256",
+      },
+    ],
+    name: "updateRedeemSettings",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+      {
+        internalType: "bool",
+        name: "add",
+        type: "bool",
+      },
+    ],
+    name: "updateTransferWhitelist",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "usageAllocations",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "usageApprovals",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "usagesDeallocationFee",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
     name: "userRedeems",
-    inputs: [
-      { type: "address", name: "", internalType: "address" },
-      { type: "uint256", name: "", internalType: "uint256" },
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "grailAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "xGrailAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "endTime",
+        type: "uint256",
+      },
+      {
+        internalType: "contract IXGrailTokenUsage",
+        name: "dividendsAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "dividendsAllocation",
+        type: "uint256",
+      },
     ],
+    stateMutability: "view",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "view",
-    outputs: [
-      { type: "uint256", name: "allocatedAmount", internalType: "uint256" },
-      { type: "uint256", name: "redeemingAmount", internalType: "uint256" },
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
     name: "xGrailBalances",
-    inputs: [{ type: "address", name: "", internalType: "address" }],
-  },
-  {
-    type: "event",
-    name: "Allocate",
-    inputs: [
-      { type: "address", name: "userAddress", indexed: true },
-      { type: "address", name: "usageAddress", indexed: true },
-      { type: "uint256", name: "amount", indexed: false },
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "allocatedAmount",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "redeemingAmount",
+        type: "uint256",
+      },
     ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "Approval",
-    inputs: [
-      { type: "address", name: "owner", indexed: true },
-      { type: "address", name: "spender", indexed: true },
-      { type: "uint256", name: "value", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "ApproveUsage",
-    inputs: [
-      { type: "address", name: "userAddress", indexed: true },
-      { type: "address", name: "usageAddress", indexed: true },
-      { type: "uint256", name: "amount", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "CancelRedeem",
-    inputs: [
-      { type: "address", name: "userAddress", indexed: true },
-      { type: "uint256", name: "xGrailAmount", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "Convert",
-    inputs: [
-      { type: "address", name: "from", indexed: true },
-      { type: "address", name: "to", indexed: false },
-      { type: "uint256", name: "amount", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "Deallocate",
-    inputs: [
-      { type: "address", name: "userAddress", indexed: true },
-      { type: "address", name: "usageAddress", indexed: true },
-      { type: "uint256", name: "amount", indexed: false },
-      { type: "uint256", name: "fee", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "FinalizeRedeem",
-    inputs: [
-      { type: "address", name: "userAddress", indexed: true },
-      { type: "uint256", name: "xGrailAmount", indexed: false },
-      { type: "uint256", name: "grailAmount", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "OwnershipTransferred",
-    inputs: [
-      { type: "address", name: "previousOwner", indexed: true },
-      { type: "address", name: "newOwner", indexed: true },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "Redeem",
-    inputs: [
-      { type: "address", name: "userAddress", indexed: true },
-      { type: "uint256", name: "xGrailAmount", indexed: false },
-      { type: "uint256", name: "grailAmount", indexed: false },
-      { type: "uint256", name: "duration", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SetTransferWhitelist",
-    inputs: [
-      { type: "address", name: "account", indexed: false },
-      { type: "bool", name: "add", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "Transfer",
-    inputs: [
-      { type: "address", name: "from", indexed: true },
-      { type: "address", name: "to", indexed: true },
-      { type: "uint256", name: "value", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "UpdateDeallocationFee",
-    inputs: [
-      { type: "address", name: "usageAddress", indexed: true },
-      { type: "uint256", name: "fee", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "UpdateDividendsAddress",
-    inputs: [
-      { type: "address", name: "previousDividendsAddress", indexed: false },
-      { type: "address", name: "newDividendsAddress", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "UpdateRedeemDividendsAddress",
-    inputs: [
-      { type: "address", name: "userAddress", indexed: true },
-      { type: "uint256", name: "redeemIndex", indexed: false },
-      { type: "address", name: "previousDividendsAddress", indexed: false },
-      { type: "address", name: "newDividendsAddress", indexed: false },
-    ],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "UpdateRedeemSettings",
-    inputs: [
-      { type: "uint256", name: "minRedeemRatio", indexed: false },
-      { type: "uint256", name: "maxRedeemRatio", indexed: false },
-      { type: "uint256", name: "minRedeemDuration", indexed: false },
-      { type: "uint256", name: "maxRedeemDuration", indexed: false },
-      { type: "uint256", name: "redeemDividendsAdjustment", indexed: false },
-    ],
-    anonymous: false,
+    stateMutability: "view",
+    type: "function",
   },
 ];
 
