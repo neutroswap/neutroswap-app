@@ -26,6 +26,7 @@ import { XGRAIL_ABI } from "@/shared/abi";
 import { NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT } from "@/shared/helpers/constants";
 import { utils } from "ethers";
 import VestingXgrail from "@/components/modules/Vesting";
+import Link from "next/link";
 
 const data = {
   totalAllocation: 1000,
@@ -199,7 +200,7 @@ export default function Xgrail() {
         <div className="col-span-8 mt-8 flex flex-col">
           {/* Dividends */}
           <Card>
-            <a href="/dividend">
+            <Link href="/dividend">
               <div className="flex justify-between items-center mt-2">
                 <DividendLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
                 <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
@@ -234,11 +235,11 @@ export default function Xgrail() {
                   <div className="mt-1 text-sm text-neutral-400">0</div>
                 </div>
               </div>
-            </a>
+            </Link>
           </Card>
           {/* Yield Booster */}
           <Card className="mt-5">
-            <a href="/yieldbooster">
+            <Link href="/yieldbooster">
               <div className="flex justify-between items-center mt-2">
                 <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
                 <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
@@ -274,11 +275,11 @@ export default function Xgrail() {
                   <div className="mt-1 text-sm text-neutral-400">0</div>
                 </div>
               </div>
-            </a>
+            </Link>
           </Card>
           {/* Launchpad */}
           <Card className="mt-5">
-            <a href="/launchpad">
+            <Link href="/launchpad">
               <div className="flex justify-between items-center mt-2">
                 <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
                 <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
@@ -291,8 +292,8 @@ export default function Xgrail() {
                 Launchpad
               </div>
               <span className="text-sm text-neutral-500 ml-9 mt-1">
-                Get perks and benefits from every project on Camelot's launchpad
-                by staking your xGRAIL here.
+                Get perks and benefits from every project on Camelot&apos;s
+                launchpad by staking your xGRAIL here.
               </span>
               <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
                 <div className="flex- grow flex flex-col">
@@ -314,7 +315,7 @@ export default function Xgrail() {
                   <div className="mt-1 text-sm text-neutral-400">0</div>
                 </div>
               </div>
-            </a>
+            </Link>
           </Card>
         </div>
       </div>

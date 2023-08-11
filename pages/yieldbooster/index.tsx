@@ -226,8 +226,8 @@ export default function Dividend() {
             <WarningLogo className="w-5 h-5 text-amber-500 mt-0.5" />
             <span className="text-xs text-neutral-500 mt-1">
               Only yield farming rewards can be boosted. Nitro pools, Genesis
-              pools, and swap fees APRs won't be affected by any YieldBooster
-              allocation.
+              pools, and swap fees APRs won&apos;t be affected by any
+              YieldBooster allocation.
             </span>
           </div>
         </div>
