@@ -1,13 +1,8 @@
 // import { Inter } from 'next/font/google'
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Navbar from "@/components/modules/Navbar";
 import { Button, Page, Text } from "@geist-ui/core";
-import EthLogo from "@/public/logo/eth.svg";
-import NeutroLogo from "@/public/logo/neutro_token.svg";
 import EpochLogo from "@/public/logo/epoch.svg";
-import DeallocationLogo from "@/public/logo/deallocation.svg";
-import APYLogo from "@/public/logo/apy.svg";
-import AllocationLogo from "@/public/logo/allocation.svg";
 import WalletLogo from "@/public/icons/wallet.svg";
 import LockLogo from "@/public/logo/lock.svg";
 import LockedLogo from "@/public/logo/locked.svg";
@@ -18,7 +13,19 @@ import RedeemForm from "@/components/modules/Form/RedeemForm";
 import ConvertForm from "@/components/modules/Form/ConvertForm";
 import { Card, CardContent, CardFooter } from "@/components/elements/Card";
 import { Tab } from "@headlessui/react";
-// const inter = Inter({ subsets: ['latin'] })
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+} from "wagmi";
+import { formatEther } from "ethers/lib/utils.js";
+import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { XGRAIL_ABI } from "@/shared/abi";
+import { NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT } from "@/shared/helpers/constants";
+import { utils } from "ethers";
+import VestingXgrail from "@/components/modules/Vesting";
 
 const data = {
   totalAllocation: 1000,
@@ -27,65 +34,23 @@ const data = {
   deallocationFee: 0,
 };
 
-export default function Dividend() {
-  const [activeTab, setActiveTab] = useState("Convert");
-  const [months, setMonths] = useState(0);
-  const [days, setDays] = useState(15);
-  const [error, setError] = useState(false);
+export default function Xgrail() {
+  const { chain } = useNetwork();
+  const { address, isConnected } = useAccount();
 
-  const handleTabClick = (tab: string) => {
-    setActiveTab(tab);
-  };
+  const { data: xgrailBalance } = useContractRead({
+    enabled: Boolean(address),
+    watch: true,
+    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
+    abi: XGRAIL_ABI,
+    functionName: "balanceOf",
+    args: [address!],
+  });
 
-  const handleDecrement = () => {
-    if (months === 0 && days === 0) {
-      // Don't decrement further as it will go below 15 days
-      setError(true); // Show the error message
-      return;
-    }
-
-    if (days === 0) {
-      setMonths((prevMonths) => prevMonths - 1);
-      setDays(29);
-    } else {
-      setDays((prevDays) => prevDays - 1);
-    }
-
-    setError(false); // Reset the error state on decrement
-  };
-
-  const handleIncrement = () => {
-    if (months < 6 || (months === 6 && days < 30)) {
-      if (days === 29) {
-        setDays(0);
-        setMonths((prevMonths) => prevMonths + 1);
-      } else {
-        setDays((prevDays) => prevDays + 1);
-      }
-    }
-
-    if (months > 6 || (months === 6 && days >= 30)) {
-      setError(true);
-    } else {
-      setError(false);
-    }
-  };
-
-  const handleSetMax = () => {
-    setMonths(6);
-    setDays(0);
-    setError(false);
-  };
-
-  useEffect(() => {
-    if (months === 6 && days > 0) {
-      setError(true);
-    } else if (months === 0 && days < 15) {
-      setError(true);
-    } else {
-      setError(false);
-    }
-  }, [months, days]);
+  // const availableXgrail = useMemo(() => {
+  //   if (!xgrailBalance) return "0";
+  //   return `${Number(formatEther(xgrailBalance)).toFixed(2)}`;
+  // }, [xgrailBalance]);
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -194,8 +159,9 @@ export default function Dividend() {
               </Tab.Group>
             </CardContent>
           </Card>
+          <VestingXgrail />
 
-          <Card className="p-4 mt-4">
+          {/* <Card className="p-4 mt-4">
             <div className="text-xl font-bold m-3 flex flex-col">Vesting</div>
 
             <div className=" uppercase font-thin m-3 mt-5">Claimable</div>
@@ -226,7 +192,7 @@ export default function Dividend() {
                 <span className="text-gray-600"> GRAIL</span>
               </span>
             </div>
-          </Card>
+          </Card> */}
         </div>
 
         {/* The other column */}
