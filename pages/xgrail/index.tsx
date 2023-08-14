@@ -22,8 +22,11 @@ import {
 } from "wagmi";
 import { formatEther } from "ethers/lib/utils.js";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
-import { XGRAIL_ABI } from "@/shared/abi";
-import { NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT } from "@/shared/helpers/constants";
+import { DIVIDENDS_ABI, XGRAIL_ABI } from "@/shared/abi";
+import {
+  NEXT_PUBLIC_DIVIDENDS_CONTRACT,
+  NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+} from "@/shared/helpers/constants";
 import { utils } from "ethers";
 import VestingXgrail from "@/components/modules/Vesting";
 
@@ -38,7 +41,7 @@ export default function Xgrail() {
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
 
-  const { data: xgrailBalance } = useContractRead({
+  const { data: balanceData } = useContractRead({
     enabled: Boolean(address),
     watch: true,
     address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
@@ -47,10 +50,47 @@ export default function Xgrail() {
     args: [address!],
   });
 
-  // const availableXgrail = useMemo(() => {
-  //   if (!xgrailBalance) return "0";
-  //   return `${Number(formatEther(xgrailBalance)).toFixed(2)}`;
-  // }, [xgrailBalance]);
+  const { data: xgrailBalance } = useContractRead({
+    enabled: Boolean(address),
+    watch: true,
+    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
+    abi: XGRAIL_ABI,
+    functionName: "getXGrailBalance",
+    args: [address!],
+  });
+
+  const availableXgrail = useMemo(() => {
+    if (!balanceData) return "0";
+    return `${Number(formatEther(balanceData)).toFixed(2)}`;
+  }, [balanceData]);
+
+  const redeemingAmount = useMemo(() => {
+    if (!xgrailBalance) return "0";
+    return `${Number(formatEther(xgrailBalance.redeemingAmount)).toFixed(2)}`;
+  }, [xgrailBalance]);
+
+  const allocatedAmount = useMemo(() => {
+    if (!xgrailBalance) return "0";
+    return `${Number(formatEther(xgrailBalance.allocatedAmount)).toFixed(2)}`;
+  }, [xgrailBalance]);
+
+  const totalXgrail = useMemo(() => {
+    const availableXgrailValue = Number(availableXgrail);
+    const allocatedAmountValue = Number(allocatedAmount);
+    return (availableXgrailValue + allocatedAmountValue).toFixed(2);
+  }, [availableXgrail, allocatedAmount]);
+
+  const { data: totalAllocation } = useContractRead({
+    watch: true,
+    address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+    abi: DIVIDENDS_ABI,
+    functionName: "totalAllocation",
+  });
+
+  const dividendTotalAllocation = useMemo(() => {
+    if (!totalAllocation) return "0";
+    return `${Number(formatEther(totalAllocation)).toFixed(2)}`;
+  }, [totalAllocation]);
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -76,7 +116,7 @@ export default function Xgrail() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {data.totalAllocation}
+                      {totalXgrail}
                     </span>
                   </div>
                 </div>
@@ -93,7 +133,7 @@ export default function Xgrail() {
                     Available xGRAIL
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {data.currentEpoch}
+                    {availableXgrail}
                   </span>
                 </div>
                 <LockLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -109,7 +149,7 @@ export default function Xgrail() {
                     Allocated xGRAIL
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {data.APY}
+                    {allocatedAmount}
                   </span>
                 </div>
                 <LockedLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -125,7 +165,7 @@ export default function Xgrail() {
                     Redeeming xGRAIL
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {data.deallocationFee}
+                    {redeemingAmount}
                   </span>
                 </div>
                 <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -225,7 +265,9 @@ export default function Xgrail() {
                   <span className="text-xs text-neutral-500">
                     Total Allocations
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-400">
+                    {dividendTotalAllocation}
+                  </div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <span className="text-xs text-neutral-500">
