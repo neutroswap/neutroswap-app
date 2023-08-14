@@ -74,7 +74,7 @@ export default function RedeemForm() {
       {
         ...xgrailContract,
         functionName: "allowance",
-        args: [address!, NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT],
+        args: [address!, NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`],
       },
     ],
     onSuccess: (data: any) => {
@@ -94,7 +94,7 @@ export default function RedeemForm() {
     abi: XGRAIL_ABI,
     functionName: "approve",
     args: [
-      NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+      NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
       BigNumber.from(
         "115792089237316195423570985008687907853269984665640564039457584007913129639935"
       ),
@@ -151,7 +151,7 @@ export default function RedeemForm() {
         parseEther(
           debouncedRedeemXgrailToGrail ? `${debouncedRedeemXgrailToGrail}` : "0"
         ),
-        Number(Math.floor(grailRedeemDurationInSeconds)),
+        BigNumber.from(Math.floor(grailRedeemDurationInSeconds)),
       ],
     });
 
