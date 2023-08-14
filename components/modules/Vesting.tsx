@@ -19,6 +19,7 @@ import { BigNumber } from "ethers";
 export default function VestingXgrail() {
   const { address } = useAccount();
 
+  const [redeemsLength, setRedeemsLength] = useState(0);
   const [pendingRedeems, setPendingRedeems] = useState<any>([]);
   const [claimableRedeems, setClaimableRedeems] = useState<any>([]);
 
@@ -48,6 +49,8 @@ export default function VestingXgrail() {
     contracts: getUserRedeemCalls,
     allowFailure: false,
     onSuccess: (userRedeemsInfo) => {
+      const lengthNumber = Number(userRedeemsLength);
+      setRedeemsLength(lengthNumber);
       let claimable = [];
       let pending = [];
       for (let i = 0; i < userRedeemsInfo.length; i++) {
@@ -76,51 +79,49 @@ export default function VestingXgrail() {
 
   return (
     <>
-      {!userRedeemsLength ||
-        (userRedeemsLength.toNumber() == 0 && (
-          <Card className="flex flex-col gap-4 mt-5">
-            <CardContent>
-              <div className="flex flex-col gap-1">
-                <h2 className="text-lg font-semibold text-gray-900">Vesting</h2>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {redeemsLength == 0 && (
+        <Card className="flex flex-col gap-4 mt-5">
+          <CardContent>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-lg font-semibold text-gray-900">Vesting</h2>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
-      {!userRedeemsLength ||
-        (userRedeemsLength?.toNumber() > 0 && (
-          <Card className="flex flex-col gap-6 mt-5">
-            <CardContent>
-              <div className="flex flex-col gap-1">
-                <h2 className="text-lg font-semibold text-gray-900">Vesting</h2>
-                <p className="text-sm font-normal leading-5 text-gray-500">
-                  Redeeming xGRAIL back into GRAIL require a vesting period. All
-                  of that information will be shown here
-                </p>
-              </div>
-              <div className="flex flex-col gap-2.5">
-                <span className="text-xs font-semibold uppercase leading-4 tracking-wide text-gray-700">
-                  Pending
-                </span>
+      {redeemsLength > 0 && (
+        <Card className="flex flex-col gap-6 mt-5">
+          <CardContent>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-lg font-semibold text-gray-900">Vesting</h2>
+              <p className="text-sm font-normal leading-5 text-gray-500">
+                Redeeming xGRAIL back into GRAIL require a vesting period. All
+                of that information will be shown here
+              </p>
+            </div>
+            <div className="flex flex-col gap-2.5">
+              <span className="text-xs font-semibold uppercase leading-4 tracking-wide text-gray-700">
+                Pending
+              </span>
 
-                <>
-                  {pendingRedeems.map(
-                    (item: any, index: Key | null | undefined) => (
-                      <PendingRedeem key={index} data={item} />
-                    )
-                  )}
-                </>
-              </div>
               <>
-                {claimableRedeems.map(
+                {pendingRedeems.map(
                   (item: any, index: Key | null | undefined) => (
-                    <ClaimableRedeem key={index} data={item} />
+                    <PendingRedeem key={index} data={item} />
                   )
                 )}
               </>
-            </CardContent>
-          </Card>
-        ))}
+            </div>
+            <>
+              {claimableRedeems.map(
+                (item: any, index: Key | null | undefined) => (
+                  <ClaimableRedeem key={index} data={item} />
+                )
+              )}
+            </>
+          </CardContent>
+        </Card>
+      )}
     </>
   );
 }
