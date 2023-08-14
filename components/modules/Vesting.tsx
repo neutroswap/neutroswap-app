@@ -1,10 +1,11 @@
 "use client";
 
 import { XGRAIL_ABI } from "@/shared/abi";
-import { Key, useState } from "react";
+import { Key, useMemo, useState } from "react";
 import {
   useAccount,
   useContractRead,
+  useContractReads,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
@@ -13,6 +14,7 @@ import { multicall } from "@wagmi/core";
 import { Card, CardContent } from "@/components/elements/Card";
 import { formatEther } from "ethers/lib/utils.js";
 import { NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT } from "@/shared/helpers/constants";
+import { BigNumber } from "ethers";
 
 export default function VestingXgrail() {
   const { address } = useAccount();
@@ -26,29 +28,35 @@ export default function VestingXgrail() {
     abi: XGRAIL_ABI,
     functionName: "getUserRedeemsLength",
     args: [address!],
-    onSuccess: async (userRedeemsLength) => {
+  });
+
+  const getUserRedeemCalls = useMemo(() => {
+    const xgrailContract = {
+      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
+      abi: XGRAIL_ABI,
+      functionName: "getUserRedeem",
+    } as const;
+    return Array(userRedeemsLength).map((_item, index) => {
+      return {
+        ...xgrailContract,
+        args: [address!, BigNumber.from(index)],
+      } as const;
+    });
+  }, [userRedeemsLength, address]);
+
+  const { data } = useContractReads({
+    enabled: Boolean(userRedeemsLength),
+    contracts: getUserRedeemCalls,
+    allowFailure: false,
+    onSuccess: (userRedeemsInfo) => {
       const lengthNumber = Number(userRedeemsLength);
       setRedeemsLength(lengthNumber);
-      let contracts = [];
-      for (let i = 0; i < lengthNumber; i++) {
-        let contract = {
-          address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-          abi: XGRAIL_ABI,
-          functionName: "getUserRedeem",
-          args: [address!, BigInt(i)],
-        };
-        contracts.push(contract);
-      }
-
-      const userRedeemsInfo: any = await multicall({
-        ...contracts,
-      });
-
       let claimable = [];
       let pending = [];
       for (let i = 0; i < userRedeemsInfo.length; i++) {
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const timeDifference = Number(userRedeemsInfo[i][2]) - currentTimestamp;
+        const timeDifference =
+          Number(userRedeemsInfo[i].endTime) - currentTimestamp;
         const days = Math.floor(timeDifference / 86400);
         const hours = Math.floor((timeDifference % 86400) / 3600);
         const minutes = Math.floor((timeDifference % 3600) / 60);
@@ -57,11 +65,10 @@ export default function VestingXgrail() {
           hours,
           minutes,
         };
-        userRedeemsInfo[i].date = date;
-        if (userRedeemsInfo[i][2] <= currentTimestamp) {
-          claimable.push({ index: i, ...userRedeemsInfo[i] });
+        if (userRedeemsInfo[i].endTime.toNumber() <= currentTimestamp) {
+          claimable.push({ index: i, date: date, ...userRedeemsInfo[i] });
         } else {
-          pending.push({ index: i, ...userRedeemsInfo[i] });
+          pending.push({ index: i, date: date, ...userRedeemsInfo[i] });
         }
       }
       setClaimableRedeems(claimable);
@@ -83,7 +90,7 @@ export default function VestingXgrail() {
       )}
 
       {redeemsLength > 0 && (
-        <Card className="flex flex-col gap-6">
+        <Card className="flex flex-col gap-6 mt-5">
           <CardContent>
             <div className="flex flex-col gap-1">
               <h2 className="text-lg font-semibold text-gray-900">Vesting</h2>
@@ -120,13 +127,12 @@ export default function VestingXgrail() {
 }
 const PendingRedeem = ({ data }: { data: any }) => {
   const { chain } = useNetwork();
-  //   const { XGFC } = useConfig(chain);
 
   const { config: cancelRedeemConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x{string}`,
     abi: XGRAIL_ABI,
     functionName: "cancelRedeem",
-    args: [BigInt(data.index)],
+    args: [BigNumber.from(data.index)],
   });
 
   const { write: cancelRedeem, isLoading: isLoadingCancelRedeem } =
@@ -138,17 +144,17 @@ const PendingRedeem = ({ data }: { data: any }) => {
     <div className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
       <div className="flex flex-col gap-1">
         <span className="text-sm font-semibold leading-6 sm:text-base">
-          <span className="text-gray-900">
+          <span className="dark:text-white">
             {" "}
             {Number(formatEther(data[1])).toFixed(2)}{" "}
           </span>
-          <span className="text-gray-600"> xGRAIL </span>
-          <span className="text-gray-600"> &gt; </span>
-          <span className="text-gray-900">
+          <span className="text-neutral-500"> xGRAIL </span>
+          <span className="text-neutral-500"> &gt; </span>
+          <span className="dark:text-white">
             {" "}
             {Number(formatEther(data[0])).toFixed(2)}{" "}
           </span>
-          <span className="text-gray-600"> GRAIL </span>
+          <span className="text-neutral-500"> GRAIL </span>
         </span>
         <span className="text-xs font-normal leading-4 text-gray-500">
           Claimable in {data.date.days}d {data.date.hours}h {data.date.minutes}m
@@ -167,13 +173,12 @@ const PendingRedeem = ({ data }: { data: any }) => {
 
 const ClaimableRedeem = ({ data }: { data: any }) => {
   const { chain } = useNetwork();
-  //   const { XGFC } = useConfig(chain);
 
   const { config: finalizeRedeemConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x{string}`,
     abi: XGRAIL_ABI,
     functionName: "finalizeRedeem",
-    args: [BigInt(data.index)],
+    args: [BigNumber.from(data.index)],
   });
 
   const { write: finalizeRedeem, isLoading: isLoadingFinalizeRedeem } =
@@ -189,17 +194,17 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
       <div className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
         <div className="flex flex-col gap-1">
           <span className="text-sm font-semibold leading-6 sm:text-base">
-            <span className="text-gray-900">
+            <span className="dark:text-white">
               {" "}
               {Number(formatEther(data[1])).toFixed(2)}{" "}
             </span>
-            <span className="text-gray-600"> xGRAIL </span>
-            <span className="text-gray-600"> &gt; </span>
-            <span className="text-gray-900">
+            <span className="text-neutral-500"> xGRAIL </span>
+            <span className="text-neutral-500"> &gt; </span>
+            <span className="dark:text-white">
               {" "}
               {Number(formatEther(data[0])).toFixed(2)}{" "}
             </span>
-            <span className="text-gray-600"> GRAIL </span>
+            <span className="text-neutral-500"> GRAIL </span>
           </span>
           <span className="text-xs font-normal leading-4 text-gray-500">
             Claimable in {data.date.days}d {data.date.hours}h{" "}
