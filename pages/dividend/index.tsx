@@ -9,6 +9,7 @@ import DeallocationLogo from "@/public/logo/deallocation.svg";
 import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 import AllocateDividendModal from "@/components/modules/Modal/AllocateDividendModal";
+import DeallocateDividendModal from "@/components/modules/Modal/DeallocateDividendModal";
 // const inter = Inter({ subsets: ['latin'] })
 
 const data = {
@@ -170,9 +171,7 @@ export default function Dividend() {
                 Your allocation
               </p>
               <div className="flex space-x-4">
-                <button className="border rounded px-3 py-1 font-semibold">
-                  -
-                </button>
+                <DeallocateDividendModal />
                 <AllocateDividendModal />
               </div>
             </div>
