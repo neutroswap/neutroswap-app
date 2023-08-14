@@ -8,6 +8,7 @@ import EpochLogo from "@/public/logo/epoch.svg";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
 import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
+import AllocateDividendModal from "@/components/modules/Modal/AllocateDividendModal";
 // const inter = Inter({ subsets: ['latin'] })
 
 const data = {
@@ -172,9 +173,7 @@ export default function Dividend() {
                 <button className="border rounded px-3 py-1 font-semibold">
                   -
                 </button>
-                <button className="border rounded px-3 py-1 border-amber-500 text-black font-semibold bg-amber-500">
-                  +
-                </button>
+                <AllocateDividendModal />
               </div>
             </div>
             <div className="flex flex-col md:pl-8 m-0">

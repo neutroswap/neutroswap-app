@@ -23,96 +23,113 @@ import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
   useAccount,
+  useContractRead,
   useContractReads,
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
 import Button from "@/components/elements/Button";
+import { BigNumber } from "ethers";
 
 export default function AllocateDividendModal() {
   const { address } = useAccount();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  //useForm utils
   const form = useForm();
-
   const allocateXneutro = useWatch({
     control: form.control,
     name: "allocateXneutro",
   });
   const debouncedAllocateXneutro = useDebounce(allocateXneutro, 500);
 
-  const xneutroContract = {
-    addres: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
-    abi: XGRAIL_ABI,
-  };
-  const [xneutroBalance, setXneutroBalance] = useState(BigInt(0));
-  const [allowance, setAllowance] = useState(BigInt(0));
-  const { refetch: refetchXneutroInfo } = useContractReads({
-    enabled: Boolean(address),
-    watch: true,
-    contracts: [
-      {
-        ...xneutroContract,
-        functionName: "balanceOf",
-        args: [address!],
+  //Get xNEUTRO balance & allowance for Dividend Plugin
+  const [xneutroBalance, setXneutroBalance] = useState("0");
+  const [allowance, setAllowance] = useState("0");
+  const { refetch: refetchBalance, isFetching: isFetchingBalance } =
+    useContractRead({
+      enabled: Boolean(address!),
+      watch: true,
+      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
+      abi: XGRAIL_ABI,
+      functionName: "balanceOf",
+      args: [address!],
+      onSuccess: (data) => {
+        let balance = formatEther(data);
+        setXneutroBalance(balance);
       },
-      {
-        ...xneutroContract,
-        functionName: "getUsageApproval",
-        args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT],
+    });
+  const { refetch: refetchAllowance, isFetching: isFetchingAllowance } =
+    useContractRead({
+      enabled: Boolean(address!),
+      watch: true,
+      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
+      abi: XGRAIL_ABI,
+      functionName: "getUsageApproval",
+      args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+      onSuccess: (data) => {
+        let allowance = formatEther(data);
+        setAllowance(allowance);
       },
-    ],
-    onSuccess: (data: any) => {
-      const [xneutroBalanceResult, allowanceResult] = data;
-      if (xneutroBalanceResult.status === "success") {
-        setXneutroBalance(xneutroBalanceResult.result);
-      }
-      if (allowanceResult.status === "success") {
-        setAllowance(allowanceResult.result);
-      }
-    },
-  });
-
+    });
   const availableXneutro = useMemo(() => {
     if (!xneutroBalance) return "0";
-    return `${Number(formatEther(xneutroBalance)).toFixed(2)}`;
+    return Number(xneutroBalance).toFixed(2);
   }, [xneutroBalance]);
-
   const isApproved = useMemo(() => {
-    return Number(allowance) >= debouncedAllocateXneutro;
+    return +allowance >= +debouncedAllocateXneutro;
   }, [allowance, debouncedAllocateXneutro]);
+  console.log("isApproved", isApproved);
+  console.log("allowance", +allowance);
+  console.log("debouncedAllocateXneutro", +debouncedAllocateXneutro);
 
+  //Write approveUsage function
   const { config: approveConfig, refetch: retryApproveConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
       address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
       abi: XGRAIL_ABI,
-      functionName: "getUsageApproval",
-      args: [address, NEXT_PUBLIC_DIVIDENDS_CONTRACT],
+      functionName: "approveUsage",
+      args: [
+        NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        parseEther(
+          debouncedAllocateXneutro ? `${debouncedAllocateXneutro}` : "0"
+        ),
+      ],
     });
   const { write: approve, isLoading: isLoadingApprove } = useContractWrite({
     ...approveConfig,
     onSuccess: async (tx) => {
       await waitForTransaction({ hash: tx.hash });
+      refetchAllowance();
     },
   });
 
+  //Write allocate function
   const { config: allocateConfig, refetch: retryAllocateConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
       address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
       abi: XGRAIL_ABI,
       functionName: "allocate",
-      args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT, debouncedAllocateXneutro, "0x"],
+      args: [
+        NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        parseEther(
+          debouncedAllocateXneutro ? `${debouncedAllocateXneutro}` : "0"
+        ),
+        "0x",
+      ],
     });
   const { write: allocate, isLoading: isLoadingAllocate } = useContractWrite({
     ...allocateConfig,
     onSuccess: async (tx) => {
       await waitForTransaction({ hash: tx.hash });
+      refetchAllowance();
     },
   });
 
+  //onSubmit handler
   const onSubmit = async () => {
     setIsLoading(true);
     if (!address) return new Error("Not connected");
@@ -127,17 +144,17 @@ export default function AllocateDividendModal() {
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Modal>
-          <ModalOpenButton>
-            <button className="border rounded px-3 py-1 border-amber-500 text-black font-semibold bg-amber-500">
-              +
-            </button>
-          </ModalOpenButton>
-          <ModalContents>
-            {() => (
-              <div className="border border-red-500">
+    <Modal>
+      <ModalOpenButton>
+        <button className="border rounded px-3 py-1 border-amber-500 text-black font-semibold bg-amber-500">
+          +
+        </button>
+      </ModalOpenButton>
+      <ModalContents>
+        {() => (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="box-border">
                 <div className="flex flex-col gap-1">
                   <div className="text-xl font-bold">Allocate xNEUTRO</div>
                 </div>
@@ -153,7 +170,7 @@ export default function AllocateDividendModal() {
                             suffix={
                               <button
                                 type="button"
-                                className="mt-2 rounded-md text-sm font-semibold uppercase leading-5 text-neutral-600"
+                                className="mt-2 mr-4 items-center justify-center rounded-md text-sm font-semibold uppercase leading-5 text-neutral-600"
                                 onClick={() =>
                                   form.setValue(
                                     "allocateXneutro",
@@ -161,7 +178,7 @@ export default function AllocateDividendModal() {
                                   )
                                 }
                               >
-                                Max
+                                MAX
                               </button>
                             }
                           >
@@ -180,7 +197,7 @@ export default function AllocateDividendModal() {
                 <div className="flex justify-end text-xs text-neutral-500 mt-2">
                   <div>
                     <span>Wallet Balance:</span>
-                    <span> {availableXneutro} GRAIL</span>
+                    <span> {availableXneutro} xNEUTRO</span>
                   </div>
                 </div>
                 {(() => {
@@ -192,7 +209,7 @@ export default function AllocateDividendModal() {
                         disabled={!approve}
                         loading={isLoadingApprove}
                       >
-                        Approve GRAIL
+                        Approve xNEUTRO
                       </Button>
                     );
                   }
@@ -203,15 +220,15 @@ export default function AllocateDividendModal() {
                       disabled={!allocate}
                       loading={isLoadingAllocate}
                     >
-                      Convert GRAIL
+                      Allocate xNEUTRO
                     </Button>
                   );
                 })()}
               </div>
-            )}
-          </ModalContents>
-        </Modal>
-      </form>
-    </Form>
+            </form>
+          </Form>
+        )}
+      </ModalContents>
+    </Modal>
   );
 }
