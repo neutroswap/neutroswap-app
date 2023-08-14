@@ -80,9 +80,6 @@ export default function AllocateDividendModal() {
   const isApproved = useMemo(() => {
     return +allowance >= +debouncedAllocateXneutro;
   }, [allowance, debouncedAllocateXneutro]);
-  console.log("isApproved", isApproved);
-  console.log("allowance", +allowance);
-  console.log("debouncedAllocateXneutro", +debouncedAllocateXneutro);
 
   //Write approveUsage function
   const { config: approveConfig, refetch: retryApproveConfig } =
