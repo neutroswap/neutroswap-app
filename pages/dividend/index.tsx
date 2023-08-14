@@ -10,16 +10,86 @@ import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 import AllocateDividendModal from "@/components/modules/Modal/AllocateDividendModal";
 import DeallocateDividendModal from "@/components/modules/Modal/DeallocateDividendModal";
+import {
+  useAccount,
+  useContractRead,
+  useContractWrite,
+  usePrepareContractWrite,
+} from "wagmi";
+import { NEXT_PUBLIC_DIVIDENDS_CONTRACT } from "@/shared/helpers/constants";
+import { DIVIDENDS_ABI } from "@/shared/abi";
+import { useState } from "react";
+import { formatEther } from "ethers/lib/utils.js";
+import { waitForTransaction } from "@wagmi/core";
 // const inter = Inter({ subsets: ['latin'] })
 
-const data = {
+const masterData = {
   totalAllocation: 1000,
   currentEpoch: 1000,
   APY: 24.57,
   deallocationFee: 0,
+  currentEpochDetails: [
+    {
+      token: "ETH-USDC.e",
+      logo: "logoethusdc",
+      amountToDistributeInToken: 0.00004,
+      amountToDistributeInUsd: 20000,
+    },
+    {
+      token: "xGRAIL",
+      logo: "logoxgrail",
+      pendingAmount: 0.0000001,
+      amountToDistributeInToken: 12.2,
+      amountToDistributeInUsd: 1782.1,
+    },
+  ],
+  nextEpochDetails: {
+    minEstValue: 120, // in dollar
+    APY: 10,
+    startTime: 12390123901, // epoch
+  },
+};
+
+const allocationData = {
+  userTotalAllocation: 20.2,
+  manualAllocation: 12.2,
+  totalShare: 34.12,
+  redeemAllocation: 12.22,
+  // buat fetching ini jgn manual,
+  dividendTokens: [
+    {
+      token: "ETH-USDC.e",
+      logo: "logoethusdc",
+      pendingAmountInToken: 1.2,
+      pendingAmountInUsd: 200,
+    },
+    {
+      token: "xGRAIL",
+      logo: "logoxgrail",
+      pendingAmountInToken: 0.00001,
+      pendingAmountInUsd: 12.82,
+    },
+  ],
 };
 
 export default function Dividend() {
+  const { address } = useAccount();
+
+  const { config: harvetAllConfig, refetch: refetchHarvestAllConfig } =
+    usePrepareContractWrite({
+      enabled: Boolean(address!),
+      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+      abi: DIVIDENDS_ABI,
+      functionName: "harvestAllDividends",
+    });
+  const { write: harvestAll, isLoading: isLoadingHarvestAll } =
+    useContractWrite({
+      ...harvetAllConfig,
+      onSuccess: async (tx) => {
+        await waitForTransaction({ hash: tx.hash });
+      },
+    });
+
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
       <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
@@ -44,7 +114,7 @@ export default function Dividend() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {data.totalAllocation}
+                      {masterData.totalAllocation}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
                       xGRAIL
@@ -64,7 +134,7 @@ export default function Dividend() {
                     Current Epochs
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    ${data.currentEpoch}
+                    ${masterData.currentEpoch}
                   </span>
                 </div>
                 <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -80,7 +150,7 @@ export default function Dividend() {
                     APY
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {data.APY}%
+                    {masterData.APY}%
                   </span>
                 </div>
                 <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -96,7 +166,7 @@ export default function Dividend() {
                     Deallocation Fee
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {data.deallocationFee}%
+                    {masterData.deallocationFee}%
                   </span>
                 </div>
                 <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -181,23 +251,31 @@ export default function Dividend() {
                   <span className="text-xs text-neutral-500">
                     Total Allocation
                   </span>
-                  <div className="mt-1 text-xs text-neutral-400">0</div>
+                  <div className="mt-1 text-xs text-neutral-400">
+                    {allocationData.userTotalAllocation} xNEUTRO
+                  </div>
                 </div>
                 <div>
                   <span className="text-xs text-neutral-500">Total Share</span>
-                  <div className="mt-1 text-xs text-neutral-400">0</div>
+                  <div className="mt-1 text-xs text-neutral-400">
+                    {allocationData.totalShare}%
+                  </div>
                 </div>
                 <div>
                   <span className="text-xs text-neutral-500">
                     Manual Allocation
                   </span>
-                  <div className="mt-1 text-xs text-neutral-400">0</div>
+                  <div className="mt-1 text-xs text-neutral-400">
+                    {allocationData.manualAllocation} xNEUTRO
+                  </div>
                 </div>
                 <div>
                   <span className="text-xs text-neutral-500">
                     Redeem Allocation
                   </span>
-                  <div className="mt-1 text-xs text-neutral-400">0</div>
+                  <div className="mt-1 text-xs text-neutral-400">
+                    {allocationData.redeemAllocation} xNEUTRO
+                  </div>
                 </div>
               </div>
             </div>
@@ -210,9 +288,13 @@ export default function Dividend() {
                 Your dividends
               </p>
               <div className="flex space-x-4">
-                <button className="px-4 py-2 border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded">
+                <Button
+                  className="px-4 py-2 border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
+                  onClick={() => harvestAll?.()}
+                  disabled={!harvestAll}
+                >
                   Claim all
-                </button>
+                </Button>
               </div>
             </div>
             <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
