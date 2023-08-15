@@ -21,6 +21,7 @@ import { DIVIDENDS_ABI } from "@/shared/abi";
 import { useState } from "react";
 import { formatEther } from "ethers/lib/utils.js";
 import { waitForTransaction } from "@wagmi/core";
+import { currencyFormat } from "@/shared/helpers/currencyFormat";
 // const inter = Inter({ subsets: ['latin'] })
 
 const masterData = {
@@ -30,15 +31,16 @@ const masterData = {
   deallocationFee: 0,
   currentEpochDetails: [
     {
-      token: "ETH-USDC.e",
-      logo: "logoethusdc",
+      tokenName: "ETH-USDC.e",
+      logoToken0: "logoToken0",
+      logoToken1: "logoToken1",
       amountToDistributeInToken: 0.00004,
       amountToDistributeInUsd: 20000,
     },
     {
-      token: "xGRAIL",
-      logo: "logoxgrail",
-      pendingAmount: 0.0000001,
+      tokenName: "xGRAIL",
+      logoToken0: "logoToken0",
+      logoToken1: "logoToken1",
       amountToDistributeInToken: 12.2,
       amountToDistributeInUsd: 1782.1,
     },
@@ -50,6 +52,9 @@ const masterData = {
   },
 };
 
+const currentEpochReward = masterData.currentEpochDetails;
+const nextEpochReward = masterData.nextEpochDetails;
+
 const allocationData = {
   userTotalAllocation: 20.2,
   manualAllocation: 12.2,
@@ -58,24 +63,31 @@ const allocationData = {
   // buat fetching ini jgn manual,
   dividendTokens: [
     {
-      token: "ETH-USDC.e",
-      logo: "logoethusdc",
+      tokenName: "ETH-USDC.e",
+      tokenAddress: 0x000000000000000,
+      logoToken0: "logoToken0",
+      logoToken1: "logoToken1",
       pendingAmountInToken: 1.2,
       pendingAmountInUsd: 200,
     },
     {
-      token: "xGRAIL",
-      logo: "logoxgrail",
+      tokenName: "xGRAIL",
+      tokenAddress: 0x000000000000000,
+      logoToken0: "logoToken0",
+      logoToken1: "logoToken1",
       pendingAmountInToken: 0.00001,
       pendingAmountInUsd: 12.82,
     },
   ],
 };
 
+const allocationReward = allocationData.dividendTokens;
+
 export default function Dividend() {
   const { address } = useAccount();
 
-  const { config: harvetAllConfig, refetch: refetchHarvestAllConfig } =
+  //Claim all button function
+  const { config: harvestAllConfig, refetch: refetchHarvestAllConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address!),
       address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
@@ -84,11 +96,27 @@ export default function Dividend() {
     });
   const { write: harvestAll, isLoading: isLoadingHarvestAll } =
     useContractWrite({
-      ...harvetAllConfig,
+      ...harvestAllConfig,
       onSuccess: async (tx) => {
         await waitForTransaction({ hash: tx.hash });
       },
     });
+
+  //Claim individual reward button function
+  const { config: harvestConfig, refetch: refetchHarvestConfig } =
+    usePrepareContractWrite({
+      enabled: Boolean(address!),
+      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+      abi: DIVIDENDS_ABI,
+      functionName: "harvestDividends",
+      // args: [] Need to find a way to get the address
+    });
+  const { write: harvest, isLoading: isLoadingHarvest } = useContractWrite({
+    ...harvestConfig,
+    onSuccess: async (tx) => {
+      await waitForTransaction({ hash: tx.hash });
+    },
+  });
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -97,7 +125,7 @@ export default function Dividend() {
       </span>
       <div className="flex flex-col">
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
-          Allocate xGRAIL here to earn a share of protocol earnings in the form
+          Allocate xNEUTRO here to earn a share of protocol earnings in the form
           of real yield.
         </p>
       </div>
@@ -117,7 +145,7 @@ export default function Dividend() {
                       {masterData.totalAllocation}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
-                      xGRAIL
+                      xNEUTRO
                     </span>
                   </div>
                 </div>
@@ -185,49 +213,91 @@ export default function Dividend() {
                   Current epoch
                 </p>
               </div>
-              <div className="flex flex-col md:pl-8 m-0">
-                <div className="flex">
-                  <div className="w-1/2 flex items-center">
-                    <div className="flex">
-                      <EthLogo className="w-7 h-7 rounded-full" />
-                      <NeutroLogo className="w-7 h-7 rounded-full" />
-                    </div>
-                    <div className="ml-2">
-                      <span className="text-xs text-neutral-500">
-                        ETH-USDC.e
-                      </span>
-                      <div className="mt-0 text-xs text-neutral-400">0</div>
-                    </div>
-                  </div>
 
-                  <div className="w-1/2 flex items-center">
-                    <div className="flex">
-                      <EthLogo className="w-7 h-7 rounded-full" />
-                    </div>
-                    <div className="ml-2">
-                      <span className="text-xs text-neutral-500">xGRAIL</span>
-                      <div className="mt-0 text-xs text-neutral-400">0</div>
+              {/* Need to change numbering format */}
+              <div className="flex">
+                {currentEpochReward.map((item, index) => (
+                  <div
+                    key={index}
+                    className="flex w-1/2 items-center md:pl-8 m-0 "
+                  >
+                    <div className="flex items-center ">
+                      <div className="flex">
+                        <EthLogo className="relative w-8 h-8 rounded-full" />
+                        <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
+                        {/* <img src={item.logoToken0} className="relative w-8 h-8 rounded-full" />
+                        <img src={item.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
+                      </div>
+                      <div className="ml-2">
+                        <span className="text-sm text-neutral-500">
+                          {item.tokenName}
+                        </span>
+                        <div className="mt-0 text-sm">
+                          {Number(item.amountToDistributeInToken)} &nbsp;
+                          <span className="text-neutral-500 text-xs">
+                            ($
+                            {currencyFormat(
+                              Number(item.amountToDistributeInUsd)
+                            )}
+                            )
+                          </span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
 
               <div className="grid grid-col-2"></div>
               <hr className="my-4 ml-8 w-11/12 border-neutral-200/80 dark:border-neutral-800/80" />
               <div className="flex flex-col justify-between items-start md:p-8 md:pt-0">
-                <div className="flex flex-col">
+                <div className="flex flex-col w-3/4">
                   <p className="m-0 text-left font-semibold whitespace-nowrap">
                     Next epoch
                   </p>
-                  <div className="flex flex-row justify-between space-x-40">
-                    <span className="text-xs text-neutral-500">
-                      Min. estimated value
-                    </span>
-                    <span className="text-xs text-neutral-500">APY</span>
-                    <span className="text-xs text-neutral-500">
-                      Remaining time
-                    </span>
+
+                  <div className="flex justify-between mt-2">
+                    <div className="flex flex-col">
+                      <span className="text-sm text-neutral-500">
+                        Min. estimated value
+                      </span>
+                      <span className="text-sm ">
+                        ${currencyFormat(nextEpochReward.minEstValue)}
+                      </span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-neutral-500">APY</span>
+                      <span className="text-sm ">{nextEpochReward.APY}%</span>
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-sm text-neutral-500">
+                        Remaining time
+                      </span>
+                      <span className="text-sm ">0</span>
+                    </div>
                   </div>
+                  {/* <div className="border border-red-500">
+                    <div className="flex flex-row justify-between space-x-40">
+                      <span className="text-xs text-neutral-500">
+                        Min. estimated value
+                      </span>
+                      <span className="text-xs text-neutral-500">APY</span>
+                      <span className="text-xs text-neutral-500">
+                        Remaining time
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border border-red-500">
+                    <div className="flex flex-row justify-between space-x-40">
+                      <span className="text-xs text-neutral-500">
+                        ${currencyFormat(nextEpochReward.minEstValue)}
+                      </span>
+                      <span className="text-xs text-neutral-500">APY</span>
+                      <span className="text-xs text-neutral-500">
+                        Remaining time
+                      </span>
+                    </div>
+                  </div> */}
                 </div>
               </div>
             </div>
@@ -248,32 +318,32 @@ export default function Dividend() {
             <div className="flex flex-col md:pl-8 m-0">
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <span className="text-xs text-neutral-500">
+                  <span className="text-sm text-neutral-500">
                     Total Allocation
                   </span>
-                  <div className="mt-1 text-xs text-neutral-400">
+                  <div className="mt-1 text-sm">
                     {allocationData.userTotalAllocation} xNEUTRO
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs text-neutral-500">Total Share</span>
-                  <div className="mt-1 text-xs text-neutral-400">
+                  <span className="text-sm text-neutral-500">Total Share</span>
+                  <div className="mt-1 text-sm">
                     {allocationData.totalShare}%
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs text-neutral-500">
+                  <span className="text-sm text-neutral-500">
                     Manual Allocation
                   </span>
-                  <div className="mt-1 text-xs text-neutral-400">
+                  <div className="mt-1 text-sm">
                     {allocationData.manualAllocation} xNEUTRO
                   </div>
                 </div>
                 <div>
-                  <span className="text-xs text-neutral-500">
+                  <span className="text-sm text-neutral-500">
                     Redeem Allocation
                   </span>
-                  <div className="mt-1 text-xs text-neutral-400">
+                  <div className="mt-1 text-sm">
                     {allocationData.redeemAllocation} xNEUTRO
                   </div>
                 </div>
@@ -297,41 +367,43 @@ export default function Dividend() {
                 </Button>
               </div>
             </div>
-            <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
-              <div className="flex items-center">
-                <div className="flex">
-                  <EthLogo className="w-7 h-7 rounded-full" />
-                  <NeutroLogo className="w-7 h-7 rounded-full" />
-                </div>
-                <div className="ml-2">
-                  <span className="text-xs text-neutral-500">ETH-USDC.e</span>
-                  <br />
-                  <span className="text-xs text-neutral-500">0</span>
-                </div>
-              </div>
-              <div>
-                <button className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded">
-                  Claim
-                </button>
-              </div>
-            </div>
 
-            <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
-              <div className="flex items-center">
-                <EthLogo className="w-7 h-7 rounded-full" />
-                <div className="w-7 h-7"></div>
-                <div className="ml-2">
-                  <span className="text-xs text-neutral-500">xGRAIL</span>
-                  <br />
-                  <span className="text-xs text-neutral-500">0</span>
+            {allocationReward.map((item, index) => (
+              <div
+                key={index}
+                className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0"
+              >
+                <div className="flex items-center">
+                  <div className="flex">
+                    <EthLogo className="relative w-8 h-8 rounded-full" />
+                    <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
+                    {/* <img src={item.logoToken0} className="relative w-8 h-8 rounded-full" />
+                        <img src={item.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
+                  </div>
+                  <div className="ml-2">
+                    <span className="text-sm text-neutral-500">
+                      {item.tokenName}
+                    </span>
+                    <br />
+                    <span className="text-sm">
+                      {Number(item.pendingAmountInToken)} &nbsp;
+                      <span className="text-neutral-500 text-xs">
+                        ($
+                        {currencyFormat(Number(item.pendingAmountInUsd))})
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                <div>
+                  <button
+                    onClick={() => harvest?.()}
+                    className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
+                  >
+                    Claim
+                  </button>
                 </div>
               </div>
-              <div>
-                <button className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded">
-                  Claim
-                </button>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </div>
