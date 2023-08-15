@@ -240,15 +240,13 @@ export default function Dividend() {
                 ))}
               </div>
 
-              <div className="grid grid-col-2"></div>
               <hr className="my-4 ml-8 w-11/12 border-neutral-200/80 dark:border-neutral-800/80" />
               <div className="flex flex-col justify-between items-start md:p-8 md:pt-0">
-                <div className="flex flex-col w-3/4">
+                <div className="flex flex-col w-full">
                   <p className="m-0 text-left font-semibold whitespace-nowrap">
                     Next epoch
                   </p>
-
-                  <div className="flex justify-between mt-2">
+                  <div className="grid grid-cols-3 auto-cols-max mt-2 ">
                     <div className="flex flex-col">
                       <span className="text-sm text-neutral-500">
                         Min. estimated value
@@ -268,28 +266,6 @@ export default function Dividend() {
                       <Countdown targetEpochTime={targetEpochTime} />
                     </div>
                   </div>
-                  {/* <div className="border border-red-500">
-                    <div className="flex flex-row justify-between space-x-40">
-                      <span className="text-xs text-neutral-500">
-                        Min. estimated value
-                      </span>
-                      <span className="text-xs text-neutral-500">APY</span>
-                      <span className="text-xs text-neutral-500">
-                        Remaining time
-                      </span>
-                    </div>
-                  </div>
-                  <div className="border border-red-500">
-                    <div className="flex flex-row justify-between space-x-40">
-                      <span className="text-xs text-neutral-500">
-                        ${currencyFormat(nextEpochReward.minEstValue)}
-                      </span>
-                      <span className="text-xs text-neutral-500">APY</span>
-                      <span className="text-xs text-neutral-500">
-                        Remaining time
-                      </span>
-                    </div>
-                  </div> */}
                 </div>
               </div>
             </div>
