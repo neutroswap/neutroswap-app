@@ -22,6 +22,7 @@ import { useState } from "react";
 import { formatEther } from "ethers/lib/utils.js";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import Countdown from "@/components/modules/Countdown";
 // const inter = Inter({ subsets: ['latin'] })
 
 const masterData = {
@@ -48,7 +49,7 @@ const masterData = {
   nextEpochDetails: {
     minEstValue: 120, // in dollar
     APY: 10,
-    startTime: 12390123901, // epoch
+    startTime: 1692177380, // epoch
   },
 };
 
@@ -117,6 +118,13 @@ export default function Dividend() {
       await waitForTransaction({ hash: tx.hash });
     },
   });
+
+  //countdown utils
+  const now = new Date();
+  let startTimeInterval = nextEpochReward.startTime * 1000 - now.getTime();
+  const targetEpochTime = Math.floor(
+    (now.getTime() + startTimeInterval) / 1000
+  );
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -273,7 +281,7 @@ export default function Dividend() {
                       <span className="text-sm text-neutral-500">
                         Remaining time
                       </span>
-                      <span className="text-sm ">0</span>
+                      <Countdown targetEpochTime={targetEpochTime} />
                     </div>
                   </div>
                   {/* <div className="border border-red-500">
