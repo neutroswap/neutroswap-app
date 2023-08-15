@@ -73,7 +73,7 @@ const allocationData = {
     },
     {
       tokenName: "xGRAIL",
-      tokenAddress: 0x000000000000000,
+      tokenAddress: 0xfc43ba5d73afc7ae2745ea6c2f534b1f40871b34,
       logoToken0: "logoToken0",
       logoToken1: "logoToken1",
       pendingAmountInToken: 0.00001,
@@ -102,22 +102,6 @@ export default function Dividend() {
         await waitForTransaction({ hash: tx.hash });
       },
     });
-
-  //Claim individual reward button function
-  const { config: harvestConfig, refetch: refetchHarvestConfig } =
-    usePrepareContractWrite({
-      enabled: Boolean(address!),
-      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
-      abi: DIVIDENDS_ABI,
-      functionName: "harvestDividends",
-      // args: [] Need to find a way to get the address
-    });
-  const { write: harvest, isLoading: isLoadingHarvest } = useContractWrite({
-    ...harvestConfig,
-    onSuccess: async (tx) => {
-      await waitForTransaction({ hash: tx.hash });
-    },
-  });
 
   //countdown utils
   const now = new Date();
@@ -377,40 +361,7 @@ export default function Dividend() {
             </div>
 
             {allocationReward.map((item, index) => (
-              <div
-                key={index}
-                className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0"
-              >
-                <div className="flex items-center">
-                  <div className="flex">
-                    <EthLogo className="relative w-8 h-8 rounded-full" />
-                    <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
-                    {/* <img src={item.logoToken0} className="relative w-8 h-8 rounded-full" />
-                        <img src={item.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
-                  </div>
-                  <div className="ml-2">
-                    <span className="text-sm text-neutral-500">
-                      {item.tokenName}
-                    </span>
-                    <br />
-                    <span className="text-sm">
-                      {Number(item.pendingAmountInToken)} &nbsp;
-                      <span className="text-neutral-500 text-xs">
-                        ($
-                        {currencyFormat(Number(item.pendingAmountInUsd))})
-                      </span>
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <button
-                    onClick={() => harvest?.()}
-                    className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
-                  >
-                    Claim
-                  </button>
-                </div>
-              </div>
+              <AllocationReward key={index} data={item} />
             ))}
           </div>
         </div>
@@ -418,3 +369,59 @@ export default function Dividend() {
     </div>
   );
 }
+
+const AllocationReward = ({ data }: { data: any }) => {
+  const { address } = useAccount();
+
+  //Claim individual reward button function
+  const { config: harvestConfig, refetch: refetchHarvestConfig } =
+    usePrepareContractWrite({
+      enabled: Boolean(address!),
+      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+      abi: DIVIDENDS_ABI,
+      functionName: "harvestDividends",
+      args: [data.tokenAddress as `0x${string}`],
+    });
+  const { write: harvest, isLoading: isLoadingHarvest } = useContractWrite({
+    ...harvestConfig,
+    onSuccess: async (tx) => {
+      await waitForTransaction({ hash: tx.hash });
+    },
+  });
+
+  return (
+    <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
+      <div className="flex items-center">
+        <div className="flex">
+          <EthLogo className="relative w-8 h-8 rounded-full" />
+          <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
+          {/* <img
+            src={data.logoToken0}
+            className="relative w-8 h-8 rounded-full"
+          />
+          <img src={data.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
+        </div>
+        <div className="ml-2">
+          <span className="text-sm text-neutral-500">{data.tokenName}</span>
+          <br />
+          <span className="text-sm">
+            {Number(data.pendingAmountInToken)} &nbsp;
+            <span className="text-neutral-500 text-xs">
+              ($
+              {currencyFormat(Number(data.pendingAmountInUsd))})
+            </span>
+          </span>
+        </div>
+      </div>
+      <div>
+        <Button
+          onClick={() => harvest?.()}
+          disabled={!harvest}
+          className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
+        >
+          Claim
+        </Button>
+      </div>
+    </div>
+  );
+};
