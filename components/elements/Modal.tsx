@@ -13,8 +13,8 @@ import { Drawer, useMediaQuery } from "@geist-ui/core";
 
 const callAll =
   (...fns: any) =>
-    (...args: any) =>
-      fns.forEach((fn: any) => fn && fn(...args));
+  (...args: any) =>
+    fns.forEach((fn: any) => fn && fn(...args));
 const ModalContext = createContext<
   [boolean, Dispatch<SetStateAction<boolean>>] | any
 >([]);
@@ -50,10 +50,14 @@ const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
 
   if (isMobile) {
     return (
-      <Drawer visible={isOpen} placement="bottom" onClose={() => setIsOpen(false)}>
+      <Drawer
+        visible={isOpen}
+        placement="bottom"
+        onClose={() => setIsOpen(false)}
+      >
         {props.children}
       </Drawer>
-    )
+    );
   }
 
   return (
