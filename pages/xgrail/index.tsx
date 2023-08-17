@@ -22,21 +22,15 @@ import {
 } from "wagmi";
 import { formatEther } from "ethers/lib/utils.js";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
-import { DIVIDENDS_ABI, XGRAIL_ABI } from "@/shared/abi";
+import { DIVIDENDS_ABI, XGRAIL_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
 import {
   NEXT_PUBLIC_DIVIDENDS_CONTRACT,
   NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+  NEXT_PUBLIC_YIELDBOOSTER_CONTRACT,
 } from "@/shared/helpers/constants";
 import { utils } from "ethers";
 import VestingXgrail from "@/components/modules/Vesting";
-import Link from "next/link";
-
-const data = {
-  totalAllocation: 1000,
-  currentEpoch: 1000,
-  APY: 24.57,
-  deallocationFee: 0,
-};
+import { BigNumber } from "ethers";
 
 export default function Xgrail() {
   const { chain } = useNetwork();
@@ -81,7 +75,7 @@ export default function Xgrail() {
     return (availableXgrailValue + allocatedAmountValue).toFixed(2);
   }, [availableXgrail, allocatedAmount]);
 
-  const { data: totalAllocation } = useContractRead({
+  const { data: totalAllocationDividend } = useContractRead({
     watch: true,
     address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
     abi: DIVIDENDS_ABI,
@@ -89,9 +83,69 @@ export default function Xgrail() {
   });
 
   const dividendTotalAllocation = useMemo(() => {
-    if (!totalAllocation) return "0";
-    return `${Number(formatEther(totalAllocation)).toFixed(2)}`;
-  }, [totalAllocation]);
+    if (!totalAllocationDividend) return "0";
+    return `${Number(formatEther(totalAllocationDividend))}`;
+  }, [totalAllocationDividend]);
+
+  const { data: dividendDeallocationFee } = useContractRead({
+    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
+    abi: XGRAIL_ABI,
+    functionName: "usagesDeallocationFee",
+    args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+  });
+
+  const formattedDividendDeallocationFee = useMemo(() => {
+    if (!dividendDeallocationFee) return "0";
+    return `${(Number(dividendDeallocationFee) / 100).toFixed(1)}`;
+  }, [dividendDeallocationFee]);
+
+  const { data: yieldBoosterDeallocationFee } = useContractRead({
+    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
+    abi: XGRAIL_ABI,
+    functionName: "usagesDeallocationFee",
+    args: [NEXT_PUBLIC_YIELDBOOSTER_CONTRACT as `0x${string}`],
+  });
+
+  const formattedYieldBoosterDeallocationFee = useMemo(() => {
+    if (!yieldBoosterDeallocationFee) return "0";
+    return `${(Number(yieldBoosterDeallocationFee) / 100).toFixed(1)}`;
+  }, [yieldBoosterDeallocationFee]);
+
+  const { data: userDividendAllocation } = useContractRead({
+    address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+    abi: DIVIDENDS_ABI,
+    functionName: "usersAllocation",
+    args: [address!],
+  });
+
+  const formattedUserDividendAllocation = useMemo(() => {
+    if (!userDividendAllocation) return "0";
+    return `${Number(formatEther(userDividendAllocation!))}`;
+  }, [userDividendAllocation]);
+
+  const { data: totalAllocationYieldBooster } = useContractRead({
+    watch: true,
+    address: NEXT_PUBLIC_YIELDBOOSTER_CONTRACT as `0x${string}`,
+    abi: YIELDBOOSTER_ABI,
+    functionName: "totalAllocation",
+  });
+
+  const yieldBoosterTotalAllocation = useMemo(() => {
+    if (!totalAllocationYieldBooster) return "0";
+    return `${Number(formatEther(totalAllocationYieldBooster))}`;
+  }, [totalAllocationYieldBooster]);
+
+  const { data: userYieldBoosterAllocation } = useContractRead({
+    address: NEXT_PUBLIC_YIELDBOOSTER_CONTRACT as `0x${string}`,
+    abi: YIELDBOOSTER_ABI,
+    functionName: "getUserTotalAllocation",
+    args: [address!],
+  });
+
+  const formattedUserYieldBoosterAllocation = useMemo(() => {
+    if (!userYieldBoosterAllocation) return "0";
+    return `${Number(formatEther(userYieldBoosterAllocation!))}`;
+  }, [userYieldBoosterAllocation]);
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -201,39 +255,6 @@ export default function Xgrail() {
             </CardContent>
           </Card>
           <VestingXgrail />
-
-          {/* <Card className="p-4 mt-4">
-            <div className="text-xl font-bold m-3 flex flex-col">Vesting</div>
-
-            <div className=" uppercase font-thin m-3 mt-5">Claimable</div>
-            <div className="flex flex-row gap-1 justify-between -mt-3 items-center">
-              <span className="text-sm font-semibold m-3 sm:text-s">
-                <span className="text-gray-900 dark:text-white"> 0.00001 </span>
-                <span className="text-gray-600"> xGRAIL </span>
-                <span className="text-gray-600 "> &gt; </span>
-                <span className="text-gray-900 dark:text-white"> 0.00001 </span>
-                <span className="text-gray-600 "> GRAIL </span>
-              </span>
-              <button className="border border-neutral-200 dark:border-neutral-800 mr-6">
-                <span className="px-3 py-1 text-amber-500 text-sm font-semibold">
-                  Claim
-                </span>
-              </button>
-            </div>
-
-            <div className=" uppercase font-thin m-3 mt-5">Pending</div>
-            <div className="flex flex-row space-x-10 justify-between -mt-3">
-              <span className="text-sm font-semibold m-3 sm:text-s">
-                <span className="text-gray-900 dark:text-white">0.000001</span>
-                <span className="text-gray-600"> xGRAIL</span>
-                <span className="text-gray-600">&nbsp; &gt; &nbsp;</span>
-                <span className="text-gray-900 dark:text-white">14d20h</span>
-                <span className="text-gray-600">&nbsp; &gt; &nbsp;</span>
-                <span className="text-gray-900 dark:text-white">0.000001</span>
-                <span className="text-gray-600"> GRAIL</span>
-              </span>
-            </div>
-          </Card> */}
         </div>
 
         {/* The other column */}
@@ -260,21 +281,25 @@ export default function Xgrail() {
                   <span className="text-xs text-neutral-500">
                     Your Allocation
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    {formattedUserDividendAllocation} xGRAIL
+                  </div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <span className="text-xs text-neutral-500">
                     Total Allocations
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">
-                    {dividendTotalAllocation}
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    {dividendTotalAllocation} xGRAIL
                   </div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <span className="text-xs text-neutral-500">
                     Deallocation Fee
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    {formattedDividendDeallocationFee}%
+                  </div>
                 </div>
               </div>
             </Link>
@@ -302,19 +327,25 @@ export default function Xgrail() {
                   <span className="text-xs text-neutral-500">
                     Your Allocation
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    {formattedUserDividendAllocation} xGRAIL
+                  </div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <span className="text-xs text-neutral-500">
                     Total Allocations
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    {yieldBoosterTotalAllocation} xGRAIL
+                  </div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <span className="text-xs text-neutral-500">
                     Deallocation Fee
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    {formattedYieldBoosterDeallocationFee}%
+                  </div>
                 </div>
               </div>
             </Link>
@@ -342,19 +373,25 @@ export default function Xgrail() {
                   <span className="text-xs text-neutral-500">
                     Your Allocation
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    0
+                  </div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <span className="text-xs text-neutral-500">
                     Total Allocations
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    0
+                  </div>
                 </div>
                 <div className="flex-grow flex flex-col">
                   <span className="text-xs text-neutral-500">
                     Deallocation Fee
                   </span>
-                  <div className="mt-1 text-sm text-neutral-400">0</div>
+                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                    0
+                  </div>
                 </div>
               </div>
             </Link>

@@ -27,8 +27,8 @@ import {
   NEXT_PUBLIC_GRAIL_TOKEN_CONTRACT,
   NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
 } from "@/shared/helpers/constants";
-import { useWaitForTransaction } from "wagmi";
 import { BigNumber } from "ethers";
+import { waitForTransaction } from "@wagmi/core";
 
 export default function ConvertForm() {
   const { chain } = useNetwork();
@@ -114,7 +114,7 @@ export default function ConvertForm() {
     useContractWrite({
       ...convertGrailConfig,
       onSuccess: async (tx) => {
-        await useWaitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash });
       },
     });
 
@@ -122,7 +122,7 @@ export default function ConvertForm() {
     {
       ...approveGrailConfig,
       onSuccess: async (tx) => {
-        await useWaitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash });
         await refetchGrailInfo();
         await retryConvertGrailConfig();
       },

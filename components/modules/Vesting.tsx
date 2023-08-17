@@ -36,19 +36,22 @@ export default function VestingXgrail() {
       abi: XGRAIL_ABI,
       functionName: "getUserRedeem",
     } as const;
-    return Array(userRedeemsLength).map((_item, index) => {
-      return {
+    let arr = [];
+    const lengthNumber = Number(userRedeemsLength);
+    for (let i = 0; i < lengthNumber; i++) {
+      arr.push({
         ...xgrailContract,
-        args: [address!, BigNumber.from(index)],
-      } as const;
-    });
+        args: [address!, BigNumber.from(i)],
+      });
+    }
+    return arr;
   }, [userRedeemsLength, address]);
 
   const { data } = useContractReads({
     enabled: Boolean(userRedeemsLength),
     contracts: getUserRedeemCalls,
     allowFailure: false,
-    onSuccess: (userRedeemsInfo) => {
+    onSuccess: (userRedeemsInfo: any[]) => {
       const lengthNumber = Number(userRedeemsLength);
       setRedeemsLength(lengthNumber);
       let claimable = [];
@@ -83,7 +86,7 @@ export default function VestingXgrail() {
         <Card className="flex flex-col gap-4 mt-5">
           <CardContent>
             <div className="flex flex-col gap-1">
-              <h2 className="text-lg font-semibold text-gray-900">Vesting</h2>
+              <div className="text-xl font-bold">Vesting</div>
             </div>
           </CardContent>
         </Card>
@@ -93,14 +96,14 @@ export default function VestingXgrail() {
         <Card className="flex flex-col gap-6 mt-5">
           <CardContent>
             <div className="flex flex-col gap-1">
-              <h2 className="text-lg font-semibold text-gray-900">Vesting</h2>
-              <p className="text-sm font-normal leading-5 text-gray-500">
+              <h2 className="text-xl font-bold ">Vesting</h2>
+              <p className="text-sm font-normal leading-5 text-neutral-500">
                 Redeeming xGRAIL back into GRAIL require a vesting period. All
                 of that information will be shown here
               </p>
             </div>
             <div className="flex flex-col gap-2.5">
-              <span className="text-xs font-semibold uppercase leading-4 tracking-wide text-gray-700">
+              <span className="text-xs font-semibold uppercase leading-4 tracking-wide text-neutral-500">
                 Pending
               </span>
 
@@ -127,7 +130,7 @@ export default function VestingXgrail() {
 }
 const PendingRedeem = ({ data }: { data: any }) => {
   const { chain } = useNetwork();
-
+  // console.log("data ", data);
   const { config: cancelRedeemConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x{string}`,
     abi: XGRAIL_ABI,
@@ -156,7 +159,7 @@ const PendingRedeem = ({ data }: { data: any }) => {
           </span>
           <span className="text-neutral-500"> GRAIL </span>
         </span>
-        <span className="text-xs font-normal leading-4 text-gray-500">
+        <span className="text-xs font-normal leading-4 text-neutral-500">
           Claimable in {data.date.days}d {data.date.hours}h {data.date.minutes}m
         </span>
       </div>
@@ -188,7 +191,7 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
 
   return (
     <div className="flex flex-col gap-2.5">
-      <span className="text-xs font-semibold uppercase leading-4 tracking-wide text-gray-700">
+      <span className="text-xs font-semibold uppercase leading-4 tracking-wide text-neutral-500">
         Claimable
       </span>
       <div className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
@@ -206,7 +209,7 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
             </span>
             <span className="text-neutral-500"> GRAIL </span>
           </span>
-          <span className="text-xs font-normal leading-4 text-gray-500">
+          <span className="text-xs font-normal leading-4 text-neutral-500">
             Claimable in {data.date.days}d {data.date.hours}h{" "}
             {data.date.minutes}m{" "}
           </span>

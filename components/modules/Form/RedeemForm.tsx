@@ -24,9 +24,9 @@ import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { XGRAIL_ABI } from "@/shared/abi";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT } from "@/shared/helpers/constants";
-import { useWaitForTransaction } from "wagmi";
 import { BigNumber } from "ethers";
 import { Slider } from "@/components/elements/Slider";
+import { waitForTransaction } from "@wagmi/core";
 
 const DEFAULT_PERCENTAGE = 50;
 const DAY_PER_PERCENTAGE = 3.3;
@@ -104,7 +104,7 @@ export default function RedeemForm() {
     useContractWrite({
       ...approveXgrailConfig,
       onSuccess: async (tx) => {
-        await useWaitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash });
         await refetchXgrailInfo();
         await retryRedeemXgrailConfig();
       },
@@ -159,7 +159,7 @@ export default function RedeemForm() {
     useContractWrite({
       ...redeemXgrailConfig,
       onSuccess: async (tx) => {
-        await useWaitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash });
       },
     });
 
