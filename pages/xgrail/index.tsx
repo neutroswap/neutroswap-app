@@ -31,6 +31,7 @@ import {
 import { utils } from "ethers";
 import VestingXgrail from "@/components/modules/Vesting";
 import { BigNumber } from "ethers";
+import Link from "next/dist/client/link";
 
 export default function Xgrail() {
   const { chain } = useNetwork();
