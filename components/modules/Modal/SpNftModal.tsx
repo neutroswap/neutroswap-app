@@ -45,6 +45,7 @@ import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
 import MiniButton from "@/components/elements/MiniButton";
+import DataBreakdown from "../DataBreakdown";
 import * as Collapsible from "@radix-ui/react-collapsible";
 
 export default function SpNftModal() {
@@ -284,11 +285,7 @@ export default function SpNftModal() {
                   </div>
                 </div>
 
-                <div className="items-start flex justify-start">
-                  <div className="w-full border-box bg-primary">
-                    <span className="text-neutral-500">Data breakdown</span>
-                  </div>
-                </div>
+                <DataBreakdown />
 
                 <Button type="button" variant="outline" onClick={() => close()}>
                   Close
