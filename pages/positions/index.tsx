@@ -11,6 +11,8 @@ import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import NewPositionsModal from "@/components/modules/Modal/NewPositionsModal";
 import ImportTokenModal from "@/components/modules/Modal/ImportTokenModal";
 import SpNftModal from "@/components/modules/Modal/SpNftModal";
+import TransferPositionModal from "@/components/modules/Modal/TransferPositionModal";
+import SplitPositionModal from "@/components/modules/Modal/SplitPositionModal";
 // const inter = Inter({ subsets: ['latin'] })
 
 export default function Dividend() {
@@ -85,6 +87,8 @@ export default function Dividend() {
               <div className="flex">
                 <ImportTokenModal />
                 <SpNftModal />
+                <TransferPositionModal />
+                <SplitPositionModal />
                 <NewPositionsModal />
               </div>
             </div>
