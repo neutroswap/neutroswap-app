@@ -36,7 +36,7 @@ export default function AddToSpNftModal() {
     control: form.control,
     name: "addToPosition",
   });
-  const debouncedAddLiquidity = useDebounce(addToPosition, 500);
+  const debouncedAddToPosition = useDebounce(addToPosition, 500);
 
   //Get LP Token balance & allowance
   // const [lpTokenBalance, setLpTokenBalance] = useState("0");
