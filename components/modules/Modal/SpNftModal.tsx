@@ -47,6 +47,7 @@ import DeallocationLogo from "@/public/logo/deallocation.svg";
 import MiniButton from "@/components/elements/MiniButton";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import AddToSpNftModal from "./AddToSpNftModal";
+import WithdrawFromSpNftModal from "./WithdrawFromSpNftModal";
 
 export default function SpNftModal() {
   const { address } = useAccount();
@@ -116,9 +117,7 @@ export default function SpNftModal() {
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <MiniButton type="button">
-                        <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                      </MiniButton>
+                      <WithdrawFromSpNftModal />
                       <div className="text-xs text-amber-500 mt-2 text-center">
                         Withdraw
                       </div>
