@@ -113,55 +113,63 @@ export default function LockSpNftModal() {
                 </div>
               </div>
 
-              <div className="mt-4 font-medium bg-neutral-800 rounded-sm">
-                <div className="px-2 py-1">Estimates</div>
-              </div>
-
-              <div className="flex flex-col px-2 mt-2 text-sm">
-                <div className="w-full flex justify-between">
-                  <div>Deposit Value</div>
-                  <div className="text-neutral-500">
-                    $0.2 -&gt; <span className="text-white">$0.21</span>
+              {lockDuration > 0 && (
+                <>
+                  <div className="mt-4 font-medium bg-neutral-800 rounded-sm">
+                    <div className="px-2 py-1">Estimates</div>
                   </div>
-                </div>
 
-                <Collapsible.Root
-                  className="w-full"
-                  open={open}
-                  onOpenChange={setOpen}
-                >
-                  <Collapsible.Trigger asChild>
-                    <div className="w-full flex justify-between hover:cursor-pointer hover:bg-neutral-900 py-2 rounded-sm ">
-                      <div className="flex">
-                        <div className="underline">Total APR</div>
-                        <ChevronDownIcon className="h-5 ml-1" />
-                      </div>
+                  <div className="flex flex-col px-2 mt-2 text-sm">
+                    <div className="w-full flex justify-between">
+                      <div>Deposit Value</div>
                       <div className="text-neutral-500">
-                        21.96% -&gt;{" "}
-                        <span className="text-amber-500">30.15%</span>
+                        $0.2 -&gt; <span className="text-white">$0.21</span>
                       </div>
                     </div>
-                  </Collapsible.Trigger>
 
-                  <Collapsible.Content className="py-2 flex flex-col gap-2 p-2">
-                    <div className="w-full flex justify-between">
-                      <div>Swap Fees APR</div>
-                      <div className="text-black dark:text-white">13.76%</div>
-                    </div>
-                    <div className="w-full flex justify-between">
-                      <div>Swap Base APR</div>
-                      <div className="text-black dark:text-white">8.2%</div>
-                    </div>
-                    <div className="w-full flex justify-between">
-                      <div>Farm Bonus APR</div>
-                      <div className="text-neutral-500">
-                        0% -&gt;{" "}
-                        <span className="text-black dark:text-white">0%</span>
-                      </div>
-                    </div>
-                  </Collapsible.Content>
-                </Collapsible.Root>
-              </div>
+                    <Collapsible.Root
+                      className="w-full"
+                      open={open}
+                      onOpenChange={setOpen}
+                    >
+                      <Collapsible.Trigger asChild>
+                        <div className="w-full flex justify-between hover:cursor-pointer hover:bg-neutral-900 py-2 rounded-sm ">
+                          <div className="flex">
+                            <div className="underline">Total APR</div>
+                            <ChevronDownIcon className="h-5 ml-1" />
+                          </div>
+                          <div className="text-neutral-500">
+                            21.96% -&gt;{" "}
+                            <span className="text-amber-500">30.15%</span>
+                          </div>
+                        </div>
+                      </Collapsible.Trigger>
+
+                      <Collapsible.Content className="py-2 flex flex-col gap-2 p-2">
+                        <div className="w-full flex justify-between">
+                          <div>Swap Fees APR</div>
+                          <div className="text-black dark:text-white">
+                            13.76%
+                          </div>
+                        </div>
+                        <div className="w-full flex justify-between">
+                          <div>Swap Base APR</div>
+                          <div className="text-black dark:text-white">8.2%</div>
+                        </div>
+                        <div className="w-full flex justify-between">
+                          <div>Farm Bonus APR</div>
+                          <div className="text-neutral-500">
+                            0% -&gt;{" "}
+                            <span className="text-black dark:text-white">
+                              0%
+                            </span>
+                          </div>
+                        </div>
+                      </Collapsible.Content>
+                    </Collapsible.Root>
+                  </div>
+                </>
+              )}
 
               <div className="flex gap-2 mt-4">
                 <Button
