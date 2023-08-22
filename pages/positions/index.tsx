@@ -8,11 +8,12 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { TableColumnRender } from "@geist-ui/core/esm/table";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
-import NewPositionsModal from "@/components/modules/Modal/NewPositionsModal";
+import NewPositionModal from "@/components/modules/Modal/NewPositionModal";
 import ImportTokenModal from "@/components/modules/Modal/ImportTokenModal";
 import SpNftModal from "@/components/modules/Modal/SpNftModal";
 import TransferPositionModal from "@/components/modules/Modal/TransferPositionModal";
 import SplitPositionModal from "@/components/modules/Modal/SplitPositionModal";
+import MergePositionModal from "@/components/modules/Modal/MergePositionModal";
 // const inter = Inter({ subsets: ['latin'] })
 
 export default function Dividend() {
@@ -89,7 +90,8 @@ export default function Dividend() {
                 <SpNftModal />
                 <TransferPositionModal />
                 <SplitPositionModal />
-                <NewPositionsModal />
+                <MergePositionModal />
+                <NewPositionModal />
               </div>
             </div>
             <div className="flex items-center justify-between space-x-4 w-full mt-7">
