@@ -47,6 +47,9 @@ import DeallocationLogo from "@/public/logo/deallocation.svg";
 import MiniButton from "@/components/elements/MiniButton";
 import DataBreakdown from "../DataBreakdown";
 import * as Collapsible from "@radix-ui/react-collapsible";
+import TransferPositionModal from "./TransferPositionModal";
+import SplitPositionModal from "./SplitPositionModal";
+import MergePositionModal from "./MergePositionModal";
 
 export default function SpNftModal() {
   const { address } = useAccount();
@@ -170,25 +173,19 @@ export default function SpNftModal() {
                     <Collapsible.Content>
                       <div className="flex flex-row justify-center space-x-7 m-5">
                         <div className="flex flex-col items-center">
-                          <MiniButton type="button">
-                            <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                          </MiniButton>
+                          <TransferPositionModal />
                           <div className="text-xs text-amber-500 mt-2 text-center">
                             Transfer
                           </div>
                         </div>
                         <div className="flex flex-col items-center">
-                          <MiniButton type="button">
-                            <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                          </MiniButton>
+                          <SplitPositionModal />
                           <div className="text-xs text-amber-500 mt-2 text-center">
                             Split
                           </div>
                         </div>
                         <div className="flex flex-col items-center">
-                          <MiniButton type="button">
-                            <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                          </MiniButton>
+                          <MergePositionModal />
                           <div className="text-xs text-amber-500 mt-2 text-center">
                             Merge
                           </div>

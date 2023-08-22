@@ -44,6 +44,8 @@ import {
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import ImportLogo from "@/public/logo/import.svg";
+import MiniButton from "@/components/elements/MiniButton";
+import DeallocationLogo from "@/public/logo/deallocation.svg";
 
 export default function TransferPositionModal() {
   const { address } = useAccount();
@@ -68,12 +70,9 @@ export default function TransferPositionModal() {
   return (
     <Modal>
       <ModalOpenButton>
-        <button className="px-3 py-2 border rounded-md border-neutral-200 dark:border-neutral-800 mr-6 flex space-x-2">
-          <ImportLogo className="w-4 h-4 mt-[0.20rem]" />
-          <span className="text-black dark:text-white text-sm font-semibold">
-            Transfer position
-          </span>
-        </button>
+        <MiniButton type="button">
+          <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
+        </MiniButton>
       </ModalOpenButton>
       <ModalContents>
         {({ close }) => (

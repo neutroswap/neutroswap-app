@@ -88,9 +88,6 @@ export default function Dividend() {
               <div className="flex">
                 <ImportTokenModal />
                 <SpNftModal />
-                <TransferPositionModal />
-                <SplitPositionModal />
-                <MergePositionModal />
                 <NewPositionModal />
               </div>
             </div>
