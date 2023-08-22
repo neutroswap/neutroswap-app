@@ -16,6 +16,7 @@ import {
 import DeallocationLogo from "@/public/logo/deallocation.svg";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { formatEther } from "ethers/lib/utils.js";
@@ -93,7 +94,7 @@ export default function AddToSpNftModal() {
     <Modal>
       <ModalOpenButton>
         <MiniButton type="button">
-          <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
+          <ArrowDownTrayIcon className="w-7 h-7 mx-auto text-amber-500" />
         </MiniButton>
       </ModalOpenButton>
 
