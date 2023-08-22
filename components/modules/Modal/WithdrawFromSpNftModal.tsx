@@ -13,15 +13,20 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
+import { classNames } from "@/shared/helpers/classNamer";
 import { useDebounce } from "@/shared/hooks/useDebounce";
+import { RadioGroup } from "@headlessui/react";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import Link from "next/link";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useAccount } from "wagmi";
 
 export default function WithdrawFromSpNftModal() {
   const { address } = useAccount();
+
+  const [isAutoUnbind, setIsAutoUnbind] = useState<boolean>(false);
 
   //useForm utils
   const form = useForm();
@@ -129,6 +134,51 @@ export default function WithdrawFromSpNftModal() {
 
               <div className="mt-4 font-medium bg-neutral-800 rounded-sm">
                 <div className="px-2 py-1">Options</div>
+              </div>
+
+              <div className="w-full mt-2 px-2 ">
+                <RadioGroup
+                  value={isAutoUnbind}
+                  onChange={setIsAutoUnbind}
+                  className="flex justify-between"
+                >
+                  <RadioGroup.Label className="flex flex-col ">
+                    <span>LP auto-unbind</span>
+                    <span className="text-xs text-neutral-500">
+                      Auto unbind your underlying LP tokens
+                    </span>
+                  </RadioGroup.Label>
+                  <div className="flex items-center bg-neutral-800 cursor-pointer rounded-md p-1">
+                    <RadioGroup.Option value={true}>
+                      {({ checked }) => (
+                        <div
+                          className={classNames(
+                            checked
+                              ? "text-neutral-900 dark:text-neutral-900 bg-white dark:bg-amber-500 shadow"
+                              : "text-neutral-500 dark:text-neutral-400 ",
+                            "p-1 rounded-md text-sm "
+                          )}
+                        >
+                          ON
+                        </div>
+                      )}
+                    </RadioGroup.Option>
+                    <RadioGroup.Option value={false}>
+                      {({ checked }) => (
+                        <div
+                          className={classNames(
+                            checked
+                              ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-900 shadow"
+                              : "text-neutral-500 dark:text-neutral-400",
+                            "p-1 rounded-md text-sm"
+                          )}
+                        >
+                          OFF
+                        </div>
+                      )}
+                    </RadioGroup.Option>
+                  </div>
+                </RadioGroup>
               </div>
 
               <div className="mt-4 font-medium bg-neutral-800 rounded-sm">
