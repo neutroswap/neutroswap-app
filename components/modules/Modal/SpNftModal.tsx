@@ -50,6 +50,7 @@ import AddToSpNftModal from "./AddToSpNftModal";
 import WithdrawFromSpNftModal from "./WithdrawFromSpNftModal";
 import LockSpNftModal from "./LockSpNftModal";
 import BoostSpNftModal from "./BoostSpNftModal";
+import StakeNitroModal from "./StakeNitroModal";
 
 export default function SpNftModal() {
   const { address } = useAccount();
@@ -137,9 +138,7 @@ export default function SpNftModal() {
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <MiniButton type="button">
-                        <DeallocationLogo className="w-7 h-7 mx-auto text-sky-500" />
-                      </MiniButton>
+                      <StakeNitroModal />
                       <div className="text-xs text-sky-500 mt-2 text-center">
                         Stake in Nitro
                       </div>
