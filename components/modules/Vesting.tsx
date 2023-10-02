@@ -98,7 +98,7 @@ export default function VestingXgrail() {
             <div className="flex flex-col gap-1">
               <h2 className="text-xl font-bold ">Vesting</h2>
               <p className="text-sm font-normal leading-5 text-neutral-500">
-                Redeeming xGRAIL back into GRAIL require a vesting period. All
+                Redeeming xNEUTRO back into NEUTRO require a vesting period. All
                 of that information will be shown here
               </p>
             </div>
@@ -151,13 +151,13 @@ const PendingRedeem = ({ data }: { data: any }) => {
             {" "}
             {Number(formatEther(data[1])).toFixed(2)}{" "}
           </span>
-          <span className="text-neutral-500"> xGRAIL </span>
+          <span className="text-neutral-500"> xNEUTRO </span>
           <span className="text-neutral-500"> &gt; </span>
           <span className="dark:text-white">
             {" "}
             {Number(formatEther(data[0])).toFixed(2)}{" "}
           </span>
-          <span className="text-neutral-500"> GRAIL </span>
+          <span className="text-neutral-500"> NEUTRO </span>
         </span>
         <span className="text-xs font-normal leading-4 text-neutral-500">
           Claimable in {data.date.days}d {data.date.hours}h {data.date.minutes}m
@@ -201,13 +201,13 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
               {" "}
               {Number(formatEther(data[1])).toFixed(2)}{" "}
             </span>
-            <span className="text-neutral-500"> xGRAIL </span>
+            <span className="text-neutral-500"> xNEUTRO </span>
             <span className="text-neutral-500"> &gt; </span>
             <span className="dark:text-white">
               {" "}
               {Number(formatEther(data[0])).toFixed(2)}{" "}
             </span>
-            <span className="text-neutral-500"> GRAIL </span>
+            <span className="text-neutral-500"> NEUTRO </span>
           </span>
           <span className="text-xs font-normal leading-4 text-neutral-500">
             Claimable in {data.date.days}d {data.date.hours}h{" "}
@@ -219,7 +219,7 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
           onClick={() => finalizeRedeem?.()}
           className="rounded-md px-3.5 py-2 text-sm font-semibold text-sky-600 hover:bg-sky-50 hover:text-sky-700"
         >
-          Claim GRAIL
+          Claim NEUTRO
         </button>
       </div>
     </div>

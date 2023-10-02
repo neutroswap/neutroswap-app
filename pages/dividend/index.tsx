@@ -39,7 +39,7 @@ const masterData = {
       amountToDistributeInUsd: 20000,
     },
     {
-      tokenName: "xGRAIL",
+      tokenName: "xNEUTRO",
       logoToken0: "logoToken0",
       logoToken1: "logoToken1",
       amountToDistributeInToken: 12.2,
@@ -72,7 +72,7 @@ const allocationData = {
       pendingAmountInUsd: 200,
     },
     {
-      tokenName: "xGRAIL",
+      tokenName: "xNEUTRO",
       tokenAddress: 0xfc43ba5d73afc7ae2745ea6c2f534b1f40871b34,
       logoToken0: "logoToken0",
       logoToken1: "logoToken1",

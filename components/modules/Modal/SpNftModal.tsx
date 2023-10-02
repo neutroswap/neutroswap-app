@@ -252,7 +252,7 @@ export default function SpNftModal() {
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-semibold">
-                          0.00001 xGRAIL
+                          0.00001 xNEUTRO
                         </div>
                         <span className="text-xs text-neutral-500">
                           Boost Allocation

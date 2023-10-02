@@ -143,7 +143,7 @@ export default function ConvertForm() {
             <div className="text-xl font-bold">Get xGRAIL</div>
             <p className="text-sm font-normal leading-5 text-gray-500">
               Unlock bonus rewards and exclusive benefits by converting your
-              GRAIL to xGRAIL.
+              NEUTRO to xNEUTRO.
             </p>
           </div>
           <div className="flex flex-col gap-2.5">
@@ -184,7 +184,7 @@ export default function ConvertForm() {
           <div className="flex justify-end text-xs text-neutral-500 -mt-2">
             <div>
               <span className="mr-2">wallet balance:</span>
-              <span>{availableGrail} GRAIL</span>
+              <span>{availableGrail} NEUTRO</span>
             </div>
           </div>
           {(() => {
@@ -197,7 +197,7 @@ export default function ConvertForm() {
                   loading={isApprovingGrail}
                   onClick={() => approveGrail?.()}
                 >
-                  Approve GRAIL
+                  Approve NEUTRO
                 </Button>
               );
             }
@@ -208,7 +208,7 @@ export default function ConvertForm() {
                 disabled={!convertGrail}
                 loading={isConvertGrailLoading}
               >
-                Convert GRAIL
+                Convert NEUTRO
               </Button>
             );
           })()}
