@@ -61,7 +61,7 @@ const ModalContentBase: React.FC<{ children: React.ReactNode }> = (props) => {
   }
 
   return (
-    <Transition.Root show={isOpen} as={Fragment}>
+    <Transition.Root show={isOpen} as={Fragment} unmount={true}>
       <Dialog as="div" className="relative z-20" onClose={onClose}>
         <Transition.Child
           as={Fragment}

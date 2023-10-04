@@ -21,6 +21,7 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
+// import {arbitrum} from 'wagmi/chains'
 import Footer from "@/components/modules/Footer";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 
@@ -30,6 +31,7 @@ import colors from "tailwindcss/colors";
 import {
   NEXT_PUBLIC_BLOCK_EXPLORER,
   NEXT_PUBLIC_CHAIN_ID,
+  NEXT_PUBLIC_MULTICALL_CONTRACT,
   NEXT_PUBLIC_RPC,
 } from "@/shared/helpers/constants";
 import { usePrefersColorScheme } from "@/shared/hooks/usePreferColorScheme";
@@ -64,6 +66,12 @@ const eosChain: any = {
     },
   },
   testnet: false,
+  contracts: {
+    multicall3: {
+      address: NEXT_PUBLIC_MULTICALL_CONTRACT,
+      blockCreated: 0,
+    },
+  },
 };
 
 const { chains, provider } = configureChains(

@@ -60,7 +60,7 @@ export default function Dividend() {
       </span>
       <div className="flex flex-col">
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
-          Allocate xGRAIL here to increase the yield of your staking positions
+          Allocate xNEUTRO here to increase the yield of your staking positions
           up to +100%.
         </p>
       </div>
@@ -79,7 +79,7 @@ export default function Dividend() {
                       {data.totalAllocation}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
-                      xGRAIL
+                      xNEUTRO
                     </span>
                   </div>
                 </div>
@@ -100,7 +100,7 @@ export default function Dividend() {
                       {data.yourAllocation}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
-                      xGRAIL
+                      xNEUTRO
                     </span>
                   </div>
                 </div>
@@ -217,7 +217,7 @@ export default function Dividend() {
           <span className="text-neutral-500">Remaining available balance</span>
           <div className="flex flex-row space-x-1">
             <span className="dark:text-white">0</span>
-            <span className="dark:text-white">xGRAIL</span>
+            <span className="dark:text-white">xNEUTRO</span>
           </div>
         </div>
 
@@ -226,8 +226,8 @@ export default function Dividend() {
             <WarningLogo className="w-5 h-5 text-amber-500 mt-0.5" />
             <span className="text-xs text-neutral-500 mt-1">
               Only yield farming rewards can be boosted. Nitro pools, Genesis
-              pools, and swap fees APRs won't be affected by any YieldBooster
-              allocation.
+              pools, and swap fees APRs won&apos;t be affected by any
+              YieldBooster allocation.
             </span>
           </div>
         </div>

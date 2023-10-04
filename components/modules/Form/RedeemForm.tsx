@@ -168,9 +168,9 @@ export default function RedeemForm() {
       <form onSubmit={form.handleSubmit(() => redeemXgrail?.())}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <div className="text-xl font-bold">Redeem xGRAIL</div>
+            <div className="text-xl font-bold">Redeem xNEUTRO</div>
             <p className="text-sm font-normal leading-5 text-gray-500">
-              Redeem your xGRAIL back into GRAIL over a vesting period of 15
+              Redeem your xNEUTRO back into NEUTRO over a vesting period of 15
               days (1 → 0.5 ratio) to 6 months (1 → 1 ratio).
             </p>
           </div>
@@ -212,7 +212,7 @@ export default function RedeemForm() {
           <div className="flex justify-end text-xs text-neutral-500 -mt-2">
             <div>
               <span className="mr-2">wallet balance:</span>
-              <span>{availableXgrail} xGRAIL</span>
+              <span>{availableXgrail} xNEUTRO</span>
             </div>
           </div>
           <div className="flex justify-between mt-3">
@@ -245,7 +245,7 @@ export default function RedeemForm() {
                 GRAIL Output
               </span>
               <span className="text-sm font-semibold leading-5 text-neutral-500">
-                {grailOutput} GRAIL
+                {grailOutput} NEUTRO
               </span>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function RedeemForm() {
                   loading={isApprovingXgrail}
                   onClick={() => approveXgrail?.()}
                 >
-                  Approve xGRAIL
+                  Approve xNEUTRO
                 </Button>
               );
             }
@@ -271,7 +271,7 @@ export default function RedeemForm() {
                 disabled={!redeemXgrail}
                 loading={isRedeemXgrailLoading}
               >
-                Redeem xGRAIL
+                Redeem xNEUTRO
               </Button>
             );
           })()}

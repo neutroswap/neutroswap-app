@@ -50,6 +50,11 @@ import * as Collapsible from "@radix-ui/react-collapsible";
 import TransferPositionModal from "./TransferPositionModal";
 import SplitPositionModal from "./SplitPositionModal";
 import MergePositionModal from "./MergePositionModal";
+import AddToSpNftModal from "./AddToSpNftModal";
+import WithdrawFromSpNftModal from "./WithdrawFromSpNftModal";
+import LockSpNftModal from "./LockSpNftModal";
+import BoostSpNftModal from "./BoostSpNftModal";
+import StakeNitroModal from "./StakeNitroModal";
 
 export default function SpNftModal() {
   const { address } = useAccount();
@@ -113,41 +118,31 @@ export default function SpNftModal() {
                 <div className="flex flex-col items-center justify-center">
                   <div className="flex flex-row justify-center space-x-7 m-5">
                     <div className="flex flex-col items-center">
-                      <MiniButton type="button">
-                        <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                      </MiniButton>
+                      <AddToSpNftModal />
                       <div className="text-xs text-amber-500 mt-2 text-center">
                         Add
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <MiniButton type="button">
-                        <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                      </MiniButton>
+                      <WithdrawFromSpNftModal />
                       <div className="text-xs text-amber-500 mt-2 text-center">
                         Withdraw
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <MiniButton type="button">
-                        <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                      </MiniButton>
+                      <LockSpNftModal />
                       <div className="text-xs text-amber-500 mt-2 text-center">
                         Lock
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <MiniButton type="button">
-                        <DeallocationLogo className="w-7 h-7 mx-auto text-amber-500" />
-                      </MiniButton>
+                      <BoostSpNftModal />
                       <div className="text-xs text-amber-500 mt-2 text-center whitespace-nowrap">
                         Yield Boost
                       </div>
                     </div>
                     <div className="flex flex-col items-center">
-                      <MiniButton type="button">
-                        <DeallocationLogo className="w-7 h-7 mx-auto text-sky-500" />
-                      </MiniButton>
+                      <StakeNitroModal />
                       <div className="text-xs text-sky-500 mt-2 text-center">
                         Stake in Nitro
                       </div>
@@ -255,7 +250,7 @@ export default function SpNftModal() {
                       </div>
                       <div className="text-right">
                         <div className="text-sm font-semibold">
-                          0.00001 xGRAIL
+                          0.00001 xNEUTRO
                         </div>
                         <span className="text-xs text-neutral-500">
                           Boost Allocation
