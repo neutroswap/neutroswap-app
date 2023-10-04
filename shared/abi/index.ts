@@ -4397,12 +4397,12 @@ export const NEUTRO_VAULT_ABI = <const>[
   },
 ];
 
-export const XGRAIL_ABI = <const>[
+export const XNEUTRO_ABI = <const>[
   {
     inputs: [
       {
-        internalType: "contract IGrailTokenV2",
-        name: "grailToken_",
+        internalType: "address",
+        name: "neutroToken_",
         type: "address",
       },
     ],
@@ -4496,7 +4496,7 @@ export const XGRAIL_ABI = <const>[
       {
         indexed: false,
         internalType: "uint256",
-        name: "xGrailAmount",
+        name: "xNeutroAmount",
         type: "uint256",
       },
     ],
@@ -4571,13 +4571,13 @@ export const XGRAIL_ABI = <const>[
       {
         indexed: false,
         internalType: "uint256",
-        name: "xGrailAmount",
+        name: "xNeutroAmount",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "grailAmount",
+        name: "neutroAmount",
         type: "uint256",
       },
     ],
@@ -4615,13 +4615,13 @@ export const XGRAIL_ABI = <const>[
       {
         indexed: false,
         internalType: "uint256",
-        name: "xGrailAmount",
+        name: "xNeutroAmount",
         type: "uint256",
       },
       {
         indexed: false,
         internalType: "uint256",
-        name: "grailAmount",
+        name: "neutroAmount",
         type: "uint256",
       },
       {
@@ -4902,7 +4902,7 @@ export const XGRAIL_ABI = <const>[
   {
     inputs: [
       {
-        internalType: "contract IXGrailTokenUsage",
+        internalType: "contract IXNeutroTokenUsage",
         name: "usage",
         type: "address",
       },
@@ -5063,7 +5063,7 @@ export const XGRAIL_ABI = <const>[
     name: "dividendsAddress",
     outputs: [
       {
-        internalType: "contract IXGrailTokenUsage",
+        internalType: "contract IXNeutroTokenUsage",
         name: "",
         type: "address",
       },
@@ -5097,7 +5097,7 @@ export const XGRAIL_ABI = <const>[
         type: "uint256",
       },
     ],
-    name: "getGrailByVestingDuration",
+    name: "getNeutroByVestingDuration",
     outputs: [
       {
         internalType: "uint256",
@@ -5173,12 +5173,12 @@ export const XGRAIL_ABI = <const>[
     outputs: [
       {
         internalType: "uint256",
-        name: "grailAmount",
+        name: "neutroAmount",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "xGrailAmount",
+        name: "xNeutroAmount",
         type: "uint256",
       },
       {
@@ -5227,7 +5227,7 @@ export const XGRAIL_ABI = <const>[
         type: "address",
       },
     ],
-    name: "getXGrailBalance",
+    name: "getXNeutroBalance",
     outputs: [
       {
         internalType: "uint256",
@@ -5238,19 +5238,6 @@ export const XGRAIL_ABI = <const>[
         internalType: "uint256",
         name: "redeemingAmount",
         type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "grailToken",
-    outputs: [
-      {
-        internalType: "contract IGrailTokenV2",
-        name: "",
-        type: "address",
       },
     ],
     stateMutability: "view",
@@ -5366,6 +5353,19 @@ export const XGRAIL_ABI = <const>[
   },
   {
     inputs: [],
+    name: "neutroToken",
+    outputs: [
+      {
+        internalType: "contract INeutroToken",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "owner",
     outputs: [
       {
@@ -5381,7 +5381,7 @@ export const XGRAIL_ABI = <const>[
     inputs: [
       {
         internalType: "uint256",
-        name: "xGrailAmount",
+        name: "xNeutroAmount",
         type: "uint256",
       },
       {
@@ -5560,7 +5560,7 @@ export const XGRAIL_ABI = <const>[
   {
     inputs: [
       {
-        internalType: "contract IXGrailTokenUsage",
+        internalType: "address",
         name: "dividendsAddress_",
         type: "address",
       },
@@ -5718,12 +5718,12 @@ export const XGRAIL_ABI = <const>[
     outputs: [
       {
         internalType: "uint256",
-        name: "grailAmount",
+        name: "neutroAmount",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "xGrailAmount",
+        name: "xNeutroAmount",
         type: "uint256",
       },
       {
@@ -5732,7 +5732,7 @@ export const XGRAIL_ABI = <const>[
         type: "uint256",
       },
       {
-        internalType: "contract IXGrailTokenUsage",
+        internalType: "contract IXNeutroTokenUsage",
         name: "dividendsAddress",
         type: "address",
       },
@@ -5753,7 +5753,7 @@ export const XGRAIL_ABI = <const>[
         type: "address",
       },
     ],
-    name: "xGrailBalances",
+    name: "xNeutroBalances",
     outputs: [
       {
         internalType: "uint256",
@@ -6177,7 +6177,7 @@ export const DIVIDENDS_ABI = <const>[
     inputs: [
       {
         internalType: "address",
-        name: "xGrailToken_",
+        name: "xNeutroToken_",
         type: "address",
       },
       {
@@ -6845,7 +6845,7 @@ export const DIVIDENDS_ABI = <const>[
   },
   {
     inputs: [],
-    name: "xGrailToken",
+    name: "xNeutroToken",
     outputs: [
       {
         internalType: "address",
@@ -6860,328 +6860,862 @@ export const DIVIDENDS_ABI = <const>[
 
 export const MASTER_ABI = <const>[
   {
-    type: "constructor",
     inputs: [
       {
+        internalType: "contract INeutroToken",
+        name: "neutroToken_",
         type: "address",
-        name: "grailToken_",
-        internalType: "contract IGrailTokenV2",
       },
-      { type: "uint256", name: "startTime_", internalType: "uint256" },
+      {
+        internalType: "uint256",
+        name: "emissionStartTime_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "emissionRate_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "treasuryAllocation_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "farmingAllocation_",
+        type: "uint256",
+      },
+      {
+        internalType: "address",
+        name: "treasury_",
+        type: "address",
+      },
     ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "activePoolsLength",
-    inputs: [],
-  },
-  {
-    type: "function",
     stateMutability: "nonpayable",
-    outputs: [],
-    name: "add",
+    type: "constructor",
+  },
+  {
+    anonymous: false,
     inputs: [
-      { type: "address", name: "nftPool", internalType: "contract INFTPool" },
-      { type: "uint256", name: "allocPoint", internalType: "uint256" },
-      { type: "bool", name: "withUpdate", internalType: "bool" },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "farmShare",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "treasuryShare",
+        type: "uint256",
+      },
     ],
+    name: "AllocationsDistributed",
+    type: "event",
   },
   {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "poolAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
+    ],
+    name: "ClaimRewards",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "OwnershipTransferred",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "poolAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "allocPoint",
+        type: "uint256",
+      },
+    ],
+    name: "PoolAdded",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "poolAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "allocPoint",
+        type: "uint256",
+      },
+    ],
+    name: "PoolSet",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "poolAddress",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "reserve",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "lastRewardTime",
+        type: "uint256",
+      },
+    ],
+    name: "PoolUpdated",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "emergencyUnlock",
+        type: "bool",
+      },
+    ],
+    name: "SetEmergencyUnlock",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "previousTreasury",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newTreasury",
+        type: "address",
+      },
+    ],
+    name: "SetTreasury",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "previousYieldBooster",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newYieldBooster",
+        type: "address",
+      },
+    ],
+    name: "SetYieldBooster",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "farmingAllocation",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "treasuryAllocation",
+        type: "uint256",
+      },
+    ],
+    name: "UpdateAllocations",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "previousEmissionRate",
+        type: "uint256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newEmissionRate",
+        type: "uint256",
+      },
+    ],
+    name: "UpdateEmissionRate",
+    type: "event",
+  },
+  {
+    inputs: [],
+    name: "ALLOCATION_PRECISION",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
+  },
+  {
+    inputs: [],
+    name: "MAX_EMISSION_RATE",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "activePoolsLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "contract INFTPool",
+        name: "nftPool",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "allocPoint",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "withUpdate",
+        type: "bool",
+      },
+    ],
+    name: "add",
+    outputs: [],
     stateMutability: "nonpayable",
-    outputs: [
-      { type: "uint256", name: "rewardsAmount", internalType: "uint256" },
-    ],
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "claimRewards",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "bool", name: "", internalType: "bool" }],
-    name: "emergencyUnlock",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "emissionRate",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "getActivePoolAddressByIndex",
-    inputs: [{ type: "uint256", name: "index", internalType: "uint256" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "getPoolAddressByIndex",
-    inputs: [{ type: "uint256", name: "index", internalType: "uint256" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
     outputs: [
-      { type: "address", name: "poolAddress", internalType: "address" },
-      { type: "uint256", name: "allocPoint", internalType: "uint256" },
-      { type: "uint256", name: "lastRewardTime", internalType: "uint256" },
-      { type: "uint256", name: "reserve", internalType: "uint256" },
-      { type: "uint256", name: "poolEmissionRate", internalType: "uint256" },
+      {
+        internalType: "uint256",
+        name: "rewardsAmount",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "emergencyUnlock",
+    outputs: [
+      {
+        internalType: "bool",
+        name: "",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "emissionRate",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "emissionStartTime",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "emitAllocations",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "farmEmissionRate",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "farmingAllocation",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "index",
+        type: "uint256",
+      },
+    ],
+    name: "getActivePoolAddressByIndex",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "index",
+        type: "uint256",
+      },
+    ],
+    name: "getPoolAddressByIndex",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "poolAddress_",
+        type: "address",
+      },
     ],
     name: "getPoolInfo",
-    inputs: [
-      { type: "address", name: "poolAddress_", internalType: "address" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "grailToken",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "massUpdatePools",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "owner",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "poolsLength",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "renounceOwnership",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "set",
-    inputs: [
-      { type: "address", name: "poolAddress", internalType: "address" },
-      { type: "uint256", name: "allocPoint", internalType: "uint256" },
-      { type: "bool", name: "withUpdate", internalType: "bool" },
-    ],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "setEmergencyUnlock",
-    inputs: [{ type: "bool", name: "emergencyUnlock_", internalType: "bool" }],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "setYieldBooster",
-    inputs: [
+    outputs: [
       {
+        internalType: "address",
+        name: "poolAddress",
         type: "address",
-        name: "yieldBooster_",
-        internalType: "contract IYieldBooster",
+      },
+      {
+        internalType: "uint256",
+        name: "allocPoint",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "lastRewardTime",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "reserve",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "poolEmissionRate",
+        type: "uint256",
       },
     ],
+    stateMutability: "view",
+    type: "function",
   },
   {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "startTime",
     inputs: [],
+    name: "lastEmissionTime",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
   {
+    inputs: [],
+    name: "massUpdatePools",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
+  },
+  {
+    inputs: [],
+    name: "neutroToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
     stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "owner",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "poolsLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "renounceOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "poolAddress",
+        type: "address",
+      },
+      {
+        internalType: "uint256",
+        name: "allocPoint",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "withUpdate",
+        type: "bool",
+      },
+    ],
+    name: "set",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "bool",
+        name: "emergencyUnlock_",
+        type: "bool",
+      },
+    ],
+    name: "setEmergencyUnlock",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "treasury_",
+        type: "address",
+      },
+    ],
+    name: "setTreasury",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "yieldBooster_",
+        type: "address",
+      },
+    ],
+    name: "setYieldBooster",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
     name: "totalAllocPoint",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "transferOwnership",
-    inputs: [{ type: "address", name: "newOwner", internalType: "address" }],
-  },
-  {
-    type: "function",
-    stateMutability: "nonpayable",
-    outputs: [],
-    name: "updatePool",
-    inputs: [{ type: "address", name: "nftPool", internalType: "address" }],
-  },
-  {
-    type: "function",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
     stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "yieldBooster",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
+    ],
+    name: "transferOwnership",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
-  },
-  {
-    type: "event",
-    name: "ClaimRewards",
-    inputs: [
-      { type: "address", name: "poolAddress", indexed: true },
-      { type: "uint256", name: "amount", indexed: false },
+    name: "treasury",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    anonymous: false,
+    stateMutability: "view",
+    type: "function",
   },
   {
-    type: "event",
-    name: "OwnershipTransferred",
-    inputs: [
-      { type: "address", name: "previousOwner", indexed: true },
-      { type: "address", name: "newOwner", indexed: true },
+    inputs: [],
+    name: "treasuryAllocation",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
     ],
-    anonymous: false,
+    stateMutability: "view",
+    type: "function",
   },
   {
-    type: "event",
-    name: "PoolAdded",
     inputs: [
-      { type: "address", name: "poolAddress", indexed: true },
-      { type: "uint256", name: "allocPoint", indexed: false },
+      {
+        internalType: "uint256",
+        name: "treasuryAllocation_",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "farmingAllocation_",
+        type: "uint256",
+      },
     ],
-    anonymous: false,
+    name: "updateAllocations",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "event",
-    name: "PoolSet",
     inputs: [
-      { type: "address", name: "poolAddress", indexed: true },
-      { type: "uint256", name: "allocPoint", indexed: false },
+      {
+        internalType: "uint256",
+        name: "emissionRate_",
+        type: "uint256",
+      },
     ],
-    anonymous: false,
+    name: "updateEmissionRate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "event",
-    name: "PoolUpdated",
     inputs: [
-      { type: "address", name: "poolAddress", indexed: true },
-      { type: "uint256", name: "reserve", indexed: false },
-      { type: "uint256", name: "lastRewardTime", indexed: false },
+      {
+        internalType: "address",
+        name: "nftPool",
+        type: "address",
+      },
     ],
-    anonymous: false,
+    name: "updatePool",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
   },
   {
-    type: "event",
-    name: "SetEmergencyUnlock",
-    inputs: [{ type: "bool", name: "emergencyUnlock", indexed: false }],
-    anonymous: false,
-  },
-  {
-    type: "event",
-    name: "SetYieldBooster",
-    inputs: [
-      { type: "address", name: "previousYieldBooster", indexed: false },
-      { type: "address", name: "newYieldBooster", indexed: false },
+    inputs: [],
+    name: "yieldBooster",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
     ],
-    anonymous: false,
+    stateMutability: "view",
+    type: "function",
   },
 ];
 
 export const NFTPOOLFACTORY_ABI = <const>[
   {
-    type: "constructor",
     inputs: [
       {
-        type: "address",
+        internalType: "address",
         name: "master_",
-        internalType: "contract ICamelotMaster",
-      },
-      { type: "address", name: "grailToken_", internalType: "contract IERC20" },
-      {
         type: "address",
-        name: "xGrailToken_",
-        internalType: "contract IXGrailToken",
+      },
+      {
+        internalType: "address",
+        name: "neutroToken_",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "xNeutroToken_",
+        type: "address",
       },
     ],
-  },
-  {
-    type: "function",
     stateMutability: "nonpayable",
-    outputs: [{ type: "address", name: "pool", internalType: "address" }],
-    name: "createPool",
-    inputs: [{ type: "address", name: "lpToken", internalType: "address" }],
+    type: "constructor",
   },
   {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "getPool",
-    inputs: [{ type: "address", name: "", internalType: "address" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "contract IERC20" }],
-    name: "grailToken",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [
-      { type: "address", name: "", internalType: "contract ICamelotMaster" },
-    ],
-    name: "master",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "address", name: "", internalType: "address" }],
-    name: "pools",
-    inputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [{ type: "uint256", name: "", internalType: "uint256" }],
-    name: "poolsLength",
-    inputs: [],
-  },
-  {
-    type: "function",
-    stateMutability: "view",
-    outputs: [
-      { type: "address", name: "", internalType: "contract IXGrailToken" },
-    ],
-    name: "xGrailToken",
-    inputs: [],
-  },
-  {
-    type: "event",
-    name: "PoolCreated",
-    inputs: [
-      { type: "address", name: "lpToken", indexed: true },
-      { type: "address", name: "pool", indexed: false },
-    ],
     anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "lpToken",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "pool",
+        type: "address",
+      },
+    ],
+    name: "PoolCreated",
+    type: "event",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "lpToken",
+        type: "address",
+      },
+    ],
+    name: "createPool",
+    outputs: [
+      {
+        internalType: "address",
+        name: "pool",
+        type: "address",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    name: "getPool",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "master",
+    outputs: [
+      {
+        internalType: "contract INeutroMaster",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "neutroToken",
+    outputs: [
+      {
+        internalType: "contract IERC20",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    name: "pools",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "poolsLength",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "xNeutroToken",
+    outputs: [
+      {
+        internalType: "contract IXNeutroToken",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
   },
 ];
 
@@ -7189,8 +7723,8 @@ export const YIELDBOOSTER_ABI = <const>[
   {
     inputs: [
       {
-        internalType: "contract IXGrailToken",
-        name: "xGrailToken_",
+        internalType: "address",
+        name: "xNeutroToken_",
         type: "address",
       },
     ],
@@ -7759,10 +8293,10 @@ export const YIELDBOOSTER_ABI = <const>[
   },
   {
     inputs: [],
-    name: "xGrailToken",
+    name: "xNeutroToken",
     outputs: [
       {
-        internalType: "contract IXGrailToken",
+        internalType: "contract IXNeutroToken",
         name: "",
         type: "address",
       },
