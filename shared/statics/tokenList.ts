@@ -1,5 +1,5 @@
-import { SupportedChainID } from "../types/chain.types"
-import { Token } from "../types/tokens.types"
+import { SupportedChainID } from "../types/chain.types";
+import { Token } from "../types/tokens.types";
 
 /**
  * index0: Native token (with wrapped token address)
@@ -84,5 +84,13 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       address: "0x4D0BfAF503fE1e229b1B4F8E4FC1952803ec843f",
       decimal: 18,
     },
+    {
+      network_id: "15557",
+      symbol: "USDT",
+      logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
+      name: "USD Tether",
+      address: "0xd61551b3E56343B6D9323444cf398f2fdf23732b",
+      decimal: 18,
+    },
   ],
-}
+};
