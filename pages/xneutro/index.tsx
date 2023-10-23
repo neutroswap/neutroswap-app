@@ -22,10 +22,10 @@ import {
 } from "wagmi";
 import { formatEther } from "ethers/lib/utils.js";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
-import { DIVIDENDS_ABI, XGRAIL_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
+import { DIVIDENDS_ABI, XNEUTRO_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
 import {
   NEXT_PUBLIC_DIVIDENDS_CONTRACT,
-  NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
   NEXT_PUBLIC_YIELDBOOSTER_CONTRACT,
 } from "@/shared/helpers/constants";
 import { utils } from "ethers";
@@ -40,8 +40,8 @@ export default function Xgrail() {
   const { data: balanceData } = useContractRead({
     enabled: Boolean(address),
     watch: true,
-    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-    abi: XGRAIL_ABI,
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: XNEUTRO_ABI,
     functionName: "balanceOf",
     args: [address!],
   });
@@ -49,9 +49,9 @@ export default function Xgrail() {
   const { data: xgrailBalance } = useContractRead({
     enabled: Boolean(address),
     watch: true,
-    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-    abi: XGRAIL_ABI,
-    functionName: "getXGrailBalance",
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: XNEUTRO_ABI,
+    functionName: "getXNeutroBalance",
     args: [address!],
   });
 
@@ -89,8 +89,8 @@ export default function Xgrail() {
   }, [totalAllocationDividend]);
 
   const { data: dividendDeallocationFee } = useContractRead({
-    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-    abi: XGRAIL_ABI,
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: XNEUTRO_ABI,
     functionName: "usagesDeallocationFee",
     args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
   });
@@ -101,8 +101,8 @@ export default function Xgrail() {
   }, [dividendDeallocationFee]);
 
   const { data: yieldBoosterDeallocationFee } = useContractRead({
-    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-    abi: XGRAIL_ABI,
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: XNEUTRO_ABI,
     functionName: "usagesDeallocationFee",
     args: [NEXT_PUBLIC_YIELDBOOSTER_CONTRACT as `0x${string}`],
   });
@@ -155,8 +155,8 @@ export default function Xgrail() {
       </span>
       <div className="flex flex-col">
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
-          Convert your NEUTRO, redeem your xNEUTRO and manage your xNEUTRO plugins
-          allocations.
+          Convert your NEUTRO, redeem your xNEUTRO and manage your xNEUTRO
+          plugins allocations.
         </p>
       </div>
 
@@ -320,8 +320,8 @@ export default function Xgrail() {
                 Yield Booster
               </div>
               <span className="text-sm text-neutral-500 ml-9 mt-1">
-                Boost your staking yields by up to +100% by adding xNEUTRO to any
-                eligible position.
+                Boost your staking yields by up to +100% by adding xNEUTRO to
+                any eligible position.
               </span>
               <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
                 <div className="flex- grow flex flex-col">

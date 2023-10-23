@@ -6,7 +6,7 @@ import {
   FormField,
   FormItem,
 } from "@/components/elements/Form";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import InputGroup from "@/components/elements/InputGroup";
 import Button from "@/components/elements/Button";
@@ -21,11 +21,10 @@ import {
   usePrepareContractWrite,
 } from "wagmi";
 import { formatEther, parseEther } from "ethers/lib/utils.js";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
-import { GRAIL_ABI, XGRAIL_ABI } from "@/shared/abi";
+import { ERC20_ABI, XNEUTRO_ABI } from "@/shared/abi";
 import {
-  NEXT_PUBLIC_GRAIL_TOKEN_CONTRACT,
-  NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+  NEXT_PUBLIC_NEUTRO_TOKEN_CONTRACT,
+  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
 } from "@/shared/helpers/constants";
 import { BigNumber } from "ethers";
 import { waitForTransaction } from "@wagmi/core";
@@ -36,111 +35,111 @@ export default function ConvertForm() {
 
   const form = useForm();
 
-  const convertGrailToXgrail = useWatch({
+  const convertNeutroToXneutro = useWatch({
     control: form.control,
-    name: "convertGrailToXgrail",
+    name: "convertNeutroToXneutro",
   });
 
-  const debouncedConvertGrailToXgrail = useDebounce(convertGrailToXgrail, 500);
+  const debouncedConvertNeutroToXneutro = useDebounce(
+    convertNeutroToXneutro,
+    500
+  );
 
-  const grailContract = {
-    address: NEXT_PUBLIC_GRAIL_TOKEN_CONTRACT as `0x${string}`,
-    abi: GRAIL_ABI,
+  const neutroContract = {
+    address: NEXT_PUBLIC_NEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: ERC20_ABI,
   };
 
-  const [grailBalance, setGrailBalance] = useState(BigInt(0));
+  const [neutroBalance, setNeutroBalance] = useState(BigInt(0));
   const [allowance, setAllowance] = useState(BigInt(0));
-  const { refetch: refetchGrailInfo } = useContractReads({
+  const { refetch: refetchNeutroInfo } = useContractReads({
     enabled: Boolean(address),
     watch: true,
     allowFailure: false,
     contracts: [
       {
-        ...grailContract,
+        ...neutroContract,
         functionName: "balanceOf",
         args: [address!],
       },
       {
-        ...grailContract,
+        ...neutroContract,
         functionName: "allowance",
-        args: [address!, NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT],
+        args: [address!, NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`],
       },
     ],
     onSuccess: (data: any) => {
-      const [grailBalanceResult, allowanceResult] = data;
-      // if (grailBalanceResult.status === "success") {
-      //   setGrailBalance(grailBalanceResult);
+      const [neutroBalanceResult, allowanceResult] = data;
+      // if (neutroBalanceResult.status === "success") {
+      //   setNeutroBalance(neutroBalanceResult);
       // }
       // if (allowanceResult.status === "success") {
       //   setAllowance(allowanceResult);
       // }
-      setGrailBalance(grailBalanceResult);
+      setNeutroBalance(neutroBalanceResult);
       setAllowance(allowanceResult);
     },
   });
 
-  const availableGrail = useMemo(() => {
-    if (!grailBalance) return "0";
-    return `${Number(formatEther(grailBalance)).toFixed(2)}`;
-  }, [grailBalance]);
+  const availableNeutro = useMemo(() => {
+    if (!neutroBalance) return "0";
+    return `${Number(formatEther(neutroBalance)).toFixed(2)}`;
+  }, [neutroBalance]);
 
-  const { config: approveGrailConfig } = usePrepareContractWrite({
-    address: NEXT_PUBLIC_GRAIL_TOKEN_CONTRACT as `0x${string}`,
-    abi: GRAIL_ABI,
+  const { config: approveNeutroConfig } = usePrepareContractWrite({
+    address: NEXT_PUBLIC_NEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: ERC20_ABI,
     functionName: "approve",
     args: [
-      NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+      NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
       BigNumber.from(
         "115792089237316195423570985008687907853269984665640564039457584007913129639935"
       ),
     ],
   });
 
-  const { config: convertGrailConfig, refetch: retryConvertGrailConfig } =
+  const { config: convertNeutroConfig, refetch: retryConvertNeutroConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "convert",
       args: [
         parseEther(
-          debouncedConvertGrailToXgrail
-            ? `${debouncedConvertGrailToXgrail}`
+          debouncedConvertNeutroToXneutro
+            ? `${debouncedConvertNeutroToXneutro}`
             : "0"
         ),
       ],
     });
-  const { write: convertGrail, isLoading: isConvertGrailLoading } =
+  const { write: convertNeutro, isLoading: isConvertNeutroLoading } =
     useContractWrite({
-      ...convertGrailConfig,
+      ...convertNeutroConfig,
       onSuccess: async (tx) => {
         await waitForTransaction({ hash: tx.hash });
       },
     });
 
-  const { isLoading: isApprovingGrail, write: approveGrail } = useContractWrite(
-    {
-      ...approveGrailConfig,
+  const { isLoading: isApprovingNeutro, write: approveNeutro } =
+    useContractWrite({
+      ...approveNeutroConfig,
       onSuccess: async (tx) => {
         await waitForTransaction({ hash: tx.hash });
-        await refetchGrailInfo();
-        await retryConvertGrailConfig();
+        await refetchNeutroInfo();
+        await retryConvertNeutroConfig();
       },
-    }
-  );
+    });
 
   const isApproved = useMemo(() => {
-    return Number(allowance) >= Number(debouncedConvertGrailToXgrail ?? "0");
-  }, [allowance, debouncedConvertGrailToXgrail]);
-  // console.log("allowance", allowance);
-  // console.log("debounce", debouncedConvertGrailToXgrail);
+    return Number(allowance) >= Number(debouncedConvertNeutroToXneutro ?? "0");
+  }, [allowance, debouncedConvertNeutroToXneutro]);
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(() => convertGrail?.())}>
+      <form onSubmit={form.handleSubmit(() => convertNeutro?.())}>
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <div className="text-xl font-bold">Get xGRAIL</div>
+            <div className="text-xl font-bold">Get xNEUTRO</div>
             <p className="text-sm font-normal leading-5 text-gray-500">
               Unlock bonus rewards and exclusive benefits by converting your
               NEUTRO to xNEUTRO.
@@ -149,7 +148,7 @@ export default function ConvertForm() {
           <div className="flex flex-col gap-2.5">
             <FormField
               control={form.control}
-              name="convertGrailToXgrail"
+              name="convertNeutroToXneutro"
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
@@ -160,8 +159,8 @@ export default function ConvertForm() {
                           className="mr-1.5 mt-2 rounded-md px-2.5 py-1.5 text-sm font-semibold uppercase leading-5 text-neutral-600"
                           onClick={() =>
                             form.setValue(
-                              "convertGrailToXgrail",
-                              availableGrail
+                              "convertNeutroToXneutro",
+                              availableNeutro
                             )
                           }
                         >
@@ -184,7 +183,7 @@ export default function ConvertForm() {
           <div className="flex justify-end text-xs text-neutral-500 -mt-2">
             <div>
               <span className="mr-2">wallet balance:</span>
-              <span>{availableGrail} NEUTRO</span>
+              <span>{availableNeutro} NEUTRO</span>
             </div>
           </div>
           {(() => {
@@ -193,9 +192,9 @@ export default function ConvertForm() {
                 <Button
                   type="button"
                   variant="outline"
-                  disabled={!approveGrail}
-                  loading={isApprovingGrail}
-                  onClick={() => approveGrail?.()}
+                  disabled={!approveNeutro}
+                  loading={isApprovingNeutro}
+                  onClick={() => approveNeutro?.()}
                 >
                   Approve NEUTRO
                 </Button>
@@ -205,8 +204,8 @@ export default function ConvertForm() {
               <Button
                 type="submit"
                 variant="outline"
-                disabled={!convertGrail}
-                loading={isConvertGrailLoading}
+                disabled={!convertNeutro}
+                loading={isConvertNeutroLoading}
               >
                 Convert NEUTRO
               </Button>

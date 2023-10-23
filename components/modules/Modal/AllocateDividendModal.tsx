@@ -10,10 +10,10 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { XGRAIL_ABI } from "@/shared/abi";
+import { XNEUTRO_ABI } from "@/shared/abi";
 import {
   NEXT_PUBLIC_DIVIDENDS_CONTRACT,
-  NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
 } from "@/shared/helpers/constants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { waitForTransaction } from "@wagmi/core";
@@ -51,8 +51,8 @@ export default function AllocateDividendModal() {
     useContractRead({
       enabled: Boolean(address!),
       watch: true,
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "balanceOf",
       args: [address!],
       onSuccess: (data) => {
@@ -64,8 +64,8 @@ export default function AllocateDividendModal() {
     useContractRead({
       enabled: Boolean(address!),
       watch: true,
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "getUsageApproval",
       args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
       onSuccess: (data) => {
@@ -85,8 +85,8 @@ export default function AllocateDividendModal() {
   const { config: approveConfig, refetch: retryApproveConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "approveUsage",
       args: [
         NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
@@ -95,10 +95,11 @@ export default function AllocateDividendModal() {
         ),
       ],
     });
+
   const { write: approve, isLoading: isLoadingApprove } = useContractWrite({
     ...approveConfig,
     onSuccess: async (tx) => {
-      await waitForTransaction({ hash: tx.hash });
+      await waitForTransaction({ hash: tx.hash, confirmations: 8 });
       refetchAllowance();
     },
   });
@@ -107,8 +108,8 @@ export default function AllocateDividendModal() {
   const { config: allocateConfig, refetch: retryAllocateConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "allocate",
       args: [
         NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,

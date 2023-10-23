@@ -21,7 +21,7 @@ import { XCircleIcon } from "@heroicons/react/24/solid";
 import { Fragment, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import BoostForm from "../Form/BoostForm";
-import UnboostForm from "../Form/unboostForm";
+import UnboostForm from "../Form/UnboostForm";
 
 export default function BoostSpNftModal() {
   const [openBoost, setOpenBoost] = useState<boolean>(false);

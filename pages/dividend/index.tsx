@@ -13,16 +13,23 @@ import DeallocateDividendModal from "@/components/modules/Modal/DeallocateDivide
 import {
   useAccount,
   useContractRead,
+  useContractReads,
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
-import { NEXT_PUBLIC_DIVIDENDS_CONTRACT } from "@/shared/helpers/constants";
-import { DIVIDENDS_ABI } from "@/shared/abi";
+import {
+  NEXT_PUBLIC_DIVIDENDS_CONTRACT,
+  NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
+  NEXT_PUBLIC_NEUTRO_TOKEN_CONTRACT,
+} from "@/shared/helpers/constants";
+import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI } from "@/shared/abi";
 import { useState } from "react";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther, formatUnits } from "ethers/lib/utils.js";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import Countdown from "@/components/modules/Countdown";
+import UserDividends from "./modules/UserDividends";
+import { BigNumber } from "ethers";
 // const inter = Inter({ subsets: ['latin'] })
 
 const masterData = {
@@ -87,6 +94,46 @@ const allocationReward = allocationData.dividendTokens;
 export default function Dividend() {
   const { address } = useAccount();
 
+  const { data } = useContractReads({
+    // enabled: Boolean(address),
+    cacheOnBlock: true,
+    allowFailure: false,
+    contracts: [
+      {
+        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        abi: NEUTRO_HELPER_ABI,
+        functionName: "totalAllocationAtPlugin",
+        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+      } as const,
+      {
+        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        abi: NEUTRO_HELPER_ABI,
+        functionName: "deallocationFeePlugin",
+        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+      } as const,
+      {
+        address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        abi: DIVIDENDS_ABI,
+        functionName: "nextCycleStartTime",
+      } as const,
+      {
+        address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        abi: DIVIDENDS_ABI,
+        functionName: "currentCycleStartTime",
+      } as const,
+      {
+        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        abi: NEUTRO_HELPER_ABI,
+        functionName: "dividendsDistributedTokensRewards",
+      } as const,
+    ],
+  });
+  const totalCurrentEpoch = data?.[4][0]?.currentDistributionAmountInUsd.sub(
+    data?.[4][1]?.currentDistributionAmountInUsd
+  );
+
+  const totalAllocation = data?.[0];
+
   //Claim all button function
   const { config: harvestAllConfig, refetch: refetchHarvestAllConfig } =
     usePrepareContractWrite({
@@ -134,7 +181,7 @@ export default function Dividend() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {masterData.totalAllocation}
+                      {formatEther(totalAllocation ?? 0)}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
                       xNEUTRO
@@ -154,7 +201,7 @@ export default function Dividend() {
                     Current Epochs
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    ${masterData.currentEpoch}
+                    ${formatEther(totalCurrentEpoch ?? 0)}
                   </span>
                 </div>
                 <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -186,7 +233,7 @@ export default function Dividend() {
                     Deallocation Fee
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {masterData.deallocationFee}%
+                    {formatEther(data?.[1] ?? 0)}%
                   </span>
                 </div>
                 <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -272,7 +319,7 @@ export default function Dividend() {
           </div>
         </div>
 
-        <div className="col-span-5 mt-8 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
+        {/* <div className="col-span-5 mt-8 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
           <div>
             <div className="flex flex-row items-center w-full md:p-8 justify-between">
               <p className="m-0 text-left font-semibold whitespace-nowrap">
@@ -340,7 +387,8 @@ export default function Dividend() {
               <AllocationReward key={index} data={item} />
             ))}
           </div>
-        </div>
+        </div> */}
+        <UserDividends />
       </div>
     </div>
   );

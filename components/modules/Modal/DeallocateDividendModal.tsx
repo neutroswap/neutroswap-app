@@ -10,10 +10,10 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { XGRAIL_ABI } from "@/shared/abi";
+import { XNEUTRO_ABI } from "@/shared/abi";
 import {
   NEXT_PUBLIC_DIVIDENDS_CONTRACT,
-  NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
+  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
 } from "@/shared/helpers/constants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { waitForTransaction } from "@wagmi/core";
@@ -49,8 +49,8 @@ export default function AllocateDividendModal() {
     useContractRead({
       enabled: Boolean(address!),
       watch: true,
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "getUsageAllocation",
       args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
       onSuccess: (data) => {
@@ -67,8 +67,8 @@ export default function AllocateDividendModal() {
   const { config: deallocateConfig, refetch: retryDeallocateConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "deallocate",
       args: [
         NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,

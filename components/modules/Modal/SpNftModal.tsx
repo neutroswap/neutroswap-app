@@ -10,11 +10,8 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { XGRAIL_ABI } from "@/shared/abi";
-import {
-  NEXT_PUBLIC_DIVIDENDS_CONTRACT,
-  NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT,
-} from "@/shared/helpers/constants";
+import { XNEUTRO_ABI } from "@/shared/abi";
+import { NEXT_PUBLIC_DIVIDENDS_CONTRACT } from "@/shared/helpers/constants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { waitForTransaction } from "@wagmi/core";
 import { formatEther, parseEther } from "ethers/lib/utils.js";

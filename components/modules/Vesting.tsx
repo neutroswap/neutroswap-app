@@ -1,6 +1,6 @@
 "use client";
 
-import { XGRAIL_ABI } from "@/shared/abi";
+import { XNEUTRO_ABI } from "@/shared/abi";
 import { Key, useMemo, useState } from "react";
 import {
   useAccount,
@@ -13,7 +13,7 @@ import {
 import { multicall } from "@wagmi/core";
 import { Card, CardContent } from "@/components/elements/Card";
 import { formatEther } from "ethers/lib/utils.js";
-import { NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT } from "@/shared/helpers/constants";
+import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
 import { BigNumber } from "ethers";
 
 export default function VestingXgrail() {
@@ -24,16 +24,16 @@ export default function VestingXgrail() {
   const [claimableRedeems, setClaimableRedeems] = useState<any>([]);
 
   const { data: userRedeemsLength } = useContractRead({
-    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-    abi: XGRAIL_ABI,
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: XNEUTRO_ABI,
     functionName: "getUserRedeemsLength",
     args: [address!],
   });
 
   const getUserRedeemCalls = useMemo(() => {
     const xgrailContract = {
-      address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-      abi: XGRAIL_ABI,
+      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      abi: XNEUTRO_ABI,
       functionName: "getUserRedeem",
     } as const;
     let arr = [];
@@ -132,8 +132,8 @@ const PendingRedeem = ({ data }: { data: any }) => {
   const { chain } = useNetwork();
   // console.log("data ", data);
   const { config: cancelRedeemConfig } = usePrepareContractWrite({
-    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x{string}`,
-    abi: XGRAIL_ABI,
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x{string}`,
+    abi: XNEUTRO_ABI,
     functionName: "cancelRedeem",
     args: [BigNumber.from(data.index)],
   });
@@ -178,8 +178,8 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
   const { chain } = useNetwork();
 
   const { config: finalizeRedeemConfig } = usePrepareContractWrite({
-    address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x{string}`,
-    abi: XGRAIL_ABI,
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x{string}`,
+    abi: XNEUTRO_ABI,
     functionName: "finalizeRedeem",
     args: [BigNumber.from(data.index)],
   });
