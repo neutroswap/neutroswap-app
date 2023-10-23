@@ -29,11 +29,11 @@ import {
   NEXT_PUBLIC_YIELDBOOSTER_CONTRACT,
 } from "@/shared/helpers/constants";
 import { utils } from "ethers";
-import VestingXgrail from "@/components/modules/Vesting";
+import VestingXneutro from "@/components/modules/Vesting";
 import { BigNumber } from "ethers";
 import Link from "next/dist/client/link";
 
-export default function Xgrail() {
+export default function Xneutro() {
   const { chain } = useNetwork();
   const { address, isConnected } = useAccount();
 
@@ -46,7 +46,7 @@ export default function Xgrail() {
     args: [address!],
   });
 
-  const { data: xgrailBalance } = useContractRead({
+  const { data: xneutroBalance } = useContractRead({
     enabled: Boolean(address),
     watch: true,
     address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
@@ -55,26 +55,26 @@ export default function Xgrail() {
     args: [address!],
   });
 
-  const availableXgrail = useMemo(() => {
+  const availableXneutro = useMemo(() => {
     if (!balanceData) return "0";
     return `${Number(formatEther(balanceData)).toFixed(2)}`;
   }, [balanceData]);
 
   const redeemingAmount = useMemo(() => {
-    if (!xgrailBalance) return "0";
-    return `${Number(formatEther(xgrailBalance.redeemingAmount)).toFixed(2)}`;
-  }, [xgrailBalance]);
+    if (!xneutroBalance) return "0";
+    return `${Number(formatEther(xneutroBalance.redeemingAmount)).toFixed(2)}`;
+  }, [xneutroBalance]);
 
   const allocatedAmount = useMemo(() => {
-    if (!xgrailBalance) return "0";
-    return `${Number(formatEther(xgrailBalance.allocatedAmount)).toFixed(2)}`;
-  }, [xgrailBalance]);
+    if (!xneutroBalance) return "0";
+    return `${Number(formatEther(xneutroBalance.allocatedAmount)).toFixed(2)}`;
+  }, [xneutroBalance]);
 
-  const totalXgrail = useMemo(() => {
-    const availableXgrailValue = Number(availableXgrail);
+  const totalXneutro = useMemo(() => {
+    const availableXneutroValue = Number(availableXneutro);
     const allocatedAmountValue = Number(allocatedAmount);
-    return (availableXgrailValue + allocatedAmountValue).toFixed(2);
-  }, [availableXgrail, allocatedAmount]);
+    return (availableXneutroValue + allocatedAmountValue).toFixed(2);
+  }, [availableXneutro, allocatedAmount]);
 
   const { data: totalAllocationDividend } = useContractRead({
     watch: true,
@@ -172,7 +172,7 @@ export default function Xgrail() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {totalXgrail}
+                      {totalXneutro}
                     </span>
                   </div>
                 </div>
@@ -189,7 +189,7 @@ export default function Xgrail() {
                     Available xNEUTRO
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {availableXgrail}
+                    {availableXneutro}
                   </span>
                 </div>
                 <LockLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -255,7 +255,7 @@ export default function Xgrail() {
               </Tab.Group>
             </CardContent>
           </Card>
-          <VestingXgrail />
+          <VestingXneutro />
         </div>
 
         {/* The other column */}

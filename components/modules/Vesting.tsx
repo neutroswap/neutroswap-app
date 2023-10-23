@@ -16,7 +16,7 @@ import { formatEther } from "ethers/lib/utils.js";
 import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
 import { BigNumber } from "ethers";
 
-export default function VestingXgrail() {
+export default function VestingXneutro() {
   const { address } = useAccount();
 
   const [redeemsLength, setRedeemsLength] = useState(0);
@@ -31,7 +31,7 @@ export default function VestingXgrail() {
   });
 
   const getUserRedeemCalls = useMemo(() => {
-    const xgrailContract = {
+    const xneutroContract = {
       address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
       abi: XNEUTRO_ABI,
       functionName: "getUserRedeem",
@@ -40,7 +40,7 @@ export default function VestingXgrail() {
     const lengthNumber = Number(userRedeemsLength);
     for (let i = 0; i < lengthNumber; i++) {
       arr.push({
-        ...xgrailContract,
+        ...xneutroContract,
         args: [address!, BigNumber.from(i)],
       });
     }
