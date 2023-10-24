@@ -113,7 +113,9 @@ export default function UserDividends() {
   });
 
   const userAllocationInPercent =
-    ((Number(data?.[2]?.[0]) || 0) / (Number(data?.[0]) || 0)) * 100;
+    !isNaN(Number(data?.[2]?.[0])) && !isNaN(Number(data?.[0]))
+      ? ((Number(data?.[2]?.[0]) || 0) / (Number(data?.[0]) || 1)) * 100
+      : 0;
 
   //Claim all button function
   const { config: harvestAllConfig, refetch: refetchHarvestAllConfig } =
