@@ -11,12 +11,14 @@ import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import NewPositionModal from "@/components/modules/Modal/NewPositionModal";
 import ImportTokenModal from "@/components/modules/Modal/ImportTokenModal";
 import SpNftModal from "@/components/modules/Modal/SpNftModal";
-import TransferPositionModal from "@/components/modules/Modal/TransferPositionModal";
-import SplitPositionModal from "@/components/modules/Modal/SplitPositionModal";
-import MergePositionModal from "@/components/modules/Modal/MergePositionModal";
-// const inter = Inter({ subsets: ['latin'] })
+import {
+  useQuery as useTanstackQuery,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import { Client, cacheExchange, fetchExchange } from "urql";
 
-export default function Dividend() {
+export default function Positions() {
   const searchRef = useRef<any>(null);
 
   const [allPositions, setAllPositions] = useState<Array<User>>([]);

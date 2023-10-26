@@ -329,7 +329,7 @@ export default function Xneutro() {
                     Your Allocation
                   </span>
                   <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    {formattedUserDividendAllocation} xNEUTRO
+                    {formattedUserYieldBoosterAllocation} xNEUTRO
                   </div>
                 </div>
                 <div className="flex-grow flex flex-col">
