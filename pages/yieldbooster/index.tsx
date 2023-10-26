@@ -1,10 +1,6 @@
 // import { Inter } from 'next/font/google'
-import React from "react";
+import React, { useMemo } from "react";
 import { useState, useRef } from "react";
-import Navbar from "@/components/modules/Navbar";
-import { Button, Page, Text } from "@geist-ui/core";
-import EthLogo from "@/public/logo/eth.svg";
-import NeutroLogo from "@/public/logo/neutro_token.svg";
 import EpochLogo from "@/public/logo/epoch.svg";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
 import APYLogo from "@/public/logo/apy.svg";
@@ -21,15 +17,17 @@ import {
 } from "@/components/elements/DropdownMenu";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/solid";
 import Input from "@/components/elements/Input";
+import { useAccount, useContractRead, useContractReads } from "wagmi";
+import {
+  NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
+  NEXT_PUBLIC_YIELDBOOSTER_CONTRACT,
+} from "@/shared/helpers/constants";
+import { NEUTRO_HELPER_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
+import { formatEther } from "ethers/lib/utils.js";
 // const inter = Inter({ subsets: ['latin'] })
 
-const data = {
-  totalAllocation: 1000,
-  yourAllocation: 500,
-  deallocationFee: 0.5,
-};
-
 export default function Dividend() {
+  const { address } = useAccount();
   const [isChecked, setIsChecked] = useState(false);
   const searchRef = useRef<any>(null);
   const [showFilter, setShowFilter] = useState(false);
@@ -53,6 +51,37 @@ export default function Dividend() {
 
   const handler = (val: any) => console.log(val);
 
+  const { data: userAllocation } = useContractRead({
+    address: NEXT_PUBLIC_YIELDBOOSTER_CONTRACT as `0x${string}`,
+    abi: YIELDBOOSTER_ABI,
+    functionName: "getUserTotalAllocation",
+    args: [address!],
+  });
+
+  const formattedUserAllocation = useMemo(() => {
+    if (!userAllocation) return "0";
+    return `${Number(formatEther(userAllocation!))}`;
+  }, [userAllocation]);
+
+  const { data } = useContractReads({
+    // enabled: Boolean(address),
+    cacheOnBlock: true,
+    allowFailure: false,
+    contracts: [
+      {
+        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        abi: NEUTRO_HELPER_ABI,
+        functionName: "totalAllocationAtPlugin",
+        args: [NEXT_PUBLIC_YIELDBOOSTER_CONTRACT as `0x${string}`],
+      } as const,
+      {
+        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        abi: NEUTRO_HELPER_ABI,
+        functionName: "deallocationFeePlugin",
+        args: [NEXT_PUBLIC_YIELDBOOSTER_CONTRACT as `0x${string}`],
+      } as const,
+    ],
+  });
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
       <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
@@ -76,7 +105,7 @@ export default function Dividend() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {data.totalAllocation}
+                      {Number(data?.[0])}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
                       xNEUTRO
@@ -97,7 +126,7 @@ export default function Dividend() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {data.yourAllocation}
+                      {formattedUserAllocation}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
                       xNEUTRO
@@ -117,7 +146,7 @@ export default function Dividend() {
                     Deallocation Fee
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {data.deallocationFee}%
+                    {Number(data?.[1])}%
                   </span>
                 </div>
                 <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
