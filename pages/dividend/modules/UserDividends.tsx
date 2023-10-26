@@ -154,7 +154,9 @@ export default function UserDividends() {
             </div>
             <div>
               <span className="text-sm text-neutral-500">Total Share</span>
-              <div className="mt-1 text-sm">{userAllocationInPercent}%</div>
+              <div className="mt-1 text-sm">
+                {userAllocationInPercent.toFixed(2)}%
+              </div>
             </div>
             <div>
               <span className="text-sm text-neutral-500">
