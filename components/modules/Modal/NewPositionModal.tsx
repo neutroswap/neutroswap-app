@@ -10,7 +10,10 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { NEXT_PUBLIC_DIVIDENDS_CONTRACT } from "@/shared/helpers/constants";
+import {
+  NEXT_PUBLIC_DIVIDENDS_CONTRACT,
+  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
+} from "@/shared/helpers/constants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { waitForTransaction } from "@wagmi/core";
 import { formatEther, parseEther } from "ethers/lib/utils.js";
@@ -39,6 +42,7 @@ import {
 } from "@/shared/types/chain.types";
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
+import { XNEUTRO_ABI } from "@/shared/abi";
 
 export default function NewPositionModal() {
   const { address } = useAccount();
@@ -59,6 +63,20 @@ export default function NewPositionModal() {
     // if (isApproved) {
     //   allocate?.();
   };
+
+  const { data: balanceData } = useContractRead({
+    enabled: Boolean(address),
+    watch: true,
+    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    abi: XNEUTRO_ABI,
+    functionName: "balanceOf",
+    args: [address!],
+  });
+
+  const availableXneutro = useMemo(() => {
+    if (!balanceData) return "0";
+    return `${Number(formatEther(balanceData)).toFixed(2)}`;
+  }, [balanceData]);
 
   const chainSpecificTokens = useMemo(() => {
     if (!chain) return tokens[DEFAULT_CHAIN_ID];
@@ -166,8 +184,8 @@ export default function NewPositionModal() {
                 </div>
                 <div className="flex justify-end text-xs text-neutral-500 mt-2">
                   <div>
-                    <span>wallet balance:</span>
-                    <span> xNEUTRO</span>
+                    <span>wallet balance: {""}</span>
+                    <span>{availableXneutro} xNEUTRO</span>
                   </div>
                 </div>
                 <div className="flex justify-between mt-2 mx-auto items-center space-x-3 mb-6">
