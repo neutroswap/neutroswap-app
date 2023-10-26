@@ -33,5 +33,6 @@ export const supportedChains =
 
 export const supportedChainID = ["17777", "15557"] as const;
 export type SupportedChainID = (typeof supportedChainID)[number];
-export const DEFAULT_CHAIN_ID = supportedChainID[0];
+export const DEFAULT_CHAIN_ID = (process.env.NEXT_PUBLIC_CHAIN_ID ??
+  "17777") as SupportedChainID;
 // export type SupportedChainID = "15557" | "17777"
