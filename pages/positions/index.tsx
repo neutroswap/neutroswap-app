@@ -108,7 +108,9 @@ export default function Positions() {
         </span>
         <Modal>
           <ModalOpenButton>
-            <Button className="!mt-2">Add Liquidity</Button>
+            <Button auto className="!mt-2" iconRight={<PlusIcon />}>
+              Add Liquidity
+            </Button>
           </ModalOpenButton>
           <ModalContents>
             {({ close }) => <AddLiquidityModal handleClose={close} />}
