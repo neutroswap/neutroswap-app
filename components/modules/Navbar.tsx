@@ -54,6 +54,21 @@ const Navbar: React.FC<Props> = () => {
         hidden: false,
       },
       {
+        label: "XNeutro",
+        value: "/xneutro",
+        hidden: false,
+      },
+      {
+        label: "Position",
+        value: "/positions",
+        hidden: false,
+      },
+      {
+        label: "Boost",
+        value: "/yieldbooster",
+        hidden: false,
+      },
+      {
         label: "Presales",
         value: "/presales",
         hidden: true,
