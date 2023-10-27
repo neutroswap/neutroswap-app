@@ -128,7 +128,7 @@ export default function Positions() {
             <div className="flex justify-between items-center">
               <span className="text-2xl font-semibold">spNFTs</span>
               <div className="flex">
-                <ImportTokenModal />
+                {/* <ImportTokenModal /> */}
                 <SpNftModal />
                 {/* <NewPositionModal /> */}
               </div>
