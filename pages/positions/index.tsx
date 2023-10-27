@@ -1,5 +1,5 @@
 import Navbar from "@/components/modules/Navbar";
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import { Button, Page, Text, Tabs, Card, Table } from "@geist-ui/core";
 import ImportLogo from "@/public/logo/import.svg";
 import CirclePlus from "@/public/logo/pluscircle.svg";
@@ -17,6 +17,36 @@ import {
   QueryClientProvider,
 } from "@tanstack/react-query";
 import { Client, cacheExchange, fetchExchange } from "urql";
+import { useRouter } from "next/router";
+import {
+  useContractRead,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+} from "wagmi";
+import { tokens } from "@/shared/statics/tokenList";
+import {
+  DEFAULT_CHAIN_ID,
+  SupportedChainID,
+  supportedChainID,
+} from "@/shared/types/chain.types";
+import { Token } from "@/shared/types/tokens.types";
+import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
+import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
+import { ethers } from "ethers";
+import { classNames } from "@/shared/helpers/classNamer";
+import {
+  ArrowRightIcon,
+  ChevronRightIcon,
+  PlusIcon,
+  XCircleIcon,
+} from "@heroicons/react/20/solid";
+import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import {
+  Modal,
+  ModalContents,
+  ModalOpenButton,
+} from "@/components/elements/Modal";
 
 export default function Positions() {
   const searchRef = useRef<any>(null);
@@ -71,10 +101,20 @@ export default function Positions() {
   };
 
   return (
-    <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
-      <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
-        Positions
-      </span>
+    <div className="flex flex-col items-center sm:items-start justify-between py-16">
+      <div className="flex justify-between items-center w-full">
+        <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
+          Positions
+        </span>
+        <Modal>
+          <ModalOpenButton>
+            <Button className="!mt-2">Add Liquidity</Button>
+          </ModalOpenButton>
+          <ModalContents>
+            {({ close }) => <AddLiquidityModal handleClose={close} />}
+          </ModalContents>
+        </Modal>
+      </div>
       <div className="flex flex-col">
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
           Create and manage all your staking positions.
@@ -90,7 +130,7 @@ export default function Positions() {
               <div className="flex">
                 <ImportTokenModal />
                 <SpNftModal />
-                <NewPositionModal />
+                {/* <NewPositionModal /> */}
               </div>
             </div>
             <div className="flex items-center justify-between space-x-4 w-full mt-7">
@@ -167,3 +207,183 @@ export default function Positions() {
     </div>
   );
 }
+
+const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
+  handleClose,
+}) => {
+  const router = useRouter();
+  const { chain } = useNetwork();
+
+  // TODO: MOVE THIS HOOKS
+  const chainSpecificTokens = useMemo(() => {
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
+    if (!supportedChainID.includes(chain.id.toString() as any))
+      return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID];
+  }, [chain]);
+
+  const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
+  const [token1, setToken1] = useState<Token>(chainSpecificTokens[1]);
+
+  const {
+    data: existingPool,
+    isError,
+    isLoading: isFetchingGetPair,
+  } = useContractRead({
+    address: FACTORY_CONTRACT,
+    abi: NEUTRO_FACTORY_ABI,
+    functionName: "getPair",
+    args: [token0.address, token1.address],
+  });
+
+  const { config: createPairConfig } = usePrepareContractWrite({
+    address: FACTORY_CONTRACT,
+    abi: NEUTRO_FACTORY_ABI,
+    functionName: "createPair",
+    args: [token0.address, token1.address],
+  });
+  const { isLoading: isCreatingPair, write: createPair } = useContractWrite({
+    ...createPairConfig,
+    address: token1.address,
+    onSuccess: async (result) => {
+      const tx = await result.wait();
+      const decodedResult = ethers.utils.defaultAbiCoder.decode(
+        ["address", "uint256"],
+        tx.logs[0].data
+      );
+      router.push(`/pool/${decodedResult[0]}`);
+    },
+  });
+
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between text-black dark:text-white mb-8">
+        <div>
+          <p className="text-left text-xl font-semibold m-0">Add Liquidity</p>
+          <p className="text-sm m-0 opacity-50">
+            Select token pair to add liquidty
+          </p>
+        </div>
+        <button type="button" onClick={handleClose}>
+          <XCircleIcon className="h-6 w-6 text-cool-gray-500 hover:text-cool-gray-400 opacity-30" />
+        </button>
+      </div>
+
+      <TokenPicker
+        selectedToken={token0}
+        setSelectedToken={setToken0}
+        disabledToken={token1}
+      >
+        {({ selectedToken }) => (
+          <div
+            className={classNames(
+              "py-1 px-4 rounded-2xl rounded-b-none cursor-pointer transition-colors group",
+              "bg-neutral-100 dark:bg-neutral-900",
+              "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
+            )}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-neutral-500 dark:text-neutral-600">
+                  1
+                </p>
+                <img
+                  alt={`${selectedToken.name} Icon`}
+                  src={selectedToken.logo}
+                  className="h-7 mr-2 rounded-full"
+                  onError={(event) => {
+                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
+                  }}
+                />
+                <span className="text-sm font-semibold text-black dark:text-white">
+                  {selectedToken.symbol}
+                </span>
+              </div>
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all text-black dark:text-white" />
+            </div>
+          </div>
+        )}
+      </TokenPicker>
+      <TokenPicker
+        selectedToken={token1}
+        setSelectedToken={setToken1}
+        disabledToken={token0}
+      >
+        {({ selectedToken }) => (
+          <div
+            className={classNames(
+              "py-1 px-4 rounded-2xl rounded-t-none cursor-pointer transition-colors group",
+              "bg-neutral-100 dark:bg-neutral-900",
+              "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
+            )}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-neutral-500 dark:text-neutral-600">
+                  2
+                </p>
+                <img
+                  alt={`${selectedToken.name} Icon`}
+                  src={selectedToken.logo}
+                  className="h-7 mr-2 rounded-full"
+                  onError={(event) => {
+                    event.currentTarget.src = `https://ui-avatars.com/api/?background=random&name=${selectedToken.symbol}`;
+                  }}
+                />
+                <span className="text-sm font-semibold text-black dark:text-white">
+                  {selectedToken.symbol}
+                </span>
+              </div>
+              <ChevronRightIcon className="ml-4 w-5 h-5 group-hover:translate-x-1 transition-all text-black dark:text-white" />
+            </div>
+          </div>
+        )}
+      </TokenPicker>
+      {(!existingPool ||
+        existingPool !== "0x0000000000000000000000000000000000000000") && (
+        <Button
+          scale={1.25}
+          className={classNames(
+            "!w-full !mt-4 !bg-transparent !rounded-lg",
+            "!border-neutral-300 dark:!border-neutral-700",
+            "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+            "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+            "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+            "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+          )}
+          disabled={isError}
+          loading={isFetchingGetPair}
+          onClick={() => router.push(`/pool/${existingPool}`)}
+        >
+          <span>Enter pool</span>
+          <ArrowRightIcon className="w-4 h-4 ml-2" />
+        </Button>
+      )}
+      {existingPool === "0x0000000000000000000000000000000000000000" && (
+        <div>
+          <Button
+            scale={1.25}
+            className={classNames(
+              "!w-full !mt-4 !bg-transparent !rounded-lg",
+              "!border-neutral-300 dark:!border-neutral-700",
+              "hover:!border-neutral-400 dark:hover:!border-neutral-600",
+              "focus:!border-neutral-400 dark:focus:!border-neutral-600",
+              "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
+              "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+            )}
+            disabled={!createPair}
+            loading={isCreatingPair}
+            onClick={() => createPair?.()}
+          >
+            <PlusIcon className="w-4 h-4 mr-2" />
+            <span>Start adding liquidity</span>
+          </Button>
+          <p className="max-w-3xl mx-auto text-sm text-neutral-400 dark:text-neutral-600 text-center">
+            No pool found! But, you can create it now and start providing
+            liquidity.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};
