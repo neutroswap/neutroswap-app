@@ -147,7 +147,7 @@ export default function SpNftModal() {
                   </div>
                 </div>
 
-                <div className="flex justify-center mb-5">
+                {/* <div className="flex justify-center mb-5">
                   <Collapsible.Root
                     className="w-[300px]"
                     open={open}
@@ -185,7 +185,7 @@ export default function SpNftModal() {
                       </div>
                     </Collapsible.Content>
                   </Collapsible.Root>
-                </div>
+                </div> */}
 
                 <div className="items-start flex justify-start">
                   <div className="w-full border-box bg-primary">
