@@ -15,6 +15,7 @@ import { readContracts } from "@wagmi/core";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { GetSpnftPositionsQuery } from "../gql/types/nft/graphql";
+import { getNitroCompatibleLPList } from "../gql/queries/factory";
 
 dayjs.extend(utc);
 
@@ -54,10 +55,10 @@ const addressToTokenLogoMap = new Map(
   ])
 );
 
-// const factoryClient = new Client({
-//   url: urls[DEFAULT_CHAIN.id].FACTORY_GRAPH_URL,
-//   exchanges: [cacheExchange, fetchExchange],
-// });
+const factoryClient = new Client({
+  url: urls[DEFAULT_CHAIN_ID].FACTORY_GRAPH_URL,
+  exchanges: [cacheExchange, fetchExchange],
+});
 
 const nftClient = new Client({
   url: urls[DEFAULT_CHAIN_ID].NFT_GRAPH_URL,
