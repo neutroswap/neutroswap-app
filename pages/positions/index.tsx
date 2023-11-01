@@ -1,6 +1,9 @@
-import Navbar from "@/components/modules/Navbar";
-import { useState, useRef, useMemo } from "react";
-import { Button, Page, Text, Tabs, Card, Table } from "@geist-ui/core";
+"use client";
+
+import React, { useState, useRef, useMemo, useEffect } from "react";
+import { Button, Table, Loading, useTheme } from "@geist-ui/core";
+import NoContentDark from "@/public/states/empty/dark.svg";
+import NoContentLight from "@/public/states/empty/light.svg";
 import ImportLogo from "@/public/logo/import.svg";
 import CirclePlus from "@/public/logo/pluscircle.svg";
 import Input from "@/components/elements/Input";
@@ -16,9 +19,10 @@ import {
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { Client, cacheExchange, fetchExchange } from "urql";
+import { Client, Provider, cacheExchange, fetchExchange, useQuery } from "urql";
 import { useRouter } from "next/router";
 import {
+  useAccount,
   useContractRead,
   useContractWrite,
   useNetwork,
@@ -42,63 +46,305 @@ import {
   XCircleIcon,
 } from "@heroicons/react/20/solid";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { ThemeType } from "@/shared/hooks/usePrefers";
 import {
   Modal,
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
+import getNFTPosition from "@/shared/getters/getNFTPosition";
+import { urls } from "@/shared/config/urls";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@radix-ui/react-tabs";
+import {
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/elements/Table";
+import { Response } from "@/shared/getters/getNFTPosition";
 
-export default function Positions() {
-  const searchRef = useRef<any>(null);
+// export default function Positions() {
+//   const { address } = useAccount();
+//   const searchRef = useRef<any>(null);
 
-  const [allPositions, setAllPositions] = useState<Array<User>>([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSearching, setIsSearching] = useState<boolean>(false);
-  const [selectedRow, setSelectedRow] = useState<User>();
+//   const [allPositions, setAllPositions] = useState<Array<User>>([]);
+//   const [isOpen, setIsOpen] = useState(false);
+//   const [isSearching, setIsSearching] = useState<boolean>(false);
+//   const [selectedRow, setSelectedRow] = useState<User>();
 
-  // const { data: userPositions, isLoading: isUserPositionsLoading, error: isUserPositionsError } = useUserPositions(address)
+//   // const { data, error, isFetching } = useTanstackQuery({
+//   //   queryKey: ["spnft.positions"],
+//   //   queryFn: async () => {
+//   //     const response = await getNFTPosition(
+//   //       address
+//   //         ? (address.toLowerCase() as `0x${string}`)
+//   //         : "0x0000000000000000000000000000000000000000"
+//   //     );
+//   //     if (!response) throw new Error("Cannot fetch spnft.positions");
+//   //     return response;
+//   //   },
+//   //   refetchOnWindowFocus: false,
+//   // });
 
-  type User = {
-    name: string;
-    token0Logo: string;
-    token1Logo: string;
-    totalStaked?: string;
-    totalStakedInUsd?: string;
-    pendingTokens?: string;
-    pendingTokensInUsd?: string;
-  };
+//   // if (isFetching) return <Loading scale={3} />;
 
-  const tokenNameColumnHandler: TableColumnRender<User> = (
-    value,
-    rowData,
-    index
-  ) => {
+//   type User = {
+//     name: string;
+//     token0Logo: string;
+//     token1Logo: string;
+//     totalStaked?: string;
+//     totalStakedInUsd?: string;
+//     pendingTokens?: string;
+//     pendingTokensInUsd?: string;
+//   };
+
+//   const tokenNameColumnHandler: TableColumnRender<User> = (
+//     value,
+//     rowData,
+//     index
+//   ) => {
+//     return (
+//       <div className="flex space-x-3 items-center my-5">
+//         <div className="flex -space-x-2 relative z-0">
+//           <img
+//             src={rowData.token0Logo}
+//             className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
+//             onError={(e) => {
+//               handleImageFallback(rowData.token0Logo, e);
+//             }}
+//           />
+//           <img
+//             src={rowData.token1Logo}
+//             className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
+//             onError={(e) => {
+//               handleImageFallback(rowData.token1Logo, e);
+//             }}
+//           />
+//         </div>
+//         <div className="space-x-1 font-semibold text-neutral-800 dark:text-neutral-200">
+//           <span>{rowData.name.split("-")[0]}</span>
+//           <span className="text-neutral-400 dark:text-neutral-600">-</span>
+//           <span>{rowData.name.split("-")[1]}</span>
+//         </div>
+//       </div>
+//     );
+//   };
+
+//   return (
+//     // <Provider value={nftClient}>
+//     //   <QueryClientProvider client={queryClient}>
+//     <div className="flex flex-col items-center sm:items-start justify-between py-16">
+//       <div className="flex justify-between items-center w-full">
+//         <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
+//           Positions
+//         </span>
+//         <Modal>
+//           <ModalOpenButton>
+//             <Button auto className="!mt-2" iconRight={<PlusIcon />}>
+//               Add Liquidity
+//             </Button>
+//           </ModalOpenButton>
+//           <ModalContents>
+//             {({ close }) => <AddLiquidityModal handleClose={close} />}
+//           </ModalContents>
+//         </Modal>
+//       </div>
+//       <div className="flex flex-col">
+//         <p className="m-0 text-center text-base text-neutral-400 mt-2">
+//           Create and manage all your staking positions.
+//         </p>
+//       </div>
+//       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
+
+//       <Tabs initialValue="1" className="w-full">
+//         <Tabs.Item label="spNFTs" value="1">
+//           <Card className="-mt-3 overflow-x-auto w-full">
+//             <div className="flex justify-between items-center">
+//               <span className="text-2xl font-semibold">spNFTs</span>
+//               <div className="flex">
+//                 <SpNftModal />
+//               </div>
+//             </div>
+//             <div className="flex items-center justify-between space-x-4 w-full mt-7">
+//               <div className="flex flex-grow items-center">
+//                 <Input
+//                   type="text"
+//                   //   ref={searchRef}
+//                   placeholder="Search"
+//                   // onChange={handleSearchAll}
+//                 />
+//               </div>
+//             </div>
+//             {/* {Boolean(allPositions.length) && ( */}
+//             <div className="overflow-x-scroll mt-8 p-0">
+//               <Table
+//                 data={allPositions}
+//                 rowClassName={() => "cursor-pointer"}
+//                 className="min-w-max"
+//                 emptyText="Loading..."
+//                 onRow={(rowData) => {
+//                   setIsOpen(true);
+//                   setSelectedRow(rowData);
+//                 }}
+//               >
+//                 <Table.Column
+//                   prop="name"
+//                   label="Token"
+//                   render={tokenNameColumnHandler}
+//                   width={380}
+//                 />
+//                 <Table.Column
+//                   prop="amount"
+//                   label="Amount"
+//                   render={(value) => <span>$ {currencyFormat(+value)}</span>}
+//                 />
+//                 <Table.Column
+//                   prop="setttings"
+//                   label="Settings"
+//                   // render={(value) => (
+//                   //   <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>
+//                   // )}
+//                 />
+//                 <Table.Column
+//                   prop="apr"
+//                   label="APR"
+//                   render={(_value, rowData: User | any) => (
+//                     <span>{+rowData.details.apr} %</span>
+//                   )}
+//                 />
+//                 <Table.Column
+//                   prop="pending"
+//                   label="Pending Rewards"
+//                   // render={(value) => (
+//                   //   <span>
+//                   //     {currencyFormat(Number(value.rps) * 86400)} NEUTRO
+//                   //   </span>
+//                   // )}
+//                 />
+//                 <Table.Column prop="nothing" label="" />
+//               </Table>
+//             </div>
+//             {/* )} */}
+//           </Card>
+//         </Tabs.Item>
+
+//         <Tabs.Item label="LP v1" value="2">
+//           <Card className="-mt-3 overflow-x-auto w-full">
+//             <div className="flex items-center">
+//               <span className="text-2xl font-semibold">LP V1</span>
+//             </div>
+//           </Card>
+//         </Tabs.Item>
+//       </Tabs>
+//     </div>
+//     //   </QueryClientProvider>
+//     // </Provider>
+//   );
+// }
+
+function SPNFTPool() {
+  const theme = useTheme();
+  const { address } = useAccount();
+
+  const { data, error, isFetching } = useTanstackQuery({
+    queryKey: ["spnft.positions"],
+    queryFn: async () => {
+      const response = await getNFTPosition(
+        address
+          ? (address.toLowerCase() as `0x${string}`)
+          : "0x0000000000000000000000000000000000000000"
+      );
+      if (!response) throw new Error("Cannot fetch spnft.positions");
+      return response;
+    },
+    refetchOnWindowFocus: false,
+  });
+
+  if (isFetching) return <Loading scale={3} />;
+
+  if (error || !data || !data.length) {
     return (
-      <div className="flex space-x-3 items-center my-5">
-        <div className="flex -space-x-2 relative z-0">
-          <img
-            src={rowData.token0Logo}
-            className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
-            onError={(e) => {
-              handleImageFallback(rowData.token0Logo, e);
-            }}
-          />
-          <img
-            src={rowData.token1Logo}
-            className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
-            onError={(e) => {
-              handleImageFallback(rowData.token1Logo, e);
-            }}
-          />
-        </div>
-        <div className="space-x-1 font-semibold text-neutral-800 dark:text-neutral-200">
-          <span>{rowData.name.split("-")[0]}</span>
-          <span className="text-neutral-400 dark:text-neutral-600">-</span>
-          <span>{rowData.name.split("-")[1]}</span>
+      <div className="flex justify-center items-center w-full">
+        <div className="mt-8 text-center rounded-lg md:border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full max-w-3xl">
+          <div className="flex flex-col items-center w-full md:p-8">
+            {(theme.type as ThemeType) === "nlight" && (
+              <NoContentLight className="w-40 h-40 opacity-75" />
+            )}
+            {(theme.type as ThemeType) === "ndark" && (
+              <NoContentDark className="w-40 h-40 opacity-75" />
+            )}
+            <p className="text-neutral-500 w-3/4">
+              You do not have any liquidity positions. Add some liquidity to
+              start earning.
+            </p>
+
+            <Modal>
+              <ModalOpenButton>
+                <Button className="!mt-2">Add Liquidity</Button>
+              </ModalOpenButton>
+              <ModalContents>
+                {({ close }) => <AddLiquidityModal handleClose={close} />}
+              </ModalContents>
+            </Modal>
+          </div>
         </div>
       </div>
     );
-  };
+  }
+
+  // return (
+  // <div className="flex flex-col items-center sm:items-start justify-between py-16">
+  //   <div className="flex justify-between items-center w-full">
+  //     <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
+  //       Positions
+  //     </span>
+  //     <Modal>
+  //       <ModalOpenButton>
+  //         <Button auto className="!mt-2" iconRight={<PlusIcon />}>
+  //           Add Liquidity
+  //         </Button>
+  //       </ModalOpenButton>
+  //       <ModalContents>
+  //         {({ close }) => <AddLiquidityModal handleClose={close} />}
+  //       </ModalContents>
+  //     </Modal>
+  //   </div>
+  //   <div className="flex flex-col">
+  //     <p className="m-0 text-center text-base text-neutral-400 mt-2">
+  //       Create and manage all your staking positions.
+  //     </p>
+  //   </div>
+  //   <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
+  //   //{" "}
+  //   {/* <div className="flex justify-center items-center w-full">
+  // //       <div className="mt-8 text-center rounded-lg md:border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full max-w-3xl">
+  // //         <div className="flex flex-col items-center w-full md:p-8">
+  // //           {(theme.type as ThemeType) === "nlight" && (
+  // //             <NoContentLight className="w-40 h-40 opacity-75" />
+  // //           )}
+  // //           {(theme.type as ThemeType) === "ndark" && (
+  // //             <NoContentDark className="w-40 h-40 opacity-75" />
+  // //           )}
+  // //           <p className="text-neutral-500 w-3/4">
+  // //             You do not have any liquidity positions. Add some liquidity to
+  // //             start earning.
+  // //           </p>
+
+  // //           <Modal>
+  // //             <ModalOpenButton>
+  // //               <Button className="!mt-2">Add Liquidity</Button>
+  // //             </ModalOpenButton>
+  // //             <ModalContents>
+  // //               {({ close }) => <AddLiquidityModal handleClose={close} />}
+  // //             </ModalContents>
+  // //           </Modal>
+  // //         </div>
+  // //       </div>
+  // //     </div> */}
+  //   //{" "}
+  // </div>;
+  // );
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-between py-16">
@@ -123,90 +369,107 @@ export default function Positions() {
         </p>
       </div>
       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-
-      <Tabs initialValue="1" className="w-full">
-        <Tabs.Item label="spNFTs" value="1">
-          <Card className="-mt-3 overflow-x-auto w-full">
-            <div className="flex justify-between items-center">
-              <span className="text-2xl font-semibold">spNFTs</span>
-              <div className="flex">
-                {/* <ImportTokenModal /> */}
-                <SpNftModal />
-                {/* <NewPositionModal /> */}
-              </div>
-            </div>
-            <div className="flex items-center justify-between space-x-4 w-full mt-7">
-              <div className="flex flex-grow items-center">
-                <Input
-                  type="text"
-                  //   ref={searchRef}
-                  placeholder="Search"
-                  // onChange={handleSearchAll}
-                />
-              </div>
-            </div>
-            {/* {Boolean(allPositions.length) && ( */}
-            <div className="overflow-x-scroll mt-8 p-0">
-              <Table
-                data={allPositions}
-                rowClassName={() => "cursor-pointer"}
-                className="min-w-max"
-                emptyText="Loading..."
-                onRow={(rowData) => {
-                  setIsOpen(true);
-                  setSelectedRow(rowData);
-                }}
-              >
-                <Table.Column
-                  prop="name"
-                  label="Token"
-                  render={tokenNameColumnHandler}
-                  width={380}
-                />
-                <Table.Column
-                  prop="amount"
-                  label="Amount"
-                  render={(value) => <span>$ {currencyFormat(+value)}</span>}
-                />
-                <Table.Column
-                  prop="setttings"
-                  label="Settings"
-                  // render={(value) => (
-                  //   <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>
-                  // )}
-                />
-                <Table.Column
-                  prop="apr"
-                  label="APR"
-                  render={(_value, rowData: User | any) => (
-                    <span>{+rowData.details.apr} %</span>
-                  )}
-                />
-                <Table.Column
-                  prop="pending"
-                  label="Pending Rewards"
-                  // render={(value) => (
-                  //   <span>
-                  //     {currencyFormat(Number(value.rps) * 86400)} NEUTRO
-                  //   </span>
-                  // )}
-                />
-                <Table.Column prop="nothing" label="" />
-              </Table>
-            </div>
-            {/* )} */}
-          </Card>
-        </Tabs.Item>
-
-        <Tabs.Item label="LP v1" value="2">
-          <Card className="-mt-3 overflow-x-auto w-full">
-            <div className="flex items-center">
-              <span className="text-2xl font-semibold">LP V1</span>
-            </div>
-          </Card>
-        </Tabs.Item>
-      </Tabs>
+      <div
+        className={classNames(
+          "relative flex flex-col w-full border rounded-lg bg-white dark:bg-neutral-900/75 shadow-lg shadow-slate-200 dark:shadow-black/50 overflow-hidden"
+        )}
+      >
+        <Table>
+          <TableHeader className="border-b">
+            <TableRow className="hover:bg-transparent">
+              <TableHead>Staked spNFT</TableHead>
+              <TableHead>Amount</TableHead>
+              <TableHead className="text-center">Settings</TableHead>
+              <TableHead className="text-center">APR</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {data.map((pool) => (
+              <SpNftModal key={pool.id} data={pool}>
+                <TableRow
+                  className="cursor-pointer group"
+                  // @ts-ignore
+                  type="tr"
+                >
+                  <TableCell>
+                    <div className="flex items-center">
+                      <div className="flex items-center -space-x-2 mr-2">
+                        <img
+                          src={pool.assets.token0.logo}
+                          className={classNames("h-6 rounded-full")}
+                        />
+                        <img
+                          src={pool.assets.token1.logo}
+                          className={classNames("h-6 rounded-full")}
+                        />
+                      </div>
+                      <div>
+                        <div className="flex items-center space-x-1 mr-4">
+                          <p className="font-semibold">
+                            {pool.assets.token0.symbol}
+                          </p>
+                          <p className="font-semibold text-muted-foreground">
+                            /
+                          </p>
+                          <p className="font-semibold">
+                            {pool.assets.token1.symbol}
+                          </p>
+                        </div>
+                        <p className="text-xs text-muted-foreground tracking-wide">
+                          #ID-{pool.tokenId}
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-left font-medium">
+                        {currencyFormat(+pool.amount)}
+                      </span>
+                      <span className="text-left"></span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-center"></TableCell>
+                </TableRow>
+              </SpNftModal>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
+  );
+}
+
+const queryClient = new QueryClient();
+export default function PoolPosition() {
+  const { chain } = useNetwork();
+
+  const factoryClient = new Client({
+    url: urls[DEFAULT_CHAIN_ID].FACTORY_GRAPH_URL,
+    exchanges: [cacheExchange, fetchExchange],
+  });
+
+  const nftClient = new Client({
+    url: urls[DEFAULT_CHAIN_ID].NFT_GRAPH_URL,
+    exchanges: [cacheExchange, fetchExchange],
+  });
+
+  return (
+    <Tabs defaultValue="spnft" className="w-full">
+      <TabsList>
+        <TabsTrigger value="spnft">spNFT</TabsTrigger>
+        <TabsTrigger value="lp">Liquidity V2</TabsTrigger>
+      </TabsList>
+      <TabsContent value="spnft">
+        <Provider value={nftClient}>
+          <QueryClientProvider client={queryClient}>
+            <SPNFTPool />
+          </QueryClientProvider>
+        </Provider>
+      </TabsContent>
+      <TabsContent value="lp"></TabsContent>
+    </Tabs>
   );
 }
 
