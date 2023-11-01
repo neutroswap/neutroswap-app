@@ -74,7 +74,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdc.svg",
       name: "USD Circle",
       address: "0x4ceaC0A4104D29f9d5f97F34B1060A98A5eAf21d",
-      decimal: 18,
+      decimal: 6,
     },
     {
       network_id: "15557",
@@ -90,7 +90,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
       name: "USD Tether",
       address: "0xd61551b3E56343B6D9323444cf398f2fdf23732b",
-      decimal: 18,
+      decimal: 6,
     },
   ],
 };
