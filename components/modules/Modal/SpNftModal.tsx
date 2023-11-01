@@ -52,8 +52,14 @@ import WithdrawFromSpNftModal from "./WithdrawFromSpNftModal";
 import LockSpNftModal from "./LockSpNftModal";
 import BoostSpNftModal from "./BoostSpNftModal";
 import StakeNitroModal from "./StakeNitroModal";
+import { Response as GetNFTPositionResponse } from "@/shared/getters/getNFTPosition";
 
-export default function SpNftModal() {
+type Props = {
+  children: React.ReactNode;
+  data: GetNFTPositionResponse;
+};
+
+export default function SpNftModal(props: Props) {
   const { address } = useAccount();
   const { chain } = useNetwork();
 
