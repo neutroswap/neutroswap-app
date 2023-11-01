@@ -3,14 +3,14 @@ export const dynamic = "force dynamic";
 import { MulticallResults, formatEther, getContract } from "viem";
 import { DEFAULT_CHAIN_ID } from "../types/chain.types";
 import { tokens } from "../statics/tokenList";
-import { Token } from "../types/tokens.types";
+import { Token, Tokenss } from "../types/tokens.types";
 import { Client, cacheExchange, fetchExchange } from "@urql/core";
 import { urls } from "../config/urls";
 // import { getNitroCompatibleLPList } from "../gql/queries/factory";
 import { getSPNFTPositions } from "../gql/queries/nft";
 // import { contracts } from "../config/contracts";
 import { NEUTRO_HELPER_ABI } from "../abi";
-import { readContracts } from "@wagmi/core";
+import { readContracts } from "wagmi/actions";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
@@ -24,8 +24,8 @@ export type Response = {
   lpToken: `0x${string}`;
   tokenId: `0x${string}`;
   assets: {
-    token0: Token;
-    token1: Token;
+    token0: Tokenss;
+    token1: Tokenss;
   };
   lockDuration: string;
   endLockTime: string;
@@ -61,7 +61,7 @@ const factoryClient = new Client({
 });
 
 const nftClient = new Client({
-  url: urls[DEFAULT_CHAIN_ID].NFT_GRAPH_URL,
+  url: "http://13.59.70.85:8000/subgraphs/name/neutroswap-nitro",
   exchanges: [cacheExchange, fetchExchange],
 });
 
@@ -252,10 +252,10 @@ async function getAllAprForSpnft(
             parseFloat(formatEther(nitroPoolApr[1])),
           multiplier: {
             lock: lockMultiplier
-              ? Number(lockMultiplier * BigInt(1)) / 10000
+              ? (Number(lockMultiplier) * Number(BigInt(1))) / 10000
               : 0,
             boost: boostMultiplier
-              ? Number(boostMultiplier * BigInt(1)) / 10000
+              ? (Number(boostMultiplier) * Number(BigInt(1))) / 10000
               : 0,
           },
         },
