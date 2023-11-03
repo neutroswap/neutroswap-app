@@ -22,7 +22,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       symbol: "USDT",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
       name: "USD Tether",
-      address: "0xfA9343C3897324496A05fC75abeD6bAC29f8A40f",
+      address: "0x33B57dC70014FD7AA6e1ed3080eeD2B619632B8e",
       decimal: 6,
     },
     {
@@ -32,14 +32,6 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       name: "USD Circle",
       address: "0x765277EebeCA2e31912C9946eAe1021199B39C61",
       decimal: 6,
-    },
-    {
-      network_id: "17777",
-      symbol: "WETH",
-      logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/weth.svg",
-      name: "Wrapped ETH",
-      address: "0x922D641a426DcFFaeF11680e5358F34d97d112E1",
-      decimal: 18,
     },
     {
       network_id: "17777",

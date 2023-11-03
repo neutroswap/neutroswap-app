@@ -340,9 +340,11 @@ export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
     farm.details.apr = apr.toFixed(2).toString()
   }
 
+  let sortedByAPR = yieldFarm.farms.sort((a: any, b: any) => b.details?.apr - a.details?.apr)
+
   const result: YieldFarm = {
     tvl: yieldFarm.tvl,
-    farms: yieldFarm.farms
+    farms: sortedByAPR
   }
 
   return result
