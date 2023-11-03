@@ -19,7 +19,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
     },
     {
       network_id: "17777",
-      symbol: "USDT",
+      symbol: "USDT (EOS)",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
       name: "USD Tether",
       address: "0x33B57dC70014FD7AA6e1ed3080eeD2B619632B8e",
