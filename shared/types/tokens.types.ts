@@ -1,5 +1,5 @@
 export interface Token {
-  network_id: string;
+  // network_id: string;
   address: `0x${string}`;
   decimal: number;
   name: string;
@@ -35,10 +35,10 @@ export interface Network {
   logo: string;
 }
 
-export interface Tokenss {
-  address: `0x${string}`;
-  decimal: number;
-  name: string;
-  symbol: string;
-  logo: string;
-}
+// export interface Tokenss {
+//   address: `0x${string}`;
+//   decimal: number;
+//   name: string;
+//   symbol: string;
+//   logo: string;
+// }
