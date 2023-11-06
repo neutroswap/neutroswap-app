@@ -7,7 +7,7 @@ import {
 } from "@/components/elements/Form";
 import Input from "@/components/elements/Input";
 import InputGroup from "@/components/elements/InputGroup";
-import { useDebounce } from "@/shared/hooks/useDebounce";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import * as Collapsible from "@radix-ui/react-collapsible";
 import { useState } from "react";
@@ -22,7 +22,7 @@ export default function BoostForm() {
     control: form.control,
     name: "allocateXneutro",
   });
-  const debouncedAllocateXneutro = useDebounce(allocateXneutro, 500);
+  const debouncedAllocateXneutro = useDebounceValue(allocateXneutro, 500);
   return (
     <Form {...form}>
       {/* <form onSubmit={form.handleSubmit(onSubmit)}> */}

@@ -19,14 +19,13 @@ import {
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import { formatEther, parseEther } from "ethers/lib/utils.js";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { formatEther, parseEther } from "viem";
+import { currencyFormat } from "@/shared/utils";
 import { XNEUTRO_ABI } from "@/shared/abi";
-import { useDebounce } from "@/shared/hooks/useDebounce";
 import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
-import { BigNumber } from "ethers";
 import { Slider } from "@/components/elements/Slider";
 import { waitForTransaction } from "@wagmi/core";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 
 const DEFAULT_PERCENTAGE = 50;
 const DAY_PER_PERCENTAGE = 3.3;
@@ -35,10 +34,9 @@ const ONE_DAY_IN_SECONDS = 86400;
 const MIN_REDEEM_RATIO = 50;
 const MAX_REDEEM_RATIO = 100;
 const MIN_REDEEM_DURATION = 1296000;
-const MAX_REDEEM_DURATION = 15552000;
+const MAX_REDEEM_DURATION = 15811200;
 
 export default function RedeemForm() {
-  const { chain } = useNetwork();
   const { address } = useAccount();
 
   const form = useForm();
@@ -52,7 +50,7 @@ export default function RedeemForm() {
     control: form.control,
     name: "redeemXneutroToNeutro",
   });
-  const debouncedRedeemXneutroToNeutro = useDebounce(
+  const debouncedRedeemXneutroToNeutro = useDebounceValue(
     redeemXneutroToNeutro,
     500
   );
@@ -98,7 +96,7 @@ export default function RedeemForm() {
     functionName: "approve",
     args: [
       NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
-      BigNumber.from(
+      BigInt(
         "115792089237316195423570985008687907853269984665640564039457584007913129639935"
       ),
     ],
@@ -156,7 +154,7 @@ export default function RedeemForm() {
             ? `${debouncedRedeemXneutroToNeutro}`
             : "0"
         ),
-        BigNumber.from(Math.floor(neutroRedeemDurationInSeconds)),
+        BigInt(Math.floor(neutroRedeemDurationInSeconds)),
       ],
     });
 

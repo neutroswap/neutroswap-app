@@ -11,7 +11,6 @@ import { useForm, useWatch } from "react-hook-form";
 import InputGroup from "@/components/elements/InputGroup";
 import Button from "@/components/elements/Button";
 import Input from "@/components/elements/Input";
-import { useDebounce } from "@/shared/hooks/useDebounce";
 import {
   useAccount,
   useContractRead,
@@ -20,14 +19,14 @@ import {
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import { formatEther, parseEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther } from "viem";
 import { ERC20_ABI, XNEUTRO_ABI } from "@/shared/abi";
 import {
   NEXT_PUBLIC_NEUTRO_TOKEN_CONTRACT,
   NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
 } from "@/shared/helpers/constants";
-import { BigNumber } from "ethers";
 import { waitForTransaction } from "@wagmi/core";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 
 export default function ConvertForm() {
   const { chain } = useNetwork();
@@ -40,7 +39,7 @@ export default function ConvertForm() {
     name: "convertNeutroToXneutro",
   });
 
-  const debouncedConvertNeutroToXneutro = useDebounce(
+  const debouncedConvertNeutroToXneutro = useDebounceValue(
     convertNeutroToXneutro,
     500
   );
@@ -92,7 +91,7 @@ export default function ConvertForm() {
     functionName: "approve",
     args: [
       NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
-      BigNumber.from(
+      BigInt(
         "115792089237316195423570985008687907853269984665640564039457584007913129639935"
       ),
     ],
