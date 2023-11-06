@@ -19,9 +19,9 @@ import {
 } from "@/shared/helpers/constants";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
 import { useState } from "react";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther } from "viem";
 import { waitForTransaction } from "@wagmi/core";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
 
 const masterData = {
@@ -149,7 +149,7 @@ export default function UserDividends() {
             <div>
               <span className="text-sm text-neutral-500">Total Allocation</span>
               <div className="mt-1 text-sm">
-                {formatEther(data?.[2][0] ?? 0)} xNEUTRO
+                {formatEther(data?.[2][0] ?? BigInt(0))} xNEUTRO
               </div>
             </div>
             <div>
@@ -163,7 +163,7 @@ export default function UserDividends() {
                 Manual Allocation
               </span>
               <div className="mt-1 text-sm">
-                {formatEther(data?.[2][1] ?? 0)} xNEUTRO
+                {formatEther(data?.[2][1] ?? BigInt(0))} xNEUTRO
               </div>
             </div>
             <div>
@@ -171,7 +171,7 @@ export default function UserDividends() {
                 Redeem Allocation
               </span>
               <div className="mt-1 text-sm">
-                {formatEther(data?.[2][2] ?? 0)} xNEUTRO
+                {formatEther(data?.[2][2] ?? BigInt(0))} xNEUTRO
               </div>
             </div>
           </div>

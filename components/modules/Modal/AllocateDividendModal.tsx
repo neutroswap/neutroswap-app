@@ -15,9 +15,8 @@ import {
   NEXT_PUBLIC_DIVIDENDS_CONTRACT,
   NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
 } from "@/shared/helpers/constants";
-import { useDebounce } from "@/shared/hooks/useDebounce";
 import { waitForTransaction } from "@wagmi/core";
-import { formatEther, parseEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther } from "viem";
 import Input from "@/components/elements/Input";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -29,7 +28,7 @@ import {
   usePrepareContractWrite,
 } from "wagmi";
 import Button from "@/components/elements/Button";
-import { BigNumber } from "ethers";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 
 export default function AllocateDividendModal() {
   const { address } = useAccount();
@@ -42,7 +41,7 @@ export default function AllocateDividendModal() {
     control: form.control,
     name: "allocateXneutro",
   });
-  const debouncedAllocateXneutro = useDebounce(allocateXneutro, 500);
+  const debouncedAllocateXneutro = useDebounceValue(allocateXneutro, 500);
 
   //Get xNEUTRO balance & allowance for Dividend Plugin
   const [xneutroBalance, setXneutroBalance] = useState("0");

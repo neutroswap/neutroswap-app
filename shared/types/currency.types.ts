@@ -1,10 +1,8 @@
-import { BigNumber } from "ethers"
-
 export type Currency = {
   /* For tokens with weird decimals like USDC */
-  decimal: number,
+  decimal: number;
   /* Return currency in BigNumber format */
-  raw: BigNumber,
+  raw: bigint;
   /* Display currency in 2 decimal place */
-  formatted: string
-}
+  formatted: string;
+};

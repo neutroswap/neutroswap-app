@@ -3,7 +3,7 @@ export const dynamic = "force dynamic";
 import { MulticallResults, formatEther, getContract } from "viem";
 import { DEFAULT_CHAIN_ID } from "../types/chain.types";
 import { tokens } from "../statics/tokenList";
-import { Token, Tokenss } from "../types/tokens.types";
+import { Token } from "../types/tokens.types";
 import { Client, cacheExchange, fetchExchange } from "@urql/core";
 import { urls } from "../config/urls";
 // import { getNitroCompatibleLPList } from "../gql/queries/factory";
@@ -24,8 +24,8 @@ export type Response = {
   lpToken: `0x${string}`;
   tokenId: `0x${string}`;
   assets: {
-    token0: Tokenss;
-    token1: Tokenss;
+    token0: Token;
+    token1: Token;
   };
   lockDuration: string;
   endLockTime: string;
@@ -102,6 +102,7 @@ export default async function getNFTPosition(
   if (!nitroRes.data) throw new Error("Failed to fetch nitro compatible pool");
 
   const nitroMap = new Map(
+    // nitroRes.data.pairs.map((item) => {
     nitroRes.data.pairs.map((item) => {
       const token0Logo = addressToTokenLogoMap.get(item.token0.id) ?? "";
       const token1Logo = addressToTokenLogoMap.get(item.token1.id) ?? "";
@@ -146,6 +147,7 @@ export default async function getNFTPosition(
           boost: 0,
         },
       };
+      console.log(aprBreakdown);
       if (!nitroCompatibleLPData) return;
       data.push({
         id: nftPool.id as `0x${string}`,

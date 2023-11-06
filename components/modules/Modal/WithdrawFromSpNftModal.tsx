@@ -14,7 +14,7 @@ import {
   ModalOpenButton,
 } from "@/components/elements/Modal";
 import { classNames } from "@/shared/helpers/classNamer";
-import { useDebounce } from "@/shared/hooks/useDebounce";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import { RadioGroup } from "@headlessui/react";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
@@ -34,7 +34,7 @@ export default function WithdrawFromSpNftModal() {
     control: form.control,
     name: "removeFromPosition",
   });
-  const debouncedRemoveFromPosition = useDebounce(removeFromPosition, 500);
+  const debouncedRemoveFromPosition = useDebounceValue(removeFromPosition, 500);
 
   return (
     <Modal>

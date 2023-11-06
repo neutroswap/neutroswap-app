@@ -10,11 +10,10 @@ import {
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import { multicall } from "@wagmi/core";
+
 import { Card, CardContent } from "@/components/elements/Card";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther } from "viem";
 import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
-import { BigNumber } from "ethers";
 
 export default function VestingXneutro() {
   const { address } = useAccount();
@@ -41,7 +40,7 @@ export default function VestingXneutro() {
     for (let i = 0; i < lengthNumber; i++) {
       arr.push({
         ...xneutroContract,
-        args: [address!, BigNumber.from(i)],
+        args: [address!, BigInt(i)],
       });
     }
     return arr;
@@ -129,13 +128,11 @@ export default function VestingXneutro() {
   );
 }
 const PendingRedeem = ({ data }: { data: any }) => {
-  const { chain } = useNetwork();
-  // console.log("data ", data);
   const { config: cancelRedeemConfig } = usePrepareContractWrite({
     address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x{string}`,
     abi: XNEUTRO_ABI,
     functionName: "cancelRedeem",
-    args: [BigNumber.from(data.index)],
+    args: [BigInt(data.index)],
   });
 
   const { write: cancelRedeem, isLoading: isLoadingCancelRedeem } =
@@ -181,7 +178,7 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
     address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x{string}`,
     abi: XNEUTRO_ABI,
     functionName: "finalizeRedeem",
-    args: [BigNumber.from(data.index)],
+    args: [BigInt(data.index)],
   });
 
   const { write: finalizeRedeem, isLoading: isLoadingFinalizeRedeem } =

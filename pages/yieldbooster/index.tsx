@@ -7,7 +7,7 @@ import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 import WarningLogo from "@/public/logo/warning.svg";
 import { Table, Toggle, Spacer, Select } from "@geist-ui/core";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { currencyFormat } from "@/shared/utils";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -23,7 +23,7 @@ import {
   NEXT_PUBLIC_YIELDBOOSTER_CONTRACT,
 } from "@/shared/helpers/constants";
 import { NEUTRO_HELPER_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther } from "viem";
 // const inter = Inter({ subsets: ['latin'] })
 
 export default function Dividend() {

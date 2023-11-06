@@ -17,11 +17,10 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import {
   useAccount,
-  useContract,
   useContractRead,
   useContractWrite,
   useNetwork,
@@ -42,6 +41,8 @@ import {
 } from "@/shared/types/chain.types";
 
 import PoolIcon from "@/public/icons/pool.svg";
+import { waitForTransaction } from "@wagmi/core";
+import { decodeAbiParameters, parseAbiParameters } from "viem";
 
 type PositionsResponse = {
   network_id: string;
@@ -256,11 +257,14 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
   });
   const { isLoading: isCreatingPair, write: createPair } = useContractWrite({
     ...createPairConfig,
-    address: token1.address,
+    // address: token1.address,
     onSuccess: async (result) => {
-      const tx = await result.wait();
-      const decodedResult = ethers.utils.defaultAbiCoder.decode(
-        ["address", "uint256"],
+      const tx = await waitForTransaction({
+        hash: result.hash,
+        confirmations: 8,
+      });
+      const decodedResult = decodeAbiParameters(
+        parseAbiParameters("address , uint256"),
         tx.logs[0].data
       );
       router.push(`/pool/${decodedResult[0]}`);

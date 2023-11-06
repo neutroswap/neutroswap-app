@@ -14,7 +14,6 @@ import {
   ModalOpenButton,
 } from "@/components/elements/Modal";
 import { classNames } from "@/shared/helpers/classNamer";
-import { useDebounce } from "@/shared/hooks/useDebounce";
 import { Tab } from "@headlessui/react";
 import { ChevronDownIcon, RocketLaunchIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
@@ -22,6 +21,7 @@ import { Fragment, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import BoostForm from "../Form/BoostForm";
 import UnboostForm from "../Form/UnboostForm";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 
 export default function BoostSpNftModal() {
   const [openBoost, setOpenBoost] = useState<boolean>(false);
@@ -33,7 +33,7 @@ export default function BoostSpNftModal() {
     control: form.control,
     name: "allocateXneutro",
   });
-  const debouncedAllocateXneutro = useDebounce(allocateXneutro, 500);
+  const debouncedAllocateXneutro = useDebounceValue(allocateXneutro, 500);
 
   return (
     <>

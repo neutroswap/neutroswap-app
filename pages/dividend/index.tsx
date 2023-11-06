@@ -11,8 +11,8 @@ import {
   NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
 } from "@/shared/helpers/constants";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI } from "@/shared/abi";
-import { formatEther, formatUnits } from "ethers/lib/utils.js";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { formatEther, formatUnits } from "viem";
+import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
 import UserDividends from "./modules/UserDividends";
 
@@ -81,12 +81,12 @@ export default function Dividend() {
       } as const,
     ],
   });
-  const totalCurrentEpoch = data?.[4][0]?.currentDistributionAmountInUsd.sub(
-    data?.[4][1]?.currentDistributionAmountInUsd
-  );
+  const totalCurrentEpoch =
+    BigInt(data?.[4][0]?.currentDistributionAmountInUsd ?? 0) +
+    BigInt(data?.[4][1]?.currentDistributionAmountInUsd ?? 0);
 
-  const totalAllocation = formatEther(data?.[0] ?? 0);
-  const deallocationFee = formatEther(data?.[1] ?? 0);
+  const totalAllocation = formatEther(data?.[0] ?? BigInt(0));
+  const deallocationFee = formatEther(data?.[1] ?? BigInt(0));
 
   //countdown utils
   const protocolEarningsTime = Math.floor(Number(data?.[2]));

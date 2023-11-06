@@ -20,7 +20,7 @@ import {
   midnightTheme,
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit";
-import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
 // import {arbitrum} from 'wagmi/chains'
 import Footer from "@/components/modules/Footer";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
@@ -35,6 +35,7 @@ import {
   NEXT_PUBLIC_RPC,
 } from "@/shared/helpers/constants";
 import { usePrefersColorScheme } from "@/shared/hooks/usePreferColorScheme";
+import { create } from "lodash";
 
 dayjs.extend(relativeTime);
 
@@ -74,7 +75,7 @@ const eosChain: any = {
   },
 };
 
-const { chains, provider } = configureChains(
+const { chains, publicClient } = configureChains(
   [eosChain],
   [
     jsonRpcProvider({
@@ -85,13 +86,14 @@ const { chains, provider } = configureChains(
 
 const { connectors } = getDefaultWallets({
   appName: "Neutroswap",
+  projectId: "7ae5586a4ce03c8281f3c346214fa7b1",
   chains,
 });
 
-const wagmiClient = createClient({
+const wagmiClient = createConfig({
   autoConnect: true,
   connectors,
-  provider,
+  publicClient,
 });
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -132,7 +134,7 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     // <GeistProvider themes={[myTheme1]} themeType={'coolTheme'}>
-    <WagmiConfig client={wagmiClient}>
+    <WagmiConfig config={wagmiClient}>
       <RainbowKitProvider
         chains={chains}
         theme={themeType === "ndark" ? midnightTheme() : lightTheme()}

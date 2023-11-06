@@ -20,7 +20,7 @@ import {
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther } from "viem";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { DIVIDENDS_ABI, XNEUTRO_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
 import {
@@ -62,12 +62,12 @@ export default function Xneutro() {
 
   const redeemingAmount = useMemo(() => {
     if (!xneutroBalance) return "0";
-    return `${Number(formatEther(xneutroBalance.redeemingAmount)).toFixed(2)}`;
+    return `${Number(formatEther(xneutroBalance[1])).toFixed(2)}`;
   }, [xneutroBalance]);
 
   const allocatedAmount = useMemo(() => {
     if (!xneutroBalance) return "0";
-    return `${Number(formatEther(xneutroBalance.allocatedAmount)).toFixed(2)}`;
+    return `${Number(formatEther(xneutroBalance[0])).toFixed(2)}`;
   }, [xneutroBalance]);
 
   const totalXneutro = useMemo(() => {

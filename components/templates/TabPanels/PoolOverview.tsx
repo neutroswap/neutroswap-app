@@ -3,29 +3,41 @@ import { ScaleIcon } from "@heroicons/react/24/solid";
 import { useRouter } from "next/router";
 import { useMemo, useState } from "react";
 
-import NoContentDark from "@/public/states/empty/dark.svg"
-import NoContentLight from "@/public/states/empty/light.svg"
+import NoContentDark from "@/public/states/empty/dark.svg";
+import NoContentLight from "@/public/states/empty/light.svg";
 import { Token } from "@/shared/types/tokens.types";
 import { classNames } from "@/shared/helpers/classNamer";
 import { BigNumber } from "ethers";
 import { Currency } from "@/shared/types/currency.types";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
-import { formatEther, getAddress } from "ethers/lib/utils.js";
+import { formatEther, getAddress } from "viem";
+
 import { tokens } from "@/shared/statics/tokenList";
 import { useNetwork } from "wagmi";
-import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
+import {
+  DEFAULT_CHAIN_ID,
+  supportedChainID,
+  SupportedChainID,
+} from "@/shared/types/chain.types";
 
 type PoolOverviewPanelProps = {
-  token0: Token,
-  token1: Token,
-  priceRatio: [number, number],
-  totalLPSupply: BigNumber,
-  userLPBalance: Currency,
-  poolBalances: Currency[],
+  token0: Token;
+  token1: Token;
+  priceRatio: [number, number];
+  totalLPSupply: bigint;
+  userLPBalance: Currency;
+  poolBalances: Currency[];
 };
 
 const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
-  const { priceRatio, token0, token1, totalLPSupply, userLPBalance, poolBalances } = props;
+  const {
+    priceRatio,
+    token0,
+    token1,
+    totalLPSupply,
+    userLPBalance,
+    poolBalances,
+  } = props;
 
   const router = useRouter();
   const theme = useTheme();
@@ -36,8 +48,9 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
   // TODO: MOVE THIS HOOKS
   const nativeToken = useMemo(() => {
     if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
-    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID][0];
-    return tokens[chain.id.toString() as SupportedChainID][0]
+    if (!supportedChainID.includes(chain.id.toString() as any))
+      return tokens[DEFAULT_CHAIN_ID][0];
+    return tokens[chain.id.toString() as SupportedChainID][0];
   }, [chain]);
 
   return (
@@ -46,7 +59,9 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
         <ScaleIcon className="w-5 h-5 rounded-lg border border-neutral-300 dark:border-neutral-700 p-1.5" />
         <p className="m-0 text-2xl font-semibold">Pool Overview</p>
       </div>
-      <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p>
+      <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">
+        Contract: {router.query.id}
+      </p>
 
       <div
         onClick={() => setIsPriceFlipped((prev) => !prev)}
@@ -58,27 +73,46 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
         {!isPriceFlipped && (
           <>
             <span className="text-sm font-semibold">1 {token0.symbol}</span>
-            <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500">=</span>
-            <span className="text-sm font-semibold">{priceRatio[1].toFixed(5)} {token1.symbol}</span>
+            <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500">
+              =
+            </span>
+            <span className="text-sm font-semibold">
+              {priceRatio[1].toFixed(5)} {token1.symbol}
+            </span>
           </>
         )}
         {isPriceFlipped && (
           <>
             <span className="text-sm font-semibold">1 {token1.symbol}</span>
-            <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500">=</span>
-            <span className="text-sm font-semibold">{priceRatio[0].toFixed(5)} {token0.symbol}</span>
+            <span className="text-sm font-semibold text-neutral-400 dark:text-neutral-500">
+              =
+            </span>
+            <span className="text-sm font-semibold">
+              {priceRatio[0].toFixed(5)} {token0.symbol}
+            </span>
           </>
         )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg px-4 py-6 box-border">
-          <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">Owned LP</p>
-          <p className="m-0 text-2xl font-semibold">{(+formatEther(userLPBalance.raw)).toFixed(8)} NLP</p>
+          <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">
+            Owned LP
+          </p>
+          <p className="m-0 text-2xl font-semibold">
+            {(+formatEther(userLPBalance.raw)).toFixed(8)} NLP
+          </p>
         </div>
         <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg px-4 py-6 box-border">
-          <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">Pool Shares</p>
-          <p className="m-0 text-2xl font-semibold">{(+formatEther(userLPBalance.raw) / +formatEther(totalLPSupply)).toFixed(6)}%</p>
+          <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">
+            Pool Shares
+          </p>
+          <p className="m-0 text-2xl font-semibold">
+            {(
+              +formatEther(userLPBalance.raw) / +formatEther(totalLPSupply)
+            ).toFixed(6)}
+            %
+          </p>
         </div>
       </div>
 
@@ -89,7 +123,9 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
             <div className="space-y-3 mt-4">
               <div className="flex space-x-4 items-center">
                 <div className="flex items-center px-2 py-1 bg-orange-300/20 rounded-lg">
-                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">50%</span>
+                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">
+                    50%
+                  </span>
                 </div>
                 <div className="flex space-x-2 items-center">
                   <img
@@ -100,23 +136,33 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
                       handleImageFallback(token0.symbol, e);
                     }}
                   />
-                  <p className="m-0 font-medium text-sm">{poolBalances[0].formatted} {token0.symbol}</p>
+                  <p className="m-0 font-medium text-sm">
+                    {poolBalances[0].formatted} {token0.symbol}
+                  </p>
                 </div>
               </div>
               <div className="flex space-x-4 items-center">
                 <div className="flex items-center px-2 py-1 bg-orange-300/20 rounded-lg">
-                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">50%</span>
+                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">
+                    50%
+                  </span>
                 </div>
                 <div className="flex space-x-2 items-center">
                   <img
                     alt={`${token1.symbol} Icon`}
-                    src={token1.address === nativeToken.address ? nativeToken.logo : token1.logo}
+                    src={
+                      token1.address === nativeToken.address
+                        ? nativeToken.logo
+                        : token1.logo
+                    }
                     className="h-5 rounded-full"
                     onError={(e) => {
                       handleImageFallback(token1.symbol, e);
                     }}
                   />
-                  <p className="m-0 font-medium text-sm">{poolBalances[1].formatted} {token1.symbol}</p>
+                  <p className="m-0 font-medium text-sm">
+                    {poolBalances[1].formatted} {token1.symbol}
+                  </p>
                 </div>
               </div>
             </div>
@@ -133,7 +179,7 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
       {/*   </div> */}
       {/* </div> */}
     </div>
-  )
-}
+  );
+};
 
 export default PoolOverviewPanel;

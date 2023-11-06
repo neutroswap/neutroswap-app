@@ -14,7 +14,7 @@ import { XNEUTRO_ABI } from "@/shared/abi";
 import { NEXT_PUBLIC_DIVIDENDS_CONTRACT } from "@/shared/helpers/constants";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { waitForTransaction } from "@wagmi/core";
-import { formatEther, parseEther } from "ethers/lib/utils.js";
+import { formatEther, parseEther } from "viem";
 import Input from "@/components/elements/Input";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -27,7 +27,6 @@ import {
   useNetwork,
 } from "wagmi";
 import Button from "@/components/elements/Button";
-import { BigNumber } from "ethers";
 import CirclePlus from "@/public/logo/pluscircle.svg";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import TokenDefault from "@/public/tokens_default.svg";

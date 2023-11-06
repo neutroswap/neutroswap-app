@@ -10,7 +10,7 @@ import Input from "@/components/elements/Input";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { TableColumnRender } from "@geist-ui/core/esm/table";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import { currencyFormat } from "@/shared/utils";
 import NewPositionModal from "@/components/modules/Modal/NewPositionModal";
 import ImportTokenModal from "@/components/modules/Modal/ImportTokenModal";
 import SpNftModal from "@/components/modules/Modal/SpNftModal";
@@ -63,6 +63,8 @@ import {
   TableRow,
 } from "@/components/elements/Table";
 import { Response } from "@/shared/getters/getNFTPosition";
+import { waitForTransaction } from "@wagmi/core";
+import { decodeAbiParameters, parseAbiParameters } from "viem";
 
 // export default function Positions() {
 //   const { address } = useAccount();
@@ -509,11 +511,13 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
   });
   const { isLoading: isCreatingPair, write: createPair } = useContractWrite({
     ...createPairConfig,
-    address: token1.address,
     onSuccess: async (result) => {
-      const tx = await result.wait();
-      const decodedResult = ethers.utils.defaultAbiCoder.decode(
-        ["address", "uint256"],
+      const tx = await waitForTransaction({
+        hash: result.hash,
+        confirmations: 8,
+      });
+      const decodedResult = decodeAbiParameters(
+        parseAbiParameters("address, uint256"),
         tx.logs[0].data
       );
       router.push(`/pool/${decodedResult[0]}`);

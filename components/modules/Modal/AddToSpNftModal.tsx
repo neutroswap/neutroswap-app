@@ -14,16 +14,17 @@ import {
   ModalOpenButton,
 } from "@/components/elements/Modal";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
-import { useDebounce } from "@/shared/hooks/useDebounce";
+
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import * as Collapsible from "@radix-ui/react-collapsible";
-import { formatEther } from "ethers/lib/utils.js";
+import { formatEther } from "viem";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { useAccount, useContractRead } from "wagmi";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 
 export default function AddToSpNftModal() {
   const { address } = useAccount();
@@ -37,7 +38,7 @@ export default function AddToSpNftModal() {
     control: form.control,
     name: "addToPosition",
   });
-  const debouncedAddToPosition = useDebounce(addToPosition, 500);
+  const debouncedAddToPosition = useDebounceValue(addToPosition, 500);
 
   //Get LP Token balance & allowance
   // const [lpTokenBalance, setLpTokenBalance] = useState("0");
