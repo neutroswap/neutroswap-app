@@ -1,4 +1,4 @@
-import { eos, eosTestnet } from "@wagmi/chains";
+import { eos, eosTestnet } from "@wagmi/core/chains";
 
 export const customEosTestnet = {
   ...eosTestnet,
