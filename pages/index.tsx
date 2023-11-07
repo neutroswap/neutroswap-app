@@ -25,7 +25,7 @@ import {
   useAccount,
   useContractReads,
   useNetwork,
-  useSigner,
+  useWalletClient,
   useBalance,
 } from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI, NEUTRO_POOL_ABI } from "@/shared/abi";
@@ -33,7 +33,7 @@ import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
 import debounce from "lodash/debounce";
-import { formatUnits } from "ethers/lib/utils.js";
+import { formatUnits } from "viem";
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import {
@@ -84,17 +84,17 @@ export default function Home() {
 
   const [balance0, setBalance0] = useState<Currency>({
     decimal: 18,
-    raw: BigNumber.from(0),
+    raw: BigInt(0),
     formatted: "0.00",
   });
   const [balance1, setBalance1] = useState<Currency>({
     decimal: 18,
-    raw: BigNumber.from(0),
+    raw: BigInt(0),
     formatted: "0.00",
   });
   const [eosBalance, setEosBalance] = useState<Currency>({
     decimal: 18,
-    raw: BigNumber.from(0),
+    raw: BigInt(0),
     formatted: "0.00",
   });
   const [tokenName0, setTokenName0] = useState("");
@@ -168,16 +168,16 @@ export default function Home() {
       const [token0Balance, token0Symbol, token0Decimals] = value;
       if (!token0Balance || !token0Symbol || !token0Decimals) return;
       setBalance0({
-        decimal: token0Decimals.toNumber(),
-        raw: token0Balance,
+        decimal: Number(token0Decimals),
+        raw: token0Balance.result as bigint,
         formatted: parseFloat(
           formatUnits(
-            token0Balance.toString(),
-            token0Decimals.toNumber()
+            BigInt(Number(token0Balance.result)),
+            Number(token0Decimals.result)
           ).toString()
         ).toFixed(3),
       });
-      setTokenName0(token0Symbol);
+      // setTokenName0(token0Symbol);
     },
   });
 
@@ -203,16 +203,16 @@ export default function Home() {
       const [token1Balance, token1Symbol, token1Decimals] = value;
       if (!token1Balance || !token1Symbol || !token1Decimals) return;
       setBalance1({
-        decimal: token1Decimals.toNumber(),
-        raw: token1Balance,
+        decimal: Number(token1Decimals),
+        raw: token1Balance.result as bigint,
         formatted: parseFloat(
           formatUnits(
-            token1Balance.toString(),
-            token1Decimals.toNumber()
+            BigInt(Number(token1Balance)),
+            Number(token1Decimals.result)
           ).toString()
         ).toFixed(3),
       });
-      setTokenName1(token1Symbol);
+      // setTokenName1(token1Symbol);
     },
   });
 
@@ -226,9 +226,9 @@ export default function Home() {
       token0 && token1 && pairs !== "0x0000000000000000000000000000000000000000"
     ),
     contracts: [
-      { ...poolContract, functionName: "token0" },
-      { ...poolContract, functionName: "token1" },
-      { ...poolContract, functionName: "getReserves" },
+      { ...poolContract, functionName: "token0" } as const,
+      { ...poolContract, functionName: "token1" } as const,
+      { ...poolContract, functionName: "getReserves" } as const,
     ],
     onSuccess(response) {
       const [t0, t1, reserves] = response;
@@ -273,7 +273,7 @@ export default function Home() {
     };
   }, [uniswapPair]);
 
-  const { data: signer } = useSigner({
+  const { data: signer } = useWalletClient({
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
   });
 
@@ -355,10 +355,14 @@ export default function Home() {
     if (!signer) throw new Error("No signer");
 
     if (tradeContext.approvalTransaction) {
-      const approved = await signer.sendTransaction(
-        tradeContext.approvalTransaction
-      );
-      await approved.wait();
+      // const approved = await signer.sendTransaction(
+      //   tradeContext.approvalTransaction
+      // );
+      const approved = await signer.sendTransaction({
+        to: tradeContext.approvalTransaction.to as `0x${string}`,
+        data: tradeContext.approvalTransaction.data as `0x${string}`,
+        value: BigInt(tradeContext.approvalTransaction.value),
+      });
       setIsLoading(false);
       setIsApproved(true);
     }
@@ -370,11 +374,12 @@ export default function Home() {
     if (!signer) throw new Error("No signer");
 
     try {
-      const tradeTransaction = await signer.sendTransaction(
-        tradeContext.transaction
-      );
-      const tradeReceipt = await tradeTransaction.wait();
-      setTxHash(tradeReceipt.transactionHash);
+      const tradeReceipt = await signer.sendTransaction({
+        to: tradeContext.transaction.to as `0x${string}`,
+        data: tradeContext.transaction.data as `0x${string}`,
+        value: BigInt(tradeContext.transaction.value),
+      });
+      setTxHash(tradeReceipt);
       setIsLoading(false);
       tradeContext.destroy();
     } catch (error) {

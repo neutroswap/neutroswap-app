@@ -10,7 +10,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
   // NOTE: EOS Mainnet
   "17777": [
     {
-      network_id: "17777",
+      // network_id: "17777",
       symbol: "EOS",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
       name: "EOS",
@@ -18,7 +18,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 18,
     },
     {
-      network_id: "17777",
+      // network_id: "17777",
       symbol: "USDT",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
       name: "USD Tether",
@@ -26,7 +26,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 6,
     },
     {
-      network_id: "17777",
+      // network_id: "17777",
       symbol: "USDC",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdc.svg",
       name: "USD Circle",
@@ -34,7 +34,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 6,
     },
     {
-      network_id: "17777",
+      // network_id: "17777",
       symbol: "WETH",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/weth.svg",
       name: "Wrapped ETH",
@@ -42,7 +42,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 18,
     },
     {
-      network_id: "17777",
+      // network_id: "17777",
       symbol: "WBTC",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/wbtc.svg",
       name: "Wrapped BTC",
@@ -50,7 +50,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 18,
     },
     {
-      network_id: "17777",
+      // network_id: "17777",
       symbol: "NEUTRO",
       logo: "/logo/neutro_token.svg",
       name: "Neutroswap Token",
@@ -61,7 +61,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
   // NOTE: EOS Testnet
   "15557": [
     {
-      network_id: "15557",
+      // network_id: "15557",
       symbol: "EOS",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
       name: "EOS",
@@ -69,7 +69,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 18,
     },
     {
-      network_id: "15557",
+      // network_id: "15557",
       symbol: "USDC",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdc.svg",
       name: "USD Circle",
@@ -77,7 +77,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 6,
     },
     {
-      network_id: "15557",
+      // network_id: "15557",
       symbol: "NEUTRO",
       logo: "/logo/neutro_token.svg",
       name: "Neutroswap Token",
@@ -85,7 +85,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       decimal: 18,
     },
     {
-      network_id: "15557",
+      // network_id: "15557",
       symbol: "USDT",
       logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
       name: "USD Tether",

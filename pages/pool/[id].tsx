@@ -6,10 +6,9 @@ import { classNames } from "@/shared/helpers/classNamer";
 import { ChevronLeftIcon } from "@heroicons/react/20/solid";
 
 import { Token } from "@/shared/types/tokens.types";
-import { formatEther, formatUnits } from "ethers/lib/utils.js";
+import { formatEther, formatUnits } from "viem";
 import { useAccount, useContractRead, useContractReads } from "wagmi";
 import { ERC20_ABI, NEUTRO_POOL_ABI } from "@/shared/abi";
-
 import PoolDepositPanel from "@/components/templates/TabPanels/PoolDeposit";
 import PoolOverviewPanel from "@/components/templates/TabPanels/PoolOverview";
 import PoolWithdrawalPanel from "@/components/templates/TabPanels/PoolWithdrawal";
@@ -26,7 +25,7 @@ export default function PoolDetails() {
     abi: NEUTRO_POOL_ABI,
   };
 
-  const [selectedIndex, setSelectedIndex] = useState(0)
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const [isNewPool, setIsNewPool] = useState<boolean>(false);
   const [priceRatio, setPriceRatio] = useState<[number, number]>([0, 0]);
   const [token0, setToken0] = useState<Token>();
@@ -34,33 +33,33 @@ export default function PoolDetails() {
   const [balances, setBalances] = useState<Currency[]>([
     {
       decimal: 18,
-      raw: BigNumber.from(0),
+      raw: BigInt(0),
       formatted: "0.00",
     },
     {
       decimal: 18,
-      raw: BigNumber.from(0),
+      raw: BigInt(0),
       formatted: "0.00",
     },
   ]);
-  const [totalLPSupply, setTotalLPSupply] = useState<BigNumber>(BigNumber.from(0));
+  const [totalLPSupply, setTotalLPSupply] = useState<bigint>(BigInt(0));
   const [userLPBalance, setUserLPBalance] = useState<Currency>({
     decimal: 18,
-    raw: BigNumber.from(0),
-    formatted: "0.00"
-  })
+    raw: BigInt(0),
+    formatted: "0.00",
+  });
   const [poolBalances, setPoolBalances] = useState<Currency[]>([
     {
       decimal: 18,
-      raw: BigNumber.from(0),
-      formatted: "0.00"
+      raw: BigInt(0),
+      formatted: "0.00",
     },
     {
       decimal: 18,
-      raw: BigNumber.from(0),
-      formatted: "0.00"
-    }
-  ])
+      raw: BigInt(0),
+      formatted: "0.00",
+    },
+  ]);
 
   const { data: pairs } = useContractReads({
     contracts: [
@@ -75,17 +74,19 @@ export default function PoolDetails() {
     abi: NEUTRO_POOL_ABI,
     functionName: "getReserves",
     onSuccess(response) {
-      if (response._reserve0.isZero() && response._reserve1.isZero()) {
+      if (response[0] !== BigInt(0) && response[1] !== BigInt(0)) {
         setIsNewPool(true);
         setSelectedIndex(1);
         return setPriceRatio([0, 0]);
-      };
+      }
       setIsNewPool(false);
       setPriceRatio([
-        +formatUnits(response._reserve0, token0?.decimal) / +formatUnits(response._reserve1, token1?.decimal), // amount0 * ratio0 = quote1
-        +formatUnits(response._reserve1, token1?.decimal) / +formatUnits(response._reserve0, token0?.decimal) // amount1 * ratio1 = quote0
-      ])
-    }
+        +formatUnits(response[0], Number(token0?.decimal)) /
+          +formatUnits(response[1], Number(token1?.decimal)), // amount0 * ratio0 = quote1
+        +formatUnits(response[1], Number(token1?.decimal)) /
+          +formatUnits(response[0], Number(token0?.decimal)), // amount1 * ratio1 = quote0
+      ]);
+    },
   });
 
   const { refetch: refetchUserBalances } = useContractReads({
@@ -111,34 +112,49 @@ export default function PoolDetails() {
       { address: pairs?.[1], abi: ERC20_ABI, functionName: "decimals" },
     ],
     onSuccess(value) {
-      const [balance0, balance1, name0, name1, symbol0, symbol1, decimal0, decimal1] = value;
+      const [
+        balance0,
+        balance1,
+        name0,
+        name1,
+        symbol0,
+        symbol1,
+        decimal0,
+        decimal1,
+      ] = value;
+      if (isNaN(Number(balance0.result))) return;
+      if (isNaN(Number(balance1.result))) return;
       setBalances([
         {
-          decimal: +formatUnits(balance0, decimal0),
-          raw: balance0,
-          formatted: Number(formatUnits(balance0, decimal0)).toFixed(2),
+          decimal: Number(balance0.result),
+          raw: balance0.result as bigint,
+          formatted: parseFloat(
+            formatUnits(BigInt(Number(balance0)), Number(decimal0))
+          ).toFixed(2),
         },
         {
-          decimal: +formatUnits(balance1, decimal1),
-          raw: balance1,
-          formatted: Number(formatUnits(balance1, decimal1)).toFixed(2),
+          decimal: Number(balance1.result),
+          raw: balance1.result as bigint,
+          formatted: parseFloat(
+            formatUnits(BigInt(Number(balance1)), Number(decimal1))
+          ).toFixed(2),
         },
       ]);
       setToken0({
-        network_id: "15557",
+        // network_id: "15557",
         name: name0,
         address: pairs?.[0]!,
         symbol: symbol0,
         logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol0.toLowerCase()}.svg`,
-        decimal: decimal0.toNumber(),
+        decimal: Number(decimal0),
       });
       setToken1({
-        network_id: "15557",
+        // network_id: "15557",
         address: pairs?.[1]!,
         name: name1,
         symbol: symbol1,
         logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol1.toLowerCase()}.svg`,
-        decimal: decimal1.toNumber(),
+        decimal: Number(decimal1),
       });
     },
   });
@@ -149,106 +165,125 @@ export default function PoolDetails() {
       {
         address: router.query.id as `0x${string}`,
         abi: NEUTRO_POOL_ABI,
-        functionName: 'balanceOf',
+        functionName: "balanceOf",
         args: [address!],
       },
       {
         address: router.query.id as `0x${string}`,
         abi: NEUTRO_POOL_ABI,
-        functionName: 'totalSupply',
+        functionName: "totalSupply",
       },
       {
         address: token0?.address,
         abi: ERC20_ABI,
-        functionName: 'balanceOf',
-        args: [router.query.id as `0x${string}`]
+        functionName: "balanceOf",
+        args: [router.query.id as `0x${string}`],
       },
       {
         address: token1?.address,
         abi: ERC20_ABI,
-        functionName: 'balanceOf',
-        args: [router.query.id as `0x${string}`]
+        functionName: "balanceOf",
+        args: [router.query.id as `0x${string}`],
       },
       {
         address: token0?.address,
         abi: ERC20_ABI,
-        functionName: 'decimals',
+        functionName: "decimals",
       },
       {
         address: token1?.address,
         abi: ERC20_ABI,
-        functionName: 'decimals',
+        functionName: "decimals",
       },
     ],
     onSuccess: (value) => {
       setUserLPBalance({
         decimal: 18,
-        raw: value[0],
-        formatted: Number(formatEther(value[0])).toFixed(2)
-      })
-      setTotalLPSupply(value[1])
+        raw: value[0].result as bigint,
+        formatted: Number(formatEther(value[0])).toFixed(2),
+      });
+      setTotalLPSupply(value[1]);
       setPoolBalances([
         {
-          decimal: value[4].toNumber(),
-          raw: value[2],
-          formatted: Number(
-            formatUnits(value[2], value[4].toNumber())
-          ).toFixed(2)
+          decimal: Number(value[4]),
+          raw: value[2].result as bigint,
+          formatted: parseFloat(
+            formatUnits(BigInt(Number(value[2])), Number(value[4]))
+          ).toFixed(2),
         },
         {
-          decimal: value[5].toNumber(),
-          raw: value[3],
-          formatted: Number(
-            formatUnits(value[3], value[5].toNumber())
-          ).toFixed(2)
-        }
-      ])
-    }
-  })
+          decimal: Number(value[5]),
+          raw: value[3].result as bigint,
+          formatted: parseFloat(
+            formatUnits(BigInt(Number(value[3])), Number(value[5]))
+          ).toFixed(2),
+        },
+      ]);
+    },
+  });
 
   return (
     <div className="flex py-16">
       <Tab.Group selectedIndex={selectedIndex} onChange={setSelectedIndex}>
         <div className="w-full grid grid-cols-1 md:grid-cols-12 gap-10 sm:gap-14">
-          <Tab.List className={classNames(
-            "w-full md:col-span-2 rounded-lg p-0.5",
-            "bg-neutral-100 dark:bg-neutral-900/50 md:bg-transparent md:dark:bg-transparent",
-          )}>
-            <Link href="/pool" className="hidden md:block group text-black dark:text-white mb-6">
+          <Tab.List
+            className={classNames(
+              "w-full md:col-span-2 rounded-lg p-0.5",
+              "bg-neutral-100 dark:bg-neutral-900/50 md:bg-transparent md:dark:bg-transparent"
+            )}
+          >
+            <Link
+              href="/pool"
+              className="hidden md:block group text-black dark:text-white mb-6"
+            >
               <div className="flex space-x-1 items-center">
                 <ChevronLeftIcon className="w-5 h-5 group-hover:-translate-x-0.5 transition-all" />
                 <span>Pool</span>
               </div>
             </Link>
             <div className="flex flex-row md:flex-col gap-y-2">
-              <Tab disabled={isNewPool} className={({ selected }) => classNames(
-                selected && "bg-white dark:bg-neutral-900 shadow-sm",
-                selected && "!text-neutral-900 dark:!text-neutral-300 font-medium",
-                "flex w-full rounded-lg text-neutral-500",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
+              <Tab
+                disabled={isNewPool}
+                className={({ selected }) =>
+                  classNames(
+                    selected && "bg-white dark:bg-neutral-900 shadow-sm",
+                    selected &&
+                      "!text-neutral-900 dark:!text-neutral-300 font-medium",
+                    "flex w-full rounded-lg text-neutral-500",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )
+                }
               >
                 <span className="text-sm w-full text-center md:text-left px-3 py-2">
                   Overview
                 </span>
               </Tab>
-              <Tab className={({ selected }) => classNames(
-                selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                selected && "!text-neutral-900 dark:!text-neutral-300 font-medium",
-                "flex w-full rounded-lg text-neutral-500",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
+              <Tab
+                className={({ selected }) =>
+                  classNames(
+                    selected && "bg-neutral-200/50 dark:bg-neutral-900",
+                    selected &&
+                      "!text-neutral-900 dark:!text-neutral-300 font-medium",
+                    "flex w-full rounded-lg text-neutral-500",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )
+                }
               >
                 <span className="text-sm w-full text-center md:text-left px-3 py-2">
                   Deposit
                 </span>
               </Tab>
-              <Tab disabled={isNewPool} className={({ selected }) => classNames(
-                selected && "bg-neutral-200/50 dark:bg-neutral-900",
-                selected && "!text-neutral-900 dark:!text-neutral-300 font-medium",
-                "flex w-full rounded-lg text-neutral-500",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
-              )}
+              <Tab
+                disabled={isNewPool}
+                className={({ selected }) =>
+                  classNames(
+                    selected && "bg-neutral-200/50 dark:bg-neutral-900",
+                    selected &&
+                      "!text-neutral-900 dark:!text-neutral-300 font-medium",
+                    "flex w-full rounded-lg text-neutral-500",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )
+                }
               >
                 <span className="text-sm w-full text-center md:text-left px-3 py-2">
                   Withdraw

@@ -2,17 +2,15 @@ import { ERC20_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatUnits, parseUnits } from "ethers/lib/utils.js";
+import { formatUnits, parseUnits } from "viem";
 import { ChangeEvent, useMemo, useState } from "react";
 import {
   useAccount,
   useBalance,
-  useContract,
   useContractReads,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
-  useSigner,
 } from "wagmi";
 import debounce from "lodash/debounce";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
@@ -20,8 +18,8 @@ import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
 import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
-import NativeTokenPicker from "@/components/modules/Swap/NativeTokenPicker";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
+import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
+import { currencyFormat } from "@/shared/utils";
 import { tokens } from "@/shared/statics/tokenList";
 import {
   DEFAULT_CHAIN_ID,
@@ -29,11 +27,16 @@ import {
   SupportedChainID,
 } from "@/shared/types/chain.types";
 import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
+import { useApprove } from "@/shared/hooks/useApprove";
+import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
+import { waitForTransaction } from "@wagmi/core";
 
 type PoolDepositPanelProps = {
   balances: Currency[];
   token0: Token;
   token1: Token;
+  token0Amount: string;
+  token1Amount: string;
   priceRatio: [number, number];
   refetchReserves: (options?: any) => Promise<any>;
   refetchAllBalance: (options?: any) => Promise<any>;
@@ -53,14 +56,13 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     isNewPool,
   } = props;
 
-  const signer = useSigner();
   const { chain } = useNetwork();
   const { address } = useAccount();
 
-  const [token0Amount, setToken0Amount] = useState<string>();
-  const [token1Amount, setToken1Amount] = useState<string>();
-  const [token0Min, setToken0Min] = useState(BigNumber.from(0));
-  const [token1Min, setToken1Min] = useState(BigNumber.from(0));
+  const [token0Amount, setToken0Amount] = useState<string>("");
+  const [token1Amount, setToken1Amount] = useState<string>("");
+  const [token0Min, setToken0Min] = useState(BigInt(0));
+  const [token1Min, setToken1Min] = useState(BigInt(0));
 
   const [isFetchingToken0Price, setIsFetchingToken0Price] = useState(false);
   const [isFetchingToken1Price, setIsFetchingToken1Price] = useState(false);
@@ -86,79 +88,47 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     address,
   });
 
-  const neutroRouter = useContract({
+  const neutroRouter = {
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
-    signerOrProvider: signer.data,
-  });
+  };
 
-  const { data: allowances, refetch: refetchAllowance } = useContractReads({
-    enabled: Boolean(address),
-    contracts: [
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: "allowance",
-        args: [address!, ROUTER_CONTRACT],
-      },
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: "allowance",
-        args: [address!, ROUTER_CONTRACT],
-      },
-    ],
-  });
+  const {
+    balance: balance0,
+    allowance: allowance0,
+    refetch: refetchBalanceAndAllowance0,
+  } = useBalanceAndAllowance(token0.address);
 
-  const { config: approveConfig0 } = usePrepareContractWrite({
+  const {
+    balance: balance1,
+    allowance: allowance1,
+    refetch: refetchBalanceAndAllowance1,
+  } = useBalanceAndAllowance(token1.address);
+
+  const { isLoading: isApprovingToken0, write: approveToken0 } = useApprove({
     address: token0.address,
-    abi: ERC20_ABI,
-    functionName: "approve",
-    args: [
-      ROUTER_CONTRACT,
-      BigNumber.from(
-        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-      ),
-    ],
+    spender: ROUTER_CONTRACT,
+    onSuccess: async () => {
+      await refetchBalanceAndAllowance0();
+    },
   });
-  const { isLoading: isApprovingToken0, write: approveToken0 } =
-    useContractWrite({
-      ...approveConfig0,
-      onSuccess: async (result) => {
-        await result.wait();
-        await refetchAllowance();
-      },
-    });
 
-  const { config: approveConfig1 } = usePrepareContractWrite({
+  const { isLoading: isApprovingToken1, write: approveToken1 } = useApprove({
     address: token1.address,
-    abi: ERC20_ABI,
-    functionName: "approve",
-    args: [
-      ROUTER_CONTRACT,
-      BigNumber.from(
-        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
-      ),
-    ],
+    spender: ROUTER_CONTRACT,
+    onSuccess: async () => {
+      await refetchBalanceAndAllowance1();
+    },
   });
-  const { isLoading: isApprovingToken1, write: approveToken1 } =
-    useContractWrite({
-      ...approveConfig1,
-      address: token1.address,
-      onSuccess: async (result) => {
-        await result.wait();
-        await refetchAllowance();
-      },
-    });
 
   const { config: addLiquidityConfig, isFetching: isSimulatingAddLiquidity } =
     usePrepareContractWrite({
       enabled: Boolean(
         !isPreferNative &&
-          !token0Min.isZero() &&
-          !token1Min.isZero() &&
-          Boolean(Number(token0Amount)) &&
-          Boolean(Number(token1Amount))
+          token0Min !== BigInt(0) &&
+          token1Min !== BigInt(0) &&
+          Number(token0Amount) &&
+          Number(token1Amount)
       ),
       address: ROUTER_CONTRACT,
       abi: NEUTRO_ROUTER_ABI,
@@ -166,22 +136,23 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
       args: [
         token0.address,
         token1.address,
-        parseBigNumber(token0Amount, token0.decimal),
-        parseBigNumber(token1Amount, token1.decimal),
+        parseUnits(token0Amount, token0.decimal),
+        parseUnits(token1Amount, token1.decimal),
         token0Min,
         token1Min,
         address!,
-        BigNumber.from(dayjs().add(5, "minutes").unix()), // deadline
+        BigInt(dayjs().add(5, "minutes").unix()), // deadline
       ],
       onError(error) {
         console.log("Error", error);
       },
     });
+
   const { isLoading: isAddingLiquidity, write: addLiquidity } =
     useContractWrite({
       ...addLiquidityConfig,
       onSuccess: async (tx) => {
-        await tx.wait();
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchAllBalance();
         await refetchUserBalances();
         await refetchReserves();
@@ -205,28 +176,24 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     args: [
       token0.symbol === "WEOS" ? token1.address : token0.address, // token (address)
       token0.symbol === "WEOS"
-        ? parseBigNumber(token1Amount, token1.decimal)
-        : parseBigNumber(token0Amount, token0.decimal), // amountTokenDesired
+        ? parseUnits(token1Amount, token1.decimal)
+        : parseUnits(token0Amount, token0.decimal), // amountTokenDesired
       token0.symbol === "WEOS" ? token1Min : token0Min, // amountTokenMin
       token0.symbol === "WEOS" ? token0Min : token1Min, // amountETHMin
       address!, // to
-      BigNumber.from(dayjs().add(5, "minutes").unix()), // deadline
+      BigInt(dayjs().add(5, "minutes").unix()), // deadline
     ],
-    overrides: {
-      value:
-        token0.symbol === "WEOS"
-          ? parseBigNumber(token0Amount, token0.decimal)
-          : parseBigNumber(token1Amount, token1.decimal),
-    },
-    onError(error) {
-      console.log("Error", error);
-    },
+    value:
+      token0.symbol === "WEOS"
+        ? parseUnits(token0Amount, token0.decimal)
+        : parseUnits(token1Amount, token1.decimal),
   });
+
   const { isLoading: isAddingLiquidityETH, write: addLiquidityETH } =
     useContractWrite({
       ...addLiquidityETHConfig,
       onSuccess: async (tx) => {
-        await tx.wait();
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchAllBalance();
         await refetchUserBalances();
         await refetchBalanceETH();
@@ -243,9 +210,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
     if (isNewPool)
       return setToken0Min(
-        parseUnits(!!value ? value : "0", token0.decimal)
-          .mul(10000 - SLIPPAGE)
-          .div(10000)
+        (parseUnits(!!value ? value : "0", token0.decimal) *
+          BigInt(10000 - SLIPPAGE)) /
+          BigInt(10000)
       );
     else debouncedToken0(value);
   };
@@ -291,9 +258,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
     if (isNewPool)
       return setToken1Min(
-        parseUnits(!!value ? value : "0", token1.decimal)
-          .mul(10000 - SLIPPAGE)
-          .div(10000)
+        (parseUnits(!!value ? value : "0", token1.decimal) *
+          BigInt(10000 - SLIPPAGE)) /
+          BigInt(10000)
       );
     else debouncedToken1(value);
   };
@@ -347,7 +314,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   // }, [token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
   const isAmount0Invalid = () => {
-    let value: BigNumber;
+    let value: bigint;
     if (isPreferNative && token0.symbol === "WEOS" && balance)
       value = balance.value;
     else value = balances[0].raw;
@@ -355,7 +322,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   };
 
   const isAmount1Invalid = () => {
-    let value: BigNumber;
+    let value: bigint;
     if (isPreferNative && token1.symbol === "WEOS" && balance)
       value = balance.value;
     else value = balances[1].raw;
@@ -364,15 +331,15 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
   const isToken0NeedApproval = useMemo(() => {
     if (isPreferNative && token0.address === nativeToken.address) return false;
-    if (!allowances) return true;
-    return +formatUnits(allowances[0], token0.decimal) < Number(token0Amount);
-  }, [token0, isPreferNative, nativeToken, allowances, token0Amount]);
+    if (!allowance0) return true;
+    return +formatUnits(allowance0, token0.decimal) < Number(token0Amount);
+  }, [token0, isPreferNative, nativeToken, allowance0, token0Amount]);
 
   const isToken1NeedApproval = useMemo(() => {
     if (isPreferNative && token1.address === nativeToken.address) return false;
-    if (!allowances) return true;
-    return +formatUnits(allowances[1], token1.decimal) < Number(token1Amount);
-  }, [token1, isPreferNative, nativeToken, allowances, token1Amount]);
+    if (!allowance1) return true;
+    return +formatUnits(allowance1, token1.decimal) < Number(token1Amount);
+  }, [token1, isPreferNative, nativeToken, allowance1, token1Amount]);
 
   return (
     <div className="">
@@ -579,16 +546,10 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               {JSON.stringify(
                 {
                   token0: token0.address,
-                  token0_allowance: +formatUnits(
-                    allowances ? allowances[0] : "0",
-                    token0.decimal
-                  ),
+                  token0_allowance: allowance0.toString(),
                   isToken0NeedApproval: isToken0NeedApproval,
                   token1: token1.address,
-                  token1_allowance: +formatUnits(
-                    allowances ? allowances[1] : "0",
-                    token1.decimal
-                  ),
+                  token1_allowance: formatUnits(allowance1, token1.decimal),
                   isToken1NeedApproval: isToken1NeedApproval,
                   isPreferNative: isPreferNative,
                   slippage: (SLIPPAGE / 10000) * 100 + "%",
