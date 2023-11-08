@@ -32,6 +32,9 @@ import { useAddLiquidity } from "@/shared/hooks/useAddLiquidityETH";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { Tabs, TabsList, TabsTrigger } from "@/components/elements/Tabs";
 import { TabsContent } from "@radix-ui/react-tabs";
+import { ResponsiveDialog } from "@/components/modules/ResponsiveDialog";
+import { useRouter } from "next/router";
+import { CreatePositionModal } from "@/components/modules/CreatePosition";
 
 type PoolDepositPanelProps = {
   balances: Currency[];
@@ -70,6 +73,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   );
   const { chain } = useNetwork();
   const { address } = useAccount();
+  const router = useRouter();
 
   const [token0Amount, setToken0Amount] = useState<string>("");
   const [token1Amount, setToken1Amount] = useState<string>("");
@@ -579,54 +583,91 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 </TabsList>
               </div>
 
-              <TabsContent value="nft"></TabsContent>
+              <TabsContent value="nft">
+                <ResponsiveDialog.Root shouldScaleBackground>
+                  <ResponsiveDialog.Trigger>
+                    <Button className="w-full uppercase font-semibold tracking-tight">
+                      Create spNFT
+                    </Button>
+                  </ResponsiveDialog.Trigger>
+                  <ResponsiveDialog.Content>
+                    <CreatePositionModal
+                      pool={router.query.id as string}
+                      // stats={props.stats}
+                      token0={token0}
+                      token1={token1}
+                      token0Amount={token0Amount}
+                      token1Amount={token1Amount}
+                      token0Min={token0Min}
+                      token1Min={token1Min}
+                      isPreferNative={isPreferNative}
+                      onSuccess={async () => {
+                        if (isWrappedNative(token0.address))
+                          await refetchBalanceETH();
+                        else await refetchBalanceAndAllowance0();
+                        if (isWrappedNative(token1.address))
+                          await refetchBalanceETH();
+                        else await refetchBalanceAndAllowance1();
+                        setToken0Amount("");
+                        setToken1Amount("");
+                        router.push("/pool/position");
+                      }}
+                    />
+                  </ResponsiveDialog.Content>
+                </ResponsiveDialog.Root>
+              </TabsContent>
+              <TabsContent value="token">
+                <div className="flex flex-col w-full">
+                  {(isToken0NeedApproval || isToken1NeedApproval) && (
+                    <Button
+                      scale={1.25}
+                      className="!mt-2"
+                      loading={isApprovingToken0 || isApprovingToken1}
+                      onClick={() => {
+                        if (isToken0NeedApproval) return approveToken0?.();
+                        if (isToken1NeedApproval) return approveToken1?.();
+                      }}
+                    >
+                      {isToken0NeedApproval
+                        ? `Approve ${token0.symbol}`
+                        : isToken1NeedApproval && `Approve ${token1.symbol}`}
+                    </Button>
+                  )}
+                  {!isToken0NeedApproval && !isToken1NeedApproval && (
+                    <>
+                      {isPreferNative && (
+                        <Button
+                          name="addLiquidityETH"
+                          scale={1.25}
+                          className="!mt-2"
+                          loading={
+                            isAddingLiquidity || isSimulatingAddLiquidity
+                          }
+                          disabled={!addLiquidity}
+                          onClick={() => addLiquidity?.()}
+                        >
+                          Deposit Now
+                        </Button>
+                      )}
+                      {!isPreferNative && (
+                        <Button
+                          name="addLiquidity"
+                          scale={1.25}
+                          className="!mt-2"
+                          loading={
+                            isAddingLiquidity || isSimulatingAddLiquidity
+                          }
+                          disabled={!addLiquidity}
+                          onClick={() => addLiquidity?.()}
+                        >
+                          Deposit Now
+                        </Button>
+                      )}
+                    </>
+                  )}
+                </div>
+              </TabsContent>
             </Tabs>
-
-            <div className="flex flex-col w-full mt-4">
-              {(isToken0NeedApproval || isToken1NeedApproval) && (
-                <Button
-                  scale={1.25}
-                  className="!mt-2"
-                  loading={isApprovingToken0 || isApprovingToken1}
-                  onClick={() => {
-                    if (isToken0NeedApproval) return approveToken0?.();
-                    if (isToken1NeedApproval) return approveToken1?.();
-                  }}
-                >
-                  {isToken0NeedApproval
-                    ? `Approve ${token0.symbol}`
-                    : isToken1NeedApproval && `Approve ${token1.symbol}`}
-                </Button>
-              )}
-              {!isToken0NeedApproval && !isToken1NeedApproval && (
-                <>
-                  {isPreferNative && (
-                    <Button
-                      name="addLiquidityETH"
-                      scale={1.25}
-                      className="!mt-2"
-                      loading={isAddingLiquidity || isSimulatingAddLiquidity}
-                      disabled={!addLiquidity}
-                      onClick={() => addLiquidity?.()}
-                    >
-                      Deposit Now
-                    </Button>
-                  )}
-                  {!isPreferNative && (
-                    <Button
-                      name="addLiquidity"
-                      scale={1.25}
-                      className="!mt-2"
-                      loading={isAddingLiquidity || isSimulatingAddLiquidity}
-                      disabled={!addLiquidity}
-                      onClick={() => addLiquidity?.()}
-                    >
-                      Deposit Now
-                    </Button>
-                  )}
-                </>
-              )}
-            </div>
           </div>
         </div>
         {/*  NOTE: FOR DEBUGGING ONLY */}
