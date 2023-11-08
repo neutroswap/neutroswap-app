@@ -23,6 +23,11 @@ import { formatEther } from "viem";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
+import {
+  DIVIDENDS_CONTRACT,
+  NEUTRO_HELPER_CONTRACT,
+  XNEUTRO_CONTRACT,
+} from "@/shared/helpers/contract";
 
 const masterData = {
   totalAllocation: 1000,
@@ -92,19 +97,19 @@ export default function UserDividends() {
     allowFailure: false,
     contracts: [
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "totalAllocationAtPlugin",
-        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+        address: XNEUTRO_CONTRACT,
         abi: XNEUTRO_ABI,
         functionName: "getUsageApproval",
-        args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [address!, DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "userAllocationInDividendsPlugin",
         args: [address!],
@@ -121,7 +126,7 @@ export default function UserDividends() {
   const { config: harvestAllConfig, refetch: refetchHarvestAllConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address!),
-      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+      address: DIVIDENDS_CONTRACT,
       abi: DIVIDENDS_ABI,
       functionName: "harvestAllDividends",
     });
@@ -186,7 +191,7 @@ export default function UserDividends() {
           </p>
           <div className="flex space-x-4">
             <Button
-              className="px-4 py-2 border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
+              className="px-4 py-2 text-white border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
               onClick={() => harvestAll?.()}
               disabled={!harvestAll}
             >
@@ -212,13 +217,13 @@ const AllocationReward = ({ data }: { data: any }) => {
     allowFailure: false,
     contracts: [
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "userPendingRewardsInDividendsPlugin",
         args: [address!],
       } as const,
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "dividendsDistributedTokensRewards",
       } as const,
@@ -229,7 +234,7 @@ const AllocationReward = ({ data }: { data: any }) => {
   const { config: harvestConfig, refetch: refetchHarvestConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address!),
-      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+      address: DIVIDENDS_CONTRACT,
       abi: DIVIDENDS_ABI,
       functionName: "harvestDividends",
       args: [data.tokenAddress as `0x${string}`],

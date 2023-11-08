@@ -1,4 +1,3 @@
-import Navbar from "@/components/modules/Navbar";
 import EthLogo from "@/public/logo/eth.svg";
 import NeutroLogo from "@/public/logo/neutro_token.svg";
 import EpochLogo from "@/public/logo/epoch.svg";
@@ -15,6 +14,10 @@ import { formatEther, formatUnits } from "viem";
 import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
 import UserDividends from "./modules/UserDividends";
+import {
+  DIVIDENDS_CONTRACT,
+  NEUTRO_HELPER_CONTRACT,
+} from "@/shared/helpers/contract";
 
 const masterData = {
   totalAllocation: 1000,
@@ -53,29 +56,29 @@ export default function Dividend() {
     allowFailure: false,
     contracts: [
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "totalAllocationAtPlugin",
-        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "deallocationFeePlugin",
-        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        address: DIVIDENDS_CONTRACT,
         abi: DIVIDENDS_ABI,
         functionName: "nextCycleStartTime",
       } as const,
       {
-        address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        address: DIVIDENDS_CONTRACT,
         abi: DIVIDENDS_ABI,
         functionName: "currentCycleStartTime",
       } as const,
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "dividendsDistributedTokensRewards",
       } as const,

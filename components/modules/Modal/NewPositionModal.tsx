@@ -17,7 +17,7 @@ import {
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { waitForTransaction } from "@wagmi/core";
 import { formatEther, parseEther } from "viem";
-import Input from "@/components/elements/Input";
+import { Input } from "@/components/elements/Input";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
@@ -28,7 +28,7 @@ import {
   usePrepareContractWrite,
   useNetwork,
 } from "wagmi";
-import Button from "@/components/elements/Button";
+import { Button } from "@/components/elements/Button";
 import CirclePlus from "@/public/logo/pluscircle.svg";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import TokenDefault from "@/public/tokens_default.svg";
@@ -42,6 +42,7 @@ import {
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import { XNEUTRO_ABI } from "@/shared/abi";
+import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
 
 export default function NewPositionModal() {
   const { address } = useAccount();
@@ -66,7 +67,7 @@ export default function NewPositionModal() {
   const { data: balanceData } = useContractRead({
     enabled: Boolean(address),
     watch: true,
-    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    address: XNEUTRO_CONTRACT,
     abi: XNEUTRO_ABI,
     functionName: "balanceOf",
     args: [address!],
