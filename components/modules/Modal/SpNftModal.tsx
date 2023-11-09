@@ -39,6 +39,7 @@ import MergePositionModal from "./MergePositionModal";
 import { ResponsiveDialog } from "../ResponsiveDialog";
 import TokenLogo from "../TokenLogo";
 import { NEUTRO_HELPER_CONTRACT } from "@/shared/helpers/contract";
+import Countdown from "../Countdown";
 
 type Props = {
   children: React.ReactNode;
@@ -369,7 +370,7 @@ export default function SPNFTSettingsModal(props: Props) {
       <ResponsiveDialog.Trigger>{children}</ResponsiveDialog.Trigger>
       <ResponsiveDialog.Content>
         <Tabs.Root
-          className="flex flex-col-reverse max-w-lg"
+          className="flex flex-col-reverse max-w-lg text-muted-foreground"
           value={selected}
           onValueChange={(value) => setSelected(value)}
         >
@@ -405,7 +406,7 @@ export default function SPNFTSettingsModal(props: Props) {
             <Tabs.Content
               key={title}
               value={title}
-              className="w-full focus-visible:outline-none"
+              className="w-full focus-visible:outline-none text-muted-foreground"
             >
               <div className="px-4 py-2 border-b border-border/60">
                 {selected === items[0].title && (
@@ -462,7 +463,6 @@ export default function SPNFTSettingsModal(props: Props) {
 
 function Overview(props: GetNFTPositionResponse) {
   const { chain } = useNetwork();
-  // const { ESPER_HELPER_CONTRACT } = useConfig(chain);
   const { address } = useAccount();
 
   const lockDurationEpoch = Math.floor(parseInt(props.endLockTime));
@@ -607,7 +607,7 @@ function Overview(props: GetNFTPositionResponse) {
               )}
               {item.name === "Lock Bonus" && (
                 <p className="text-sm text-right">
-                  {/* <Countdown targetEpochTime={lockDurationEpoch} /> */}
+                  <Countdown targetEpochTime={lockDurationEpoch} />
                 </p>
               )}
             </div>

@@ -342,7 +342,7 @@ function SPNFTPool() {
   if (error || !data || !data.length) {
     return (
       <div className="flex justify-center items-center w-full">
-        <div className="mt-8 text-center rounded-lg md:border border-neutral-200 dark:border-neutral-900/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full max-w-3xl">
+        <div className="mt-8 text-center rounded-lg md:border border-neutral-200 dark:border-neutral-900/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full">
           <div className="flex flex-col items-center w-full md:p-8">
             {(theme.type as ThemeType) === "nlight" && (
               <NoContentLight className="w-40 h-40 opacity-75" />

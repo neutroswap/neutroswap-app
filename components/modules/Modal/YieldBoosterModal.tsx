@@ -4,20 +4,7 @@ import * as Tabs from "@radix-ui/react-tabs";
 import { cn, currencyFormat } from "@/shared/utils";
 import { ResponsiveDialog } from "../ResponsiveDialog";
 import TokenLogo from "../TokenLogo";
-import {
-  Lock as LockIcon,
-  Lightning,
-  FireSimple,
-  Percent,
-  DownloadSimple,
-  UploadSimple,
-  ArrowsSplit,
-  ArrowsMerge,
-  ArrowsLeftRight,
-  Icon,
-  CaretLeft,
-  Wallet,
-} from "@phosphor-icons/react";
+import { DownloadSimple, UploadSimple, Icon } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
 import { Response as GetNFTPositionResponse } from "@/shared/getters/getNFTPosition";
 import { useAccount, useContractReads, useNetwork } from "wagmi";
@@ -65,7 +52,7 @@ export default function YieldBoosterModal(props: Props) {
       <ResponsiveDialog.Trigger>{children}</ResponsiveDialog.Trigger>
       <ResponsiveDialog.Content>
         <Tabs.Root
-          className="flex flex-col-reverse max-w-lg"
+          className="flex flex-col-reverse max-w-lg text-muted-foreground"
           value={selected}
           onValueChange={(value) => setSelected(value)}
         >
@@ -99,7 +86,7 @@ export default function YieldBoosterModal(props: Props) {
             <Tabs.Content
               key={title}
               value={title}
-              className="w-full focus-visible:outline-none"
+              className="w-full focus-visible:outline-none text-muted-foreground"
             >
               <div className="px-4 py-2 border-b border-border/60">
                 <div className="flex items-center">

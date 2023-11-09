@@ -140,7 +140,7 @@ export default function ConvertForm() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <div className="text-xl font-bold">Get xNEUTRO</div>
-            <p className="text-sm font-normal leading-5 text-muted-foreground">
+            <p className="text-sm font-normal leading-5 my-0 text-muted-foreground">
               Unlock bonus rewards and exclusive benefits by converting your
               NEUTRO to xNEUTRO.
             </p>

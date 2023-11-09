@@ -173,7 +173,7 @@ export default function RedeemForm() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <div className="text-xl font-bold">Redeem xNEUTRO</div>
-            <p className="text-sm font-normal leading-5 text-muted-foreground">
+            <p className="text-sm font-normal leading-5 my-0 text-muted-foreground">
               Redeem your xNEUTRO back into NEUTRO over a vesting period of 15
               days (1 → 0.5 ratio) to 6 months (1 → 1 ratio).
             </p>
