@@ -19,7 +19,7 @@ import { useApprove } from "@/shared/hooks/useApprove";
 import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
 import { formatEther, formatUnits } from "viem";
 import { CaretDown, Warning } from "@phosphor-icons/react";
-import Button from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import { cn, currencyFormat } from "@/shared/utils";
 import {
   Collapsible,
@@ -73,6 +73,8 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
   } = props;
   const { chain } = useNetwork();
 
+  const [openApr, setOpenApr] = useState<boolean>(false);
+
   const [multiplierSettings, setMultiplierSettings] = useState({
     maxGlobalMultiplier: 0,
     maxLockDuration: 0,
@@ -89,6 +91,8 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
     functionName: "getPool",
     args: [pool as `0x${string}`],
   });
+  console.log("NFT Pool Factory", NEXT_PUBLIC_NFT_POOL_FACTORY_CONTRACT);
+  console.log("nftPool", nftPool);
 
   const { write: approveToken0, isLoading: isApprovingToken0 } = useApprove({
     address: token0.address,
@@ -356,8 +360,8 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
 
           {(isToken0NeedApproval || isToken1NeedApproval) && (
             <Button
-              variant="outline"
-              className={cn("w-full uppercase font-semibold tracking-tight")}
+              scale={1.25}
+              className="w-full !mt-2"
               loading={isApprovingToken0 || isApprovingToken1}
               onClick={() => {
                 if (isToken0NeedApproval) return approveToken0?.();
@@ -382,8 +386,9 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
 
           {!isToken0NeedApproval && !isToken1NeedApproval && (
             <Button
+              scale={1.25}
               name="directlyCreatePosition"
-              className={cn("w-full uppercase font-semibold tracking-tight")}
+              className="w-full !mt-2"
               loading={
                 isDirectlyCreatingPosition || isSimulatingDirectlyCreatePosition
               }

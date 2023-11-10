@@ -90,7 +90,6 @@ export default function PoolDetails() {
       ]);
     },
   });
-  console.log("PR", priceRatio);
 
   const { refetch: refetchUserBalances } = useContractReads({
     enabled: Boolean(pairs && address),

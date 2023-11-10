@@ -586,7 +586,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               <TabsContent value="nft">
                 <ResponsiveDialog.Root shouldScaleBackground>
                   <ResponsiveDialog.Trigger>
-                    <Button className="w-full uppercase font-semibold tracking-tight">
+                    <Button scale={1.25} className="w-full !mt-2">
                       Create spNFT
                     </Button>
                   </ResponsiveDialog.Trigger>
