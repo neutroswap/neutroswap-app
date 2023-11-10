@@ -138,7 +138,10 @@ export default function Dividend() {
                     Current Epochs
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    ${formatEther(totalCurrentEpoch ?? 0)}
+                    $
+                    {currencyFormat(
+                      parseFloat(formatEther(BigInt(totalCurrentEpoch)))
+                    )}
                   </span>
                 </div>
                 <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
