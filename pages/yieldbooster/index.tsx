@@ -533,14 +533,22 @@ function SPNFTPool() {
               start earning.
             </p>
 
-            <Modal>
-              <ModalOpenButton>
-                <Button className="!mt-2">Add Liquidity</Button>
-              </ModalOpenButton>
-              <ModalContents>
-                {({ close }) => <AddLiquidityModal handleClose={close} />}
-              </ModalContents>
-            </Modal>
+            <div className="flex space-x-4 mt-4">
+              <Button
+                className="!mt-2"
+                onClick={() => window.location.reload()}
+              >
+                Refresh
+              </Button>
+              <Modal>
+                <ModalOpenButton>
+                  <Button className="!mt-2">Add Liquidity</Button>
+                </ModalOpenButton>
+                <ModalContents>
+                  {({ close }) => <AddLiquidityModal handleClose={close} />}
+                </ModalContents>
+              </Modal>
+            </div>
           </div>
         </div>
       </div>

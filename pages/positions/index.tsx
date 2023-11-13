@@ -82,185 +82,6 @@ import {
 import { ChevronRight } from "lucide-react";
 import TokenLogo from "@/components/modules/TokenLogo";
 
-// export default function Positions() {
-//   const { address } = useAccount();
-//   const searchRef = useRef<any>(null);
-
-//   const [allPositions, setAllPositions] = useState<Array<User>>([]);
-//   const [isOpen, setIsOpen] = useState(false);
-//   const [isSearching, setIsSearching] = useState<boolean>(false);
-//   const [selectedRow, setSelectedRow] = useState<User>();
-
-//   // const { data, error, isFetching } = useTanstackQuery({
-//   //   queryKey: ["spnft.positions"],
-//   //   queryFn: async () => {
-//   //     const response = await getNFTPosition(
-//   //       address
-//   //         ? (address.toLowerCase() as `0x${string}`)
-//   //         : "0x0000000000000000000000000000000000000000"
-//   //     );
-//   //     if (!response) throw new Error("Cannot fetch spnft.positions");
-//   //     return response;
-//   //   },
-//   //   refetchOnWindowFocus: false,
-//   // });
-
-//   // if (isFetching) return <Loading scale={3} />;
-
-//   type User = {
-//     name: string;
-//     token0Logo: string;
-//     token1Logo: string;
-//     totalStaked?: string;
-//     totalStakedInUsd?: string;
-//     pendingTokens?: string;
-//     pendingTokensInUsd?: string;
-//   };
-
-//   const tokenNameColumnHandler: TableColumnRender<User> = (
-//     value,
-//     rowData,
-//     index
-//   ) => {
-//     return (
-//       <div className="flex space-x-3 items-center my-5">
-//         <div className="flex -space-x-2 relative z-0">
-//           <img
-//             src={rowData.token0Logo}
-//             className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
-//             onError={(e) => {
-//               handleImageFallback(rowData.token0Logo, e);
-//             }}
-//           />
-//           <img
-//             src={rowData.token1Logo}
-//             className="w-7 h-7 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
-//             onError={(e) => {
-//               handleImageFallback(rowData.token1Logo, e);
-//             }}
-//           />
-//         </div>
-//         <div className="space-x-1 font-semibold text-neutral-800 dark:text-neutral-200">
-//           <span>{rowData.name.split("-")[0]}</span>
-//           <span className="text-neutral-400 dark:text-neutral-600">-</span>
-//           <span>{rowData.name.split("-")[1]}</span>
-//         </div>
-//       </div>
-//     );
-//   };
-
-//   return (
-//     // <Provider value={nftClient}>
-//     //   <QueryClientProvider client={queryClient}>
-//     <div className="flex flex-col items-center sm:items-start justify-between py-16">
-//       <div className="flex justify-between items-center w-full">
-//         <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
-//           Positions
-//         </span>
-//         <Modal>
-//           <ModalOpenButton>
-//             <Button auto className="!mt-2" iconRight={<PlusIcon />}>
-//               Add Liquidity
-//             </Button>
-//           </ModalOpenButton>
-//           <ModalContents>
-//             {({ close }) => <AddLiquidityModal handleClose={close} />}
-//           </ModalContents>
-//         </Modal>
-//       </div>
-//       <div className="flex flex-col">
-//         <p className="m-0 text-center text-base text-neutral-400 mt-2">
-//           Create and manage all your staking positions.
-//         </p>
-//       </div>
-//       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-
-//       <Tabs initialValue="1" className="w-full">
-//         <Tabs.Item label="spNFTs" value="1">
-//           <Card className="-mt-3 overflow-x-auto w-full">
-//             <div className="flex justify-between items-center">
-//               <span className="text-2xl font-semibold">spNFTs</span>
-//               <div className="flex">
-//                 <SpNftModal />
-//               </div>
-//             </div>
-//             <div className="flex items-center justify-between space-x-4 w-full mt-7">
-//               <div className="flex flex-grow items-center">
-//                 <Input
-//                   type="text"
-//                   //   ref={searchRef}
-//                   placeholder="Search"
-//                   // onChange={handleSearchAll}
-//                 />
-//               </div>
-//             </div>
-//             {/* {Boolean(allPositions.length) && ( */}
-//             <div className="overflow-x-scroll mt-8 p-0">
-//               <Table
-//                 data={allPositions}
-//                 rowClassName={() => "cursor-pointer"}
-//                 className="min-w-max"
-//                 emptyText="Loading..."
-//                 onRow={(rowData) => {
-//                   setIsOpen(true);
-//                   setSelectedRow(rowData);
-//                 }}
-//               >
-//                 <Table.Column
-//                   prop="name"
-//                   label="Token"
-//                   render={tokenNameColumnHandler}
-//                   width={380}
-//                 />
-//                 <Table.Column
-//                   prop="amount"
-//                   label="Amount"
-//                   render={(value) => <span>$ {currencyFormat(+value)}</span>}
-//                 />
-//                 <Table.Column
-//                   prop="setttings"
-//                   label="Settings"
-//                   // render={(value) => (
-//                   //   <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>
-//                   // )}
-//                 />
-//                 <Table.Column
-//                   prop="apr"
-//                   label="APR"
-//                   render={(_value, rowData: User | any) => (
-//                     <span>{+rowData.details.apr} %</span>
-//                   )}
-//                 />
-//                 <Table.Column
-//                   prop="pending"
-//                   label="Pending Rewards"
-//                   // render={(value) => (
-//                   //   <span>
-//                   //     {currencyFormat(Number(value.rps) * 86400)} NEUTRO
-//                   //   </span>
-//                   // )}
-//                 />
-//                 <Table.Column prop="nothing" label="" />
-//               </Table>
-//             </div>
-//             {/* )} */}
-//           </Card>
-//         </Tabs.Item>
-
-//         <Tabs.Item label="LP v1" value="2">
-//           <Card className="-mt-3 overflow-x-auto w-full">
-//             <div className="flex items-center">
-//               <span className="text-2xl font-semibold">LP V1</span>
-//             </div>
-//           </Card>
-//         </Tabs.Item>
-//       </Tabs>
-//     </div>
-//     //   </QueryClientProvider>
-//     // </Provider>
-//   );
-// }
-
 const queryClient = new QueryClient();
 export default function PoolPosition() {
   const { chain } = useNetwork();
@@ -355,14 +176,22 @@ function SPNFTPool() {
               start earning.
             </p>
 
-            <Modal>
-              <ModalOpenButton>
-                <Button className="!mt-2">Add Liquidity</Button>
-              </ModalOpenButton>
-              <ModalContents>
-                {({ close }) => <AddLiquidityModal handleClose={close} />}
-              </ModalContents>
-            </Modal>
+            <div className="flex space-x-4 mt-4">
+              <Button
+                className="!mt-2"
+                onClick={() => window.location.reload()}
+              >
+                Refresh
+              </Button>
+              <Modal>
+                <ModalOpenButton>
+                  <Button className="!mt-2">Add Liquidity</Button>
+                </ModalOpenButton>
+                <ModalContents>
+                  {({ close }) => <AddLiquidityModal handleClose={close} />}
+                </ModalContents>
+              </Modal>
+            </div>
           </div>
         </div>
       </div>
