@@ -17,7 +17,7 @@ import {
 } from "@/shared/helpers/constants";
 import { waitForTransaction } from "@wagmi/core";
 import { formatEther, parseEther } from "viem";
-import Input from "@/components/elements/Input";
+import { Input } from "@/components/elements/Input";
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
@@ -27,8 +27,12 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
-import Button from "@/components/elements/Button";
+import { Button } from "@/components/elements/Button";
 import useDebounceValue from "@/shared/hooks/useDebounceValue";
+import {
+  DIVIDENDS_CONTRACT,
+  XNEUTRO_CONTRACT,
+} from "@/shared/helpers/contract";
 
 export default function AllocateDividendModal() {
   const { address } = useAccount();
@@ -50,7 +54,7 @@ export default function AllocateDividendModal() {
     useContractRead({
       enabled: Boolean(address!),
       watch: true,
-      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "balanceOf",
       args: [address!],
@@ -63,10 +67,10 @@ export default function AllocateDividendModal() {
     useContractRead({
       enabled: Boolean(address!),
       watch: true,
-      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "getUsageApproval",
-      args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+      args: [address!, DIVIDENDS_CONTRACT],
       onSuccess: (data) => {
         let allowance = formatEther(data);
         setAllowance(allowance);
@@ -84,11 +88,11 @@ export default function AllocateDividendModal() {
   const { config: approveConfig, refetch: retryApproveConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
-      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "approveUsage",
       args: [
-        NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        DIVIDENDS_CONTRACT,
         parseEther(
           debouncedAllocateXneutro ? `${debouncedAllocateXneutro}` : "0"
         ),
@@ -107,11 +111,11 @@ export default function AllocateDividendModal() {
   const { config: allocateConfig, refetch: retryAllocateConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
-      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "allocate",
       args: [
-        NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        DIVIDENDS_CONTRACT,
         parseEther(
           debouncedAllocateXneutro ? `${debouncedAllocateXneutro}` : "0"
         ),
@@ -153,10 +157,12 @@ export default function AllocateDividendModal() {
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <div className="box-border">
                 <div className="flex flex-col gap-1">
-                  <div className="text-xl font-bold">Allocate xNEUTRO</div>
+                  <div className="text-xl font-bold text-muted-foreground">
+                    Allocate xNEUTRO
+                  </div>
                 </div>
                 <div className="flex flex-col">
-                  <div className="mt-2">Amount</div>
+                  <div className="mt-2 text-muted-foreground">Amount</div>
                   <FormField
                     control={form.control}
                     name="allocateXneutro"
@@ -202,6 +208,7 @@ export default function AllocateDividendModal() {
                     return (
                       <Button
                         type="submit"
+                        className="w-full mt-5 text-neutral-500"
                         variant="outline"
                         disabled={!approve}
                         loading={isLoadingApprove}
@@ -213,6 +220,7 @@ export default function AllocateDividendModal() {
                   return (
                     <Button
                       type="submit"
+                      className="w-full mt-5 text-neutral-500"
                       variant="outline"
                       disabled={!allocate}
                       loading={isLoadingAllocate}

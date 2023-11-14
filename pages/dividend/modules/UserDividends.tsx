@@ -9,6 +9,7 @@ import {
   useContractRead,
   useContractReads,
   useContractWrite,
+  useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
 import {
@@ -18,42 +19,21 @@ import {
   NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
 } from "@/shared/helpers/constants";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { formatEther } from "viem";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
-
-const masterData = {
-  totalAllocation: 1000,
-  currentEpoch: 1000,
-  APY: 24.57,
-  deallocationFee: 0,
-  currentEpochDetails: [
-    {
-      tokenName: "ETH-USDC.e",
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      amountToDistributeInToken: 0.00004,
-      amountToDistributeInUsd: 20000,
-    },
-    {
-      tokenName: "xNEUTRO",
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      amountToDistributeInToken: 12.2,
-      amountToDistributeInUsd: 1782.1,
-    },
-  ],
-  nextEpochDetails: {
-    minEstValue: 120, // in dollar
-    APY: 10,
-    startTime: 1692177380, // epoch
-  },
-};
-
-const currentEpochReward = masterData.currentEpochDetails;
-const nextEpochReward = masterData.nextEpochDetails;
+import {
+  DIVIDENDS_CONTRACT,
+  NEUTRO_CONTRACT,
+  NEUTRO_HELPER_CONTRACT,
+  XNEUTRO_CONTRACT,
+} from "@/shared/helpers/contract";
+import { Token } from "@/shared/types/tokens.types";
+import { tokens } from "@/shared/statics/tokenList";
+import { SupportedChainID } from "@/shared/types/chain.types";
+import PendingDividends from "./PendingDividends";
 
 const allocationData = {
   userTotalAllocation: 20.2,
@@ -81,9 +61,14 @@ const allocationData = {
   ],
 };
 
+interface Reward extends Omit<Token, "logo"> {
+  logo: string[];
+}
+
 const allocationReward = allocationData.dividendTokens;
 
 export default function UserDividends() {
+  const { chain } = useNetwork();
   const { address } = useAccount();
 
   const { data } = useContractReads({
@@ -92,19 +77,19 @@ export default function UserDividends() {
     allowFailure: false,
     contracts: [
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "totalAllocationAtPlugin",
-        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+        address: XNEUTRO_CONTRACT,
         abi: XNEUTRO_ABI,
         functionName: "getUsageApproval",
-        args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [address!, DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "userAllocationInDividendsPlugin",
         args: [address!],
@@ -121,7 +106,7 @@ export default function UserDividends() {
   const { config: harvestAllConfig, refetch: refetchHarvestAllConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address!),
-      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+      address: DIVIDENDS_CONTRACT,
       abi: DIVIDENDS_ABI,
       functionName: "harvestAllDividends",
     });
@@ -132,6 +117,17 @@ export default function UserDividends() {
         await waitForTransaction({ hash: tx.hash });
       },
     });
+
+  const addressToTokenInfo = useMemo(() => {
+    if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
+    return new Map(
+      tokens[chain.id as unknown as SupportedChainID].map((item) => [
+        item.address,
+        item,
+      ])
+    );
+  }, [chain]);
+
   return (
     <div className="col-span-5 mt-8 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
       <div>
@@ -179,14 +175,14 @@ export default function UserDividends() {
       </div>
 
       <hr className="my-7 border-neutral-200/80 dark:border-neutral-800/80" />
-      <div className="-space-y-12">
+      {/* <div className="-space-y-12">
         <div className="flex flex-row items-center justify-between w-full md:p-8 md:pt-0">
           <p className="m-0 text-left font-semibold whitespace-nowrap">
             Your dividends
           </p>
           <div className="flex space-x-4">
             <Button
-              className="px-4 py-2 border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
+              className="px-4 py-2 text-white border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
               onClick={() => harvestAll?.()}
               disabled={!harvestAll}
             >
@@ -198,82 +194,83 @@ export default function UserDividends() {
         {allocationReward.map((item, index) => (
           <AllocationReward key={index} data={item} />
         ))}
-      </div>
+      </div> */}
+      <PendingDividends />
     </div>
   );
 }
 
-const AllocationReward = ({ data }: { data: any }) => {
-  const { address } = useAccount();
+// const AllocationReward = ({ data }: { data: any }) => {
+//   const { address } = useAccount();
 
-  const { refetch: infoRewards } = useContractReads({
-    enabled: Boolean(address),
-    cacheOnBlock: true,
-    allowFailure: false,
-    contracts: [
-      {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
-        abi: NEUTRO_HELPER_ABI,
-        functionName: "userPendingRewardsInDividendsPlugin",
-        args: [address!],
-      } as const,
-      {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
-        abi: NEUTRO_HELPER_ABI,
-        functionName: "dividendsDistributedTokensRewards",
-      } as const,
-    ],
-  });
+//   const { refetch: infoRewards } = useContractReads({
+//     enabled: Boolean(address),
+//     cacheOnBlock: true,
+//     allowFailure: false,
+//     contracts: [
+//       {
+//         address: NEUTRO_HELPER_CONTRACT,
+//         abi: NEUTRO_HELPER_ABI,
+//         functionName: "userPendingRewardsInDividendsPlugin",
+//         args: [address!],
+//       } as const,
+//       {
+//         address: NEUTRO_HELPER_CONTRACT,
+//         abi: NEUTRO_HELPER_ABI,
+//         functionName: "dividendsDistributedTokensRewards",
+//       } as const,
+//     ],
+//   });
 
-  //Claim individual reward button function
-  const { config: harvestConfig, refetch: refetchHarvestConfig } =
-    usePrepareContractWrite({
-      enabled: Boolean(address!),
-      address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
-      abi: DIVIDENDS_ABI,
-      functionName: "harvestDividends",
-      args: [data.tokenAddress as `0x${string}`],
-    });
-  const { write: harvest, isLoading: isLoadingHarvest } = useContractWrite({
-    ...harvestConfig,
-    onSuccess: async (tx) => {
-      await waitForTransaction({ hash: tx.hash });
-    },
-  });
+//   //Claim individual reward button function
+//   const { config: harvestConfig, refetch: refetchHarvestConfig } =
+//     usePrepareContractWrite({
+//       enabled: Boolean(address!),
+//       address: DIVIDENDS_CONTRACT,
+//       abi: DIVIDENDS_ABI,
+//       functionName: "harvestDividends",
+//       args: [data.tokenAddress as `0x${string}`],
+//     });
+//   const { write: harvest, isLoading: isLoadingHarvest } = useContractWrite({
+//     ...harvestConfig,
+//     onSuccess: async (tx) => {
+//       await waitForTransaction({ hash: tx.hash });
+//     },
+//   });
 
-  return (
-    <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
-      <div className="flex items-center">
-        <div className="flex">
-          <EthLogo className="relative w-8 h-8 rounded-full" />
-          <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
-          {/* <img
-              src={data.logoToken0}
-              className="relative w-8 h-8 rounded-full"
-            />
-            <img src={data.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
-        </div>
-        <div className="ml-2">
-          <span className="text-sm text-neutral-500">{data.tokenName}</span>
-          <br />
-          <span className="text-sm">
-            {Number(data.pendingAmountInToken)} &nbsp;
-            <span className="text-neutral-500 text-xs">
-              ($
-              {currencyFormat(Number(data.pendingAmountInUsd))})
-            </span>
-          </span>
-        </div>
-      </div>
-      <div>
-        <Button
-          onClick={() => harvest?.()}
-          disabled={!harvest}
-          className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
-        >
-          Claim
-        </Button>
-      </div>
-    </div>
-  );
-};
+//   return (
+//     <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
+//       <div className="flex items-center">
+//         <div className="flex">
+//           <EthLogo className="relative w-8 h-8 rounded-full" />
+//           <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
+//           {/* <img
+//               src={data.logoToken0}
+//               className="relative w-8 h-8 rounded-full"
+//             />
+//             <img src={data.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
+//         </div>
+//         <div className="ml-2">
+//           <span className="text-sm text-neutral-500">{data.tokenName}</span>
+//           <br />
+//           <span className="text-sm">
+//             {Number(data.pendingAmountInToken)} &nbsp;
+//             <span className="text-neutral-500 text-xs">
+//               ($
+//               {currencyFormat(Number(data.pendingAmountInUsd))})
+//             </span>
+//           </span>
+//         </div>
+//       </div>
+//       <div>
+//         <Button
+//           onClick={() => harvest?.()}
+//           disabled={!harvest}
+//           className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
+//         >
+//           Claim
+//         </Button>
+//       </div>
+//     </div>
+//   );
+// };

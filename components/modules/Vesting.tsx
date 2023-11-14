@@ -14,6 +14,7 @@ import {
 import { Card, CardContent } from "@/components/elements/Card";
 import { formatEther } from "viem";
 import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
+import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
 
 export default function VestingXneutro() {
   const { address } = useAccount();
@@ -23,7 +24,7 @@ export default function VestingXneutro() {
   const [claimableRedeems, setClaimableRedeems] = useState<any>([]);
 
   const { data: userRedeemsLength } = useContractRead({
-    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    address: XNEUTRO_CONTRACT,
     abi: XNEUTRO_ABI,
     functionName: "getUserRedeemsLength",
     args: [address!],
@@ -31,7 +32,7 @@ export default function VestingXneutro() {
 
   const getUserRedeemCalls = useMemo(() => {
     const xneutroContract = {
-      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "getUserRedeem",
     } as const;
@@ -67,7 +68,7 @@ export default function VestingXneutro() {
           hours,
           minutes,
         };
-        if (userRedeemsInfo[i].endTime.toNumber() <= currentTimestamp) {
+        if (Number(userRedeemsInfo[i].endTime) <= currentTimestamp) {
           claimable.push({ index: i, date: date, ...userRedeemsInfo[i] });
         } else {
           pending.push({ index: i, date: date, ...userRedeemsInfo[i] });

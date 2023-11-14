@@ -1,11 +1,11 @@
-import Button from "@/components/elements/Button";
+import { Button } from "@/components/elements/Button";
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
 } from "@/components/elements/Form";
-import Input from "@/components/elements/Input";
+import { Input } from "@/components/elements/Input";
 import InputGroup from "@/components/elements/InputGroup";
 import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -178,7 +178,7 @@ export default function BoostForm() {
           {/* {!!isApproved && ( */}
           <Button
             type="submit"
-            variant="solid"
+            variant="default"
             // disabled={!addLiquidity}
             // loading={isLoadingAddLiquidity}
             className="!text-black dark:text-white"

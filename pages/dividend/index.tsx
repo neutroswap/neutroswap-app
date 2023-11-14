@@ -1,11 +1,10 @@
-import Navbar from "@/components/modules/Navbar";
 import EthLogo from "@/public/logo/eth.svg";
 import NeutroLogo from "@/public/logo/neutro_token.svg";
 import EpochLogo from "@/public/logo/epoch.svg";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
 import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
-import { useContractReads } from "wagmi";
+import { useContractReads, useNetwork } from "wagmi";
 import {
   NEXT_PUBLIC_DIVIDENDS_CONTRACT,
   NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
@@ -15,67 +14,53 @@ import { formatEther, formatUnits } from "viem";
 import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
 import UserDividends from "./modules/UserDividends";
+import {
+  DIVIDENDS_CONTRACT,
+  NEUTRO_HELPER_CONTRACT,
+} from "@/shared/helpers/contract";
+import { useMemo } from "react";
+import { Token } from "@/shared/types/tokens.types";
+import { tokens } from "@/shared/statics/tokenList";
+import { SupportedChainID } from "@/shared/types/chain.types";
+import getPairInfo from "@/shared/getters/getPairInfo";
+import TokenLogo from "@/components/modules/TokenLogo";
+import dayjs from "dayjs";
 
-const masterData = {
-  totalAllocation: 1000,
-  currentEpoch: 1000,
-  APY: 24.57,
-  deallocationFee: 0,
-  currentEpochDetails: [
-    {
-      tokenName: "ETH-USDC.e",
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      amountToDistributeInToken: 0.00004,
-      amountToDistributeInUsd: 20000,
-    },
-    {
-      tokenName: "xNEUTRO",
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      amountToDistributeInToken: 12.2,
-      amountToDistributeInUsd: 1782.1,
-    },
-  ],
-  nextEpochDetails: {
-    minEstValue: 120, // in dollar
-    APY: 10,
-    startTime: 1692177380, // epoch
-  },
-};
-
-const currentEpochReward = masterData.currentEpochDetails;
-const nextEpochReward = masterData.nextEpochDetails;
+interface Reward extends Omit<Token, "logo"> {
+  logo: string[];
+}
 
 export default function Dividend() {
+  const { chain } = useNetwork();
+
   const { data } = useContractReads({
     cacheOnBlock: true,
     allowFailure: false,
     contracts: [
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "totalAllocationAtPlugin",
-        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "deallocationFeePlugin",
-        args: [NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
+        args: [DIVIDENDS_CONTRACT],
       } as const,
       {
-        address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        address: DIVIDENDS_CONTRACT,
         abi: DIVIDENDS_ABI,
         functionName: "nextCycleStartTime",
       } as const,
       {
-        address: NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`,
+        address: DIVIDENDS_CONTRACT,
         abi: DIVIDENDS_ABI,
         functionName: "currentCycleStartTime",
       } as const,
       {
-        address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+        address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
         functionName: "dividendsDistributedTokensRewards",
       } as const,
@@ -89,7 +74,44 @@ export default function Dividend() {
   const deallocationFee = formatEther(data?.[1] ?? BigInt(0));
 
   //countdown utils
-  const protocolEarningsTime = Math.floor(Number(data?.[2]));
+  // const protocolEarningsTime = Math.floor(Number(data?.[2]));
+
+  const nextCycleDate = dayjs.unix(Number(data?.[2])).format("MMMM D, YYYY");
+
+  const addressToTokenInfo = useMemo(() => {
+    if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
+    return new Map(
+      tokens[chain.id as SupportedChainID].map((item) => [item.address, item])
+    );
+  }, [chain]);
+
+  function getRewardInfo(address: `0x${string}`): Reward {
+    const info = addressToTokenInfo.get(address);
+    if (!info) {
+      getPairInfo(address).then((pair) => {
+        if (!pair[0] || !pair[1]) return;
+        const lpInfo: Reward = {
+          name: `NEUTRO LP Token`,
+          address: address,
+          symbol: `${pair[0].symbol}-${pair[1].symbol} LP`,
+          logo: [pair[0].logo, pair[1].logo],
+          decimal: 18,
+        };
+        return lpInfo;
+      });
+      return {
+        name: `Unknown LP Token`,
+        address: address,
+        symbol: `Unknown LP`,
+        logo: [],
+        decimal: 18,
+      };
+    }
+    return {
+      ...info,
+      logo: [info.logo],
+    };
+  }
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -132,10 +154,13 @@ export default function Dividend() {
               <div className="flex justify-between">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Current Epochs
+                    Reward Current Epochs
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    ${formatEther(totalCurrentEpoch ?? 0)}
+                    $
+                    {currencyFormat(
+                      parseFloat(formatEther(BigInt(totalCurrentEpoch)))
+                    )}
                   </span>
                 </div>
                 <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -151,7 +176,7 @@ export default function Dividend() {
                     APY
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {masterData.APY}%
+                    0%
                   </span>
                 </div>
                 <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -183,71 +208,64 @@ export default function Dividend() {
             <div className="border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg">
               <div className="flex flex-row justify-between items-start md:p-8 -mb-7">
                 <p className="m-0 text-left font-semibold whitespace-nowrap">
-                  Current epoch
+                  Protocol Earnings
                 </p>
               </div>
 
               {/* Need to change numbering format */}
               <div className="flex">
-                {currentEpochReward.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex w-1/2 items-center md:pl-8 m-0 "
-                  >
-                    <div className="flex items-center ">
-                      <div className="flex">
-                        <EthLogo className="relative w-8 h-8 rounded-full" />
-                        <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
-                        {/* <img src={item.logoToken0} className="relative w-8 h-8 rounded-full" />
-                        <img src={item.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
-                      </div>
-                      <div className="ml-2">
-                        <span className="text-sm text-neutral-500">
-                          {item.tokenName}
-                        </span>
-                        <div className="mt-0 text-sm">
-                          {Number(item.amountToDistributeInToken)} &nbsp;
-                          <span className="text-neutral-500 text-xs">
-                            ($
-                            {currencyFormat(
-                              Number(item.amountToDistributeInUsd)
-                            )}
-                            )
-                          </span>
+                {!!data &&
+                  data[4].map((reward) => {
+                    const info = getRewardInfo(reward.token);
+                    if (!info) return null;
+                    return (
+                      <div className="flex w-1/2 items-center md:pl-8 m-0 ">
+                        <div className="flex items-center ">
+                          <div className="flex">
+                            {info.logo.map((logo) => (
+                              <TokenLogo
+                                className="w-8 h-8"
+                                src={logo}
+                                key={logo}
+                              />
+                            ))}
+                          </div>
+                          <div className="ml-2">
+                            <span className="text-sm text-neutral-500">
+                              {info.symbol}
+                            </span>
+                            <div className="mt-0 text-sm">
+                              {formatEther(
+                                BigInt(reward.currentDistributionAmount ?? 0)
+                              )}{" "}
+                              {info.symbol} &nbsp;
+                              <span className="text-neutral-500 text-xs">
+                                $
+                                {currencyFormat(
+                                  parseFloat(
+                                    formatEther(
+                                      BigInt(
+                                        reward.currentDistributionAmountInUsd
+                                      )
+                                    )
+                                  ),
+                                  2,
+                                  0.01
+                                )}
+                              </span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })}
               </div>
 
-              <hr className="my-4 ml-8 w-11/12 border-neutral-200/80 dark:border-neutral-800/80" />
-              <div className="flex flex-col justify-between items-start md:p-8 md:pt-0">
-                <div className="flex flex-col w-full">
-                  <p className="m-0 text-left font-semibold whitespace-nowrap">
-                    Next epoch
-                  </p>
-                  <div className="grid grid-cols-3 auto-cols-max mt-2 ">
-                    <div className="flex flex-col">
-                      <span className="text-sm text-neutral-500">
-                        Min. estimated value
-                      </span>
-                      <span className="text-sm ">
-                        ${currencyFormat(nextEpochReward.minEstValue)}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-neutral-500">APY</span>
-                      <span className="text-sm ">{nextEpochReward.APY}%</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-neutral-500">
-                        Remaining time
-                      </span>
-                      <Countdown targetEpochTime={protocolEarningsTime} />
-                    </div>
-                  </div>
-                </div>
+              <hr className="my-4 w-full border-neutral-200/80 dark:border-neutral-800/80" />
+              <div className="flex flex-col justify-between items-start p-2 m-5 py-0">
+                <p className="m-0 text-left whitespace-nowrap text-sm text-muted-foreground">
+                  Next distribution is scheduled at: {nextCycleDate}
+                </p>
               </div>
             </div>
           </div>

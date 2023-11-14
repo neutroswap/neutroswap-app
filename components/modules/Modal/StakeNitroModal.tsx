@@ -1,4 +1,4 @@
-import Button from "@/components/elements/Button";
+import { Button } from "@/components/elements/Button";
 import { Form } from "@/components/elements/Form";
 import MiniButton from "@/components/elements/MiniButton";
 import {
@@ -159,7 +159,7 @@ export default function StakeNitroModal() {
                 {/* {!!isApproved && ( */}
                 <Button
                   type="submit"
-                  variant="solid"
+                  // variant="solid"
                   // disabled={!addLiquidity}
                   // loading={isLoadingAddLiquidity}
                   className="!text-black dark:text-white"

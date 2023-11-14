@@ -9,8 +9,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import InputGroup from "@/components/elements/InputGroup";
-import Button from "@/components/elements/Button";
-import Input from "@/components/elements/Input";
+import { Button } from "@/components/elements/Button";
+import { Input } from "@/components/elements/Input";
 import {
   useAccount,
   useContractRead,
@@ -26,6 +26,7 @@ import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
 import { Slider } from "@/components/elements/Slider";
 import { waitForTransaction } from "@wagmi/core";
 import useDebounceValue from "@/shared/hooks/useDebounceValue";
+import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
 
 const DEFAULT_PERCENTAGE = 50;
 const DAY_PER_PERCENTAGE = 3.3;
@@ -56,7 +57,7 @@ export default function RedeemForm() {
   );
 
   const xneutroContract = {
-    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    address: XNEUTRO_CONTRACT,
     abi: XNEUTRO_ABI,
   };
 
@@ -75,7 +76,7 @@ export default function RedeemForm() {
       {
         ...xneutroContract,
         functionName: "allowance",
-        args: [address!, NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`],
+        args: [address!, XNEUTRO_CONTRACT],
       },
     ],
     onSuccess: (data: any) => {
@@ -91,11 +92,11 @@ export default function RedeemForm() {
   }, [xneutroBalance]);
 
   const { config: approveXneutroConfig } = usePrepareContractWrite({
-    address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+    address: XNEUTRO_CONTRACT,
     abi: XNEUTRO_ABI,
     functionName: "approve",
     args: [
-      NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      XNEUTRO_CONTRACT,
       BigInt(
         "115792089237316195423570985008687907853269984665640564039457584007913129639935"
       ),
@@ -145,7 +146,7 @@ export default function RedeemForm() {
   const { config: redeemXneutroConfig, refetch: retryRedeemXneutroConfig } =
     usePrepareContractWrite({
       enabled: Boolean(address),
-      address: NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT as `0x${string}`,
+      address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "redeem",
       args: [
@@ -172,7 +173,7 @@ export default function RedeemForm() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <div className="text-xl font-bold">Redeem xNEUTRO</div>
-            <p className="text-sm font-normal leading-5 text-gray-500">
+            <p className="text-sm font-normal leading-5 my-0 text-muted-foreground">
               Redeem your xNEUTRO back into NEUTRO over a vesting period of 15
               days (1 → 0.5 ratio) to 6 months (1 → 1 ratio).
             </p>
