@@ -63,14 +63,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     isNewPool,
   } = props;
 
-  console.log(
-    "reserves",
-    reserves,
-    "isNewPool",
-    isNewPool,
-    "priceRatio",
-    priceRatio
-  );
   const { chain } = useNetwork();
   const { address } = useAccount();
   const router = useRouter();
@@ -159,92 +151,10 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     },
   });
 
-  let useless0 = {
-    // const { config: addLiquidityConfig, isFetching: isSimulatingAddLiquidity } =
-    //   usePrepareContractWrite({
-    //     enabled: Boolean(
-    //       !isPreferNative &&
-    //         token0Min !== BigInt(0) &&
-    //         token1Min !== BigInt(0) &&
-    //         Number(token0Amount) &&
-    //         Number(token1Amount)
-    //     ),
-    //     address: ROUTER_CONTRACT,
-    //     abi: NEUTRO_ROUTER_ABI,
-    //     functionName: "addLiquidity",
-    //     args: [
-    //       token0.address,
-    //       token1.address,
-    //       parseUnits(token0Amount, token0.decimal),
-    //       parseUnits(token1Amount, token1.decimal),
-    //       token0Min,
-    //       token1Min,
-    //       address!,
-    //       BigInt(dayjs().add(5, "minutes").unix()), // deadline
-    //     ],
-    //     onError(error) {
-    //       console.log("Error", error);
-    //     },
-    //   });
-    // const { isLoading: isAddingLiquidity, write: addLiquidity } =
-    //   useContractWrite({
-    //     ...addLiquidityConfig,
-    //     onSuccess: async (tx) => {
-    //       await waitForTransaction({ hash: tx.hash, confirmations: 8 });
-    //       await refetchAllBalance();
-    //       await refetchUserBalances();
-    //       await refetchReserves();
-    //       setToken0Amount("");
-    //       setToken1Amount("");
-    //     },
-    //   });
-    // const {
-    //   config: addLiquidityETHConfig,
-    //   isFetching: isSimulatingAddLiquidityETH,
-    // } = usePrepareContractWrite({
-    //   enabled: Boolean(
-    //     (token0.address === nativeToken.address ||
-    //       token1.address === nativeToken.address) && // do not enable if none of the addr is WEOS
-    //       isPreferNative
-    //   ),
-    //   address: ROUTER_CONTRACT,
-    //   abi: NEUTRO_ROUTER_ABI,
-    //   functionName: "addLiquidityETH",
-    //   args: [
-    //     token0.symbol === "WEOS" ? token1.address : token0.address, // token (address)
-    //     token0.symbol === "WEOS"
-    //       ? parseUnits(token1Amount, token1.decimal)
-    //       : parseUnits(token0Amount, token0.decimal), // amountTokenDesired
-    //     token0.symbol === "WEOS" ? token1Min : token0Min, // amountTokenMin
-    //     token0.symbol === "WEOS" ? token0Min : token1Min, // amountETHMin
-    //     address!, // to
-    //     BigInt(dayjs().add(5, "minutes").unix()), // deadline
-    //   ],
-    //   value:
-    //     token0.symbol === "WEOS"
-    //       ? parseUnits(token0Amount, token0.decimal)
-    //       : parseUnits(token1Amount, token1.decimal),
-    // });
-    // const { isLoading: isAddingLiquidityETH, write: addLiquidityETH } =
-    //   useContractWrite({
-    //     ...addLiquidityETHConfig,
-    //     onSuccess: async (tx) => {
-    //       await waitForTransaction({ hash: tx.hash, confirmations: 8 });
-    //       await refetchAllBalance();
-    //       await refetchUserBalances();
-    //       await refetchBalanceETH();
-    //       await refetchReserves();
-    //       setToken0Amount("");
-    //       setToken1Amount("");
-    //     },
-    //   });
-  };
-
   const handleToken0Change = async () => {
     if (isNaN(+token0Amount)) return;
     setToken0Amount(token0Amount);
     const amountADesired = parseUnits(token0Amount, token0.decimal);
-    console.log("amountADesired", amountADesired);
 
     if (isNewPool || !reserves)
       return setToken0Min(
@@ -255,7 +165,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     if (!Number(amountADesired)) return setToken1Amount("");
 
     const amountBDesired = (amountADesired * reserves[1]) / reserves[0];
-    console.log("B Desired", amountBDesired);
     setToken1Amount(formatUnits(amountBDesired, token1.decimal));
 
     const amountAMin =
@@ -267,39 +176,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   };
 
   const debouncedToken0Change = useDebounce(handleToken0Change);
-
-  let useless1 = {
-    // const debouncedToken0 = debounce(async (nextValue) => {
-    //   if (!Number(nextValue)) return setToken1Amount("");
-    //   setIsFetchingToken1Price(true);
-    //   try {
-    //     // (r0 / r1) * amount0
-    //     const amount = (priceRatio[1] * Number(nextValue)).toFixed(
-    //       token1.decimal
-    //     );
-    //     setToken1Amount(amount);
-    //     // calculate token0Min
-    //     const amountsOut0 = await neutroRouter?.read.getAmountsOut([
-    //       parseUnits(amount, token1.decimal),
-    //       [token1.address, token0.address],
-    //     ]);
-    //     if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-    //     const [, min0] = amountsOut0;
-    //     setToken0Min(min0);
-    //     // calculate token1Min
-    //     const amountsOut1 = await neutroRouter?.read.getAmountsOut([
-    //       parseUnits(nextValue, token0.decimal),
-    //       [token0.address, token1.address],
-    //     ]);
-    //     if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-    //     const [, min1] = amountsOut1;
-    //     setToken1Min(min1);
-    //     setIsFetchingToken1Price(false);
-    //   } catch (error) {
-    //     setIsFetchingToken1Price(false);
-    //   }
-    // }, 500);
-  };
 
   const handleToken1Change = async () => {
     if (isNaN(+token1Amount)) return;
@@ -326,41 +202,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   };
 
   const debouncedToken1Change = useDebounce(handleToken1Change);
-
-  let useless2 = {
-    // const debouncedToken1 = debounce(async (nextValue) => {
-    //   if (!Number(nextValue)) return setToken0Amount("");
-    //   setIsFetchingToken0Price(true);
-    //   try {
-    //     // (r1 / r0) * amount1
-    //     const amount = (priceRatio[0] * Number(nextValue)).toFixed(
-    //       token0.decimal
-    //     );
-    //     setToken0Amount(amount);
-    //     // calculate token0Min
-    //     const amountsOut0 = await neutroRouter?.read.getAmountsOut([
-    //       parseUnits(nextValue, token1.decimal),
-    //       [token1.address, token0.address],
-    //     ]);
-    //     if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-    //     console.log("amountsOut0", amountsOut0);
-    //     const [, min0] = amountsOut0;
-    //     setToken0Min(min0);
-    //     // calculate token1Min
-    //     const amountsOut1 = await neutroRouter?.read.getAmountsOut([
-    //       parseUnits(amount, token0.decimal),
-    //       [token0.address, token1.address],
-    //     ]);
-    //     if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-    //     console.log("amountsOut1", amountsOut1);
-    //     const [, min1] = amountsOut1;
-    //     setToken1Min(min1);
-    //     setIsFetchingToken0Price(false);
-    //   } catch (error) {
-    //     setIsFetchingToken0Price(false);
-    //   }
-    // }, 500);
-  };
 
   // NOTE: Enable for debugging only
   // useEffect(() => {
