@@ -92,5 +92,13 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       address: "0xd61551b3E56343B6D9323444cf398f2fdf23732b",
       decimal: 6,
     },
+    {
+      // network_id: "15557",
+      symbol: "xNEUTRO",
+      logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
+      name: "xNEUTRO Token",
+      address: "0x96A064DB6CA1D45e59756D3DAc7CD249D4D74203",
+      decimal: 18,
+    },
   ],
 };
