@@ -1,25 +1,37 @@
-import { Dispatch, Fragment, SetStateAction, useEffect, useMemo, useState } from 'react'
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
-import { classNames } from '@/shared/helpers/classNamer'
-import { useNetwork } from 'wagmi'
-import { DEFAULT_CHAIN_ID, SupportedChainID, supportedChainID } from '@/shared/types/chain.types'
-import { tokens } from '@/shared/statics/tokenList'
-import { Token } from '@/shared/types/tokens.types'
+import {
+  Dispatch,
+  Fragment,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
+import { classNames } from "@/shared/helpers/classNamer";
+import { useNetwork } from "wagmi";
+import {
+  DEFAULT_CHAIN_ID,
+  SupportedChainID,
+  supportedChainID,
+} from "@/shared/types/chain.types";
+import { tokens } from "@/shared/statics/tokenList";
+import { Token } from "@/shared/types/tokens.types";
 
 type NativeTokenPicker = {
   handlePreferNative: Dispatch<SetStateAction<boolean>>;
-}
+};
 
 const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
   const { handlePreferNative } = props;
-  const { chain } = useNetwork()
+  const { chain } = useNetwork();
 
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID];
-    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID];
-    return tokens[chain.id.toString() as SupportedChainID]
+    if (!chain) return tokens[DEFAULT_CHAIN_ID.id];
+    if (!supportedChainID.includes(chain.id as any))
+      return tokens[DEFAULT_CHAIN_ID.id];
+    return tokens[chain.id as SupportedChainID];
   }, [chain]);
 
   const wrappedAndNativeToken: [Token, Token] = useMemo(() => {
@@ -28,16 +40,16 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
       {
         ...chainSpecificTokens[0],
         name: "W" + chainSpecificTokens[0].name,
-        symbol: "W" + chainSpecificTokens[0].name
-      }
-    ]
-  }, [chainSpecificTokens])
+        symbol: "W" + chainSpecificTokens[0].name,
+      },
+    ];
+  }, [chainSpecificTokens]);
 
-  const [selected, setSelected] = useState(wrappedAndNativeToken[0])
+  const [selected, setSelected] = useState(wrappedAndNativeToken[0]);
 
   useEffect(() => {
-    handlePreferNative(selected.symbol === "EOS")
-  }, [selected, handlePreferNative])
+    handlePreferNative(selected.symbol === "EOS");
+  }, [selected, handlePreferNative]);
 
   return (
     <Listbox value={selected} onChange={setSelected}>
@@ -51,9 +63,9 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
                 "h-6 rounded-full",
                 selected.symbol !== "EOS" && "invert"
               )}
-            // onError={(e) => {
-            //   handleImageFallback(token1.symbol, e);
-            // }}
+              // onError={(e) => {
+              //   handleImageFallback(token1.symbol, e);
+              // }}
             />
             <p className="m-0 font-bold">{selected.symbol}</p>
           </div>
@@ -70,21 +82,24 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Listbox.Options className={classNames(
-            "absolute py-1 ml-0 mt-1 w-44 max-h-60 overflow-auto rounded-md text-sm",
-            "bg-white dark:bg-[#0C0C0C] shadow-lg dark:shadow-dark-lg",
-            "border border-neutral-200 dark:border-neutral-800/50",
-            // "ring-1 ring-black ring-opacity-5 focus:outline-none",
-          )}
+          <Listbox.Options
+            className={classNames(
+              "absolute py-1 ml-0 mt-1 w-44 max-h-60 overflow-auto rounded-md text-sm",
+              "bg-white dark:bg-[#0C0C0C] shadow-lg dark:shadow-dark-lg",
+              "border border-neutral-200 dark:border-neutral-800/50"
+              // "ring-1 ring-black ring-opacity-5 focus:outline-none",
+            )}
           >
             {wrappedAndNativeToken.map((token, index) => (
               <Listbox.Option
                 key={index}
-                className={({ active }) => classNames(
-                  "relative cursor-pointer select-none py-2 px-2 mb-0 mx-1 rounded-lg before:hidden transition group",
-                  active && "bg-orange-100/50 dark:bg-orange-400/[.08]",
-                  !active && "text-gray-900"
-                )}
+                className={({ active }) =>
+                  classNames(
+                    "relative cursor-pointer select-none py-2 px-2 mb-0 mx-1 rounded-lg before:hidden transition group",
+                    active && "bg-orange-100/50 dark:bg-orange-400/[.08]",
+                    !active && "text-gray-900"
+                  )
+                }
                 value={token}
               >
                 {({ selected }) => (
@@ -101,8 +116,8 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
                       <span
                         className={classNames(
                           "block truncate font-medium group-hover:text-orange-900 group-hover:dark:text-orange-300 transition",
-                          selected && 'text-orange-900 dark:text-orange-300',
-                          !selected && 'text-neutral-500',
+                          selected && "text-orange-900 dark:text-orange-300",
+                          !selected && "text-neutral-500"
                         )}
                       >
                         {token.name}
@@ -120,8 +135,8 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
           </Listbox.Options>
         </Transition>
       </div>
-    </Listbox >
-  )
-}
+    </Listbox>
+  );
+};
 
-export default NativeTokenPicker
+export default NativeTokenPicker;
