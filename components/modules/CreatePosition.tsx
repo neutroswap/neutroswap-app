@@ -71,9 +71,6 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
     isPreferNative,
     onSuccess: handleSuccess,
   } = props;
-  const { chain } = useNetwork();
-
-  const [openApr, setOpenApr] = useState<boolean>(false);
 
   const [multiplierSettings, setMultiplierSettings] = useState({
     maxGlobalMultiplier: 0,
@@ -91,8 +88,6 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
     functionName: "getPool",
     args: [pool as `0x${string}`],
   });
-  console.log("NFT Pool Factory", NEXT_PUBLIC_NFT_POOL_FACTORY_CONTRACT);
-  console.log("nftPool", nftPool);
 
   const { write: approveToken0, isLoading: isApprovingToken0 } = useApprove({
     address: token0.address,
@@ -181,6 +176,7 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
         await refetchNFTPool();
       },
     });
+  console.log("pool", pool);
 
   const handleDurationChange = (event: number[]) => {
     setDuration(Number(event));
