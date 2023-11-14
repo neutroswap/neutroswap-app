@@ -1,8 +1,4 @@
 import { Button, Page, Text } from "@geist-ui/core";
-import EthLogo from "@/public/logo/eth.svg";
-import NeutroLogo from "@/public/logo/neutro_token.svg";
-import AllocateDividendModal from "@/components/modules/Modal/AllocateDividendModal";
-import DeallocateDividendModal from "@/components/modules/Modal/DeallocateDividendModal";
 import {
   useAccount,
   useContractRead,
@@ -11,12 +7,6 @@ import {
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import {
-  NEXT_PUBLIC_DIVIDENDS_CONTRACT,
-  NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
-  NEXT_PUBLIC_NEUTRO_TOKEN_CONTRACT,
-  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
-} from "@/shared/helpers/constants";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
 import { useMemo, useState } from "react";
 import { formatEther } from "viem";
@@ -42,34 +32,6 @@ interface Reward extends Omit<Token, "logo"> {
 export default function PendingDividends() {
   const { chain } = useNetwork();
   const { address } = useAccount();
-
-  const allocationData = {
-    userTotalAllocation: 20.2,
-    manualAllocation: 12.2,
-    totalShare: 34.12,
-    redeemAllocation: 12.22,
-    // buat fetching ini jgn manual,
-    dividendTokens: [
-      {
-        tokenName: "ETH-USDC.e",
-        tokenAddress: 0x000000000000000,
-        logoToken0: "logoToken0",
-        logoToken1: "logoToken1",
-        pendingAmountInToken: 1.2,
-        pendingAmountInUsd: 200,
-      },
-      {
-        tokenName: "xNEUTRO",
-        tokenAddress: 0xfc43ba5d73afc7ae2745ea6c2f534b1f40871b34,
-        logoToken0: "logoToken0",
-        logoToken1: "logoToken1",
-        pendingAmountInToken: 0.00001,
-        pendingAmountInUsd: 12.82,
-      },
-    ],
-  };
-
-  const allocationReward = allocationData.dividendTokens;
 
   const { data } = useContractReads({
     enabled: Boolean(address),
@@ -131,7 +93,7 @@ export default function PendingDividends() {
         return lpInfo;
       });
       return {
-        name: `ESPER Unknown LP Token`,
+        name: `Unknown LP Token`,
         address: address,
         symbol: `Unknown LP`,
         logo: [],
@@ -176,7 +138,7 @@ export default function PendingDividends() {
 type Props = {
   token: `0x${string}`;
   amount: bigint;
-  // amountInUsd: bigint;
+  amountInUsd: bigint;
 };
 
 const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
@@ -243,7 +205,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
         return lpInfo;
       });
       return {
-        name: `ESPER Unknown LP Token`,
+        name: `Unknown LP Token`,
         address: address,
         symbol: `Unknown LP`,
         logo: [],
@@ -262,16 +224,9 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
     <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
       <div className="flex items-center">
         <div className="flex">
-          {/* <EthLogo className="relative w-8 h-8 rounded-full" />
-          <NeutroLogo className="w-8 h-8 rounded-full -ml-2" /> */}
           {reward.logo.map((logo) => (
             <TokenLogo className="w-8 h-8" src={logo} key={logo} />
           ))}
-          {/* <img
-                src={data.logoToken0}
-                className="relative w-8 h-8 rounded-full"
-              />
-              <img src={data.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
         </div>
         <div className="ml-2">
           <span className="text-sm text-neutral-500">{reward.symbol}</span>
@@ -279,13 +234,13 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
           <span className="text-sm">
             {formatEther(BigInt(props.amount))} &nbsp;
             <span className="text-neutral-500 text-xs">
-              {/* ($
+              ($
               {currencyFormat(
                 parseFloat(formatEther(BigInt(props.amountInUsd))),
                 2,
                 0.01
               )}
-              ) */}
+              )
             </span>
           </span>
         </div>

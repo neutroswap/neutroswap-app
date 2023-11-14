@@ -30,36 +30,6 @@ interface Reward extends Omit<Token, "logo"> {
   logo: string[];
 }
 
-const masterData = {
-  totalAllocation: 1000,
-  currentEpoch: 1000,
-  APY: 24.57,
-  deallocationFee: 0,
-  currentEpochDetails: [
-    {
-      tokenName: "ETH-USDC.e",
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      amountToDistributeInToken: 0.00004,
-      amountToDistributeInUsd: 20000,
-    },
-    {
-      tokenName: "xNEUTRO",
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      amountToDistributeInToken: 12.2,
-      amountToDistributeInUsd: 1782.1,
-    },
-  ],
-  nextEpochDetails: {
-    minEstValue: 120, // in dollar
-    APY: 10,
-    startTime: 1692177380, // epoch
-  },
-};
-
-const nextEpochReward = masterData.nextEpochDetails;
-
 export default function Dividend() {
   const { chain } = useNetwork();
 
@@ -206,7 +176,7 @@ export default function Dividend() {
                     APY
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {masterData.APY}%
+                    0%
                   </span>
                 </div>
                 <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
@@ -270,11 +240,18 @@ export default function Dividend() {
                               )}{" "}
                               {info.symbol} &nbsp;
                               <span className="text-neutral-500 text-xs">
-                                {/* ($
+                                $
                                 {currencyFormat(
-                                  Number(item.amountToDistributeInUsd)
+                                  parseFloat(
+                                    formatEther(
+                                      BigInt(
+                                        reward.currentDistributionAmountInUsd
+                                      )
+                                    )
+                                  ),
+                                  2,
+                                  0.01
                                 )}
-                                ) */}
                               </span>
                             </div>
                           </div>
