@@ -28,14 +28,12 @@ import {
   useAccount,
   useContractReads,
 } from "wagmi";
-// import useConfig from "@/lib/hooks/useConfig";
 import { useApprove } from "@/shared/hooks/useApprove";
 import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
 import { formatEther, formatUnits, parseEther } from "viem";
 import dayjs from "dayjs";
 import { CaretDown, Warning } from "@phosphor-icons/react";
 import Button from "@/components/elements/Button";
-// import { Button } from "@geist-ui/core";
 import { cn, currencyFormat } from "@/shared/utils";
 import {
   Collapsible,
