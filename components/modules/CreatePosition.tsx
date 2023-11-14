@@ -176,7 +176,6 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
         await refetchNFTPool();
       },
     });
-  console.log("pool", pool);
 
   const handleDurationChange = (event: number[]) => {
     setDuration(Number(event));
