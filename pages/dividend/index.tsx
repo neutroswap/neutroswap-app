@@ -24,6 +24,7 @@ import { tokens } from "@/shared/statics/tokenList";
 import { SupportedChainID } from "@/shared/types/chain.types";
 import getPairInfo from "@/shared/getters/getPairInfo";
 import TokenLogo from "@/components/modules/TokenLogo";
+import dayjs from "dayjs";
 
 interface Reward extends Omit<Token, "logo"> {
   logo: string[];
@@ -103,7 +104,9 @@ export default function Dividend() {
   const deallocationFee = formatEther(data?.[1] ?? BigInt(0));
 
   //countdown utils
-  const protocolEarningsTime = Math.floor(Number(data?.[2]));
+  // const protocolEarningsTime = Math.floor(Number(data?.[2]));
+
+  const nextCycleDate = dayjs.unix(Number(data?.[2])).format("MMMM D, YYYY");
 
   const addressToTokenInfo = useMemo(() => {
     if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
@@ -181,7 +184,7 @@ export default function Dividend() {
               <div className="flex justify-between">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Current Epochs
+                    Reward Current Epochs
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
                     $
@@ -235,7 +238,7 @@ export default function Dividend() {
             <div className="border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg">
               <div className="flex flex-row justify-between items-start md:p-8 -mb-7">
                 <p className="m-0 text-left font-semibold whitespace-nowrap">
-                  Current epoch
+                  Protocol Earnings
                 </p>
               </div>
 
@@ -281,33 +284,11 @@ export default function Dividend() {
                   })}
               </div>
 
-              <hr className="my-4 ml-8 w-11/12 border-neutral-200/80 dark:border-neutral-800/80" />
-              <div className="flex flex-col justify-between items-start md:p-8 md:pt-0">
-                <div className="flex flex-col w-full">
-                  <p className="m-0 text-left font-semibold whitespace-nowrap">
-                    Next epoch
-                  </p>
-                  <div className="grid grid-cols-3 auto-cols-max mt-2 ">
-                    <div className="flex flex-col">
-                      <span className="text-sm text-neutral-500">
-                        Min. estimated value
-                      </span>
-                      <span className="text-sm ">
-                        ${currencyFormat(nextEpochReward.minEstValue)}
-                      </span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-neutral-500">APY</span>
-                      <span className="text-sm ">{nextEpochReward.APY}%</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm text-neutral-500">
-                        Remaining time
-                      </span>
-                      <Countdown targetEpochTime={protocolEarningsTime} />
-                    </div>
-                  </div>
-                </div>
+              <hr className="my-4 w-full border-neutral-200/80 dark:border-neutral-800/80" />
+              <div className="flex flex-col justify-between items-start p-2 m-5 py-0">
+                <p className="m-0 text-left whitespace-nowrap text-sm text-muted-foreground">
+                  Next distribution is scheduled at: {nextCycleDate}
+                </p>
               </div>
             </div>
           </div>
