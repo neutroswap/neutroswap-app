@@ -8311,7 +8311,7 @@ export const NEUTRO_HELPER_ABI = <const>[
     inputs: [
       {
         internalType: "address",
-        name: "_weth",
+        name: "_weos",
         type: "address",
       },
       {
@@ -8372,7 +8372,7 @@ export const NEUTRO_HELPER_ABI = <const>[
   },
   {
     inputs: [],
-    name: "WETH",
+    name: "WEOS",
     outputs: [
       {
         internalType: "address",
@@ -8839,6 +8839,11 @@ export const NEUTRO_HELPER_ABI = <const>[
           {
             internalType: "uint256",
             name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "amountInUsd",
             type: "uint256",
           },
         ],
