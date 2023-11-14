@@ -7,7 +7,6 @@ import { isWrappedNative, tokens } from "@/shared/statics/tokenList";
 import { parseUnits } from "viem";
 import dayjs from "dayjs";
 import { POSITION_HELPER_ABI } from "../abi";
-import { NFTPOOLFACTORY_ABI } from "../abi";
 
 type Args = {
   pool?: `0x${string}`
