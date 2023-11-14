@@ -33,7 +33,7 @@ import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
 import { formatEther, formatUnits, parseEther } from "viem";
 import dayjs from "dayjs";
 import { CaretDown, Warning } from "@phosphor-icons/react";
-import Button from "@/components/elements/Button";
+import { Button } from "@/components/elements/Button";
 import { cn, currencyFormat } from "@/shared/utils";
 import {
   Collapsible,
@@ -51,7 +51,7 @@ import {
   FormField,
   FormItem,
 } from "@/components/elements/Form";
-import Input from "@/components/elements/Input";
+import { Input } from "@/components/elements/Input";
 import {
   NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
   NEXT_PUBLIC_NFT_POOL_FACTORY_CONTRACT,
