@@ -235,8 +235,9 @@ export default function Dividend() {
                               {info.symbol}
                             </span>
                             <div className="mt-0 text-sm">
-                              {formatEther(
-                                BigInt(reward.currentDistributionAmount ?? 0)
+                              {formatUnits(
+                                BigInt(reward.currentDistributionAmount ?? 0),
+                                info.decimal
                               )}{" "}
                               {info.symbol} &nbsp;
                               <span className="text-neutral-500 text-xs">

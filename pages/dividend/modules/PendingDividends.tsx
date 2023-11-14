@@ -9,7 +9,7 @@ import {
 } from "wagmi";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
 import { useMemo, useState } from "react";
-import { formatEther } from "viem";
+import { formatEther, formatUnits } from "viem";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
@@ -232,7 +232,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
           <span className="text-sm text-neutral-500">{reward.symbol}</span>
           <br />
           <span className="text-sm">
-            {formatEther(BigInt(props.amount))} &nbsp;
+            {formatUnits(BigInt(props.amount), reward.decimal)} &nbsp;
             <span className="text-neutral-500 text-xs">
               ($
               {currencyFormat(
