@@ -74,8 +74,6 @@ export default function PoolDetails() {
     abi: NEUTRO_POOL_ABI,
     functionName: "getReserves",
     onSuccess(response) {
-      console.log("Res", response);
-      console.log(response[0] !== BigInt(0), response[1] !== BigInt(0));
       if (response[0] == BigInt(0) && response[1] == BigInt(0)) {
         setIsNewPool(true);
         setSelectedIndex(1);
