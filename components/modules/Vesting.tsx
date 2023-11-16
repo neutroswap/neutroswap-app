@@ -15,6 +15,7 @@ import { Card, CardContent } from "@/components/elements/Card";
 import { formatEther } from "viem";
 import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
+import { multicall } from "@wagmi/core";
 
 export default function VestingXneutro() {
   const { address } = useAccount();
@@ -28,38 +29,30 @@ export default function VestingXneutro() {
     abi: XNEUTRO_ABI,
     functionName: "getUserRedeemsLength",
     args: [address!],
-  });
-
-  const getUserRedeemCalls = useMemo(() => {
-    const xneutroContract = {
-      address: XNEUTRO_CONTRACT,
-      abi: XNEUTRO_ABI,
-      functionName: "getUserRedeem",
-    } as const;
-    let arr = [];
-    const lengthNumber = Number(userRedeemsLength);
-    for (let i = 0; i < lengthNumber; i++) {
-      arr.push({
-        ...xneutroContract,
-        args: [address!, BigInt(i)],
-      });
-    }
-    return arr;
-  }, [userRedeemsLength, address]);
-
-  const { data } = useContractReads({
-    enabled: Boolean(userRedeemsLength),
-    contracts: getUserRedeemCalls,
-    allowFailure: false,
-    onSuccess: (userRedeemsInfo: any[]) => {
+    onSuccess: async (userRedeemsLength) => {
       const lengthNumber = Number(userRedeemsLength);
       setRedeemsLength(lengthNumber);
+      let contracts = [];
+      for (let i = 0; i < lengthNumber; i++) {
+        let contract = {
+          address: XNEUTRO_CONTRACT,
+          abi: XNEUTRO_ABI,
+          functionName: "getUserRedeem",
+          args: [address!, BigInt(i)],
+        };
+        contracts.push(contract);
+      }
+
+      const userRedeemsInfo: any = await multicall({
+        contracts,
+        allowFailure: false,
+      });
+
       let claimable = [];
       let pending = [];
       for (let i = 0; i < userRedeemsInfo.length; i++) {
         const currentTimestamp = Math.floor(Date.now() / 1000);
-        const timeDifference =
-          Number(userRedeemsInfo[i].endTime) - currentTimestamp;
+        const timeDifference = Number(userRedeemsInfo[i][2]) - currentTimestamp;
         const days = Math.floor(timeDifference / 86400);
         const hours = Math.floor((timeDifference % 86400) / 3600);
         const minutes = Math.floor((timeDifference % 3600) / 60);
@@ -68,10 +61,11 @@ export default function VestingXneutro() {
           hours,
           minutes,
         };
-        if (Number(userRedeemsInfo[i].endTime) <= currentTimestamp) {
-          claimable.push({ index: i, date: date, ...userRedeemsInfo[i] });
+        userRedeemsInfo[i].date = date;
+        if (userRedeemsInfo[i][2] <= currentTimestamp) {
+          claimable.push({ index: i, ...userRedeemsInfo[i] });
         } else {
-          pending.push({ index: i, date: date, ...userRedeemsInfo[i] });
+          pending.push({ index: i, ...userRedeemsInfo[i] });
         }
       }
       setClaimableRedeems(claimable);
