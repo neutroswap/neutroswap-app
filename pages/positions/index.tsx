@@ -156,8 +156,6 @@ function SPNFTPool() {
     refetchOnWindowFocus: false,
   });
 
-  console.log("data", data);
-
   if (isFetching) return <Loading scale={3} />;
 
   if (error || !data || !data.length) {
