@@ -236,7 +236,9 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
             <span className="text-neutral-500 text-xs">
               ($
               {currencyFormat(
-                parseFloat(formatEther(BigInt(props.amountInUsd))),
+                parseFloat(
+                  formatUnits(BigInt(props.amountInUsd), reward.decimal)
+                ),
                 2,
                 0.01
               )}
