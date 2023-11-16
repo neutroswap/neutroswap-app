@@ -39,7 +39,7 @@
     "class-variance-authority": "^0.7.0",
     "coingecko-api-v3": "^0.0.23",
     "connectkit": "^1.5.3",
-    "dayjs": "^1.11.7",
+    "dayjs": "^1.11.10",
     "eslint": "8.35.0",
     "eslint-config-next": "13.2.3",
     "eth-chains": "^2.0.0",

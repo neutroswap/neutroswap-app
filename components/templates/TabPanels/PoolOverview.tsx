@@ -19,6 +19,8 @@ import {
   supportedChainID,
   SupportedChainID,
 } from "@/shared/types/chain.types";
+import { ResponsiveDialog } from "@/components/modules/ResponsiveDialog";
+import { WrapPositionModal } from "@/components/modules/Modal/WrapPosition";
 
 type PoolOverviewPanelProps = {
   token0: Token;
@@ -47,10 +49,10 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
 
   // TODO: MOVE THIS HOOKS
   const nativeToken = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
+    if (!chain) return tokens[DEFAULT_CHAIN_ID.id][0];
     if (!supportedChainID.includes(chain.id.toString() as any))
-      return tokens[DEFAULT_CHAIN_ID][0];
-    return tokens[chain.id.toString() as SupportedChainID][0];
+      return tokens[DEFAULT_CHAIN_ID.id][0];
+    return tokens[chain.id as SupportedChainID][0];
   }, [chain]);
 
   return (
@@ -99,9 +101,22 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
           <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">
             Owned LP
           </p>
-          <p className="m-0 text-2xl font-semibold">
-            {(+formatEther(userLPBalance.raw)).toFixed(8)} NLP
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="m-0 text-2xl font-semibold">
+              {(+formatEther(userLPBalance.raw)).toFixed(8)} NLP
+            </p>
+            <ResponsiveDialog.Root shouldScaleBackground>
+              <ResponsiveDialog.Trigger>
+                <Button>Convert to spNFT</Button>
+              </ResponsiveDialog.Trigger>
+              <ResponsiveDialog.Content>
+                <WrapPositionModal
+                  pool={router.query.id as `0x${string}`}
+                  // stats={stats}
+                />
+              </ResponsiveDialog.Content>
+            </ResponsiveDialog.Root>
+          </div>
         </div>
         <div className="w-full mt-4 border border-neutral-200/50 dark:border-neutral-800 rounded-lg px-4 py-6 box-border">
           <p className="m-0 mb-2 text-xs font-bold uppercase text-neutral-500">

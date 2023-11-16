@@ -207,7 +207,7 @@ export default function Home() {
         raw: token1Balance.result as bigint,
         formatted: parseFloat(
           formatUnits(
-            BigInt(Number(token1Balance)),
+            BigInt(Number(token1Balance.result)),
             Number(token1Decimals.result)
           ).toString()
         ).toFixed(3),
@@ -233,19 +233,19 @@ export default function Home() {
     onSuccess(response) {
       const [t0, t1, reserves] = response;
       const cp =
-        +formatUnits(reserves._reserve0, token0.decimal) *
-        +formatUnits(reserves._reserve1, token1.decimal);
+        +formatUnits(reserves.result?.[0]!, token0.decimal) *
+        +formatUnits(reserves.result?.[1]!, token1.decimal);
       setConstantProduct(cp);
-      if (token0.address === t0) {
-        const r0 = +formatUnits(reserves._reserve0, token0.decimal);
-        const r1 = +formatUnits(reserves._reserve1, token1.decimal);
+      if (token0.address === t0.result) {
+        const r0 = +formatUnits(reserves.result?.[0]!, token0.decimal);
+        const r1 = +formatUnits(reserves.result?.[1]!, token1.decimal);
         setReserves([r0, cp / r0]);
         setMarketPrice(r0 / r1); // reserve0 as quotient
       }
-      if (token0.address === t1) {
+      if (token0.address === t1.result) {
         // reverse reserve number
-        const r0 = +formatUnits(reserves._reserve1, token0.decimal);
-        const r1 = +formatUnits(reserves._reserve0, token1.decimal);
+        const r0 = +formatUnits(reserves.result?.[1]!, token0.decimal);
+        const r1 = +formatUnits(reserves.result?.[0]!, token1.decimal);
         setReserves([r0, cp / r0]);
         setMarketPrice(r0 / r1); // reserve0 as quotient
       }
@@ -289,7 +289,7 @@ export default function Home() {
   }, [tradeContext, isPreferNative, token0]);
 
   const isAmount0Invalid = () => {
-    let value: BigNumber;
+    let value: bigint;
     if (tokenName0 === "WEOS" && balance) value = balance.value;
     else value = balance0.raw;
     return Number(tokenAmount0) > +formatUnits(value, token0.decimal);

@@ -1,4 +1,5 @@
-import { SupportedChainID } from "../types/chain.types";
+import { getAddress } from "viem";
+import { DEFAULT_CHAIN_ID, SupportedChainID } from "../types/chain.types";
 import { Token } from "../types/tokens.types";
 
 /**
@@ -102,3 +103,8 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
     },
   ],
 };
+
+const WRAPPED_NATIVE = tokens[DEFAULT_CHAIN_ID.id][0]
+export const isWrappedNative = (address: `0x${string}`) => {
+  return getAddress(WRAPPED_NATIVE.address) === getAddress(address)
+}

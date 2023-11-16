@@ -68,13 +68,13 @@ export default function PoolDetails() {
     ],
   });
 
-  const { refetch: refetchReserves } = useContractRead({
+  const { data: reserves, refetch: refetchReserves } = useContractRead({
     enabled: Boolean(token0 && token1),
     address: router.query.id as `0x${string}`,
     abi: NEUTRO_POOL_ABI,
     functionName: "getReserves",
     onSuccess(response) {
-      if (response[0] !== BigInt(0) && response[1] !== BigInt(0)) {
+      if (response[0] == BigInt(0) && response[1] == BigInt(0)) {
         setIsNewPool(true);
         setSelectedIndex(1);
         return setPriceRatio([0, 0]);
@@ -93,23 +93,23 @@ export default function PoolDetails() {
     enabled: Boolean(pairs && address),
     contracts: [
       {
-        address: pairs?.[0],
+        address: pairs?.[0].result,
         abi: ERC20_ABI,
         functionName: "balanceOf",
         args: [address!],
       },
       {
-        address: pairs?.[1],
+        address: pairs?.[1].result,
         abi: ERC20_ABI,
         functionName: "balanceOf",
         args: [address!],
       },
-      { address: pairs?.[0], abi: ERC20_ABI, functionName: "name" },
-      { address: pairs?.[1], abi: ERC20_ABI, functionName: "name" },
-      { address: pairs?.[0], abi: ERC20_ABI, functionName: "symbol" },
-      { address: pairs?.[1], abi: ERC20_ABI, functionName: "symbol" },
-      { address: pairs?.[0], abi: ERC20_ABI, functionName: "decimals" },
-      { address: pairs?.[1], abi: ERC20_ABI, functionName: "decimals" },
+      { address: pairs?.[0].result, abi: ERC20_ABI, functionName: "name" },
+      { address: pairs?.[1].result, abi: ERC20_ABI, functionName: "name" },
+      { address: pairs?.[0].result, abi: ERC20_ABI, functionName: "symbol" },
+      { address: pairs?.[1].result, abi: ERC20_ABI, functionName: "symbol" },
+      { address: pairs?.[0].result, abi: ERC20_ABI, functionName: "decimals" },
+      { address: pairs?.[1].result, abi: ERC20_ABI, functionName: "decimals" },
     ],
     onSuccess(value) {
       const [
@@ -129,32 +129,42 @@ export default function PoolDetails() {
           decimal: Number(balance0.result),
           raw: balance0.result as bigint,
           formatted: parseFloat(
-            formatUnits(BigInt(Number(balance0)), Number(decimal0))
+            formatUnits(
+              BigInt(Number(balance0.result)),
+              Number(decimal0.result)
+            )
           ).toFixed(2),
         },
         {
           decimal: Number(balance1.result),
           raw: balance1.result as bigint,
           formatted: parseFloat(
-            formatUnits(BigInt(Number(balance1)), Number(decimal1))
+            formatUnits(
+              BigInt(Number(balance1.result)),
+              Number(decimal1.result)
+            )
           ).toFixed(2),
         },
       ]);
       setToken0({
         // network_id: "15557",
-        name: name0,
-        address: pairs?.[0]!,
-        symbol: symbol0,
-        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol0.toLowerCase()}.svg`,
-        decimal: Number(decimal0),
+        name: name0.result as string,
+        address: pairs?.[0].result as `0x${string}`,
+        symbol: symbol0.result as string,
+        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol0
+          .result!.toString()
+          .toLowerCase()}.svg`,
+        decimal: Number(decimal0.result),
       });
       setToken1({
         // network_id: "15557",
-        address: pairs?.[1]!,
-        name: name1,
-        symbol: symbol1,
-        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol1.toLowerCase()}.svg`,
-        decimal: Number(decimal1),
+        address: pairs?.[1].result as `0x${string}`,
+        name: name1.result as string,
+        symbol: symbol1.result as string,
+        logo: `https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/${symbol1
+          .result!.toString()
+          .toLowerCase()}.svg`,
+        decimal: Number(decimal1.result),
       });
     },
   });
@@ -200,22 +210,28 @@ export default function PoolDetails() {
       setUserLPBalance({
         decimal: 18,
         raw: value[0].result as bigint,
-        formatted: Number(formatEther(value[0])).toFixed(2),
+        formatted: Number(formatEther(value[0].result as bigint)).toFixed(2),
       });
-      setTotalLPSupply(value[1]);
+      setTotalLPSupply(value[1].result as bigint);
       setPoolBalances([
         {
           decimal: Number(value[4]),
           raw: value[2].result as bigint,
           formatted: parseFloat(
-            formatUnits(BigInt(Number(value[2])), Number(value[4]))
+            formatUnits(
+              BigInt(Number(value[2].result)),
+              Number(value[4].result)
+            )
           ).toFixed(2),
         },
         {
           decimal: Number(value[5]),
           raw: value[3].result as bigint,
           formatted: parseFloat(
-            formatUnits(BigInt(Number(value[3])), Number(value[5]))
+            formatUnits(
+              BigInt(Number(value[3].result)),
+              Number(value[5].result)
+            )
           ).toFixed(2),
         },
       ]);
@@ -312,6 +328,7 @@ export default function PoolDetails() {
                   token1={token1}
                   priceRatio={priceRatio}
                   isNewPool={isNewPool}
+                  reserves={reserves}
                   refetchReserves={refetchReserves}
                   refetchAllBalance={refetchAllBalance}
                   refetchUserBalances={refetchUserBalances}

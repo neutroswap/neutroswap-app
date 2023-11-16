@@ -3,7 +3,7 @@ import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
 import { formatUnits, parseUnits } from "viem";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useCallback, useMemo, useState } from "react";
 import {
   useAccount,
   useBalance,
@@ -12,32 +12,38 @@ import {
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import debounce from "lodash/debounce";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
 import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
-import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
+import NativeTokenPicker from "@/components/modules/Swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/utils";
-import { tokens } from "@/shared/statics/tokenList";
+import { isWrappedNative, tokens } from "@/shared/statics/tokenList";
 import {
   DEFAULT_CHAIN_ID,
   supportedChainID,
   SupportedChainID,
 } from "@/shared/types/chain.types";
-import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 import { useApprove } from "@/shared/hooks/useApprove";
 import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
-import { waitForTransaction } from "@wagmi/core";
+import { getContract, waitForTransaction } from "@wagmi/core";
+import { useAddLiquidity } from "@/shared/hooks/useAddLiquidityETH";
+import { useDebounce } from "@/shared/hooks/useDebounce";
+import { Tabs, TabsList, TabsTrigger } from "@/components/elements/Tabs";
+import { TabsContent } from "@radix-ui/react-tabs";
+import { ResponsiveDialog } from "@/components/modules/ResponsiveDialog";
+import { useRouter } from "next/router";
+import { CreatePositionModal } from "@/components/modules/CreatePosition";
 
 type PoolDepositPanelProps = {
   balances: Currency[];
   token0: Token;
   token1: Token;
-  token0Amount: string;
-  token1Amount: string;
+  // token0Amount: string;
+  // token1Amount: string;
   priceRatio: [number, number];
+  reserves: readonly [bigint, bigint, number] | undefined;
   refetchReserves: (options?: any) => Promise<any>;
   refetchAllBalance: (options?: any) => Promise<any>;
   refetchUserBalances: (options?: any) => Promise<any>;
@@ -50,6 +56,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     token0,
     token1,
     priceRatio,
+    reserves,
     refetchReserves,
     refetchAllBalance,
     refetchUserBalances,
@@ -58,6 +65,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
   const { chain } = useNetwork();
   const { address } = useAccount();
+  const router = useRouter();
 
   const [token0Amount, setToken0Amount] = useState<string>("");
   const [token1Amount, setToken1Amount] = useState<string>("");
@@ -69,10 +77,10 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
 
   // TODO: MOVE THIS HOOKS
   const nativeToken = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
+    if (!chain) return tokens[DEFAULT_CHAIN_ID.id][0];
     if (!supportedChainID.includes(chain.id.toString() as any))
-      return tokens[DEFAULT_CHAIN_ID][0];
-    return tokens[chain.id.toString() as SupportedChainID][0];
+      return tokens[DEFAULT_CHAIN_ID.id][0];
+    return tokens[chain.id as SupportedChainID][0];
   }, [chain]);
 
   const [isPreferNative, setIsPreferNative] = useState(
@@ -83,15 +91,15 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   // TODO: move slippage to state or store
   const SLIPPAGE = 500; // 1.5%
 
-  const { data: balance, refetch: refetchBalanceETH } = useBalance({
+  const { data: balanceETH, refetch: refetchBalanceETH } = useBalance({
     enabled: Boolean(address),
     address,
   });
 
-  const neutroRouter = {
+  const neutroRouter = getContract({
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
-  };
+  });
 
   const {
     balance: balance0,
@@ -121,182 +129,79 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     },
   });
 
-  const { config: addLiquidityConfig, isFetching: isSimulatingAddLiquidity } =
-    usePrepareContractWrite({
-      enabled: Boolean(
-        !isPreferNative &&
-          token0Min !== BigInt(0) &&
-          token1Min !== BigInt(0) &&
-          Number(token0Amount) &&
-          Number(token1Amount)
-      ),
-      address: ROUTER_CONTRACT,
-      abi: NEUTRO_ROUTER_ABI,
-      functionName: "addLiquidity",
-      args: [
-        token0.address,
-        token1.address,
-        parseUnits(token0Amount, token0.decimal),
-        parseUnits(token1Amount, token1.decimal),
-        token0Min,
-        token1Min,
-        address!,
-        BigInt(dayjs().add(5, "minutes").unix()), // deadline
-      ],
-      onError(error) {
-        console.log("Error", error);
-      },
-    });
-
-  const { isLoading: isAddingLiquidity, write: addLiquidity } =
-    useContractWrite({
-      ...addLiquidityConfig,
-      onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
-        await refetchAllBalance();
-        await refetchUserBalances();
-        await refetchReserves();
-        setToken0Amount("");
-        setToken1Amount("");
-      },
-    });
-
   const {
-    config: addLiquidityETHConfig,
-    isFetching: isSimulatingAddLiquidityETH,
-  } = usePrepareContractWrite({
-    enabled: Boolean(
-      (token0.address === nativeToken.address ||
-        token1.address === nativeToken.address) && // do not enable if none of the addr is WEOS
-        isPreferNative
-    ),
-    address: ROUTER_CONTRACT,
-    abi: NEUTRO_ROUTER_ABI,
-    functionName: "addLiquidityETH",
-    args: [
-      token0.symbol === "WEOS" ? token1.address : token0.address, // token (address)
-      token0.symbol === "WEOS"
-        ? parseUnits(token1Amount, token1.decimal)
-        : parseUnits(token0Amount, token0.decimal), // amountTokenDesired
-      token0.symbol === "WEOS" ? token1Min : token0Min, // amountTokenMin
-      token0.symbol === "WEOS" ? token0Min : token1Min, // amountETHMin
-      address!, // to
-      BigInt(dayjs().add(5, "minutes").unix()), // deadline
-    ],
-    value:
-      token0.symbol === "WEOS"
-        ? parseUnits(token0Amount, token0.decimal)
-        : parseUnits(token1Amount, token1.decimal),
+    write: addLiquidity,
+    isLoading: isAddingLiquidity,
+    isSimulating: isSimulatingAddLiquidity,
+  } = useAddLiquidity({
+    token0,
+    token1,
+    token0Amount,
+    token1Amount,
+    token0Min,
+    token1Min,
+    isPreferNative,
+    onSuccess: async () => {
+      if (isWrappedNative(token0.address)) await refetchBalanceETH();
+      else await refetchBalanceAndAllowance0;
+      if (isWrappedNative(token1.address)) await refetchBalanceETH();
+      else await refetchBalanceAndAllowance1;
+      setToken0Amount("");
+      setToken1Amount("");
+    },
   });
 
-  const { isLoading: isAddingLiquidityETH, write: addLiquidityETH } =
-    useContractWrite({
-      ...addLiquidityETHConfig,
-      onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
-        await refetchAllBalance();
-        await refetchUserBalances();
-        await refetchBalanceETH();
-        await refetchReserves();
-        setToken0Amount("");
-        setToken1Amount("");
-      },
-    });
+  const handleToken0Change = async () => {
+    if (isNaN(+token0Amount)) return;
+    setToken0Amount(token0Amount);
+    const amountADesired = parseUnits(token0Amount, token0.decimal);
 
-  const handleToken0Change = async (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (isNaN(+value)) return;
-    setToken0Amount(value);
-
-    if (isNewPool)
+    if (isNewPool || !reserves)
       return setToken0Min(
-        (parseUnits(!!value ? value : "0", token0.decimal) *
+        (parseUnits(!!token0Amount ? token0Amount : "0", token0.decimal) *
           BigInt(10000 - SLIPPAGE)) /
           BigInt(10000)
       );
-    else debouncedToken0(value);
+    if (!Number(amountADesired)) return setToken1Amount("");
+
+    const amountBDesired = (amountADesired * reserves[1]) / reserves[0];
+    setToken1Amount(formatUnits(amountBDesired, token1.decimal));
+
+    const amountAMin =
+      (amountADesired * BigInt(10000 - SLIPPAGE)) / BigInt(10000);
+    const amountBMin =
+      (amountBDesired * BigInt(10000 - SLIPPAGE)) / BigInt(10000);
+    setToken0Min(amountAMin);
+    setToken1Min(amountBMin);
   };
 
-  const debouncedToken0 = debounce(async (nextValue) => {
-    if (!Number(nextValue)) return setToken1Amount("");
+  const debouncedToken0Change = useDebounce(handleToken0Change);
 
-    setIsFetchingToken1Price(true);
-    try {
-      // (r0 / r1) * amount0
-      const amount = (priceRatio[1] * Number(nextValue)).toFixed(
-        token1.decimal
-      );
-      setToken1Amount(amount);
+  const handleToken1Change = async () => {
+    if (isNaN(+token1Amount)) return;
+    setToken1Amount(token1Amount);
+    const amountBDesired = parseUnits(token1Amount, token1.decimal);
 
-      // calculate token0Min
-      const amountsOut0 = await neutroRouter?.getAmountsOut(
-        parseUnits(amount, token1.decimal),
-        [token1.address, token0.address]
-      );
-      if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-      const [, min0] = amountsOut0;
-      setToken0Min(min0);
-
-      // calculate token1Min
-      const amountsOut1 = await neutroRouter?.getAmountsOut(
-        parseUnits(nextValue, token0.decimal),
-        [token0.address, token1.address]
-      );
-      if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-      const [, min1] = amountsOut1;
-      setToken1Min(min1);
-      setIsFetchingToken1Price(false);
-    } catch (error) {
-      setIsFetchingToken1Price(false);
-    }
-  }, 500);
-
-  const handleToken1Change = async (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    if (isNaN(+value)) return;
-    setToken1Amount(value);
-
-    if (isNewPool)
+    if (isNewPool || !reserves)
       return setToken1Min(
-        (parseUnits(!!value ? value : "0", token1.decimal) *
+        (parseUnits(!!token1Amount ? token1Amount : "0", token1.decimal) *
           BigInt(10000 - SLIPPAGE)) /
           BigInt(10000)
       );
-    else debouncedToken1(value);
+    if (!Number(amountBDesired)) return setToken1Amount("");
+
+    const amountADesired = (amountBDesired * reserves[0]) / reserves[1];
+    setToken0Amount(formatUnits(amountADesired, token0.decimal));
+
+    const amountAMin =
+      (amountADesired * BigInt(10000 - SLIPPAGE)) / BigInt(10000);
+    const amountBMin =
+      (amountBDesired * BigInt(10000 - SLIPPAGE)) / BigInt(10000);
+    setToken0Min(amountAMin);
+    setToken1Min(amountBMin);
   };
 
-  const debouncedToken1 = debounce(async (nextValue) => {
-    if (!Number(nextValue)) return setToken0Amount("");
-
-    setIsFetchingToken0Price(true);
-    try {
-      // (r1 / r0) * amount1
-      const amount = (priceRatio[0] * Number(nextValue)).toFixed(
-        token0.decimal
-      );
-      setToken0Amount(amount);
-      // calculate token0Min
-      const amountsOut0 = await neutroRouter?.getAmountsOut(
-        parseUnits(nextValue, token1.decimal),
-        [token1.address, token0.address]
-      );
-      if (!amountsOut0) throw new Error("Fail getAmountsOut0");
-      const [, min0] = amountsOut0;
-      setToken0Min(min0);
-
-      // calculate token1Min
-      const amountsOut1 = await neutroRouter?.getAmountsOut(
-        parseUnits(amount, token0.decimal),
-        [token0.address, token1.address]
-      );
-      if (!amountsOut1) throw new Error("Fail getAmountsOut1");
-      const [, min1] = amountsOut1;
-      setToken1Min(min1);
-      setIsFetchingToken0Price(false);
-    } catch (error) {
-      setIsFetchingToken0Price(false);
-    }
-  }, 500);
+  const debouncedToken1Change = useDebounce(handleToken1Change);
 
   // NOTE: Enable for debugging only
   // useEffect(() => {
@@ -313,18 +218,28 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   //   ])
   // }, [token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
 
+  const formattedBigBalance = useCallback(
+    (balance: bigint, token: Token) => {
+      if (isWrappedNative(token.address)) {
+        return balanceETH ? balanceETH.value : BigInt(0);
+      }
+      return balance;
+    },
+    [balanceETH]
+  );
+
   const isAmount0Invalid = () => {
     let value: bigint;
-    if (isPreferNative && token0.symbol === "WEOS" && balance)
-      value = balance.value;
+    if (isPreferNative && token0.symbol === "WEOS" && balanceETH)
+      value = balanceETH.value;
     else value = balances[0].raw;
     return Number(token0Amount) > +formatUnits(value, token0.decimal);
   };
 
   const isAmount1Invalid = () => {
     let value: bigint;
-    if (isPreferNative && token1.symbol === "WEOS" && balance)
-      value = balance.value;
+    if (isPreferNative && token1.symbol === "WEOS" && balanceETH)
+      value = balanceETH.value;
     else value = balances[1].raw;
     return Number(token1Amount) > +formatUnits(value, token1.decimal);
   };
@@ -388,8 +303,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 {token0.symbol === "WEOS" && (
                   <p className="m-0 text-neutral-500 text-sm">
                     Balance:{" "}
-                    {isPreferNative && balance
-                      ? currencyFormat(+balance?.formatted)
+                    {isPreferNative && balanceETH
+                      ? currencyFormat(+balanceETH?.formatted)
                       : balances[0].formatted}
                   </p>
                 )}
@@ -400,12 +315,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                   onClick={() => {
                     if (!balances) return;
                     const value =
-                      balance && isPreferNative && token0.symbol === "WEOS"
-                        ? balance.value
+                      balanceETH && isPreferNative && token0.symbol === "WEOS"
+                        ? balanceETH.value
                         : balances[0].raw;
                     setToken0Amount(formatUnits(value, token0.decimal));
-                    if (!isNewPool)
-                      debouncedToken0(formatUnits(value, token0.decimal));
+                    if (!isNewPool) debouncedToken0Change();
                   }}
                 >
                   MAX
@@ -417,7 +331,10 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               className="w-full rounded-lg mt-3"
               placeholder="0.00"
               value={token0Amount}
-              onChange={handleToken0Change}
+              onChange={(e) => {
+                setToken0Amount(e.target.value);
+                debouncedToken0Change();
+              }}
               iconRight={isFetchingToken0Price ? <Spinner /> : <></>}
               type={isAmount0Invalid() ? "error" : "default"}
             />
@@ -453,8 +370,8 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 {token1.symbol === "WEOS" && (
                   <p className="m-0 text-neutral-500 text-sm">
                     Balance:{" "}
-                    {isPreferNative && balance
-                      ? currencyFormat(+balance?.formatted)
+                    {isPreferNative && balanceETH
+                      ? currencyFormat(+balanceETH?.formatted)
                       : balances[1].formatted}
                   </p>
                 )}
@@ -465,12 +382,11 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                   onClick={() => {
                     if (!balances) return;
                     const value =
-                      balance && isPreferNative && token1.symbol === "WEOS"
-                        ? balance.value
+                      balanceETH && isPreferNative && token1.symbol === "WEOS"
+                        ? balanceETH.value
                         : balances[1].raw;
                     setToken1Amount(formatUnits(value, token1.decimal));
-                    if (!isNewPool)
-                      debouncedToken1(formatUnits(value, token1.decimal));
+                    if (!isNewPool) debouncedToken1Change();
                   }}
                 >
                   MAX
@@ -482,7 +398,10 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               className="w-full rounded-lg mt-3"
               placeholder="0.00"
               value={token1Amount}
-              onChange={handleToken1Change}
+              onChange={(e) => {
+                setToken1Amount(e.target.value);
+                debouncedToken1Change();
+              }}
               iconRight={isFetchingToken1Price ? <Spinner /> : <></>}
               type={isAmount1Invalid() ? "error" : "default"}
             />
@@ -490,53 +409,106 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               <small className="mt-1 text-red-500">Insufficient balance</small>
             )}
 
-            <div className="flex flex-col w-full mt-4">
-              {(isToken0NeedApproval || isToken1NeedApproval) && (
-                <Button
-                  scale={1.25}
-                  className="!mt-2"
-                  loading={isApprovingToken0 || isApprovingToken1}
-                  onClick={() => {
-                    if (isToken0NeedApproval) return approveToken0?.();
-                    if (isToken1NeedApproval) return approveToken1?.();
-                  }}
-                >
-                  {isToken0NeedApproval
-                    ? `Approve ${token0.symbol}`
-                    : !isToken1NeedApproval && `Approve ${token1.symbol}`}
-                </Button>
-              )}
-              {!isToken0NeedApproval && !isToken1NeedApproval && (
-                <>
-                  {isPreferNative && (
+            <Tabs defaultValue="token">
+              <div className="flex justify-between items-center mb-2">
+                <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                  Preferred Types
+                </p>
+                <TabsList className="p-px">
+                  <TabsTrigger value="nft" className="text-xs">
+                    spNFT
+                  </TabsTrigger>
+                  <TabsTrigger value="token" className="text-xs">
+                    LP Only
+                  </TabsTrigger>
+                </TabsList>
+              </div>
+
+              <TabsContent value="nft">
+                <ResponsiveDialog.Root shouldScaleBackground>
+                  <ResponsiveDialog.Trigger>
+                    <Button scale={1.25} className="w-full !mt-2">
+                      Create spNFT
+                    </Button>
+                  </ResponsiveDialog.Trigger>
+                  <ResponsiveDialog.Content>
+                    <CreatePositionModal
+                      pool={router.query.id as string}
+                      // stats={props.stats}
+                      token0={token0}
+                      token1={token1}
+                      token0Amount={token0Amount}
+                      token1Amount={token1Amount}
+                      token0Min={token0Min}
+                      token1Min={token1Min}
+                      isPreferNative={isPreferNative}
+                      onSuccess={async () => {
+                        if (isWrappedNative(token0.address))
+                          await refetchBalanceETH();
+                        else await refetchBalanceAndAllowance0();
+                        if (isWrappedNative(token1.address))
+                          await refetchBalanceETH();
+                        else await refetchBalanceAndAllowance1();
+                        setToken0Amount("");
+                        setToken1Amount("");
+                        router.push("/pool/position");
+                      }}
+                    />
+                  </ResponsiveDialog.Content>
+                </ResponsiveDialog.Root>
+              </TabsContent>
+              <TabsContent value="token">
+                <div className="flex flex-col w-full">
+                  {(isToken0NeedApproval || isToken1NeedApproval) && (
                     <Button
-                      name="addLiquidityETH"
                       scale={1.25}
                       className="!mt-2"
-                      loading={
-                        isAddingLiquidityETH || isSimulatingAddLiquidityETH
-                      }
-                      disabled={!addLiquidityETH}
-                      onClick={() => addLiquidityETH?.()}
+                      loading={isApprovingToken0 || isApprovingToken1}
+                      onClick={() => {
+                        if (isToken0NeedApproval) return approveToken0?.();
+                        if (isToken1NeedApproval) return approveToken1?.();
+                      }}
                     >
-                      Deposit Now
+                      {isToken0NeedApproval
+                        ? `Approve ${token0.symbol}`
+                        : isToken1NeedApproval && `Approve ${token1.symbol}`}
                     </Button>
                   )}
-                  {!isPreferNative && (
-                    <Button
-                      name="addLiquidity"
-                      scale={1.25}
-                      className="!mt-2"
-                      loading={isAddingLiquidity || isSimulatingAddLiquidity}
-                      disabled={!addLiquidity}
-                      onClick={() => addLiquidity?.()}
-                    >
-                      Deposit Now
-                    </Button>
+                  {!isToken0NeedApproval && !isToken1NeedApproval && (
+                    <>
+                      {isPreferNative && (
+                        <Button
+                          name="addLiquidityETH"
+                          scale={1.25}
+                          className="!mt-2"
+                          loading={
+                            isAddingLiquidity || isSimulatingAddLiquidity
+                          }
+                          disabled={!addLiquidity}
+                          onClick={() => addLiquidity?.()}
+                        >
+                          Deposit Now
+                        </Button>
+                      )}
+                      {!isPreferNative && (
+                        <Button
+                          name="addLiquidity"
+                          scale={1.25}
+                          className="!mt-2"
+                          loading={
+                            isAddingLiquidity || isSimulatingAddLiquidity
+                          }
+                          disabled={!addLiquidity}
+                          onClick={() => addLiquidity?.()}
+                        >
+                          Deposit Now
+                        </Button>
+                      )}
+                    </>
                   )}
-                </>
-              )}
-            </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
         </div>
         {/*  NOTE: FOR DEBUGGING ONLY */}
