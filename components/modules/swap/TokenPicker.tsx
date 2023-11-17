@@ -62,7 +62,10 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
     return tokens[chain.id as SupportedChainID];
   }, [chain]);
 
-  const [tokenList, setTokenList] = useState<Token[]>(chainSpecificTokens);
+  const filteredTokens = chainSpecificTokens.filter(
+    (item) => item.symbol !== "xNEUTRO"
+  );
+  const [tokenList, setTokenList] = useState<Token[]>(filteredTokens);
 
   const handleChange = (value: Token) => {
     setSelectedToken(value);
@@ -77,7 +80,7 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
 
   const resetTokenList = () => {
     setQuery("");
-    setTokenList(chainSpecificTokens);
+    setTokenList(filteredTokens);
     searchRef.current.value = "";
   };
 
