@@ -98,21 +98,81 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
     args: [props.pool],
   });
 
-  const { write: approveLpToken, isLoading: isApprovingLpToken } = useApprove({
-    address: props.pool,
-    spender: nftPool as `0x${string}`,
-    onSuccess: async () => {
-      await refetchBalanceAndAllowanceLp();
+  // const { allowance: allowanceLp, refetch: refetchBalanceAndAllowanceLp } =
+  //   useBalanceAndAllowance(props.pool, nftPool);
+
+  const [allowance, setAllowance] = useState(BigInt(0));
+  const { refetch: refetchLpTokenInfo } = useContractReads({
+    enabled: Boolean(address),
+    watch: true,
+    allowFailure: false,
+    contracts: [
+      {
+        address: props.pool,
+        abi: ERC20_ABI,
+        functionName: "balanceOf",
+        args: [address!],
+      },
+      {
+        address: props.pool,
+        abi: ERC20_ABI,
+        functionName: "allowance",
+        args: [address!, nftPool as `0x${string}`],
+      },
+    ],
+    onSuccess: (data: any) => {
+      const [neutroBalanceResult, allowanceResult] = data;
+      // if (neutroBalanceResult.status === "success") {
+      //   setNeutroBalance(neutroBalanceResult);
+      // }
+      // if (allowanceResult.status === "success") {
+      //   setAllowance(allowanceResult);
+      // }
+      setOwnedLP(neutroBalanceResult);
+      setAllowance(allowanceResult);
     },
   });
 
-  const { allowance: allowanceLp, refetch: refetchBalanceAndAllowanceLp } =
-    useBalanceAndAllowance(props.pool, nftPool);
+  // const { write: approveLpToken, isLoading: isApprovingLpToken } = useApprove({
+  //   address: props.pool,
+  //   spender: nftPool as `0x${string}`,
+  //   onSuccess: async (tx) => {
+  //     await refetchLpTokenInfo();
+  //     await refetchWrapNFTConfig();
+  //     await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+  //   },
+  // });
+
+  const { config: approveLpTokenConfig } = usePrepareContractWrite({
+    address: props.pool,
+    abi: ERC20_ABI,
+    functionName: "approve",
+    args: [
+      nftPool as `0x${string}`,
+      BigInt(
+        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      ),
+    ],
+  });
+
+  const { isLoading: isApprovingLpToken, write: approveLpToken } =
+    useContractWrite({
+      ...approveLpTokenConfig,
+      onSuccess: async (tx) => {
+        await waitForTransaction({ hash: tx.hash });
+        await refetchLpTokenInfo();
+        await retryWrapNFTConfig();
+      },
+    });
 
   const isApproved = useMemo(() => {
-    let formattedAllowance = formatEther(BigInt(allowanceLp ?? 0));
-    return +formattedAllowance >= +debouncedLpTokenAmount;
-  }, [debouncedLpTokenAmount, allowanceLp]);
+    // let formattedAllowance = formatEther(BigInt(allowanceLp ?? 0));
+    return formatEther(allowance) >= (debouncedLpTokenAmount ?? "0");
+  }, [debouncedLpTokenAmount, allowance]);
+
+  console.log("allowance", formatEther(allowance));
+  console.log("isApproved", isApproved);
+  console.log(formatEther(allowance), debouncedLpTokenAmount);
 
   useContractRead({
     enabled: Boolean(nftPool),
@@ -137,28 +197,28 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
     },
   });
 
-  const { isLoading } = useContractReads({
-    enabled: Boolean(address),
-    // cacheOnBlock: true,
-    allowFailure: false,
-    contracts: [
-      {
-        address: props.pool,
-        abi: ERC20_ABI,
-        functionName: "totalSupply",
-      } as const,
-      {
-        address: props.pool,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        args: [address!],
-      } as const,
-    ],
-    onSuccess: (response) => {
-      const [totalSupply, balanceOf] = response;
-      setOwnedLP(balanceOf);
-    },
-  });
+  // const { isLoading } = useContractReads({
+  //   enabled: Boolean(address),
+  //   // cacheOnBlock: true,
+  //   allowFailure: false,
+  //   contracts: [
+  //     {
+  //       address: props.pool,
+  //       abi: ERC20_ABI,
+  //       functionName: "totalSupply",
+  //     } as const,
+  //     {
+  //       address: props.pool,
+  //       abi: ERC20_ABI,
+  //       functionName: "balanceOf",
+  //       args: [address!],
+  //     } as const,
+  //   ],
+  //   onSuccess: (response) => {
+  //     const [totalSupply, balanceOf] = response;
+  //     setOwnedLP(balanceOf);
+  //   },
+  // });
 
   const { write: createNFTPool, isLoading: isCreatingNFTPool } =
     useCreateNFTPool({
@@ -169,15 +229,16 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
       },
     });
 
-  const { config: wrapNFTConfig } = usePrepareContractWrite({
-    address: nftPool,
-    abi: NFT_POOL_ABI,
-    functionName: "createPosition",
-    args: [
-      parseEther(debouncedLpTokenAmount),
-      BigInt(dayjs.duration(Number(debouncedDuration), "days").asSeconds()),
-    ],
-  });
+  const { config: wrapNFTConfig, refetch: retryWrapNFTConfig } =
+    usePrepareContractWrite({
+      address: nftPool,
+      abi: NFT_POOL_ABI,
+      functionName: "createPosition",
+      args: [
+        parseEther(debouncedLpTokenAmount),
+        BigInt(dayjs.duration(Number(debouncedDuration), "days").asSeconds()),
+      ],
+    });
 
   const { isLoading: isWrappingNFTLoading, write: wrapNFT } = useContractWrite({
     ...wrapNFTConfig,
