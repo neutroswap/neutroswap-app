@@ -61,7 +61,7 @@ const factoryClient = new Client({
 });
 
 const nftClient = new Client({
-  url: "http://13.59.70.85:8000/subgraphs/name/neutroswap-nitro",
+  url: urls[DEFAULT_CHAIN_ID.id].NFT_GRAPH_URL,
   exchanges: [cacheExchange, fetchExchange],
 });
 

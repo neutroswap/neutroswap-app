@@ -77,13 +77,15 @@ import {
 import { ChevronRight } from "lucide-react";
 import { Client, Provider, cacheExchange, fetchExchange } from "urql";
 import YieldBoosterModal from "@/components/modules/Modal/YieldBoosterModal";
+import { urls } from "@/shared/config/urls";
+import { DEFAULT_CHAIN_ID } from "@/shared/types/chain.types";
 
 const queryClient = new QueryClient();
 export default function YieldBooster() {
   const { address } = useAccount();
 
   const nftClient = new Client({
-    url: "http://13.59.70.85:8000/subgraphs/name/neutroswap-nitro",
+    url: urls[DEFAULT_CHAIN_ID.id].NFT_GRAPH_URL,
     exchanges: [cacheExchange, fetchExchange],
   });
 
