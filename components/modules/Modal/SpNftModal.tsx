@@ -498,7 +498,7 @@ function Overview(props: GetNFTPositionResponse) {
     ],
   });
 
-  const esperPrice = +formatEther(data?.[2] ?? BigInt(0));
+  const neutroPrice = +formatEther(data?.[2] ?? BigInt(0));
   const pendingRewards = +formatEther(data?.[1] ?? BigInt(0));
   const totalValue = +formatEther(data?.[0] ?? BigInt(0));
 
@@ -508,7 +508,7 @@ function Overview(props: GetNFTPositionResponse) {
   const properties = [
     {
       name: "Yield-bearing",
-      description: "This spNFT is eligible to yield ESPER incentives",
+      description: "This spNFT is eligible to yield NEUTRO incentives",
       icon: <Percent className={cn("w-6 h-6")} weight="duotone" />,
       apr: props.apr.base,
       isActive: props.settings.yield_bearing,
@@ -526,7 +526,7 @@ function Overview(props: GetNFTPositionResponse) {
     },
     {
       name: "Yield Booster",
-      description: "You allocated xESPER to this spNFT",
+      description: "You allocated xNEUTRO to this spNFT",
       icon: <Lightning className={cn("w-6 h-6")} weight="duotone" />,
       apr: props.apr.multiplier.boost,
       multiplier: props.apr.multiplier.boost,
@@ -571,7 +571,7 @@ function Overview(props: GetNFTPositionResponse) {
             Earnings
           </p>
           <p className="text-sm font-semibold">
-            ${(currencyFormat(pendingRewards * esperPrice), 2, 0.01)}
+            ${(currencyFormat(pendingRewards * neutroPrice), 2, 0.01)}
           </p>
         </div>
       </div>

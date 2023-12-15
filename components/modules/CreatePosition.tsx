@@ -214,7 +214,7 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
       <div>
         <p className="font-semibold">Create spNFT Position</p>
         <p className="text-sm text-muted-foreground">
-          Start earning yield by depositing assets to ESPER
+          Start earning yield by depositing assets to NEUTRO
         </p>
       </div>
 
