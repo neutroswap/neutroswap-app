@@ -177,7 +177,7 @@ export default function Home() {
           ).toString()
         ).toFixed(3),
       });
-      // setTokenName0(token0Symbol);
+      setTokenName0(token0Symbol.result!);
     },
   });
 
@@ -212,7 +212,7 @@ export default function Home() {
           ).toString()
         ).toFixed(3),
       });
-      // setTokenName1(token1Symbol);
+      setTokenName1(token1Symbol.result!);
     },
   });
 
