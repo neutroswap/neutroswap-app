@@ -223,7 +223,7 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
       <div>
         <p className="font-semibold">Wrap LP to spNFT Position</p>
         <p className="text-sm text-muted-foreground">
-          Start earning yield by depositing assets to ESPER
+          Start earning yield by depositing assets to NEUTRO
         </p>
       </div>
 
