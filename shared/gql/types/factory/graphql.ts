@@ -36,14 +36,22 @@ export type Block_Height = {
 
 export type Bundle = {
   __typename?: 'Bundle';
+  eosPrice: Scalars['BigDecimal']['output'];
   id: Scalars['ID']['output'];
-  mntPrice: Scalars['BigDecimal']['output'];
 };
 
 export type Bundle_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<Bundle_Filter>>>;
+  eosPrice?: InputMaybe<Scalars['BigDecimal']['input']>;
+  eosPrice_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  eosPrice_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  eosPrice_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  eosPrice_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  eosPrice_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  eosPrice_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  eosPrice_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_gt?: InputMaybe<Scalars['ID']['input']>;
   id_gte?: InputMaybe<Scalars['ID']['input']>;
@@ -52,20 +60,12 @@ export type Bundle_Filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_not?: InputMaybe<Scalars['ID']['input']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  mntPrice?: InputMaybe<Scalars['BigDecimal']['input']>;
-  mntPrice_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  mntPrice_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  mntPrice_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  mntPrice_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  mntPrice_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  mntPrice_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  mntPrice_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   or?: InputMaybe<Array<InputMaybe<Bundle_Filter>>>;
 };
 
 export enum Bundle_OrderBy {
-  Id = 'id',
-  MntPrice = 'mntPrice'
+  EosPrice = 'eosPrice',
+  Id = 'id'
 }
 
 export type Burn = {
@@ -246,22 +246,16 @@ export enum Burn_OrderBy {
   Pair = 'pair',
   PairCreatedAtBlockNumber = 'pair__createdAtBlockNumber',
   PairCreatedAtTimestamp = 'pair__createdAtTimestamp',
-  PairFeeUsd = 'pair__feeUSD',
   PairId = 'pair__id',
-  PairIsStable = 'pair__isStable',
   PairLiquidityProviderCount = 'pair__liquidityProviderCount',
   PairReserve0 = 'pair__reserve0',
   PairReserve1 = 'pair__reserve1',
-  PairReserveMnt = 'pair__reserveMNT',
+  PairReserveEos = 'pair__reserveEOS',
   PairReserveUsd = 'pair__reserveUSD',
-  PairToken0Fee = 'pair__token0Fee',
-  PairToken0FeePercent = 'pair__token0FeePercent',
   PairToken0Price = 'pair__token0Price',
-  PairToken1Fee = 'pair__token1Fee',
-  PairToken1FeePercent = 'pair__token1FeePercent',
   PairToken1Price = 'pair__token1Price',
   PairTotalSupply = 'pair__totalSupply',
-  PairTrackedReserveMnt = 'pair__trackedReserveMNT',
+  PairTrackedReserveEos = 'pair__trackedReserveEOS',
   PairTxCount = 'pair__txCount',
   PairUntrackedVolumeUsd = 'pair__untrackedVolumeUSD',
   PairVolumeToken0 = 'pair__volumeToken0',
@@ -462,22 +456,16 @@ export enum LiquidityPositionSnapshot_OrderBy {
   Pair = 'pair',
   PairCreatedAtBlockNumber = 'pair__createdAtBlockNumber',
   PairCreatedAtTimestamp = 'pair__createdAtTimestamp',
-  PairFeeUsd = 'pair__feeUSD',
   PairId = 'pair__id',
-  PairIsStable = 'pair__isStable',
   PairLiquidityProviderCount = 'pair__liquidityProviderCount',
   PairReserve0 = 'pair__reserve0',
   PairReserve1 = 'pair__reserve1',
-  PairReserveMnt = 'pair__reserveMNT',
+  PairReserveEos = 'pair__reserveEOS',
   PairReserveUsd = 'pair__reserveUSD',
-  PairToken0Fee = 'pair__token0Fee',
-  PairToken0FeePercent = 'pair__token0FeePercent',
   PairToken0Price = 'pair__token0Price',
-  PairToken1Fee = 'pair__token1Fee',
-  PairToken1FeePercent = 'pair__token1FeePercent',
   PairToken1Price = 'pair__token1Price',
   PairTotalSupply = 'pair__totalSupply',
-  PairTrackedReserveMnt = 'pair__trackedReserveMNT',
+  PairTrackedReserveEos = 'pair__trackedReserveEOS',
   PairTxCount = 'pair__txCount',
   PairUntrackedVolumeUsd = 'pair__untrackedVolumeUSD',
   PairVolumeToken0 = 'pair__volumeToken0',
@@ -565,22 +553,16 @@ export enum LiquidityPosition_OrderBy {
   Pair = 'pair',
   PairCreatedAtBlockNumber = 'pair__createdAtBlockNumber',
   PairCreatedAtTimestamp = 'pair__createdAtTimestamp',
-  PairFeeUsd = 'pair__feeUSD',
   PairId = 'pair__id',
-  PairIsStable = 'pair__isStable',
   PairLiquidityProviderCount = 'pair__liquidityProviderCount',
   PairReserve0 = 'pair__reserve0',
   PairReserve1 = 'pair__reserve1',
-  PairReserveMnt = 'pair__reserveMNT',
+  PairReserveEos = 'pair__reserveEOS',
   PairReserveUsd = 'pair__reserveUSD',
-  PairToken0Fee = 'pair__token0Fee',
-  PairToken0FeePercent = 'pair__token0FeePercent',
   PairToken0Price = 'pair__token0Price',
-  PairToken1Fee = 'pair__token1Fee',
-  PairToken1FeePercent = 'pair__token1FeePercent',
   PairToken1Price = 'pair__token1Price',
   PairTotalSupply = 'pair__totalSupply',
-  PairTrackedReserveMnt = 'pair__trackedReserveMNT',
+  PairTrackedReserveEos = 'pair__trackedReserveEOS',
   PairTxCount = 'pair__txCount',
   PairUntrackedVolumeUsd = 'pair__untrackedVolumeUSD',
   PairVolumeToken0 = 'pair__volumeToken0',
@@ -763,22 +745,16 @@ export enum Mint_OrderBy {
   Pair = 'pair',
   PairCreatedAtBlockNumber = 'pair__createdAtBlockNumber',
   PairCreatedAtTimestamp = 'pair__createdAtTimestamp',
-  PairFeeUsd = 'pair__feeUSD',
   PairId = 'pair__id',
-  PairIsStable = 'pair__isStable',
   PairLiquidityProviderCount = 'pair__liquidityProviderCount',
   PairReserve0 = 'pair__reserve0',
   PairReserve1 = 'pair__reserve1',
-  PairReserveMnt = 'pair__reserveMNT',
+  PairReserveEos = 'pair__reserveEOS',
   PairReserveUsd = 'pair__reserveUSD',
-  PairToken0Fee = 'pair__token0Fee',
-  PairToken0FeePercent = 'pair__token0FeePercent',
   PairToken0Price = 'pair__token0Price',
-  PairToken1Fee = 'pair__token1Fee',
-  PairToken1FeePercent = 'pair__token1FeePercent',
   PairToken1Price = 'pair__token1Price',
   PairTotalSupply = 'pair__totalSupply',
-  PairTrackedReserveMnt = 'pair__trackedReserveMNT',
+  PairTrackedReserveEos = 'pair__trackedReserveEOS',
   PairTxCount = 'pair__txCount',
   PairUntrackedVolumeUsd = 'pair__untrackedVolumeUSD',
   PairVolumeToken0 = 'pair__volumeToken0',
@@ -793,6 +769,214 @@ export enum Mint_OrderBy {
   TransactionTimestamp = 'transaction__timestamp'
 }
 
+export type NeutroDayData = {
+  __typename?: 'NeutroDayData';
+  dailyVolumeEOS: Scalars['BigDecimal']['output'];
+  dailyVolumeUSD: Scalars['BigDecimal']['output'];
+  dailyVolumeUntracked: Scalars['BigDecimal']['output'];
+  date: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  totalLiquidityEOS: Scalars['BigDecimal']['output'];
+  totalLiquidityUSD: Scalars['BigDecimal']['output'];
+  totalVolumeEOS: Scalars['BigDecimal']['output'];
+  totalVolumeUSD: Scalars['BigDecimal']['output'];
+  txCount: Scalars['BigInt']['output'];
+};
+
+export type NeutroDayData_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<NeutroDayData_Filter>>>;
+  dailyVolumeEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  dailyVolumeEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  dailyVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  dailyVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  dailyVolumeUntracked?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUntracked_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUntracked_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUntracked_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  dailyVolumeUntracked_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUntracked_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUntracked_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeUntracked_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  date?: InputMaybe<Scalars['Int']['input']>;
+  date_gt?: InputMaybe<Scalars['Int']['input']>;
+  date_gte?: InputMaybe<Scalars['Int']['input']>;
+  date_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  date_lt?: InputMaybe<Scalars['Int']['input']>;
+  date_lte?: InputMaybe<Scalars['Int']['input']>;
+  date_not?: InputMaybe<Scalars['Int']['input']>;
+  date_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  or?: InputMaybe<Array<InputMaybe<NeutroDayData_Filter>>>;
+  totalLiquidityEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  txCount?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  txCount_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_not?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+};
+
+export enum NeutroDayData_OrderBy {
+  DailyVolumeEos = 'dailyVolumeEOS',
+  DailyVolumeUsd = 'dailyVolumeUSD',
+  DailyVolumeUntracked = 'dailyVolumeUntracked',
+  Date = 'date',
+  Id = 'id',
+  TotalLiquidityEos = 'totalLiquidityEOS',
+  TotalLiquidityUsd = 'totalLiquidityUSD',
+  TotalVolumeEos = 'totalVolumeEOS',
+  TotalVolumeUsd = 'totalVolumeUSD',
+  TxCount = 'txCount'
+}
+
+export type NeutroFactory = {
+  __typename?: 'NeutroFactory';
+  id: Scalars['ID']['output'];
+  pairCount: Scalars['Int']['output'];
+  totalLiquidityEOS: Scalars['BigDecimal']['output'];
+  totalLiquidityUSD: Scalars['BigDecimal']['output'];
+  totalVolumeEOS: Scalars['BigDecimal']['output'];
+  totalVolumeUSD: Scalars['BigDecimal']['output'];
+  txCount: Scalars['BigInt']['output'];
+  untrackedVolumeUSD: Scalars['BigDecimal']['output'];
+};
+
+export type NeutroFactory_Filter = {
+  /** Filter for the block changed event. */
+  _change_block?: InputMaybe<BlockChangedFilter>;
+  and?: InputMaybe<Array<InputMaybe<NeutroFactory_Filter>>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_gt?: InputMaybe<Scalars['ID']['input']>;
+  id_gte?: InputMaybe<Scalars['ID']['input']>;
+  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_lt?: InputMaybe<Scalars['ID']['input']>;
+  id_lte?: InputMaybe<Scalars['ID']['input']>;
+  id_not?: InputMaybe<Scalars['ID']['input']>;
+  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
+  or?: InputMaybe<Array<InputMaybe<NeutroFactory_Filter>>>;
+  pairCount?: InputMaybe<Scalars['Int']['input']>;
+  pairCount_gt?: InputMaybe<Scalars['Int']['input']>;
+  pairCount_gte?: InputMaybe<Scalars['Int']['input']>;
+  pairCount_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  pairCount_lt?: InputMaybe<Scalars['Int']['input']>;
+  pairCount_lte?: InputMaybe<Scalars['Int']['input']>;
+  pairCount_not?: InputMaybe<Scalars['Int']['input']>;
+  pairCount_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  totalLiquidityEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  txCount?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_gt?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_gte?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  txCount_lt?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_lte?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_not?: InputMaybe<Scalars['BigInt']['input']>;
+  txCount_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
+  untrackedVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
+  untrackedVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  untrackedVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  untrackedVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  untrackedVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  untrackedVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  untrackedVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  untrackedVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+};
+
+export enum NeutroFactory_OrderBy {
+  Id = 'id',
+  PairCount = 'pairCount',
+  TotalLiquidityEos = 'totalLiquidityEOS',
+  TotalLiquidityUsd = 'totalLiquidityUSD',
+  TotalVolumeEos = 'totalVolumeEOS',
+  TotalVolumeUsd = 'totalVolumeUSD',
+  TxCount = 'txCount',
+  UntrackedVolumeUsd = 'untrackedVolumeUSD'
+}
+
 /** Defines the order direction, either ascending or descending */
 export enum OrderDirection {
   Asc = 'asc',
@@ -804,9 +988,7 @@ export type Pair = {
   burns: Array<Burn>;
   createdAtBlockNumber: Scalars['BigInt']['output'];
   createdAtTimestamp: Scalars['BigInt']['output'];
-  feeUSD: Scalars['BigDecimal']['output'];
   id: Scalars['ID']['output'];
-  isStable?: Maybe<Scalars['Boolean']['output']>;
   liquidityPositionSnapshots: Array<LiquidityPositionSnapshot>;
   liquidityPositions: Array<LiquidityPosition>;
   liquidityProviderCount: Scalars['BigInt']['output'];
@@ -815,19 +997,15 @@ export type Pair = {
   pairHourData: Array<PairHourData>;
   reserve0: Scalars['BigDecimal']['output'];
   reserve1: Scalars['BigDecimal']['output'];
-  reserveMNT: Scalars['BigDecimal']['output'];
+  reserveEOS: Scalars['BigDecimal']['output'];
   reserveUSD: Scalars['BigDecimal']['output'];
   swaps: Array<Swap>;
   token0: Token;
-  token0Fee: Scalars['BigInt']['output'];
-  token0FeePercent: Scalars['BigDecimal']['output'];
   token0Price: Scalars['BigDecimal']['output'];
   token1: Token;
-  token1Fee: Scalars['BigInt']['output'];
-  token1FeePercent: Scalars['BigDecimal']['output'];
   token1Price: Scalars['BigDecimal']['output'];
   totalSupply: Scalars['BigDecimal']['output'];
-  trackedReserveMNT: Scalars['BigDecimal']['output'];
+  trackedReserveEOS: Scalars['BigDecimal']['output'];
   txCount: Scalars['BigInt']['output'];
   untrackedVolumeUSD: Scalars['BigDecimal']['output'];
   volumeToken0: Scalars['BigDecimal']['output'];
@@ -900,7 +1078,6 @@ export type PairSwapsArgs = {
 
 export type PairDayData = {
   __typename?: 'PairDayData';
-  dailyFeeUSD: Scalars['BigDecimal']['output'];
   dailyTxns: Scalars['BigInt']['output'];
   dailyVolumeToken0: Scalars['BigDecimal']['output'];
   dailyVolumeToken1: Scalars['BigDecimal']['output'];
@@ -913,21 +1090,13 @@ export type PairDayData = {
   reserveUSD: Scalars['BigDecimal']['output'];
   token0: Token;
   token1: Token;
-  totalSupply: Scalars['BigDecimal']['output'];
+  totalSupply?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type PairDayData_Filter = {
   /** Filter for the block changed event. */
   _change_block?: InputMaybe<BlockChangedFilter>;
   and?: InputMaybe<Array<InputMaybe<PairDayData_Filter>>>;
-  dailyFeeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyFeeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   dailyTxns?: InputMaybe<Scalars['BigInt']['input']>;
   dailyTxns_gt?: InputMaybe<Scalars['BigInt']['input']>;
   dailyTxns_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1075,7 +1244,6 @@ export type PairDayData_Filter = {
 };
 
 export enum PairDayData_OrderBy {
-  DailyFeeUsd = 'dailyFeeUSD',
   DailyTxns = 'dailyTxns',
   DailyVolumeToken0 = 'dailyVolumeToken0',
   DailyVolumeToken1 = 'dailyVolumeToken1',
@@ -1085,22 +1253,16 @@ export enum PairDayData_OrderBy {
   Pair = 'pair',
   PairCreatedAtBlockNumber = 'pair__createdAtBlockNumber',
   PairCreatedAtTimestamp = 'pair__createdAtTimestamp',
-  PairFeeUsd = 'pair__feeUSD',
   PairId = 'pair__id',
-  PairIsStable = 'pair__isStable',
   PairLiquidityProviderCount = 'pair__liquidityProviderCount',
   PairReserve0 = 'pair__reserve0',
   PairReserve1 = 'pair__reserve1',
-  PairReserveMnt = 'pair__reserveMNT',
+  PairReserveEos = 'pair__reserveEOS',
   PairReserveUsd = 'pair__reserveUSD',
-  PairToken0Fee = 'pair__token0Fee',
-  PairToken0FeePercent = 'pair__token0FeePercent',
   PairToken0Price = 'pair__token0Price',
-  PairToken1Fee = 'pair__token1Fee',
-  PairToken1FeePercent = 'pair__token1FeePercent',
   PairToken1Price = 'pair__token1Price',
   PairTotalSupply = 'pair__totalSupply',
-  PairTrackedReserveMnt = 'pair__trackedReserveMNT',
+  PairTrackedReserveEos = 'pair__trackedReserveEOS',
   PairTxCount = 'pair__txCount',
   PairUntrackedVolumeUsd = 'pair__untrackedVolumeUSD',
   PairVolumeToken0 = 'pair__volumeToken0',
@@ -1111,7 +1273,7 @@ export enum PairDayData_OrderBy {
   ReserveUsd = 'reserveUSD',
   Token0 = 'token0',
   Token0Decimals = 'token0__decimals',
-  Token0DerivedMnt = 'token0__derivedMNT',
+  Token0DerivedEos = 'token0__derivedEOS',
   Token0Id = 'token0__id',
   Token0Name = 'token0__name',
   Token0Symbol = 'token0__symbol',
@@ -1123,7 +1285,7 @@ export enum PairDayData_OrderBy {
   Token0UntrackedVolumeUsd = 'token0__untrackedVolumeUSD',
   Token1 = 'token1',
   Token1Decimals = 'token1__decimals',
-  Token1DerivedMnt = 'token1__derivedMNT',
+  Token1DerivedEos = 'token1__derivedEOS',
   Token1Id = 'token1__id',
   Token1Name = 'token1__name',
   Token1Symbol = 'token1__symbol',
@@ -1139,7 +1301,6 @@ export enum PairDayData_OrderBy {
 export type PairHourData = {
   __typename?: 'PairHourData';
   hourStartUnix: Scalars['Int']['output'];
-  hourlyFeeUSD: Scalars['BigDecimal']['output'];
   hourlyTxns: Scalars['BigInt']['output'];
   hourlyVolumeToken0: Scalars['BigDecimal']['output'];
   hourlyVolumeToken1: Scalars['BigDecimal']['output'];
@@ -1149,7 +1310,7 @@ export type PairHourData = {
   reserve0: Scalars['BigDecimal']['output'];
   reserve1: Scalars['BigDecimal']['output'];
   reserveUSD: Scalars['BigDecimal']['output'];
-  totalSupply: Scalars['BigDecimal']['output'];
+  totalSupply?: Maybe<Scalars['BigDecimal']['output']>;
 };
 
 export type PairHourData_Filter = {
@@ -1164,14 +1325,6 @@ export type PairHourData_Filter = {
   hourStartUnix_lte?: InputMaybe<Scalars['Int']['input']>;
   hourStartUnix_not?: InputMaybe<Scalars['Int']['input']>;
   hourStartUnix_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  hourlyFeeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  hourlyFeeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  hourlyFeeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  hourlyFeeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  hourlyFeeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  hourlyFeeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  hourlyFeeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  hourlyFeeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   hourlyTxns?: InputMaybe<Scalars['BigInt']['input']>;
   hourlyTxns_gt?: InputMaybe<Scalars['BigInt']['input']>;
   hourlyTxns_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1270,7 +1423,6 @@ export type PairHourData_Filter = {
 
 export enum PairHourData_OrderBy {
   HourStartUnix = 'hourStartUnix',
-  HourlyFeeUsd = 'hourlyFeeUSD',
   HourlyTxns = 'hourlyTxns',
   HourlyVolumeToken0 = 'hourlyVolumeToken0',
   HourlyVolumeToken1 = 'hourlyVolumeToken1',
@@ -1279,22 +1431,16 @@ export enum PairHourData_OrderBy {
   Pair = 'pair',
   PairCreatedAtBlockNumber = 'pair__createdAtBlockNumber',
   PairCreatedAtTimestamp = 'pair__createdAtTimestamp',
-  PairFeeUsd = 'pair__feeUSD',
   PairId = 'pair__id',
-  PairIsStable = 'pair__isStable',
   PairLiquidityProviderCount = 'pair__liquidityProviderCount',
   PairReserve0 = 'pair__reserve0',
   PairReserve1 = 'pair__reserve1',
-  PairReserveMnt = 'pair__reserveMNT',
+  PairReserveEos = 'pair__reserveEOS',
   PairReserveUsd = 'pair__reserveUSD',
-  PairToken0Fee = 'pair__token0Fee',
-  PairToken0FeePercent = 'pair__token0FeePercent',
   PairToken0Price = 'pair__token0Price',
-  PairToken1Fee = 'pair__token1Fee',
-  PairToken1FeePercent = 'pair__token1FeePercent',
   PairToken1Price = 'pair__token1Price',
   PairTotalSupply = 'pair__totalSupply',
-  PairTrackedReserveMnt = 'pair__trackedReserveMNT',
+  PairTrackedReserveEos = 'pair__trackedReserveEOS',
   PairTxCount = 'pair__txCount',
   PairUntrackedVolumeUsd = 'pair__untrackedVolumeUSD',
   PairVolumeToken0 = 'pair__volumeToken0',
@@ -1327,14 +1473,6 @@ export type Pair_Filter = {
   createdAtTimestamp_lte?: InputMaybe<Scalars['BigInt']['input']>;
   createdAtTimestamp_not?: InputMaybe<Scalars['BigInt']['input']>;
   createdAtTimestamp_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  feeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  feeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  feeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  feeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  feeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  feeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  feeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  feeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_gt?: InputMaybe<Scalars['ID']['input']>;
   id_gte?: InputMaybe<Scalars['ID']['input']>;
@@ -1343,10 +1481,6 @@ export type Pair_Filter = {
   id_lte?: InputMaybe<Scalars['ID']['input']>;
   id_not?: InputMaybe<Scalars['ID']['input']>;
   id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  isStable?: InputMaybe<Scalars['Boolean']['input']>;
-  isStable_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
-  isStable_not?: InputMaybe<Scalars['Boolean']['input']>;
-  isStable_not_in?: InputMaybe<Array<Scalars['Boolean']['input']>>;
   liquidityPositionSnapshots_?: InputMaybe<LiquidityPositionSnapshot_Filter>;
   liquidityPositions_?: InputMaybe<LiquidityPosition_Filter>;
   liquidityProviderCount?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1377,14 +1511,14 @@ export type Pair_Filter = {
   reserve1_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
   reserve1_not?: InputMaybe<Scalars['BigDecimal']['input']>;
   reserve1_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  reserveMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  reserveMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  reserveMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  reserveMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  reserveMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  reserveMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  reserveMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  reserveMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  reserveEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  reserveEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  reserveEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  reserveEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  reserveEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  reserveEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  reserveEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  reserveEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   reserveUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
   reserveUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
   reserveUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -1395,22 +1529,6 @@ export type Pair_Filter = {
   reserveUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   swaps_?: InputMaybe<Swap_Filter>;
   token0?: InputMaybe<Scalars['String']['input']>;
-  token0Fee?: InputMaybe<Scalars['BigInt']['input']>;
-  token0FeePercent?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token0FeePercent_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token0FeePercent_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token0FeePercent_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  token0FeePercent_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token0FeePercent_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token0FeePercent_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token0FeePercent_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  token0Fee_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  token0Fee_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  token0Fee_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  token0Fee_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  token0Fee_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  token0Fee_not?: InputMaybe<Scalars['BigInt']['input']>;
-  token0Fee_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   token0Price?: InputMaybe<Scalars['BigDecimal']['input']>;
   token0Price_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
   token0Price_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -1440,22 +1558,6 @@ export type Pair_Filter = {
   token0_starts_with?: InputMaybe<Scalars['String']['input']>;
   token0_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
   token1?: InputMaybe<Scalars['String']['input']>;
-  token1Fee?: InputMaybe<Scalars['BigInt']['input']>;
-  token1FeePercent?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token1FeePercent_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token1FeePercent_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token1FeePercent_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  token1FeePercent_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token1FeePercent_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token1FeePercent_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  token1FeePercent_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  token1Fee_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  token1Fee_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  token1Fee_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  token1Fee_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  token1Fee_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  token1Fee_not?: InputMaybe<Scalars['BigInt']['input']>;
-  token1Fee_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
   token1Price?: InputMaybe<Scalars['BigDecimal']['input']>;
   token1Price_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
   token1Price_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -1492,14 +1594,14 @@ export type Pair_Filter = {
   totalSupply_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
   totalSupply_not?: InputMaybe<Scalars['BigDecimal']['input']>;
   totalSupply_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  trackedReserveMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  trackedReserveMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  trackedReserveMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  trackedReserveMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  trackedReserveMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  trackedReserveMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  trackedReserveMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  trackedReserveMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  trackedReserveEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  trackedReserveEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  trackedReserveEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  trackedReserveEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  trackedReserveEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  trackedReserveEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  trackedReserveEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  trackedReserveEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   txCount?: InputMaybe<Scalars['BigInt']['input']>;
   txCount_gt?: InputMaybe<Scalars['BigInt']['input']>;
   txCount_gte?: InputMaybe<Scalars['BigInt']['input']>;
@@ -1546,9 +1648,7 @@ export enum Pair_OrderBy {
   Burns = 'burns',
   CreatedAtBlockNumber = 'createdAtBlockNumber',
   CreatedAtTimestamp = 'createdAtTimestamp',
-  FeeUsd = 'feeUSD',
   Id = 'id',
-  IsStable = 'isStable',
   LiquidityPositionSnapshots = 'liquidityPositionSnapshots',
   LiquidityPositions = 'liquidityPositions',
   LiquidityProviderCount = 'liquidityProviderCount',
@@ -1557,15 +1657,13 @@ export enum Pair_OrderBy {
   PairHourData = 'pairHourData',
   Reserve0 = 'reserve0',
   Reserve1 = 'reserve1',
-  ReserveMnt = 'reserveMNT',
+  ReserveEos = 'reserveEOS',
   ReserveUsd = 'reserveUSD',
   Swaps = 'swaps',
   Token0 = 'token0',
-  Token0Fee = 'token0Fee',
-  Token0FeePercent = 'token0FeePercent',
   Token0Price = 'token0Price',
   Token0Decimals = 'token0__decimals',
-  Token0DerivedMnt = 'token0__derivedMNT',
+  Token0DerivedEos = 'token0__derivedEOS',
   Token0Id = 'token0__id',
   Token0Name = 'token0__name',
   Token0Symbol = 'token0__symbol',
@@ -1576,11 +1674,9 @@ export enum Pair_OrderBy {
   Token0TxCount = 'token0__txCount',
   Token0UntrackedVolumeUsd = 'token0__untrackedVolumeUSD',
   Token1 = 'token1',
-  Token1Fee = 'token1Fee',
-  Token1FeePercent = 'token1FeePercent',
   Token1Price = 'token1Price',
   Token1Decimals = 'token1__decimals',
-  Token1DerivedMnt = 'token1__derivedMNT',
+  Token1DerivedEos = 'token1__derivedEOS',
   Token1Id = 'token1__id',
   Token1Name = 'token1__name',
   Token1Symbol = 'token1__symbol',
@@ -1591,7 +1687,7 @@ export enum Pair_OrderBy {
   Token1TxCount = 'token1__txCount',
   Token1UntrackedVolumeUsd = 'token1__untrackedVolumeUSD',
   TotalSupply = 'totalSupply',
-  TrackedReserveMnt = 'trackedReserveMNT',
+  TrackedReserveEos = 'trackedReserveEOS',
   TxCount = 'txCount',
   UntrackedVolumeUsd = 'untrackedVolumeUSD',
   VolumeToken0 = 'volumeToken0',
@@ -1613,6 +1709,10 @@ export type Query = {
   liquidityPositions: Array<LiquidityPosition>;
   mint?: Maybe<Mint>;
   mints: Array<Mint>;
+  neutroDayData?: Maybe<NeutroDayData>;
+  neutroDayDatas: Array<NeutroDayData>;
+  neutroFactories: Array<NeutroFactory>;
+  neutroFactory?: Maybe<NeutroFactory>;
   pair?: Maybe<Pair>;
   pairDayData?: Maybe<PairDayData>;
   pairDayDatas: Array<PairDayData>;
@@ -1627,10 +1727,6 @@ export type Query = {
   tokens: Array<Token>;
   transaction?: Maybe<Transaction>;
   transactions: Array<Transaction>;
-  uniswapDayData?: Maybe<UniswapDayData>;
-  uniswapDayDatas: Array<UniswapDayData>;
-  uniswapFactories: Array<UniswapFactory>;
-  uniswapFactory?: Maybe<UniswapFactory>;
   user?: Maybe<User>;
   users: Array<User>;
 };
@@ -1728,6 +1824,42 @@ export type QueryMintsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   subgraphError?: _SubgraphErrorPolicy_;
   where?: InputMaybe<Mint_Filter>;
+};
+
+
+export type QueryNeutroDayDataArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID']['input'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type QueryNeutroDayDatasArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<NeutroDayData_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<NeutroDayData_Filter>;
+};
+
+
+export type QueryNeutroFactoriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<NeutroFactory_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<NeutroFactory_Filter>;
+};
+
+
+export type QueryNeutroFactoryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID']['input'];
+  subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
@@ -1857,42 +1989,6 @@ export type QueryTransactionsArgs = {
 };
 
 
-export type QueryUniswapDayDataArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type QueryUniswapDayDatasArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<UniswapDayData_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<UniswapDayData_Filter>;
-};
-
-
-export type QueryUniswapFactoriesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<UniswapFactory_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<UniswapFactory_Filter>;
-};
-
-
-export type QueryUniswapFactoryArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
 export type QueryUserArgs = {
   block?: InputMaybe<Block_Height>;
   id: Scalars['ID']['input'];
@@ -1924,6 +2020,10 @@ export type Subscription = {
   liquidityPositions: Array<LiquidityPosition>;
   mint?: Maybe<Mint>;
   mints: Array<Mint>;
+  neutroDayData?: Maybe<NeutroDayData>;
+  neutroDayDatas: Array<NeutroDayData>;
+  neutroFactories: Array<NeutroFactory>;
+  neutroFactory?: Maybe<NeutroFactory>;
   pair?: Maybe<Pair>;
   pairDayData?: Maybe<PairDayData>;
   pairDayDatas: Array<PairDayData>;
@@ -1938,10 +2038,6 @@ export type Subscription = {
   tokens: Array<Token>;
   transaction?: Maybe<Transaction>;
   transactions: Array<Transaction>;
-  uniswapDayData?: Maybe<UniswapDayData>;
-  uniswapDayDatas: Array<UniswapDayData>;
-  uniswapFactories: Array<UniswapFactory>;
-  uniswapFactory?: Maybe<UniswapFactory>;
   user?: Maybe<User>;
   users: Array<User>;
 };
@@ -2039,6 +2135,42 @@ export type SubscriptionMintsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   subgraphError?: _SubgraphErrorPolicy_;
   where?: InputMaybe<Mint_Filter>;
+};
+
+
+export type SubscriptionNeutroDayDataArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID']['input'];
+  subgraphError?: _SubgraphErrorPolicy_;
+};
+
+
+export type SubscriptionNeutroDayDatasArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<NeutroDayData_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<NeutroDayData_Filter>;
+};
+
+
+export type SubscriptionNeutroFactoriesArgs = {
+  block?: InputMaybe<Block_Height>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<NeutroFactory_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  subgraphError?: _SubgraphErrorPolicy_;
+  where?: InputMaybe<NeutroFactory_Filter>;
+};
+
+
+export type SubscriptionNeutroFactoryArgs = {
+  block?: InputMaybe<Block_Height>;
+  id: Scalars['ID']['input'];
+  subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
@@ -2165,42 +2297,6 @@ export type SubscriptionTransactionsArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   subgraphError?: _SubgraphErrorPolicy_;
   where?: InputMaybe<Transaction_Filter>;
-};
-
-
-export type SubscriptionUniswapDayDataArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
-};
-
-
-export type SubscriptionUniswapDayDatasArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<UniswapDayData_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<UniswapDayData_Filter>;
-};
-
-
-export type SubscriptionUniswapFactoriesArgs = {
-  block?: InputMaybe<Block_Height>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<UniswapFactory_OrderBy>;
-  orderDirection?: InputMaybe<OrderDirection>;
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  subgraphError?: _SubgraphErrorPolicy_;
-  where?: InputMaybe<UniswapFactory_Filter>;
-};
-
-
-export type SubscriptionUniswapFactoryArgs = {
-  block?: InputMaybe<Block_Height>;
-  id: Scalars['ID']['input'];
-  subgraphError?: _SubgraphErrorPolicy_;
 };
 
 
@@ -2393,22 +2489,16 @@ export enum Swap_OrderBy {
   Pair = 'pair',
   PairCreatedAtBlockNumber = 'pair__createdAtBlockNumber',
   PairCreatedAtTimestamp = 'pair__createdAtTimestamp',
-  PairFeeUsd = 'pair__feeUSD',
   PairId = 'pair__id',
-  PairIsStable = 'pair__isStable',
   PairLiquidityProviderCount = 'pair__liquidityProviderCount',
   PairReserve0 = 'pair__reserve0',
   PairReserve1 = 'pair__reserve1',
-  PairReserveMnt = 'pair__reserveMNT',
+  PairReserveEos = 'pair__reserveEOS',
   PairReserveUsd = 'pair__reserveUSD',
-  PairToken0Fee = 'pair__token0Fee',
-  PairToken0FeePercent = 'pair__token0FeePercent',
   PairToken0Price = 'pair__token0Price',
-  PairToken1Fee = 'pair__token1Fee',
-  PairToken1FeePercent = 'pair__token1FeePercent',
   PairToken1Price = 'pair__token1Price',
   PairTotalSupply = 'pair__totalSupply',
-  PairTrackedReserveMnt = 'pair__trackedReserveMNT',
+  PairTrackedReserveEos = 'pair__trackedReserveEOS',
   PairTxCount = 'pair__txCount',
   PairUntrackedVolumeUsd = 'pair__untrackedVolumeUSD',
   PairVolumeToken0 = 'pair__volumeToken0',
@@ -2426,7 +2516,7 @@ export enum Swap_OrderBy {
 export type Token = {
   __typename?: 'Token';
   decimals: Scalars['BigInt']['output'];
-  derivedMNT?: Maybe<Scalars['BigDecimal']['output']>;
+  derivedEOS?: Maybe<Scalars['BigDecimal']['output']>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   pairBase: Array<Pair>;
@@ -2491,14 +2581,14 @@ export type TokenTokenDayDataArgs = {
 export type TokenDayData = {
   __typename?: 'TokenDayData';
   dailyTxns: Scalars['BigInt']['output'];
-  dailyVolumeMNT: Scalars['BigDecimal']['output'];
+  dailyVolumeEOS: Scalars['BigDecimal']['output'];
   dailyVolumeToken: Scalars['BigDecimal']['output'];
   dailyVolumeUSD: Scalars['BigDecimal']['output'];
   date: Scalars['Int']['output'];
   id: Scalars['ID']['output'];
   priceUSD: Scalars['BigDecimal']['output'];
   token: Token;
-  totalLiquidityMNT: Scalars['BigDecimal']['output'];
+  totalLiquidityEOS: Scalars['BigDecimal']['output'];
   totalLiquidityToken: Scalars['BigDecimal']['output'];
   totalLiquidityUSD: Scalars['BigDecimal']['output'];
 };
@@ -2515,14 +2605,14 @@ export type TokenDayData_Filter = {
   dailyTxns_lte?: InputMaybe<Scalars['BigInt']['input']>;
   dailyTxns_not?: InputMaybe<Scalars['BigInt']['input']>;
   dailyTxns_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  dailyVolumeMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyVolumeMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  dailyVolumeEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  dailyVolumeEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  dailyVolumeEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   dailyVolumeToken?: InputMaybe<Scalars['BigDecimal']['input']>;
   dailyVolumeToken_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
   dailyVolumeToken_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -2585,14 +2675,14 @@ export type TokenDayData_Filter = {
   token_not_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
   token_starts_with?: InputMaybe<Scalars['String']['input']>;
   token_starts_with_nocase?: InputMaybe<Scalars['String']['input']>;
-  totalLiquidityMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  totalLiquidityEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  totalLiquidityEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   totalLiquidityToken?: InputMaybe<Scalars['BigDecimal']['input']>;
   totalLiquidityToken_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
   totalLiquidityToken_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
@@ -2613,7 +2703,7 @@ export type TokenDayData_Filter = {
 
 export enum TokenDayData_OrderBy {
   DailyTxns = 'dailyTxns',
-  DailyVolumeMnt = 'dailyVolumeMNT',
+  DailyVolumeEos = 'dailyVolumeEOS',
   DailyVolumeToken = 'dailyVolumeToken',
   DailyVolumeUsd = 'dailyVolumeUSD',
   Date = 'date',
@@ -2621,7 +2711,7 @@ export enum TokenDayData_OrderBy {
   PriceUsd = 'priceUSD',
   Token = 'token',
   TokenDecimals = 'token__decimals',
-  TokenDerivedMnt = 'token__derivedMNT',
+  TokenDerivedEos = 'token__derivedEOS',
   TokenId = 'token__id',
   TokenName = 'token__name',
   TokenSymbol = 'token__symbol',
@@ -2631,7 +2721,7 @@ export enum TokenDayData_OrderBy {
   TokenTradeVolumeUsd = 'token__tradeVolumeUSD',
   TokenTxCount = 'token__txCount',
   TokenUntrackedVolumeUsd = 'token__untrackedVolumeUSD',
-  TotalLiquidityMnt = 'totalLiquidityMNT',
+  TotalLiquidityEos = 'totalLiquidityEOS',
   TotalLiquidityToken = 'totalLiquidityToken',
   TotalLiquidityUsd = 'totalLiquidityUSD'
 }
@@ -2648,14 +2738,14 @@ export type Token_Filter = {
   decimals_lte?: InputMaybe<Scalars['BigInt']['input']>;
   decimals_not?: InputMaybe<Scalars['BigInt']['input']>;
   decimals_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  derivedMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  derivedMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  derivedMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  derivedMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  derivedMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  derivedMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  derivedMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  derivedMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  derivedEOS?: InputMaybe<Scalars['BigDecimal']['input']>;
+  derivedEOS_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  derivedEOS_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  derivedEOS_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
+  derivedEOS_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
+  derivedEOS_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
+  derivedEOS_not?: InputMaybe<Scalars['BigDecimal']['input']>;
+  derivedEOS_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_gt?: InputMaybe<Scalars['ID']['input']>;
   id_gte?: InputMaybe<Scalars['ID']['input']>;
@@ -2762,7 +2852,7 @@ export type Token_Filter = {
 
 export enum Token_OrderBy {
   Decimals = 'decimals',
-  DerivedMnt = 'derivedMNT',
+  DerivedEos = 'derivedEOS',
   Id = 'id',
   Name = 'name',
   PairBase = 'pairBase',
@@ -2877,254 +2967,6 @@ export enum Transaction_OrderBy {
   Timestamp = 'timestamp'
 }
 
-export type UniswapDayData = {
-  __typename?: 'UniswapDayData';
-  dailyFeeMNT: Scalars['BigDecimal']['output'];
-  dailyFeeUSD: Scalars['BigDecimal']['output'];
-  dailyVolumeMNT: Scalars['BigDecimal']['output'];
-  dailyVolumeUSD: Scalars['BigDecimal']['output'];
-  dailyVolumeUntracked: Scalars['BigDecimal']['output'];
-  date: Scalars['Int']['output'];
-  id: Scalars['ID']['output'];
-  totalLiquidityMNT: Scalars['BigDecimal']['output'];
-  totalLiquidityUSD: Scalars['BigDecimal']['output'];
-  totalVolumeMNT: Scalars['BigDecimal']['output'];
-  totalVolumeUSD: Scalars['BigDecimal']['output'];
-  txCount: Scalars['BigInt']['output'];
-};
-
-export type UniswapDayData_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<UniswapDayData_Filter>>>;
-  dailyFeeMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyFeeMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyFeeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyFeeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyFeeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyVolumeMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyVolumeMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyVolumeUntracked?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUntracked_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUntracked_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUntracked_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  dailyVolumeUntracked_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUntracked_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUntracked_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  dailyVolumeUntracked_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  date?: InputMaybe<Scalars['Int']['input']>;
-  date_gt?: InputMaybe<Scalars['Int']['input']>;
-  date_gte?: InputMaybe<Scalars['Int']['input']>;
-  date_in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  date_lt?: InputMaybe<Scalars['Int']['input']>;
-  date_lte?: InputMaybe<Scalars['Int']['input']>;
-  date_not?: InputMaybe<Scalars['Int']['input']>;
-  date_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  id_gt?: InputMaybe<Scalars['ID']['input']>;
-  id_gte?: InputMaybe<Scalars['ID']['input']>;
-  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  id_lt?: InputMaybe<Scalars['ID']['input']>;
-  id_lte?: InputMaybe<Scalars['ID']['input']>;
-  id_not?: InputMaybe<Scalars['ID']['input']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  or?: InputMaybe<Array<InputMaybe<UniswapDayData_Filter>>>;
-  totalLiquidityMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  txCount?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  txCount_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_not?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-};
-
-export enum UniswapDayData_OrderBy {
-  DailyFeeMnt = 'dailyFeeMNT',
-  DailyFeeUsd = 'dailyFeeUSD',
-  DailyVolumeMnt = 'dailyVolumeMNT',
-  DailyVolumeUsd = 'dailyVolumeUSD',
-  DailyVolumeUntracked = 'dailyVolumeUntracked',
-  Date = 'date',
-  Id = 'id',
-  TotalLiquidityMnt = 'totalLiquidityMNT',
-  TotalLiquidityUsd = 'totalLiquidityUSD',
-  TotalVolumeMnt = 'totalVolumeMNT',
-  TotalVolumeUsd = 'totalVolumeUSD',
-  TxCount = 'txCount'
-}
-
-export type UniswapFactory = {
-  __typename?: 'UniswapFactory';
-  id: Scalars['ID']['output'];
-  pairCount: Scalars['Int']['output'];
-  totalFeeMNT: Scalars['BigDecimal']['output'];
-  totalFeeUSD: Scalars['BigDecimal']['output'];
-  totalLiquidityMNT: Scalars['BigDecimal']['output'];
-  totalLiquidityUSD: Scalars['BigDecimal']['output'];
-  totalVolumeMNT: Scalars['BigDecimal']['output'];
-  totalVolumeUSD: Scalars['BigDecimal']['output'];
-  txCount: Scalars['BigInt']['output'];
-  untrackedVolumeUSD: Scalars['BigDecimal']['output'];
-};
-
-export type UniswapFactory_Filter = {
-  /** Filter for the block changed event. */
-  _change_block?: InputMaybe<BlockChangedFilter>;
-  and?: InputMaybe<Array<InputMaybe<UniswapFactory_Filter>>>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  id_gt?: InputMaybe<Scalars['ID']['input']>;
-  id_gte?: InputMaybe<Scalars['ID']['input']>;
-  id_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  id_lt?: InputMaybe<Scalars['ID']['input']>;
-  id_lte?: InputMaybe<Scalars['ID']['input']>;
-  id_not?: InputMaybe<Scalars['ID']['input']>;
-  id_not_in?: InputMaybe<Array<Scalars['ID']['input']>>;
-  or?: InputMaybe<Array<InputMaybe<UniswapFactory_Filter>>>;
-  pairCount?: InputMaybe<Scalars['Int']['input']>;
-  pairCount_gt?: InputMaybe<Scalars['Int']['input']>;
-  pairCount_gte?: InputMaybe<Scalars['Int']['input']>;
-  pairCount_in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  pairCount_lt?: InputMaybe<Scalars['Int']['input']>;
-  pairCount_lte?: InputMaybe<Scalars['Int']['input']>;
-  pairCount_not?: InputMaybe<Scalars['Int']['input']>;
-  pairCount_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  totalFeeMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalFeeMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalFeeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalFeeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalFeeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalLiquidityUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalLiquidityUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeMNT?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeMNT_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeMNT_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  totalVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  totalVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  txCount?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_gt?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_gte?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  txCount_lt?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_lte?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_not?: InputMaybe<Scalars['BigInt']['input']>;
-  txCount_not_in?: InputMaybe<Array<Scalars['BigInt']['input']>>;
-  untrackedVolumeUSD?: InputMaybe<Scalars['BigDecimal']['input']>;
-  untrackedVolumeUSD_gt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  untrackedVolumeUSD_gte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  untrackedVolumeUSD_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-  untrackedVolumeUSD_lt?: InputMaybe<Scalars['BigDecimal']['input']>;
-  untrackedVolumeUSD_lte?: InputMaybe<Scalars['BigDecimal']['input']>;
-  untrackedVolumeUSD_not?: InputMaybe<Scalars['BigDecimal']['input']>;
-  untrackedVolumeUSD_not_in?: InputMaybe<Array<Scalars['BigDecimal']['input']>>;
-};
-
-export enum UniswapFactory_OrderBy {
-  Id = 'id',
-  PairCount = 'pairCount',
-  TotalFeeMnt = 'totalFeeMNT',
-  TotalFeeUsd = 'totalFeeUSD',
-  TotalLiquidityMnt = 'totalLiquidityMNT',
-  TotalLiquidityUsd = 'totalLiquidityUSD',
-  TotalVolumeMnt = 'totalVolumeMNT',
-  TotalVolumeUsd = 'totalVolumeUSD',
-  TxCount = 'txCount',
-  UntrackedVolumeUsd = 'untrackedVolumeUSD'
-}
-
 export type User = {
   __typename?: 'User';
   id: Scalars['ID']['output'];
@@ -3211,21 +3053,21 @@ export type GetPairQueryVariables = Exact<{
 }>;
 
 
-export type GetPairQuery = { __typename?: 'Query', pairs: Array<{ __typename?: 'Pair', id: string, isStable?: boolean | null, reserve0: any, reserve1: any, reserveUSD: any, token0Price: any, token1Price: any, totalSupply: any, token0: { __typename?: 'Token', id: string, symbol: string, name: string }, token1: { __typename?: 'Token', id: string, symbol: string, name: string }, pairDayData: Array<{ __typename?: 'PairDayData', id: string, dailyVolumeUSD: any, dailyFeeUSD: any, date: number }> }> };
+export type GetPairQuery = { __typename?: 'Query', pairs: Array<{ __typename?: 'Pair', id: string, reserve0: any, reserve1: any, reserveUSD: any, token0Price: any, token1Price: any, totalSupply: any, token0: { __typename?: 'Token', id: string, symbol: string, name: string }, token1: { __typename?: 'Token', id: string, symbol: string, name: string }, pairDayData: Array<{ __typename?: 'PairDayData', id: string, dailyVolumeUSD: any, dailyTxns: any, date: number }> }> };
 
 export type GetPositionsQueryVariables = Exact<{
   address: Scalars['ID']['input'];
 }>;
 
 
-export type GetPositionsQuery = { __typename?: 'Query', liquidityPositions: Array<{ __typename?: 'LiquidityPosition', liquidityTokenBalance: any, pair: { __typename?: 'Pair', id: string, isStable?: boolean | null, reserveUSD: any, reserve0: any, reserve1: any, totalSupply: any, token0: { __typename?: 'Token', id: string, symbol: string }, token1: { __typename?: 'Token', id: string, symbol: string } } }> };
+export type GetPositionsQuery = { __typename?: 'Query', liquidityPositions: Array<{ __typename?: 'LiquidityPosition', liquidityTokenBalance: any, pair: { __typename?: 'Pair', id: string, reserveUSD: any, reserve0: any, reserve1: any, totalSupply: any, token0: { __typename?: 'Token', id: string, symbol: string }, token1: { __typename?: 'Token', id: string, symbol: string } } }> };
 
 export type GetPoolListQueryVariables = Exact<{
   start_date: Scalars['Int']['input'];
 }>;
 
 
-export type GetPoolListQuery = { __typename?: 'Query', pairs: Array<{ __typename?: 'Pair', id: string, isStable?: boolean | null, reserve0: any, reserve1: any, reserveUSD: any, reserveMNT: any, trackedReserveMNT: any, untrackedVolumeUSD: any, token0Price: any, token1Price: any, volumeUSD: any, txCount: any, token0: { __typename?: 'Token', id: string, symbol: string, name: string }, token1: { __typename?: 'Token', id: string, symbol: string, name: string }, pairDayData: Array<{ __typename?: 'PairDayData', id: string, date: number, dailyFeeUSD: any }> }> };
+export type GetPoolListQuery = { __typename?: 'Query', pairs: Array<{ __typename?: 'Pair', id: string, reserve0: any, reserve1: any, reserveUSD: any, reserveEOS: any, trackedReserveEOS: any, untrackedVolumeUSD: any, token0Price: any, token1Price: any, volumeUSD: any, txCount: any, token0: { __typename?: 'Token', id: string, symbol: string, name: string }, token1: { __typename?: 'Token', id: string, symbol: string, name: string }, pairDayData: Array<{ __typename?: 'PairDayData', id: string, date: number, dailyTxns: any }> }> };
 
 export type GetNitroCompatibleLpListQueryVariables = Exact<{
   pool_list?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
@@ -3233,10 +3075,10 @@ export type GetNitroCompatibleLpListQueryVariables = Exact<{
 }>;
 
 
-export type GetNitroCompatibleLpListQuery = { __typename?: 'Query', pairs: Array<{ __typename?: 'Pair', id: string, reserveUSD: any, token1: { __typename?: 'Token', id: string, name: string, symbol: string, decimals: any }, token0: { __typename?: 'Token', id: string, name: string, symbol: string, decimals: any }, pairDayData: Array<{ __typename?: 'PairDayData', id: string, date: number, dailyFeeUSD: any }> }> };
+export type GetNitroCompatibleLpListQuery = { __typename?: 'Query', pairs: Array<{ __typename?: 'Pair', id: string, reserveUSD: any, token1: { __typename?: 'Token', id: string, name: string, symbol: string, decimals: any }, token0: { __typename?: 'Token', id: string, name: string, symbol: string, decimals: any }, pairDayData: Array<{ __typename?: 'PairDayData', id: string, date: number }> }> };
 
 
-export const GetPairDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPair"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pairs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"isStable"}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reserve0"}},{"kind":"Field","name":{"kind":"Name","value":"reserve1"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"token0Price"}},{"kind":"Field","name":{"kind":"Name","value":"token1Price"}},{"kind":"Field","name":{"kind":"Name","value":"totalSupply"}},{"kind":"Field","name":{"kind":"Name","value":"pairDayData"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"dailyVolumeUSD"}},{"kind":"Field","name":{"kind":"Name","value":"dailyFeeUSD"}},{"kind":"Field","name":{"kind":"Name","value":"date"}}]}}]}}]}}]} as unknown as DocumentNode<GetPairQuery, GetPairQueryVariables>;
-export const GetPositionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPositions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"address"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"liquidityPositions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"user_"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"address"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"liquidityTokenBalance_gt"},"value":{"kind":"StringValue","value":"0","block":false}}]}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"liquidityTokenBalance"}},{"kind":"Argument","name":{"kind":"Name","value":"orderDirection"},"value":{"kind":"EnumValue","value":"desc"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pair"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"isStable"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"reserve0"}},{"kind":"Field","name":{"kind":"Name","value":"reserve1"}},{"kind":"Field","name":{"kind":"Name","value":"totalSupply"}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"liquidityTokenBalance"}}]}}]}}]} as unknown as DocumentNode<GetPositionsQuery, GetPositionsQueryVariables>;
-export const GetPoolListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPoolList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pairs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"isStable"}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reserve0"}},{"kind":"Field","name":{"kind":"Name","value":"reserve1"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"reserveMNT"}},{"kind":"Field","name":{"kind":"Name","value":"trackedReserveMNT"}},{"kind":"Field","name":{"kind":"Name","value":"untrackedVolumeUSD"}},{"kind":"Field","name":{"kind":"Name","value":"token0Price"}},{"kind":"Field","name":{"kind":"Name","value":"token1Price"}},{"kind":"Field","name":{"kind":"Name","value":"volumeUSD"}},{"kind":"Field","name":{"kind":"Name","value":"txCount"}},{"kind":"Field","name":{"kind":"Name","value":"pairDayData"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"dailyFeeUSD"}}]}}]}}]}}]} as unknown as DocumentNode<GetPoolListQuery, GetPoolListQueryVariables>;
-export const GetNitroCompatibleLpListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNitroCompatibleLPList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pool_list"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pairs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pool_list"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pairDayData"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"dailyFeeUSD"}}]}}]}}]}}]} as unknown as DocumentNode<GetNitroCompatibleLpListQuery, GetNitroCompatibleLpListQueryVariables>;
+export const GetPairDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPair"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pairs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reserve0"}},{"kind":"Field","name":{"kind":"Name","value":"reserve1"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"token0Price"}},{"kind":"Field","name":{"kind":"Name","value":"token1Price"}},{"kind":"Field","name":{"kind":"Name","value":"totalSupply"}},{"kind":"Field","name":{"kind":"Name","value":"pairDayData"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"dailyVolumeUSD"}},{"kind":"Field","name":{"kind":"Name","value":"dailyTxns"}},{"kind":"Field","name":{"kind":"Name","value":"date"}}]}}]}}]}}]} as unknown as DocumentNode<GetPairQuery, GetPairQueryVariables>;
+export const GetPositionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPositions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"address"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"liquidityPositions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"user_"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"address"}}}]}},{"kind":"ObjectField","name":{"kind":"Name","value":"liquidityTokenBalance_gt"},"value":{"kind":"StringValue","value":"0","block":false}}]}},{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"EnumValue","value":"liquidityTokenBalance"}},{"kind":"Argument","name":{"kind":"Name","value":"orderDirection"},"value":{"kind":"EnumValue","value":"desc"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pair"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"reserve0"}},{"kind":"Field","name":{"kind":"Name","value":"reserve1"}},{"kind":"Field","name":{"kind":"Name","value":"totalSupply"}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"liquidityTokenBalance"}}]}}]}}]} as unknown as DocumentNode<GetPositionsQuery, GetPositionsQueryVariables>;
+export const GetPoolListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetPoolList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pairs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"reserve0"}},{"kind":"Field","name":{"kind":"Name","value":"reserve1"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"reserveEOS"}},{"kind":"Field","name":{"kind":"Name","value":"trackedReserveEOS"}},{"kind":"Field","name":{"kind":"Name","value":"untrackedVolumeUSD"}},{"kind":"Field","name":{"kind":"Name","value":"token0Price"}},{"kind":"Field","name":{"kind":"Name","value":"token1Price"}},{"kind":"Field","name":{"kind":"Name","value":"volumeUSD"}},{"kind":"Field","name":{"kind":"Name","value":"txCount"}},{"kind":"Field","name":{"kind":"Name","value":"pairDayData"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}},{"kind":"Field","name":{"kind":"Name","value":"dailyTxns"}}]}}]}}]}}]} as unknown as DocumentNode<GetPoolListQuery, GetPoolListQueryVariables>;
+export const GetNitroCompatibleLpListDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetNitroCompatibleLPList"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"pool_list"}},"type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"pairs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id_in"},"value":{"kind":"Variable","name":{"kind":"Name","value":"pool_list"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reserveUSD"}},{"kind":"Field","name":{"kind":"Name","value":"token1"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}}]}},{"kind":"Field","name":{"kind":"Name","value":"token0"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"symbol"}},{"kind":"Field","name":{"kind":"Name","value":"decimals"}}]}},{"kind":"Field","name":{"kind":"Name","value":"pairDayData"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"where"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"date_gte"},"value":{"kind":"Variable","name":{"kind":"Name","value":"start_date"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"date"}}]}}]}}]}}]} as unknown as DocumentNode<GetNitroCompatibleLpListQuery, GetNitroCompatibleLpListQueryVariables>;

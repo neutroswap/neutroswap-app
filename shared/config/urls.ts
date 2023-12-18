@@ -16,7 +16,7 @@ export const urls: Record<SupportedChainID, Urls> = {
   },
 
   "15557": {
-    FACTORY_GRAPH_URL: "https://testnet.esper-gn.com/subgraphs/name/esper-amm",
+    FACTORY_GRAPH_URL: "http://13.59.70.85:8000/subgraphs/name/neutro-amm",
     LAUNCHPAD_GRAPH_URL:
       "http://13.59.70.85:8000/subgraphs/name/neutro-launchpad",
     NFT_GRAPH_URL: "http://13.59.70.85:8000/subgraphs/name/neutro-nftPool",

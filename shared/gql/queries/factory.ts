@@ -4,7 +4,6 @@ export const getPair = graphql(`
   query GetPair($id: ID!, $start_date: Int!) {
     pairs(where: { id: $id }) {
       id
-      isStable
       token0 {
         id
         symbol
@@ -24,7 +23,7 @@ export const getPair = graphql(`
       pairDayData(where: { date_gte: $start_date }) {
         id
         dailyVolumeUSD
-        dailyFeeUSD
+        dailyTxns
         date
       }
     }
@@ -40,7 +39,6 @@ export const getPositions = graphql(`
     ) {
       pair {
         id
-        isStable
         reserveUSD
         reserve0
         reserve1
@@ -63,7 +61,6 @@ export const getPoolListQuery = graphql(`
   query GetPoolList($start_date: Int!) {
     pairs {
       id
-      isStable
       token0 {
         id
         symbol
@@ -77,8 +74,8 @@ export const getPoolListQuery = graphql(`
       reserve0
       reserve1
       reserveUSD
-      reserveMNT
-      trackedReserveMNT
+      reserveEOS
+      trackedReserveEOS
       untrackedVolumeUSD
       token0Price
       token1Price
@@ -87,7 +84,7 @@ export const getPoolListQuery = graphql(`
       pairDayData(where: { date_gte: $start_date }) {
         id
         date
-        dailyFeeUSD
+        dailyTxns
       }
     }
   }
@@ -113,7 +110,6 @@ export const getNitroCompatibleLPList = graphql(`
       pairDayData(where: { date_gte: $start_date }) {
         id
         date
-        dailyFeeUSD
       }
     }
   }
