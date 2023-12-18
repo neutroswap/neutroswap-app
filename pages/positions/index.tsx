@@ -12,7 +12,7 @@ import {
 } from "@/components/elements/table";
 import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
-import { currencyFormat } from "@/shared/utils";
+import { currencyCompactFormat, currencyFormat } from "@/shared/utils";
 import SpNftModal from "@/components/modules/Modal/SpNftModal";
 import {
   useQuery as useTanstackQuery,
@@ -81,6 +81,8 @@ import {
 } from "@/components/elements/Tooltip";
 import { ChevronRight } from "lucide-react";
 import TokenLogo from "@/components/modules/TokenLogo";
+import { getPositions } from "@/shared/gql/queries/factory";
+import { getTokenImageUrl } from "@/shared/getters/getTokenInfo";
 
 const queryClient = new QueryClient();
 export default function PoolPosition() {
@@ -132,7 +134,11 @@ export default function PoolPosition() {
             </QueryClientProvider>
           </Provider>
         </TabsContent>
-        <TabsContent value="lp"></TabsContent>
+        <TabsContent value="lp">
+          <Provider value={factoryClient}>
+            <LiquidityPool />
+          </Provider>
+        </TabsContent>
       </Tabs>
     </main>
   );
@@ -465,6 +471,159 @@ function SPNFTPool() {
           </TableBody>
         </Table>
       </div>
+    </div>
+  );
+}
+
+function LiquidityPool() {
+  const theme = useTheme();
+  const { address } = useAccount();
+  const [{ data, fetching, error }, reexecuteQuery] = useQuery({
+    pause: !address,
+    query: getPositions,
+    variables: {
+      address: address ? address.toLowerCase() : "",
+    },
+  });
+
+  if (fetching) return <Loading />;
+  if (error) throw new Error("Error fetching pool position");
+  if (!data || !data.liquidityPositions.length) {
+    return (
+      <div className="flex justify-center items-center w-full">
+        <div className="mt-8 text-center rounded-lg md:border border-neutral-200 dark:border-neutral-900/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full">
+          <div className="flex flex-col items-center w-full md:p-8">
+            {(theme.type as ThemeType) === "nlight" && (
+              <NoContentLight className="w-40 h-40 opacity-75" />
+            )}
+            {(theme.type as ThemeType) === "ndark" && (
+              <NoContentDark className="w-40 h-40 opacity-75" />
+            )}
+            <p className="text-neutral-500 w-3/4">
+              You do not have any liquidity positions. Add some liquidity to
+              start earning.
+            </p>
+
+            <div className="flex space-x-4 mt-4">
+              <Button
+                className="!mt-2"
+                onClick={() => window.location.reload()}
+              >
+                Refresh
+              </Button>
+              <Modal>
+                <ModalOpenButton>
+                  <Button className="!mt-2">Add Liquidity</Button>
+                </ModalOpenButton>
+                <ModalContents>
+                  {({ close }) => <AddLiquidityModal handleClose={close} />}
+                </ModalContents>
+              </Modal>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "relative flex flex-col w-full border rounded-lg bg-white dark:bg-neutral-900/50 shadow-lg shadow-slate-200 dark:shadow-black/50 overflow-hidden"
+      )}
+    >
+      <Table>
+        <TableHeader className="border-b">
+          <TableRow className="hover:bg-transparent">
+            <TableHead className="w-60">Asset</TableHead>
+            <TableHead>Amount</TableHead>
+            <TableHead>Composition</TableHead>
+            <TableHead>Pool Share</TableHead>
+            <TableHead>Fees APR</TableHead>
+            <TableHead className="text-right w-20">Actions</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.liquidityPositions.map(({ pair, liquidityTokenBalance }) => (
+            <TableRow
+              key={pair.id}
+              className="cursor-pointer group"
+              href={`/pool/${pair.id}`}
+            >
+              <TableCell className="flex items-center space-x-4">
+                <div className="flex -space-x-2.5 flex-shrink-0">
+                  <TokenLogo
+                    className="w-7 h-7"
+                    src={getTokenImageUrl(pair.token0.id as `0x${string}`)}
+                  />
+                  <TokenLogo
+                    className="w-7 h-7"
+                    src={getTokenImageUrl(pair.token1.id as `0x${string}`)}
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="text-left font-medium">
+                    {pair.token0.symbol}
+                  </span>
+                  <span className="text-left font-medium text-muted-foreground opacity-25">
+                    /
+                  </span>
+                  <span className="text-left font-medium">
+                    {pair.token1.symbol}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <div className="flex items-center space-x-2">
+                  <span className="text-left font-medium">
+                    {currencyFormat(liquidityTokenBalance, 6, 0.000001)}
+                  </span>
+                  <span className="text-left text-muted-foreground">
+                    $
+                    {currencyFormat(
+                      (Number(pair.reserveUSD) / Number(pair.totalSupply)) *
+                        Number(liquidityTokenBalance)
+                    )}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell className="text-left">
+                <div className="flex flex-col text-xs text-muted-foreground">
+                  <p>
+                    {currencyCompactFormat(
+                      (Number(liquidityTokenBalance) /
+                        Number(pair.totalSupply)) *
+                        Number(pair.reserve0)
+                    )}{" "}
+                    ${pair.token0.symbol}
+                  </p>
+                  <p>
+                    {currencyCompactFormat(
+                      (Number(liquidityTokenBalance) /
+                        Number(pair.totalSupply)) *
+                        Number(pair.reserve1)
+                    )}{" "}
+                    ${pair.token1.symbol}
+                  </p>
+                </div>
+              </TableCell>
+              <TableCell className="text-left">
+                <p>
+                  {(
+                    (Number(liquidityTokenBalance) / Number(pair.totalSupply)) *
+                    100
+                  ).toFixed(2)}
+                  %
+                </p>
+              </TableCell>
+              <TableCell className="text-left">0%</TableCell>
+              <TableCell className="flex justify-end text-right">
+                <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
