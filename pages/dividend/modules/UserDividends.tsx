@@ -1,32 +1,18 @@
-import Navbar from "@/components/modules/Navbar";
-import { Button, Page, Text } from "@geist-ui/core";
-import EthLogo from "@/public/logo/eth.svg";
-import NeutroLogo from "@/public/logo/neutro_token.svg";
 import AllocateDividendModal from "@/components/modules/Modal/AllocateDividendModal";
 import DeallocateDividendModal from "@/components/modules/Modal/DeallocateDividendModal";
 import {
   useAccount,
-  useContractRead,
   useContractReads,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import {
-  NEXT_PUBLIC_DIVIDENDS_CONTRACT,
-  NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
-  NEXT_PUBLIC_NEUTRO_TOKEN_CONTRACT,
-  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
-} from "@/shared/helpers/constants";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { formatEther } from "viem";
 import { waitForTransaction } from "@wagmi/core";
-import { currencyFormat } from "@/shared/utils";
-import Countdown from "@/components/modules/Countdown";
 import {
   DIVIDENDS_CONTRACT,
-  NEUTRO_CONTRACT,
   NEUTRO_HELPER_CONTRACT,
   XNEUTRO_CONTRACT,
 } from "@/shared/helpers/contract";
@@ -35,37 +21,9 @@ import { tokens } from "@/shared/statics/tokenList";
 import { SupportedChainID } from "@/shared/types/chain.types";
 import PendingDividends from "./PendingDividends";
 
-const allocationData = {
-  userTotalAllocation: 20.2,
-  manualAllocation: 12.2,
-  totalShare: 34.12,
-  redeemAllocation: 12.22,
-  // buat fetching ini jgn manual,
-  dividendTokens: [
-    {
-      tokenName: "ETH-USDC.e",
-      tokenAddress: 0x000000000000000,
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      pendingAmountInToken: 1.2,
-      pendingAmountInUsd: 200,
-    },
-    {
-      tokenName: "xNEUTRO",
-      tokenAddress: 0xfc43ba5d73afc7ae2745ea6c2f534b1f40871b34,
-      logoToken0: "logoToken0",
-      logoToken1: "logoToken1",
-      pendingAmountInToken: 0.00001,
-      pendingAmountInUsd: 12.82,
-    },
-  ],
-};
-
 interface Reward extends Omit<Token, "logo"> {
   logo: string[];
 }
-
-const allocationReward = allocationData.dividendTokens;
 
 export default function UserDividends() {
   const { chain } = useNetwork();
@@ -110,23 +68,6 @@ export default function UserDividends() {
       abi: DIVIDENDS_ABI,
       functionName: "harvestAllDividends",
     });
-  const { write: harvestAll, isLoading: isLoadingHarvestAll } =
-    useContractWrite({
-      ...harvestAllConfig,
-      onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
-      },
-    });
-
-  const addressToTokenInfo = useMemo(() => {
-    if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
-    return new Map(
-      tokens[chain.id as unknown as SupportedChainID].map((item) => [
-        item.address,
-        item,
-      ])
-    );
-  }, [chain]);
 
   return (
     <div className="col-span-5 mt-8 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
