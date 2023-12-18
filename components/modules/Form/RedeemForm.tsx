@@ -29,7 +29,7 @@ import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
 
 const DEFAULT_PERCENTAGE = 50;
-const DAY_PER_PERCENTAGE = 3.3;
+const DAY_PER_PERCENTAGE = 3.36; // ((max redeem duration in days  - min redeem duration in days) / default percentage)
 const DEFAULT_DURATION = 15;
 const ONE_DAY_IN_SECONDS = 86400;
 const MIN_REDEEM_RATIO = 50;
@@ -121,6 +121,10 @@ export default function RedeemForm() {
       (neutroOutputPercentage - DEFAULT_PERCENTAGE) * DAY_PER_PERCENTAGE +
       DEFAULT_DURATION
     );
+    // return (
+    //   (neutroOutputPercentage - DEFAULT_PERCENTAGE) * DAY_PER_PERCENTAGE +
+    //   DEFAULT_DURATION
+    // );
   }, [neutroOutputPercentage]);
 
   const neutroRedeemDurationInSeconds = useMemo(() => {
@@ -140,7 +144,7 @@ export default function RedeemForm() {
 
   const neutroOutput = useMemo(() => {
     if (!debouncedRedeemXneutroToNeutro) return 0;
-    return (ratio * debouncedRedeemXneutroToNeutro) / 100;
+    return (ratio * +debouncedRedeemXneutroToNeutro) / 100;
   }, [debouncedRedeemXneutroToNeutro, ratio]);
 
   const { config: redeemXneutroConfig, refetch: retryRedeemXneutroConfig } =
@@ -166,6 +170,9 @@ export default function RedeemForm() {
         await waitForTransaction({ hash: tx.hash });
       },
     });
+
+  console.log("Ratio:", ratio);
+  console.log("Debounced Redeem:", debouncedRedeemXneutroToNeutro);
 
   return (
     <Form {...form}>
@@ -221,7 +228,7 @@ export default function RedeemForm() {
           </div>
           <div className="flex justify-between mt-3">
             <div className="flex flex-col mt-3">
-              <div className="font-xs font-semibold">Redeem duration</div>
+              <div className="font-xs font-semibold">Redeem ratio</div>
             </div>
             <div className="flex w-full items-center gap-2">
               <Slider
@@ -241,7 +248,7 @@ export default function RedeemForm() {
                 Redeem Duration
               </span>
               <span className="text-sm font-semibold leading-5 text-neutral-500">
-                {Math.floor(neutroRedeemDuration)} Days
+                {Math.trunc(neutroRedeemDuration)} Days
               </span>
             </div>
             <div className="flex items-center justify-between">
@@ -249,7 +256,7 @@ export default function RedeemForm() {
                 NEUTRO Output
               </span>
               <span className="text-sm font-semibold leading-5 text-neutral-500">
-                {neutroOutput} NEUTRO
+                {neutroOutput.toFixed(2)} NEUTRO
               </span>
             </div>
           </div>
