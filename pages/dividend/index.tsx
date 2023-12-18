@@ -137,7 +137,7 @@ export default function Dividend() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {totalAllocation}
+                      {Number(totalAllocation).toFixed(2)}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
                       xNEUTRO
