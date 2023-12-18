@@ -101,6 +101,7 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
       onSuccess: async (tx) => {
         await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchBalanceAndAllowance();
+        await retryBoostConfig();
       },
     }
   );
@@ -113,12 +114,13 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
     [props.id, BigInt(props.tokenId)]
   );
 
-  const { config: boostConfig } = usePrepareContractWrite({
-    address: XNEUTRO_CONTRACT,
-    abi: XNEUTRO_ABI,
-    functionName: "allocate",
-    args: [YIELDBOOSTER_CONTRACT, parseEther(debouncedBoostAmount), data],
-  });
+  const { config: boostConfig, refetch: retryBoostConfig } =
+    usePrepareContractWrite({
+      address: XNEUTRO_CONTRACT,
+      abi: XNEUTRO_ABI,
+      functionName: "allocate",
+      args: [YIELDBOOSTER_CONTRACT, parseEther(debouncedBoostAmount), data],
+    });
 
   const { isLoading: isBoostLoading, write: boost } = useContractWrite({
     ...boostConfig,
