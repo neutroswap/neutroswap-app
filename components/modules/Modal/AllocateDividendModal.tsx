@@ -53,7 +53,7 @@ export default function AllocateDividendModal() {
   const { refetch: refetchBalance, isFetching: isFetchingBalance } =
     useContractRead({
       enabled: Boolean(address!),
-      watch: true,
+
       address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "balanceOf",
@@ -66,7 +66,6 @@ export default function AllocateDividendModal() {
   const { refetch: refetchAllowance, isFetching: isFetchingAllowance } =
     useContractRead({
       enabled: Boolean(address!),
-      watch: true,
       address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "getUsageApproval",

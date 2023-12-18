@@ -52,7 +52,6 @@ export default function AllocateDividendModal() {
   const { refetch: allocated, isFetching: isFetchingAllocated } =
     useContractRead({
       enabled: Boolean(address!),
-      watch: true,
       address: XNEUTRO_CONTRACT,
       abi: XNEUTRO_ABI,
       functionName: "getUsageAllocation",
