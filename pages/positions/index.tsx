@@ -320,43 +320,96 @@ function SPNFTPool() {
                         .isBefore(dayjs.unix(+pool.endLockTime));
                       return (
                         <div className="flex items-center justify-center space-x-1">
-                          <Percent
-                            className={cn(
-                              pool.settings.yield_bearing === true
-                                ? "text-primary"
-                                : "text-muted-foreground",
-                              "w-5 h-5"
-                            )}
-                            weight="duotone"
-                          />
-                          <Lock
-                            className={cn(
-                              isLockActive === true
-                                ? "text-primary"
-                                : "text-muted-foreground",
-                              "w-5 h-5"
-                            )}
-                            weight="duotone"
-                          />
-                          <Lightning
-                            className={cn(
-                              pool.settings.boost === true
-                                ? "text-primary"
-                                : "text-muted-foreground",
-                              "w-5 h-5"
-                            )}
-                            weight="duotone"
-                          />
-                          <FireSimple
-                            className={cn(
-                              pool.settings.nitro !==
-                                "0x0000000000000000000000000000000000000000"
-                                ? "text-primary"
-                                : "text-muted-foreground",
-                              "w-5 h-5"
-                            )}
-                            weight="duotone"
-                          />
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Percent
+                                  className={cn(
+                                    pool.settings.yield_bearing === true
+                                      ? "text-primary"
+                                      : "text-muted-foreground",
+                                    "w-5 h-5"
+                                  )}
+                                  weight="duotone"
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent className="flex flex-col items-start">
+                                <p className="text-xs font-medium">
+                                  {pool.settings.yield_bearing === true
+                                    ? "Active Yield Bearing"
+                                    : "No Active Yield Bearing"}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Lock
+                                  className={cn(
+                                    isLockActive === true
+                                      ? "text-primary"
+                                      : "text-muted-foreground",
+                                    "w-5 h-5"
+                                  )}
+                                  weight="duotone"
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent className="flex flex-col items-start">
+                                <p className="text-xs font-medium">
+                                  {isLockActive === true
+                                    ? "Active Lock"
+                                    : "No Active Lock"}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Lightning
+                                  className={cn(
+                                    pool.settings.boost === true
+                                      ? "text-primary"
+                                      : "text-muted-foreground",
+                                    "w-5 h-5"
+                                  )}
+                                  weight="duotone"
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent className="flex flex-col items-start">
+                                <p className="text-xs font-medium">
+                                  {pool.settings.boost === true
+                                    ? "Boost Active"
+                                    : "No Boost Active"}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                          <TooltipProvider delayDuration={0}>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <FireSimple
+                                  className={cn(
+                                    pool.settings.nitro !==
+                                      "0x0000000000000000000000000000000000000000"
+                                      ? "text-primary"
+                                      : "text-muted-foreground",
+                                    "w-5 h-5"
+                                  )}
+                                  weight="duotone"
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent className="flex flex-col items-start">
+                                <p className="text-xs font-medium">
+                                  {pool.settings.nitro !==
+                                  "0x0000000000000000000000000000000000000000"
+                                    ? "Nitro Active"
+                                    : "No Nitro Active"}
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         </div>
                       );
                     })()}
