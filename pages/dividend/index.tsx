@@ -215,12 +215,15 @@ export default function Dividend() {
               {/* Need to change numbering format */}
               <div className="flex">
                 {!!data &&
-                  data[4].map((reward) => {
+                  data[4].map((reward, index) => {
                     const info = getRewardInfo(reward.token);
                     if (!info) return null;
                     return (
-                      <div className="flex w-1/2 items-center md:pl-8 m-0 ">
-                        <div className="flex items-center ">
+                      <div
+                        className="flex w-1/2 items-center md:pl-8 m-0"
+                        key={index}
+                      >
+                        <div className="flex items-center">
                           <div className="flex">
                             {info.logo.map((logo) => (
                               <TokenLogo
