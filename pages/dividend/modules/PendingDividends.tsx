@@ -64,7 +64,7 @@ export default function PendingDividends() {
     useContractWrite({
       ...harvestAllConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
       },
     });
 
@@ -116,6 +116,7 @@ export default function PendingDividends() {
           <Button
             className="px-4 py-2 text-white border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
             onClick={() => harvestAll?.()}
+            loading={isLoadingHarvestAll}
             disabled={!harvestAll}
           >
             Claim all
@@ -176,7 +177,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
   const { write: harvest, isLoading: isLoadingHarvest } = useContractWrite({
     ...harvestConfig,
     onSuccess: async (tx) => {
-      await waitForTransaction({ hash: tx.hash });
+      await waitForTransaction({ hash: tx.hash, confirmations: 8 });
     },
   });
 
@@ -250,6 +251,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
       <div>
         <Button
           onClick={() => harvest?.()}
+          loading={isLoadingHarvest}
           disabled={!harvest}
           className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
         >
