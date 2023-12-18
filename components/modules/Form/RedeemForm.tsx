@@ -248,7 +248,7 @@ export default function RedeemForm() {
                 Redeem Duration
               </span>
               <span className="text-sm font-semibold leading-5 text-neutral-500">
-                {Math.trunc(neutroRedeemDuration)} Days
+                {Math.floor(neutroRedeemDuration)} Days
               </span>
             </div>
             <div className="flex items-center justify-between">
