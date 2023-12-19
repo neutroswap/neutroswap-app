@@ -93,91 +93,51 @@ export default async function getNFTPosition(
   const aprByNftToken = await getAllAprForSpnft(ownedNftPoolToken);
 
   // // GET PAIR INFORMATION
-  // const nitroRes = await factoryClient
-  //   .query(getNitroCompatibleLPList, {
-  //     pool_list: Array.from(lpTokenToUserOwnedNftPool.keys()),
-  //     start_date: dayjs().utc().subtract(7, "days").startOf("day").unix(),
-  //   })
-  //   .toPromise();
-  // if (!nitroRes.data) throw new Error("Failed to fetch nitro compatible pool");
+  const nitroRes = await factoryClient
+    .query(getNitroCompatibleLPList, {
+      pool_list: Array.from(lpTokenToUserOwnedNftPool.keys()),
+      start_date: dayjs().utc().subtract(7, "days").startOf("day").unix(),
+    })
+    .toPromise();
+  if (!nitroRes.data) throw new Error("Failed to fetch nitro compatible pool");
 
-  // const nitroMap = new Map(
-  //   // nitroRes.data.pairs.map((item) => {
-  //   nitroRes.data.pairs.map((item) => {
-  //     const token0Logo = addressToTokenLogoMap.get(item.token0.id) ?? "";
-  //     const token1Logo = addressToTokenLogoMap.get(item.token1.id) ?? "";
-  //     const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
-  //       return prev + parseFloat(curr.dailyFeeUSD);
-  //     }, 0);
-  //     const feeApr = ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100;
-  //     return [
-  //       item.id, // key is lowercase address
-  //       {
-  //         ...item,
-  //         token0: {
-  //           name: item.token0.name,
-  //           symbol: item.token0.symbol,
-  //           decimal: +item.token0.decimals,
-  //           logo: token0Logo,
-  //           address: item.token0.id as `0x${string}`,
-  //         },
-  //         token1: {
-  //           name: item.token1.name,
-  //           symbol: item.token1.symbol,
-  //           decimal: +item.token1.decimals,
-  //           logo: token1Logo,
-  //           address: item.token1.id as `0x${string}`,
-  //         },
-  //         feeApr: feeApr,
-  //       },
-  //     ];
-  //   })
-  // );
-
-  // let data: Response[] = [];
-  // res.data.userInNFtPool.nftPoolToken.forEach(
-  //   ({ nftPool, amountLpToken, ...rest }) => {
-  //     const nitroCompatibleLPData = nitroMap.get(nftPool.lpToken);
-  //     const aprBreakdown = aprByNftToken.get(rest.id) ?? {
-  //       base: 0,
-  //       fees: 0,
-  //       nitro: 0,
-  //       multiplier: {
-  //         lock: 0,
-  //         boost: 0,
-  //       },
-  //     };
-  //     console.log(aprBreakdown);
-  //     if (!nitroCompatibleLPData) return;
-  //     data.push({
-  //       id: nftPool.id as `0x${string}`,
-  //       lpToken: nftPool.lpToken as `0x${string}`,
-  //       tokenId: rest.tokenId,
-  //       assets: {
-  //         token0: nitroCompatibleLPData.token0,
-  //         token1: nitroCompatibleLPData.token1,
-  //       },
-  //       lockDuration: rest.lockDuration,
-  //       amount: formatEther(amountLpToken),
-  //       endLockTime: rest.endLockTime,
-  //       apr: {
-  //         ...aprBreakdown,
-  //         fees: nitroCompatibleLPData.feeApr,
-  //       },
-  //       settings: {
-  //         yield_bearing: false, //TODO: Yield bearing data
-  //         lock: Boolean(+rest.lockDuration),
-  //         boost: Boolean(+rest.boostPoints),
-  //         nitro: rest.stakedInNitroPool,
-  //       },
-  //     });
-  //   }
-  // );
-  // return data;
+  const nitroMap = new Map(
+    // nitroRes.data.pairs.map((item) => {
+    nitroRes.data.pairs.map((item) => {
+      const token0Logo = addressToTokenLogoMap.get(item.token0.id) ?? "";
+      const token1Logo = addressToTokenLogoMap.get(item.token1.id) ?? "";
+      // const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
+      //   return prev + parseFloat(curr.dailyFeeUSD);
+      // }, 0);
+      // const feeApr = ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100;
+      return [
+        item.id, // key is lowercase address
+        {
+          ...item,
+          token0: {
+            name: item.token0.name,
+            symbol: item.token0.symbol,
+            decimal: +item.token0.decimals,
+            logo: token0Logo,
+            address: item.token0.id as `0x${string}`,
+          },
+          token1: {
+            name: item.token1.name,
+            symbol: item.token1.symbol,
+            decimal: +item.token1.decimals,
+            logo: token1Logo,
+            address: item.token1.id as `0x${string}`,
+          },
+          // feeApr: feeApr,
+        },
+      ];
+    })
+  );
 
   let data: Response[] = [];
   res.data.userInNFtPool.nftPoolToken.forEach(
     ({ nftPool, amountLpToken, ...rest }) => {
+      const nitroCompatibleLPData = nitroMap.get(nftPool.lpToken);
       const aprBreakdown = aprByNftToken.get(rest.id) ?? {
         base: 0,
         fees: 0,
@@ -187,34 +147,22 @@ export default async function getNFTPosition(
           boost: 0,
         },
       };
+      console.log(aprBreakdown);
+      if (!nitroCompatibleLPData) return;
       data.push({
         id: nftPool.id as `0x${string}`,
         lpToken: nftPool.lpToken as `0x${string}`,
         tokenId: rest.tokenId,
         assets: {
-          token0: {
-            // network_id: "15557",
-            symbol: "EOS",
-            logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
-            name: "EOS",
-            address: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
-            decimal: 18,
-          },
-          token1: {
-            // network_id: "15557",
-            symbol: "USDT",
-            logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
-            name: "USD Tether",
-            address: "0xd61551b3E56343B6D9323444cf398f2fdf23732b",
-            decimal: 6,
-          },
+          token0: nitroCompatibleLPData.token0,
+          token1: nitroCompatibleLPData.token1,
         },
         lockDuration: rest.lockDuration,
         amount: formatEther(amountLpToken),
         endLockTime: rest.endLockTime,
         apr: {
           ...aprBreakdown,
-          fees: 0,
+          // fees: nitroCompatibleLPData.feeApr,
         },
         settings: {
           yield_bearing: false, //TODO: Yield bearing data
@@ -226,94 +174,148 @@ export default async function getNFTPosition(
     }
   );
   return data;
-}
 
-type Mutable<Type> = {
-  -readonly [Key in keyof Type]: Type[Key];
-};
+  //   let data: Response[] = [];
+  //   res.data.userInNFtPool.nftPoolToken.forEach(
+  //     ({ nftPool, amountLpToken, ...rest }) => {
+  //       const aprBreakdown = aprByNftToken.get(rest.id) ?? {
+  //         base: 0,
+  //         fees: 0,
+  //         nitro: 0,
+  //         multiplier: {
+  //           lock: 0,
+  //           boost: 0,
+  //         },
+  //       };
+  //       data.push({
+  //         id: nftPool.id as `0x${string}`,
+  //         lpToken: nftPool.lpToken as `0x${string}`,
+  //         tokenId: rest.tokenId,
+  //         assets: {
+  //           token0: {
+  //             // network_id: "15557",
+  //             symbol: "EOS",
+  //             logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/eos.svg",
+  //             name: "EOS",
+  //             address: "0x6cCC5AD199bF1C64b50f6E7DD530d71402402EB6",
+  //             decimal: 18,
+  //           },
+  //           token1: {
+  //             // network_id: "15557",
+  //             symbol: "USDT",
+  //             logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
+  //             name: "USD Tether",
+  //             address: "0xd61551b3E56343B6D9323444cf398f2fdf23732b",
+  //             decimal: 6,
+  //           },
+  //         },
+  //         lockDuration: rest.lockDuration,
+  //         amount: formatEther(amountLpToken),
+  //         endLockTime: rest.endLockTime,
+  //         apr: {
+  //           ...aprBreakdown,
+  //           fees: 0,
+  //         },
+  //         settings: {
+  //           yield_bearing: false, //TODO: Yield bearing data
+  //           lock: Boolean(+rest.lockDuration),
+  //           boost: Boolean(+rest.boostPoints),
+  //           nitro: rest.stakedInNitroPool,
+  //         },
+  //       });
+  //     }
+  //   );
+  //   return data;
+  // }
 
-async function getAllAprForSpnft(
-  ownedNftPoolToken: NonNullable<
-    NonNullable<GetSpnftPositionsQuery["userInNFtPool"]>["nftPoolToken"]
-  >
-): Promise<Map<string, Response["apr"]>> {
-  // base: number => is base fee from nftPoolApr()
-  // bonus: number => is fee from bonus lock (multiplier) by calling getSpNftBoostMultiplier(address,tokenId)
-  // fees: number => fee apr is received from dayData on esper-factory subgraph
-  // nitro: number => get nitro apr by calling `nitroPoolApr()` in esper helper
+  type Mutable<Type> = {
+    -readonly [Key in keyof Type]: Type[Key];
+  };
 
-  // GET APR INFORMATION PER NFT TOKEN
-  const helperContract = getContract({
-    address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
-    abi: NEUTRO_HELPER_ABI,
-  });
+  async function getAllAprForSpnft(
+    ownedNftPoolToken: NonNullable<
+      NonNullable<GetSpnftPositionsQuery["userInNFtPool"]>["nftPoolToken"]
+    >
+  ): Promise<Map<string, Response["apr"]>> {
+    // base: number => is base fee from nftPoolApr()
+    // bonus: number => is fee from bonus lock (multiplier) by calling getSpNftBoostMultiplier(address,tokenId)
+    // fees: number => fee apr is received from dayData on esper-factory subgraph
+    // nitro: number => get nitro apr by calling `nitroPoolApr()` in esper helper
 
-  // WARNING: all params are optional because we need the length of the array here.
-  const composeMulticall = (nftPool?: `0x${string}`, tokenId?: bigint) =>
-    [
-      {
-        ...helperContract,
-        functionName: "nftPoolApr",
-        args: [nftPool!],
-      },
-      {
-        ...helperContract,
-        functionName: "getSpNftLockMultiplier",
-        args: [nftPool!, tokenId!],
-      } as const,
-      {
-        ...helperContract,
-        functionName: "getSpNftBoostMultiplier",
-        args: [nftPool!, tokenId!],
-      } as const,
-      {
-        ...helperContract,
-        functionName: "nitroPoolAprByNftPoolWithSpecificTokenId",
-        args: [nftPool!, tokenId!],
-      } as const,
-    ] as const;
+    // GET APR INFORMATION PER NFT TOKEN
+    const helperContract = getContract({
+      address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+      abi: NEUTRO_HELPER_ABI,
+    });
 
-  const constructedMulticall = ownedNftPoolToken.flatMap((item) => {
-    return composeMulticall(
-      item.nftPool.id as `0x${string}`,
-      BigInt(item.tokenId)
-    );
-  });
-
-  const result = await readContracts({
-    allowFailure: false,
-    contracts: constructedMulticall,
-  });
-
-  let chunkedResult: MulticallResults<
-    Mutable<ReturnType<typeof composeMulticall>>,
-    false
-  >[] = [];
-  for (let i = 0; i < result.length; i += composeMulticall().length) {
-    chunkedResult.push(result.slice(i, i + composeMulticall().length) as any);
-  }
-
-  return new Map(
-    chunkedResult.map((item, index) => {
-      const [nftPoolApr, lockMultiplier, boostMultiplier, nitroPoolApr] = item;
-      return [
-        ownedNftPoolToken[index].id,
+    // WARNING: all params are optional because we need the length of the array here.
+    const composeMulticall = (nftPool?: `0x${string}`, tokenId?: bigint) =>
+      [
         {
-          base: parseFloat(formatEther(nftPoolApr)),
-          fees: 0,
-          nitro:
-            parseFloat(formatEther(nitroPoolApr[0])) +
-            parseFloat(formatEther(nitroPoolApr[1])),
-          multiplier: {
-            lock: lockMultiplier
-              ? (Number(lockMultiplier) * Number(BigInt(1))) / 10000
-              : 0,
-            boost: boostMultiplier
-              ? (Number(boostMultiplier) * Number(BigInt(1))) / 10000
-              : 0,
-          },
+          ...helperContract,
+          functionName: "nftPoolApr",
+          args: [nftPool!],
         },
-      ];
-    })
-  );
+        {
+          ...helperContract,
+          functionName: "getSpNftLockMultiplier",
+          args: [nftPool!, tokenId!],
+        } as const,
+        {
+          ...helperContract,
+          functionName: "getSpNftBoostMultiplier",
+          args: [nftPool!, tokenId!],
+        } as const,
+        {
+          ...helperContract,
+          functionName: "nitroPoolAprByNftPoolWithSpecificTokenId",
+          args: [nftPool!, tokenId!],
+        } as const,
+      ] as const;
+
+    const constructedMulticall = ownedNftPoolToken.flatMap((item) => {
+      return composeMulticall(
+        item.nftPool.id as `0x${string}`,
+        BigInt(item.tokenId)
+      );
+    });
+
+    const result = await readContracts({
+      allowFailure: false,
+      contracts: constructedMulticall,
+    });
+
+    let chunkedResult: MulticallResults<
+      Mutable<ReturnType<typeof composeMulticall>>,
+      false
+    >[] = [];
+    for (let i = 0; i < result.length; i += composeMulticall().length) {
+      chunkedResult.push(result.slice(i, i + composeMulticall().length) as any);
+    }
+
+    return new Map(
+      chunkedResult.map((item, index) => {
+        const [nftPoolApr, lockMultiplier, boostMultiplier, nitroPoolApr] =
+          item;
+        return [
+          ownedNftPoolToken[index].id,
+          {
+            base: parseFloat(formatEther(nftPoolApr)),
+            fees: 0,
+            nitro:
+              parseFloat(formatEther(nitroPoolApr[0])) +
+              parseFloat(formatEther(nitroPoolApr[1])),
+            multiplier: {
+              lock: lockMultiplier
+                ? (Number(lockMultiplier) * Number(BigInt(1))) / 10000
+                : 0,
+              boost: boostMultiplier
+                ? (Number(boostMultiplier) * Number(BigInt(1))) / 10000
+                : 0,
+            },
+          },
+        ];
+      })
+    );
+  }
 }
