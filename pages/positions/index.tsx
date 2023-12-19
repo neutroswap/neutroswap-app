@@ -63,13 +63,10 @@ import { waitForTransaction } from "@wagmi/core";
 import { decodeAbiParameters, parseAbiParameters } from "viem";
 import dayjs from "dayjs";
 import {
-  Timer,
   Lock,
   Lightning,
   FireSimple,
   Percent,
-  WarningCircle,
-  CaretDown,
   Info,
 } from "@phosphor-icons/react";
 import { cn } from "@/shared/utils";
@@ -201,59 +198,6 @@ function SPNFTPool() {
       </div>
     );
   }
-
-  // return (
-  // <div className="flex flex-col items-center sm:items-start justify-between py-16">
-  //   <div className="flex justify-between items-center w-full">
-  //     <span className="m-0 text-center text-3xl md:text-4xl font-semibold">
-  //       Positions
-  //     </span>
-  //     <Modal>
-  //       <ModalOpenButton>
-  //         <Button auto className="!mt-2" iconRight={<PlusIcon />}>
-  //           Add Liquidity
-  //         </Button>
-  //       </ModalOpenButton>
-  //       <ModalContents>
-  //         {({ close }) => <AddLiquidityModal handleClose={close} />}
-  //       </ModalContents>
-  //     </Modal>
-  //   </div>
-  //   <div className="flex flex-col">
-  //     <p className="m-0 text-center text-base text-neutral-400 mt-2">
-  //       Create and manage all your staking positions.
-  //     </p>
-  //   </div>
-  //   <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-  //   //{" "}
-  //   {/* <div className="flex justify-center items-center w-full">
-  // //       <div className="mt-8 text-center rounded-lg md:border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full max-w-3xl">
-  // //         <div className="flex flex-col items-center w-full md:p-8">
-  // //           {(theme.type as ThemeType) === "nlight" && (
-  // //             <NoContentLight className="w-40 h-40 opacity-75" />
-  // //           )}
-  // //           {(theme.type as ThemeType) === "ndark" && (
-  // //             <NoContentDark className="w-40 h-40 opacity-75" />
-  // //           )}
-  // //           <p className="text-neutral-500 w-3/4">
-  // //             You do not have any liquidity positions. Add some liquidity to
-  // //             start earning.
-  // //           </p>
-
-  // //           <Modal>
-  // //             <ModalOpenButton>
-  // //               <Button className="!mt-2">Add Liquidity</Button>
-  // //             </ModalOpenButton>
-  // //             <ModalContents>
-  // //               {({ close }) => <AddLiquidityModal handleClose={close} />}
-  // //             </ModalContents>
-  // //           </Modal>
-  // //         </div>
-  // //       </div>
-  // //     </div> */}
-  //   //{" "}
-  // </div>;
-  // );
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-between py-3">
@@ -539,7 +483,6 @@ function LiquidityPool() {
             <TableHead>Amount</TableHead>
             <TableHead>Composition</TableHead>
             <TableHead>Pool Share</TableHead>
-            <TableHead>Fees APR</TableHead>
             <TableHead className="text-right w-20">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -616,7 +559,6 @@ function LiquidityPool() {
                   %
                 </p>
               </TableCell>
-              <TableCell className="text-left">0%</TableCell>
               <TableCell className="flex justify-end text-right">
                 <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />
               </TableCell>
