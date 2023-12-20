@@ -1,7 +1,4 @@
-// import { Inter } from 'next/font/google'
-import { useState, useEffect, useMemo } from "react";
-import Navbar from "@/components/modules/Navbar";
-import { Button, Page, Text } from "@geist-ui/core";
+import { useMemo } from "react";
 import EpochLogo from "@/public/logo/epoch.svg";
 import WalletLogo from "@/public/icons/wallet.svg";
 import LockLogo from "@/public/logo/lock.svg";
@@ -11,26 +8,17 @@ import YieldboosterLogo from "@/public/logo/speedometer.svg";
 import LaunchpadLogo from "@/public/logo/rocket.svg";
 import RedeemForm from "@/components/modules/Form/RedeemForm";
 import ConvertForm from "@/components/modules/Form/ConvertForm";
-import { Card, CardContent, CardFooter } from "@/components/elements/Card";
+import { Card, CardContent } from "@/components/elements/Card";
 import { Tab } from "@headlessui/react";
-import {
-  useAccount,
-  useContractRead,
-  useContractWrite,
-  useNetwork,
-  usePrepareContractWrite,
-} from "wagmi";
+import { useAccount, useContractRead, useNetwork } from "wagmi";
 import { formatEther } from "viem";
-import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { DIVIDENDS_ABI, XNEUTRO_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
 import {
   NEXT_PUBLIC_DIVIDENDS_CONTRACT,
   NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
   NEXT_PUBLIC_YIELDBOOSTER_CONTRACT,
 } from "@/shared/helpers/constants";
-import { utils } from "ethers";
 import VestingXneutro from "@/components/modules/Vesting";
-import { BigNumber } from "ethers";
 import Link from "next/dist/client/link";
 
 export default function Xneutro() {

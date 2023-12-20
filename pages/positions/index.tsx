@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useMemo, useEffect } from "react";
+import React, { useState, useMemo } from "react";
 import { Button, Loading, useTheme } from "@geist-ui/core";
 import {
   Table,

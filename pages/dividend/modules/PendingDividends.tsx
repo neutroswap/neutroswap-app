@@ -1,23 +1,19 @@
-import { Button, Page, Text } from "@geist-ui/core";
+import { Button } from "@geist-ui/core";
 import {
   useAccount,
-  useContractRead,
   useContractReads,
   useContractWrite,
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
-import { useMemo, useState } from "react";
-import { formatEther, formatUnits } from "viem";
+import { useMemo } from "react";
+import { formatUnits } from "viem";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/utils";
-import Countdown from "@/components/modules/Countdown";
 import {
   DIVIDENDS_CONTRACT,
-  NEUTRO_CONTRACT,
   NEUTRO_HELPER_CONTRACT,
-  XNEUTRO_CONTRACT,
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";

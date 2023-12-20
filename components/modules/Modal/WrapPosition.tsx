@@ -170,10 +170,6 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
     return formatEther(allowance) >= (debouncedLpTokenAmount ?? "0");
   }, [debouncedLpTokenAmount, allowance]);
 
-  console.log("allowance", formatEther(allowance));
-  console.log("isApproved", isApproved);
-  console.log(formatEther(allowance), debouncedLpTokenAmount);
-
   useContractRead({
     enabled: Boolean(nftPool),
     address: nftPool,

@@ -171,9 +171,6 @@ export default function RedeemForm() {
       },
     });
 
-  console.log("Ratio:", ratio);
-  console.log("Debounced Redeem:", debouncedRedeemXneutroToNeutro);
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(() => redeemXneutro?.())}>

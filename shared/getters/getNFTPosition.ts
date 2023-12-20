@@ -6,12 +6,9 @@ import { tokens } from "../statics/tokenList";
 import { Token } from "../types/tokens.types";
 import { Client, cacheExchange, fetchExchange } from "urql";
 import { urls } from "../config/urls";
-// import { getNitroCompatibleLPList } from "../gql/queries/factory";
 import { getSPNFTPositions } from "../gql/queries/nft";
-// import { contracts } from "../config/contracts";
 import { NEUTRO_HELPER_ABI } from "../abi";
 import { readContracts } from "wagmi/actions";
-
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { GetSpnftPositionsQuery } from "../gql/types/nft/graphql";
@@ -147,7 +144,6 @@ export default async function getNFTPosition(
           boost: 0,
         },
       };
-      console.log(aprBreakdown);
       if (!nitroCompatibleLPData) return;
       data.push({
         id: nftPool.id as `0x${string}`,

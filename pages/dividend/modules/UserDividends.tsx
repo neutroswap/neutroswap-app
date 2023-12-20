@@ -3,22 +3,17 @@ import DeallocateDividendModal from "@/components/modules/Modal/DeallocateDivide
 import {
   useAccount,
   useContractReads,
-  useContractWrite,
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
-import { useMemo } from "react";
 import { formatEther } from "viem";
-import { waitForTransaction } from "@wagmi/core";
 import {
   DIVIDENDS_CONTRACT,
   NEUTRO_HELPER_CONTRACT,
   XNEUTRO_CONTRACT,
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
-import { tokens } from "@/shared/statics/tokenList";
-import { SupportedChainID } from "@/shared/types/chain.types";
 import PendingDividends from "./PendingDividends";
 
 interface Reward extends Omit<Token, "logo"> {
@@ -116,102 +111,7 @@ export default function UserDividends() {
       </div>
 
       <hr className="my-7 border-neutral-200/80 dark:border-neutral-800/80" />
-      {/* <div className="-space-y-12">
-        <div className="flex flex-row items-center justify-between w-full md:p-8 md:pt-0">
-          <p className="m-0 text-left font-semibold whitespace-nowrap">
-            Your dividends
-          </p>
-          <div className="flex space-x-4">
-            <Button
-              className="px-4 py-2 text-white border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
-              onClick={() => harvestAll?.()}
-              disabled={!harvestAll}
-            >
-              Claim all
-            </Button>
-          </div>
-        </div>
-
-        {allocationReward.map((item, index) => (
-          <AllocationReward key={index} data={item} />
-        ))}
-      </div> */}
       <PendingDividends />
     </div>
   );
 }
-
-// const AllocationReward = ({ data }: { data: any }) => {
-//   const { address } = useAccount();
-
-//   const { refetch: infoRewards } = useContractReads({
-//     enabled: Boolean(address),
-//     cacheOnBlock: true,
-//     allowFailure: false,
-//     contracts: [
-//       {
-//         address: NEUTRO_HELPER_CONTRACT,
-//         abi: NEUTRO_HELPER_ABI,
-//         functionName: "userPendingRewardsInDividendsPlugin",
-//         args: [address!],
-//       } as const,
-//       {
-//         address: NEUTRO_HELPER_CONTRACT,
-//         abi: NEUTRO_HELPER_ABI,
-//         functionName: "dividendsDistributedTokensRewards",
-//       } as const,
-//     ],
-//   });
-
-//   //Claim individual reward button function
-//   const { config: harvestConfig, refetch: refetchHarvestConfig } =
-//     usePrepareContractWrite({
-//       enabled: Boolean(address!),
-//       address: DIVIDENDS_CONTRACT,
-//       abi: DIVIDENDS_ABI,
-//       functionName: "harvestDividends",
-//       args: [data.tokenAddress as `0x${string}`],
-//     });
-//   const { write: harvest, isLoading: isLoadingHarvest } = useContractWrite({
-//     ...harvestConfig,
-//     onSuccess: async (tx) => {
-//       await waitForTransaction({ hash: tx.hash });
-//     },
-//   });
-
-//   return (
-//     <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
-//       <div className="flex items-center">
-//         <div className="flex">
-//           <EthLogo className="relative w-8 h-8 rounded-full" />
-//           <NeutroLogo className="w-8 h-8 rounded-full -ml-2" />
-//           {/* <img
-//               src={data.logoToken0}
-//               className="relative w-8 h-8 rounded-full"
-//             />
-//             <img src={data.logoToken1} className="w-8 h-8 rounded-full -ml-2" /> */}
-//         </div>
-//         <div className="ml-2">
-//           <span className="text-sm text-neutral-500">{data.tokenName}</span>
-//           <br />
-//           <span className="text-sm">
-//             {Number(data.pendingAmountInToken)} &nbsp;
-//             <span className="text-neutral-500 text-xs">
-//               ($
-//               {currencyFormat(Number(data.pendingAmountInUsd))})
-//             </span>
-//           </span>
-//         </div>
-//       </div>
-//       <div>
-//         <Button
-//           onClick={() => harvest?.()}
-//           disabled={!harvest}
-//           className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
-//         >
-//           Claim
-//         </Button>
-//       </div>
-//     </div>
-//   );
-// };
