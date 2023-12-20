@@ -192,3 +192,7 @@ body {
 p {
   margin: 0 !important;
 }
+
+ul li::before {
+  content: none !important;
+}
