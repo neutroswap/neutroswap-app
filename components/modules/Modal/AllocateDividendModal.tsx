@@ -102,7 +102,8 @@ export default function AllocateDividendModal() {
     ...approveConfig,
     onSuccess: async (tx) => {
       await waitForTransaction({ hash: tx.hash, confirmations: 8 });
-      refetchAllowance();
+      await refetchAllowance();
+      await retryAllocateConfig();
     },
   });
 
@@ -125,7 +126,7 @@ export default function AllocateDividendModal() {
     ...allocateConfig,
     onSuccess: async (tx) => {
       await waitForTransaction({ hash: tx.hash });
-      refetchAllowance();
+      await refetchAllowance();
     },
   });
 
