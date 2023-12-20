@@ -45,13 +45,11 @@ export async function getUserLP(userAddress: any) {
       name: network.name,
       // url: network.rpc
     })
-    console.log("privderrs ", provider)
     const multicall = new Multicall({
       multicallCustomContractAddress: network.multicall_addr,
       ethersProvider: provider,
       tryAggregate: true
     })
-    console.log("multiicallll ", multicall)
     let contractCallContext: ContractCallContext[] = []
     let promises = []
     let userLPs = []
@@ -92,15 +90,9 @@ export async function getUserLP(userAddress: any) {
       )
       // promises.push(lpTokenContract.balanceOf(userAddress))
     }
-    console.log('context ', contractCallContext)
     const results: ContractCallResults = await multicall.call(
       contractCallContext
     )
-    console.log('resultssss ', results.results)
-    // let calls = results.results.LP0.callsReturnContext;
-    // for(let i=0;i<calls.length;i++){
-    //   console.log("wawawa ", calls[i].reference, calls[i].returnValues)
-    // }
     let data = []
     for (let i = 0; i < lps.length; i++) {
       //get all references.
@@ -121,15 +113,12 @@ export async function getUserLP(userAddress: any) {
       const token0Decimal = Number(data1.data[0].decimal)
       const token1Decimal = Number(data2.data[0].decimal)
 
-      console.log("balanceeeeeeee ", balance.returnValues[0])
       let balanceBN = BigNumber.from(balance.returnValues[0].hex);
 
       if (balanceBN.eq(ethers.BigNumber.from(0))) {
-        console.log('Balance is zero, skip...')
       } else {
         let totalSupplyBN = BigNumber.from(totalSupply.returnValues[0].hex);
         const poolShare = balanceBN.mul(BigNumber.from(10).pow(18)).div(totalSupplyBN).toString()
-        console.log("reserves ", BigNumber.from(reserves.returnValues[0].hex))
         userLPs.push({
           ...lps[i],
           userBalance: balanceBN,
@@ -163,26 +152,18 @@ export async function getUserLP(userAddress: any) {
             .select('address,decimal,name,symbol,logo')
             .eq('address', token1.returnValues[0])
         )
-        console.log(`Balance is ${balanceBN.toString()}`)
       }
 
-      console.log('balance ', balanceBN)
-      console.log('Total supply ', totalSupply)
-      console.log('Reserves ', reserves)
     }
-    console.log("users lp ", userLPs)
     let tokens = await Promise.all(promises)
     if (!tokens) return;
-    // console.log('tokenss ', tokens[0].data[0], tokens.length)
     for (let i = 0; i < tokens.length; i += 2) { //assign ke userLP terkait. Karena tiap LP ada 2, makanya dibagi 2 buat dapet index nya 
-      console.log("dsadsa ")
       const token0 = tokens[i];
       const token1 = tokens[i + 1];
       if (!token0.data || !token1.data) return;
       userLPs[i / 2].token0 = token0.data[0];
       userLPs[i / 2].token1 = token1.data[0];
     }
-    console.log('Data ', userLPs)
     return userLPs
   } catch (err) {
     console.error(err)
@@ -199,7 +180,6 @@ export default async function handler(
   switch (method) {
     case 'GET':
       const { userAddress } = req.query
-      console.log('iser ', userAddress)
       let nonZeroLP: any = await getUserLP(userAddress)
       let response = {
         data: nonZeroLP

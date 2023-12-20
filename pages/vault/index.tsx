@@ -406,12 +406,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
     const value = e.target.value;
     if (isNaN(+value)) return;
     setUnstakeAmount(value);
-    // debouncedUnstakeAmount(value);
   };
-
-  // const debouncedUnstakeAmount = debounce(async (nextValue) => {
-  //   console.log("Called");
-  // }, 500);
 
   const { refetch: refetchAllowance } = useContractRead({
     enabled: Boolean(neutroTokenBalance),

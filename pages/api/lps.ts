@@ -23,11 +23,9 @@ async function createLPToken (
   token0: TokenFE,
   token1: TokenFE,
 ) {
-  console.log("token")
   let token0Details = await createNewToken(token0)
   let token1Details = await createNewToken(token1)
   let networkName = token0.networkName;
-  console.log("tokeennn ", token0Details, token1Details)
   const { data: existingLiquidityTokens } = await supabaseClient
     .from('liquidity_tokens')
     .select('*')
@@ -36,7 +34,6 @@ async function createLPToken (
 
   if (existingLiquidityTokens && existingLiquidityTokens.length > 0) {
     //if it doesn exist, return.
-    console.log("LP Token is exist..", existingLiquidityTokens[0])
     return existingLiquidityTokens[0]
   }
   let lpName = "NeutroLP"; //vLPN-WETH-USDT
@@ -55,7 +52,6 @@ async function createLPToken (
   let res = await supabaseClient
     .from('liquidity_tokens')
     .insert([liquidityToken])
-  console.log("Res ", res);
   return liquidityToken
 }
 
@@ -70,7 +66,6 @@ export default async function handler (
       const { data: liquidityTokens, error } = await supabaseClient
         .from('liquidity_tokens')
         .select('*')
-      console.log('yoooo data', liquidityTokens)
       if (error) {
         res.status(500).json({ error: error.message })
       } else {
@@ -80,7 +75,6 @@ export default async function handler (
 
     case 'POST':
       const { lpToken, token0, token1 } = body
-      console.log("di lp ", token0, token1)
       const { data: newLiquidityToken, error: postError } = await createLPToken(lpToken, token0, token1)
       if (postError) {
         res.status(500).json({ error: postError.message })

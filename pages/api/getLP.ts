@@ -39,8 +39,6 @@ export async function getLPInfo(
     let lp = liquidityTokens[0]
     let promises = []
 
-    // console.log('tokenss ', token0, token1)
-
     const provider = new ethers.providers.JsonRpcProvider(network.rpc, {
       chainId: network.chain_id,
       name: network.name,
@@ -84,12 +82,10 @@ export async function getLPInfo(
     const results: ContractCallResults = await multicall.call(
       contractCallContext
     )
-    console.log('resultsss ', results)
     let callValues = results.results[indexName].callsReturnContext
 
     let [balance, totalSupply, reserves, token0, token1, devFee, swapFee] =
       callValues
-    //   console.log("balanceeeeeeee ", balance.returnValues[0])
     let balanceBN = BigNumber.from(balance.returnValues[0].hex)
     let totalSupplyBN = BigNumber.from(totalSupply.returnValues[0].hex)
     const poolShare = balanceBN
@@ -130,7 +126,6 @@ export async function getLPInfo(
 export async function getUserLP(userAddress: any) {
   try {
     let lps: any = await getAllLPs()
-    console.log('lps ', lps)
     if (lps.length == 0) throw Error('lps length is 0')
     let network: any = await getNetworkById(lps[0].network_id)
 
@@ -139,14 +134,12 @@ export async function getUserLP(userAddress: any) {
       name: network.name,
       // url: network.rpc
     })
-    console.log('privderrs ', provider)
     const multicall = new Multicall({
       multicallCustomContractAddress:
         '0x294bb4c48F762DC0AFfe9DA653E9C6E1A4011452',
       ethersProvider: provider,
       tryAggregate: true
     })
-    console.log('multiicallll ', multicall)
     let contractCallContext: ContractCallContext[] = []
     let promises = []
     let userLPs = []
@@ -187,21 +180,17 @@ export async function getUserLP(userAddress: any) {
       )
       // promises.push(lpTokenContract.balanceOf(userAddress))
     }
-    console.log('context ', contractCallContext)
     const results: ContractCallResults = await multicall.call(
       contractCallContext
     )
-    console.log('resultssss ', results.results)
 
     let data = []
     for (let i = 0; i < lps.length; i++) {
       //get all references.
       let index: string = 'LP' + i
       let callValues = results.results[index].callsReturnContext
-      console.log('call values ', callValues)
       let [balance, totalSupply, reserves, token0, token1, devFee, swapFee] =
         callValues
-      console.log('balanceeeeeeee ', balance.returnValues[0])
       let balanceBN = BigNumber.from(balance.returnValues[0].hex)
       let totalSupplyBN = BigNumber.from(totalSupply.returnValues[0].hex)
       const poolShare = balanceBN
@@ -210,7 +199,6 @@ export async function getUserLP(userAddress: any) {
         .toString()
 
       if (balanceBN.eq(ethers.BigNumber.from(0))) {
-        console.log('Balance is zero, skip...')
       } else {
         userLPs.push({
           ...lps[i],
@@ -235,16 +223,11 @@ export async function getUserLP(userAddress: any) {
             .select('address,decimal,name,symbol,logo')
             .eq('address', token1.returnValues[0])
         )
-        console.log(`Balance is ${balanceBN.toString()}`)
+        // console.log(`Balance is ${balanceBN.toString()}`)
       }
 
-      console.log('balance ', balanceBN)
-      console.log('Total supply ', totalSupply)
-      console.log('Reserves ', reserves)
     }
-    console.log('users lp ', userLPs)
     let tokens = await Promise.all(promises)
-    // console.log('tokenss ', tokens[0].data[0], tokens.length)
     for (let i = 0; i < tokens.length; i += 2) {
       //assign ke userLP terkait. Karena tiap LP ada 2, makanya dibagi 2 buat dapet index nya
       const token0 = tokens[i];
@@ -253,7 +236,6 @@ export async function getUserLP(userAddress: any) {
       userLPs[i / 2].token0 = token0.data[0];
       userLPs[i / 2].token1 = token1.data[0];
     }
-    console.log('Data ', userLPs)
     return userLPs
   } catch (err) {
     console.error(err)

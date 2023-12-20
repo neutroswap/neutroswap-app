@@ -4,7 +4,6 @@ import { getAllLPs } from '../pages/api/lps';
 describe('getLPTokens', () => {
   test('returns an array of LP tokens', async () => {
     const result = await getAllLPs();
-    console.log("result ", result);
     expect(Array.isArray(result)).toBe(true);
   });
 });
