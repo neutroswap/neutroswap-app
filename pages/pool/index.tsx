@@ -178,8 +178,9 @@ export default function Pool() {
           <TableHeader className="border-b">
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-60">Asset</TableHead>
-              <TableHead>Liquidity</TableHead>
-              {/* <TableHead className="text-center">Total Transactions</TableHead> */}
+              <TableHead className="text-right">Liquidity</TableHead>
+              <TableHead className="text-right">TVL</TableHead>
+              <TableHead className="text-center">Volume 24H</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -213,12 +214,17 @@ export default function Pool() {
                     </span>
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">
+                <TableCell className="font-medium text-right">
                   ${currencyFormat(pool.reserveUSD)}
                 </TableCell>
-                {/* <TableCell className="text-center">
-                  <p>{pool.txCount}</p>
-                </TableCell> */}
+                <TableCell className="text-right"></TableCell>
+                <TableCell className="text-center">
+                  {pool.pairDayData.map((pairData, index) => (
+                    <p key={index}>
+                      ${currencyFormat(pairData.dailyVolumeUSD)}
+                    </p>
+                  ))}
+                </TableCell>
                 <TableCell className="flex justify-end text-right">
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />
                 </TableCell>
