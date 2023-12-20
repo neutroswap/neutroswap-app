@@ -85,6 +85,7 @@ export const getPoolListQuery = graphql(`
         id
         date
         dailyTxns
+        dailyVolumeUSD
       }
     }
   }
