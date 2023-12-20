@@ -9,6 +9,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import { useMemo } from "react";
+import { Navigation } from "./Navigation";
 
 interface Props {}
 
@@ -83,7 +84,7 @@ const Navbar: React.FC<Props> = () => {
           <Link href="/">
             <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
           </Link>
-          <Tabs
+          {/* <Tabs
             hideDivider
             hideBorder
             onChange={(route) => router.push(route)}
@@ -100,7 +101,8 @@ const Navbar: React.FC<Props> = () => {
                 />
               );
             })}
-          </Tabs>
+          </Tabs> */}
+          <Navigation />
           <div className="flex space-x-2">
             <ConnectButton.Custom>
               {({
