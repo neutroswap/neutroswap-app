@@ -158,7 +158,8 @@ export function Navigation() {
         <NavigationMenuItem>
           <NavigationMenuLink
             className={cn(navigationMenuTriggerStyle())}
-            href="/analytics"
+            href="https://analytics.neutroswap.io/"
+            target="_blank"
           >
             <span>Analytics</span>
           </NavigationMenuLink>
