@@ -84,7 +84,7 @@ const xNEUTRORoutes: {
 export function Navigation() {
   return (
     <NavigationMenu delayDuration={0} className="hidden sm:flex">
-      <NavigationMenuList className="flex items-center space-x-4">
+      <NavigationMenuList className="flex items-center space-x-4 mt-4">
         <NavigationMenuItem>
           <NavigationMenuLink
             className={cn(navigationMenuTriggerStyle())}
