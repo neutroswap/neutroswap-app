@@ -4,7 +4,7 @@ import { getNetworkById, getNetworkByName, getTokenDetails } from "./tokens";
 import { BigNumber, ethers, utils } from "ethers";
 import { ERC20_ABI } from "@/shared/abi";
 import { supabaseClient } from "@/shared/helpers/supabaseClient";
-import { formatEther, parseEther, parseUnits } from "viem";
+import { formatEther, parseEther } from "ethers/lib/utils.js";
 import {
   Multicall,
   ContractCallResults,
@@ -203,9 +203,9 @@ export async function composeData(
       const pendingTokens = result[1].returnValues[3];
 
       farm.details = {
-        totalStaked: formatEther(BigInt(totalStaked.hex)),
+        totalStaked: formatEther(BigNumber.from(totalStaked.hex)),
         totalStakedInUsd: "",
-        pendingTokens: formatEther(BigInt(pendingTokens[0].hex)),
+        pendingTokens: formatEther(BigNumber.from(pendingTokens[0].hex)),
         pendingTokensInUsd: "",
       };
     }
@@ -784,37 +784,49 @@ export async function totalValueOfLiquidity(farmHoldings: FarmHoldings) {
     const cirSupply =
       contractCalls.results[indexName + farm.lpToken].callsReturnContext[1]
         .returnValues[0];
-    farm.circulatingSupply = formatEther(BigInt(cirSupply.hex));
+    farm.circulatingSupply = formatEther(
+      BigNumber.from(cirSupply.hex).toString()
+    );
 
-    farm.reserves0 = BigInt(reserves0.hex).toString();
-    farm.reserves1 = BigInt(reserves1.hex).toString();
+    farm.reserves0 = BigNumber.from(reserves0.hex).toString();
+    farm.reserves1 = BigNumber.from(reserves1.hex).toString();
 
-    const reserve0 = BigInt(farm.reserves0);
-    const reserve1 = BigInt(farm.reserves1);
-    const price0 = parseUnits(farm.token0price.toString(), farm.token0decimals);
-
-    const price1 = parseUnits(farm.token1price.toString(), farm.token1decimals);
-
+    const reserve0 = BigNumber.from(farm.reserves0);
+    const reserve1 = BigNumber.from(farm.reserves1);
+    const price0 = BigNumber.from(
+      utils.parseUnits(farm.token0price.toString(), farm.token0decimals)
+    );
+    const price1 = BigNumber.from(
+      utils.parseUnits(farm.token1price.toString(), farm.token1decimals)
+    );
     // const denominator = utils.parseUnits("1", 18);
-    const denominator0 = parseUnits("1", farm.token0decimals);
-    const denominator1 = parseUnits("1", farm.token1decimals);
+    const denominator0 = utils.parseUnits("1", farm.token0decimals);
+    const denominator1 = utils.parseUnits("1", farm.token1decimals);
 
     if (farm.token0decimals == 18) {
-      farm.valueReserves0 = formatEther((reserve0 * price0) / denominator0);
+      farm.valueReserves0 = formatEther(
+        reserve0.mul(price0).div(denominator0)
+      ).toString();
     } else {
       farm.valueReserves0 = formatEther(
-        ((reserve0 * price0) / denominator0) *
-          parseUnits("1", farm.token0denominator)
-      );
+        reserve0
+          .mul(price0)
+          .div(denominator0)
+          .mul(utils.parseUnits("1", farm.token0denominator))
+      ).toString();
     }
 
     if (farm.token1decimals == 18) {
-      farm.valueReserves1 = formatEther((reserve1 * price1) / denominator1);
+      farm.valueReserves1 = formatEther(
+        reserve1.mul(price1).div(denominator1)
+      ).toString();
     } else {
       farm.valueReserves1 = formatEther(
-        ((reserve1 * price1) / denominator1) *
-          parseUnits("1", farm.token1denominator)
-      );
+        reserve1
+          .mul(price1)
+          .div(denominator1)
+          .mul(utils.parseUnits("1", farm.token1denominator))
+      ).toString();
     }
     // farm.valueOfLiquidity = Number(formatEther(totalValueReserve0.add(totalValueReserve1).div(denominator).toString())).toFixed(2).toString()
     farm.valueOfLiquidity = (
@@ -882,8 +894,6 @@ export default async function handler(
       try {
         let result = await getAllFarms();
         let data = await composeData(result, userAddress);
-        console.log("data", data);
-
         if (!data) {
           throw Error("error multicall");
         }

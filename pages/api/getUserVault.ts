@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { BigNumber, ethers } from "ethers";
 import { supabaseClient } from "@/shared/helpers/supabaseClient";
-import { formatEther } from "viem";
+import { formatEther } from "ethers/lib/utils.js";
 import {
   Multicall,
   ContractCallResults,
@@ -155,17 +155,19 @@ export async function composeData(
     if (result) {
       const totalStaked = result[0].returnValues[0];
       const pendingTokens = result[1].returnValues[3];
-      const unlockTime = BigInt(result[2].returnValues[0].hex).toString();
+      const unlockTime = BigNumber.from(
+        result[2].returnValues[0].hex
+      ).toString();
 
       vault.totalDeposit = parseFloat(
-        formatEther(BigInt(totalStaked.hex))
+        formatEther(BigNumber.from(totalStaked.hex))
       ).toFixed(2);
       vault.totalDepositInUsd = (
         parseFloat(vault.totalDeposit) * parseFloat(NEUTRO_PRICE)
       )
         .toFixed(2)
         .toString();
-      vault.pendingTokens = formatEther(BigInt(pendingTokens[0].hex));
+      vault.pendingTokens = formatEther(BigNumber.from(pendingTokens[0].hex));
       vault.pendingTokensInUsd = (
         parseFloat(vault.pendingTokens) * parseFloat(NEUTRO_PRICE)
       )
