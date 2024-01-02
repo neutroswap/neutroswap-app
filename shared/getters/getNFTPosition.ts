@@ -235,8 +235,8 @@ export default async function getNFTPosition(
   ): Promise<Map<string, Response["apr"]>> {
     // base: number => is base fee from nftPoolApr()
     // bonus: number => is fee from bonus lock (multiplier) by calling getSpNftBoostMultiplier(address,tokenId)
-    // fees: number => fee apr is received from dayData on esper-factory subgraph
-    // nitro: number => get nitro apr by calling `nitroPoolApr()` in esper helper
+    // fees: number => fee apr is received from dayData on neutro-factory subgraph
+    // nitro: number => get nitro apr by calling `nitroPoolApr()` in neutro helper
 
     // GET APR INFORMATION PER NFT TOKEN
     const helperContract = getContract({
