@@ -59,7 +59,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/elements/table";
+} from "@/components/elements/Table";
 import { getTokenImageUrl } from "@/shared/getters/getTokenInfo";
 import TokenLogo from "@/components/modules/TokenLogo";
 import { ChevronRight } from "lucide-react";

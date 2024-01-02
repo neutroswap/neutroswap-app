@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/elements/table";
+} from "@/components/elements/Table";
 import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
 import { currencyCompactFormat, currencyFormat } from "@/shared/utils";

@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { classNames } from "@/shared/helpers/classNamer";
 import { useDebounce } from "@/shared/hooks/useDebounce";
+import useDebounceValue from "@/shared/hooks/useDebounceValue";
 
 type SimpleProps<L, R> = R & Pick<L, Exclude<keyof L, keyof R>>;
 
@@ -47,7 +48,7 @@ const NumberInput: React.FC<Props> = ({
   const [lastValue, setLastValue] = useState(+defaultValue! || "");
   const [value, setValue] = useState(+defaultValue! || "");
   const [error, setError] = useState(false);
-  const debouncedValue = useDebounce(value, 500);
+  const debouncedValue = useDebounceValue(value, 500);
   const [type, setType] = useState("number");
   const isMounted = useRef(false);
   const inputRef: any = useRef(null);
@@ -91,11 +92,21 @@ const NumberInput: React.FC<Props> = ({
     onBlur && onBlur(e);
   }
 
+  // function onChangeLocal() {
+  //   if (+inputRef.current.value !== 0 && +inputRef.current.value < min)
+  //     return setError(true);
+  //   setError(false);
+  //   setValue(inputRef.current.value);
+  // }
   function onChangeLocal() {
-    if (+inputRef.current.value !== 0 && +inputRef.current.value < min)
+    const inputValue = +inputRef.current.value; // Convert to number
+    const minValue = Number(min); // Convert min to number
+
+    if (!isNaN(inputValue) && inputValue !== 0 && inputValue < minValue) {
       return setError(true);
+    }
     setError(false);
-    setValue(inputRef.current.value);
+    setValue(inputRef.current.value.toString());
   }
 
   return (

@@ -28,9 +28,8 @@ import {
   NEXT_PUBLIC_FARM_CONTRACT,
 } from "@/shared/helpers/constants";
 import { ERC20_ABI, NEUTRO_FARM_ABI } from "@/shared/abi";
-import { formatEther } from "viem";
+import { formatEther, parseUnits } from "viem";
 import debounce from "lodash/debounce";
-import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import useFarmList, {
   AvailableFarm,
@@ -470,8 +469,8 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
 
   const [isLpTokenApproved, setIsLpTokenApproved] = useState(false);
 
-  const [stakeAmount, setStakeAmount] = useState<string>();
-  const [unstakeAmount, setUnstakeAmount] = useState<string>();
+  const [stakeAmount, setStakeAmount] = useState("");
+  const [unstakeAmount, setUnstakeAmount] = useState("");
 
   const { data: lpTokenBalance } = useContractRead({
     address: selectedRow.lpToken,
@@ -536,7 +535,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     abi: NEUTRO_FARM_ABI,
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "deposit",
-    args: [BigInt(selectedRow.pid), BigInt(stakeAmount!)],
+    args: [BigInt(selectedRow.pid), parseUnits(stakeAmount!, 18)],
     onError(error) {
       console.log("Error", error);
     },
@@ -553,7 +552,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     address: NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`,
     abi: NEUTRO_FARM_ABI,
     functionName: "withdraw",
-    args: [BigInt(selectedRow.pid), BigInt(unstakeAmount!)],
+    args: [BigInt(selectedRow.pid), parseUnits(unstakeAmount!, 18)],
   });
 
   const { write: unstake, isLoading: isUnstaking } = useContractWrite({
@@ -705,7 +704,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
               <div
                 className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
                 onClick={() =>
-                  setUnstakeAmount(selectedRow.details.totalStaked)
+                  setUnstakeAmount(selectedRow.details.totalStaked ?? "0")
                 }
               >
                 MAX

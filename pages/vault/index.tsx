@@ -31,7 +31,6 @@ import {
 import { ERC20_ABI, NEUTRO_VAULT_ABI } from "@/shared/abi";
 import { formatEther, parseUnits } from "viem";
 import debounce from "lodash/debounce";
-import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import useVaultList, {
   AvailableVault,
@@ -446,7 +445,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
     abi: NEUTRO_VAULT_ABI,
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     functionName: "deposit",
-    args: [BigInt(selectedRow.pid), parseUnits(stakeAmount!, 0)],
+    args: [BigInt(selectedRow.pid), parseUnits(stakeAmount!, 18)],
     onError(error) {
       console.log("Error", error);
     },
@@ -463,7 +462,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
     address: NEXT_PUBLIC_VAULT_CONTRACT as `0x${string}`,
     abi: NEUTRO_VAULT_ABI,
     functionName: "withdraw",
-    args: [BigInt(selectedRow.pid), parseUnits(unstakeAmount!, 0)],
+    args: [BigInt(selectedRow.pid), parseUnits(unstakeAmount!, 18)],
   });
 
   const { write: unstake, isLoading: isUnstaking } = useContractWrite({
@@ -613,7 +612,9 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
               ></input>
               <div
                 className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
-                onClick={() => setUnstakeAmount(selectedRow.totalDeposit)}
+                onClick={() =>
+                  setUnstakeAmount(selectedRow.totalDeposit ?? "0")
+                }
               >
                 MAX
               </div>

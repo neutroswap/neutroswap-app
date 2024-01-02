@@ -155,9 +155,7 @@ export async function composeData(
     if (result) {
       const totalStaked = result[0].returnValues[0];
       const pendingTokens = result[1].returnValues[3];
-      const unlockTime = BigNumber.from(
-        result[2].returnValues[0].hex
-      ).toString();
+      const unlockTime = BigInt(result[2].returnValues[0].hex).toString();
 
       vault.totalDeposit = parseFloat(
         formatEther(BigInt(totalStaked.hex))

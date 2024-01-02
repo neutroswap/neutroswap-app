@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getNetworkById, getNetworkByName, getTokenDetails } from "./tokens";
-import { BigNumber, ethers, utils } from "ethers";
+import { ethers } from "ethers";
 import { ERC20_ABI } from "@/shared/abi";
 import { supabaseClient } from "@/shared/helpers/supabaseClient";
 import { formatEther, formatUnits, parseEther, parseUnits } from "viem";
@@ -212,7 +212,8 @@ export async function composeData(
       // const liquidity = result[0].returnValues;
       const rps = rpsResult[0].returnValues[3];
       const totalStaked = stakedResult[0].returnValues[0];
-      (farm.totalStaked = formatEther(BigInt(totalStaked))),
+
+      (farm.totalStaked = formatEther(BigInt(totalStaked.hex))),
         (farm.details = {
           // totalSupplyLpToken: "0",
           apr: BigInt(1).toString(),

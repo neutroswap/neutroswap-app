@@ -34,7 +34,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/elements/table";
+} from "@/components/elements/Table";
 import TokenLogo from "@/components/modules/TokenLogo";
 import dayjs from "dayjs";
 import {

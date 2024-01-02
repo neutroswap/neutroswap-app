@@ -17,7 +17,7 @@ import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
 import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
-import NativeTokenPicker from "@/components/modules/Swap/NativeTokenPicker";
+import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/utils";
 import { isWrappedNative, tokens } from "@/shared/statics/tokenList";
 import {
