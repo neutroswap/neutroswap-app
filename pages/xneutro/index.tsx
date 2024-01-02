@@ -354,7 +354,7 @@ export default function Xneutro() {
                 Launchpad
               </div>
               <span className="text-sm text-neutral-500 ml-9 mt-1">
-                Get perks and benefits from every project on Camelot&apos;s
+                Get perks and benefits from every project on Neutroswap&apos;s
                 launchpad by staking your xNEUTRO here.
               </span>
               <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
