@@ -49,7 +49,7 @@ import { getPoolListQuery } from "@/shared/gql/queries/factory";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { cn, currencyFormat } from "@/shared/utils";
+import { cn, currencyCompactFormat, currencyFormat } from "@/shared/utils";
 dayjs.extend(utc);
 
 import {
@@ -179,8 +179,8 @@ export default function Pool() {
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-60">Asset</TableHead>
               <TableHead className="text-right">Liquidity</TableHead>
-              <TableHead className="text-right">TVL</TableHead>
-              <TableHead className="text-center">Volume 24H</TableHead>
+
+              <TableHead className="text-right">Volume 24H</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -215,10 +215,9 @@ export default function Pool() {
                   </div>
                 </TableCell>
                 <TableCell className="font-medium text-right">
-                  ${currencyFormat(pool.reserveUSD)}
+                  ${currencyCompactFormat(pool.reserveUSD)}
                 </TableCell>
-                <TableCell className="text-right"></TableCell>
-                <TableCell className="text-center">
+                <TableCell className="text-right">
                   {pool.pairDayData.map((pairData, index) => (
                     <p key={index}>
                       ${currencyFormat(pairData.dailyVolumeUSD)}
