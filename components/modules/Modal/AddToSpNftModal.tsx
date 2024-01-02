@@ -47,65 +47,6 @@ export default function AddToSpNftModal(
   const [isLoading, setIsLoading] = useState(false);
   const [open, setOpen] = useState<boolean>(false);
 
-  // //useForm utils
-  // const form = useForm();
-  // const addToPosition = useWatch({
-  //   control: form.control,
-  //   name: "addToPosition",
-  // });
-  // const debouncedAddToPosition = useDebounceValue(addToPosition, 500);
-
-  //Get LP Token balance & allowance
-  // const [lpTokenBalance, setLpTokenBalance] = useState("0");
-  // const [allowance, setAllowance] = useState("0");
-  // const { refetch: refetchBalance, isFetching: isFetchingBalance } =
-  //   useContractRead({
-  //     enabled: Boolean(address!),
-  //     watch: true,
-  //     address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-  //     abi: XGRAIL_ABI,
-  //     functionName: "balanceOf",
-  //     args: [address!],
-  //     onSuccess: (data) => {
-  //       let balance = formatEther(data);
-  //       setLpTokenBalance(balance);
-  //     },
-  //   });
-  // const { refetch: refetchAllowance, isFetching: isFetchingAllowance } =
-  //   useContractRead({
-  //     enabled: Boolean(address!),
-  //     watch: true,
-  //     address: NEXT_PUBLIC_XGRAIL_TOKEN_CONTRACT as `0x${string}`,
-  //     abi: XGRAIL_ABI,
-  //     functionName: "getUsageApproval",
-  //     args: [address!, NEXT_PUBLIC_DIVIDENDS_CONTRACT as `0x${string}`],
-  //     onSuccess: (data) => {
-  //       let allowance = formatEther(data);
-  //       setAllowance(allowance);
-  //     },
-  //   });
-  // const availableLpToken = useMemo(() => {
-  //   if (!lpTokenBalance) return "0";
-  //   return Number(lpTokenBalance).toFixed(2);
-  // }, [lpTokenBalance]);
-  // const isApproved = useMemo(() => {
-  //   return +allowance >= +debouncedAddLiquidity;
-  // }, [allowance, debouncedAddLiquidity]);
-
-  //onSubmit handler
-  // const onSubmit = async () => {
-  //   setIsLoading(true);
-  //   if (!address) return new Error("Not connected");
-
-  //   if (!isApproved) {
-  //     approve?.();
-  //   }
-
-  //   if (isApproved) {
-  //     allocate?.();
-  //   }
-  // };
-
   const {
     balance,
     allowance,
