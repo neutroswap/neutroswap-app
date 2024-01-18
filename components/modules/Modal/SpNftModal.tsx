@@ -366,7 +366,6 @@ function Overview(props: GetNFTPositionResponse) {
                   <Countdown targetEpochTime={lockDurationEpoch} />
                 </p>
               ) : null}
-              {/* <pre>{JSON.stringify(props.endLockTime)}</pre> */}
             </div>
           </div>
         ))}
