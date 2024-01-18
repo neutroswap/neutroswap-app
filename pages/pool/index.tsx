@@ -1,17 +1,9 @@
-import { Text, Button, Loading, useTheme } from "@geist-ui/core";
+import { Button } from "@geist-ui/core";
 import { useEffect, useMemo, useState } from "react";
-import NoContentDark from "@/public/states/empty/dark.svg";
-import NoContentLight from "@/public/states/empty/light.svg";
-import { Disclosure } from "@headlessui/react";
-import {
-  ChevronRightIcon,
-  ChevronUpIcon,
-  XCircleIcon,
-} from "@heroicons/react/20/solid";
-import { BigNumberish, ethers } from "ethers";
-import { formatEther } from "ethers/lib/utils.js";
+import { ChevronRightIcon, XCircleIcon } from "@heroicons/react/20/solid";
+import { BigNumberish } from "ethers";
 import { classNames } from "@/shared/helpers/classNamer";
-import { ArrowRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { ArrowRightIcon, PlusIcon } from "@heroicons/react/24/solid";
 import {
   Modal,
   ModalContents,
@@ -20,7 +12,6 @@ import {
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import {
-  useAccount,
   useContractRead,
   useContractWrite,
   useNetwork,
@@ -28,12 +19,8 @@ import {
 } from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
-import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";
-import { decimalFormat } from "@/shared/helpers/decimalFormat";
-import Link from "next/link";
-import { ThemeType } from "@/shared/hooks/usePrefers";
 import {
   DEFAULT_CHAIN_ID,
   SupportedChainID,
@@ -49,7 +36,7 @@ import { getPoolListQuery } from "@/shared/gql/queries/factory";
 
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
-import { cn, currencyCompactFormat, currencyFormat } from "@/shared/utils";
+import { cn, currencyCompactFormat } from "@/shared/utils";
 dayjs.extend(utc);
 
 import {
@@ -100,6 +87,7 @@ export default function Pool() {
       token0Price: any;
       token1Price: any;
       volumeUSD: any;
+      dailyVolume: string;
       txCount: any;
       pairDayData: any[];
       apr: number;
@@ -124,32 +112,20 @@ export default function Pool() {
         let pools = res.data;
         if (!pools) throw new Error("Failed to fetch data");
 
-        //       const dataWithApr = pools.pairs.map((item) => {
-        //         const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
-        //           return prev + parseFloat(curr.dailyTxns);
-        //         }, 0);
-        //         return {
-        //           ...item,
-        //           apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
-        //         };
-        //       });
-
-        //       setDataWithApr(dataWithApr);
-        //     } catch (error) {
-        //       console.error("Error fetching data:", error);
-        //     }
-        //   }
-
-        //   fetchData();
-        // }, []);
-
         const dataWithApr = pools.pairs.map((item) => {
           const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
             return prev + parseFloat(curr.dailyTxns);
           }, 0);
+
+          // Aggregate daily volume for each day
+          const dailyVolume = item.pairDayData.reduce((total, day) => {
+            return total + parseFloat(day.dailyVolumeUSD);
+          }, 0);
+
           return {
             ...item,
             apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
+            dailyVolume: dailyVolume.toFixed(2), // Format the total daily volume
           };
         });
 
@@ -242,11 +218,7 @@ export default function Pool() {
                   ${currencyCompactFormat(pool.reserveUSD)}
                 </TableCell>
                 <TableCell className="text-right">
-                  {pool.pairDayData.map((pairData, index) => (
-                    <p key={index}>
-                      ${currencyFormat(pairData.dailyVolumeUSD)}
-                    </p>
-                  ))}
+                  ${pool.dailyVolume}
                 </TableCell>
                 <TableCell className="flex justify-end text-right">
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />
