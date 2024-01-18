@@ -385,49 +385,14 @@ export default function LockSpNftModal(
               )}
             </p>
           </div>
-          <Collapsible className="w-full">
-            <CollapsibleTrigger className="w-full flex justify-between items-center group">
-              <div className="flex text-muted-foreground group-hover:text-foreground text-sm items-center transition-colors">
-                <p className="text-xs font-semibold uppercase tracking-wide">
-                  Total APR
-                </p>
-                <CaretDown
-                  className={cn(
-                    "flex ml-2 w-3 h-3",
-                    "group-data-[state=open]:-rotate-90"
-                  )}
-                  weight="bold"
-                />
-              </div>
-              <p className="text-sm">{totalAPR}%</p>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="CollapsibleContent">
-              <div className="space-y-1 ml-2 mt-2">
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Swap Fees APR
-                  </p>
-                  <p className="text-sm">{props.apr.fees}%</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Farm Base APR
-                  </p>
-                  <p className="text-sm">{props.apr.base}%</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Farm Bonus APR
-                  </p>
-                  <p className="text-sm">
-                    {(props.apr.multiplier.boost + props.apr.multiplier.lock) *
-                      props.apr.base}{" "}
-                    &#x21E2; {afterLock}%
-                  </p>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+          <div className="w-full flex justify-between items-center group">
+            <div className="flex text-muted-foreground group-hover:text-foreground text-sm items-center transition-colors">
+              <p className="text-xs font-semibold uppercase tracking-wide">
+                Total APR
+              </p>
+            </div>
+            <p className="text-sm">{totalAPR}%</p>
+          </div>
         </div>
       </div>
 
