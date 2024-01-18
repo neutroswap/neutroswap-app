@@ -44,11 +44,11 @@ export function Unboost(
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { base, fees, nitro, multiplier } = props.apr;
+  const { base, nitro, multiplier } = props.apr;
   const bonus = (multiplier.lock + multiplier.boost) * base;
   const totalAPR = Object.values(multiplier).reduce(
     (prev, curr) => prev + curr,
-    base + fees + nitro + bonus
+    base + nitro + bonus
   );
 
   //get user account as signer
@@ -316,45 +316,15 @@ export function Unboost(
               </div>
             </CollapsibleContent>
           </Collapsible>
-          <Collapsible className="w-full">
-            <CollapsibleTrigger className="w-full flex justify-between items-center group">
-              <div className="flex text-muted-foreground group-hover:text-foreground text-sm items-center transition-colors">
-                <p className="text-xs font-semibold uppercase tracking-wide">
-                  APR
-                </p>
-                <CaretDown
-                  className={cn(
-                    "flex ml-2 w-3 h-3",
-                    "group-data-[state=open]:-rotate-90"
-                  )}
-                  weight="bold"
-                />
-              </div>
-              <p className="text-sm">{currencyFormat(totalAPR, 2, 0.01)}%</p>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="CollapsibleContent">
-              <div className="space-y-1 ml-2 mt-2">
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Farm base APR
-                  </p>
-                  <p className="text-sm">{currencyFormat(base, 2, 0.01)}%</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Bonus APR
-                  </p>
-                  <p className="text-sm">{currencyFormat(bonus, 2, 0.01)}%</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Earned fees APR
-                  </p>
-                  <p className="text-sm">{currencyFormat(fees, 2, 0.01)}%</p>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+
+          <div className="w-full flex justify-between items-center group">
+            <div className="flex text-muted-foreground text-sm items-center">
+              <p className="text-xs font-semibold uppercase tracking-wide">
+                Total APR
+              </p>
+            </div>
+            <p className="text-sm">{currencyFormat(totalAPR, 2, 0.01)}%</p>
+          </div>
         </div>
       </div>
 
