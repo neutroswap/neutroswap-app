@@ -493,7 +493,7 @@ function LiquidityPool() {
               className="cursor-pointer group"
               href={`/pool/${pair.id}`}
             >
-              <TableCell className="flex items-center space-x-4">
+              <TableCell className="flex items-center mt-1.5 space-x-4">
                 <div className="flex -space-x-2.5 flex-shrink-0">
                   <TokenLogo
                     className="w-7 h-7"
