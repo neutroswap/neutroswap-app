@@ -124,6 +124,25 @@ export default function Pool() {
         let pools = res.data;
         if (!pools) throw new Error("Failed to fetch data");
 
+        //       const dataWithApr = pools.pairs.map((item) => {
+        //         const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
+        //           return prev + parseFloat(curr.dailyTxns);
+        //         }, 0);
+        //         return {
+        //           ...item,
+        //           apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
+        //         };
+        //       });
+
+        //       setDataWithApr(dataWithApr);
+        //     } catch (error) {
+        //       console.error("Error fetching data:", error);
+        //     }
+        //   }
+
+        //   fetchData();
+        // }, []);
+
         const dataWithApr = pools.pairs.map((item) => {
           const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
             return prev + parseFloat(curr.dailyTxns);
@@ -134,7 +153,12 @@ export default function Pool() {
           };
         });
 
-        setDataWithApr(dataWithApr);
+        // Sort the dataWithApr array based on reserveUSD in descending order
+        const sortedData = dataWithApr
+          .slice()
+          .sort((a, b) => b.reserveUSD - a.reserveUSD);
+
+        setDataWithApr(sortedData);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
