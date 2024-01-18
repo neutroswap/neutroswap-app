@@ -31,6 +31,21 @@ type PoolOverviewPanelProps = {
   poolBalances: Currency[];
 };
 
+type Urls = {
+  contract_address: string;
+};
+
+const getExplorerLink: Record<SupportedChainID, Urls> = {
+  "17777": {
+    contract_address:
+      "https://explorer.evm.eosnetwork.com/address/${contractAddress}",
+  },
+  "15557": {
+    contract_address:
+      "https://explorer.testnet.evm.eosnetwork.com/address/${contractAddress}",
+  },
+};
+
 const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
   const {
     priceRatio,
@@ -44,6 +59,17 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
   const router = useRouter();
   const theme = useTheme();
   const { chain } = useNetwork();
+
+  const contractAddress = router.query.id;
+  const isValidContractAddress = typeof contractAddress === "string";
+  const baseLink =
+    getExplorerLink[(chain?.id || DEFAULT_CHAIN_ID) as SupportedChainID];
+  const link = isValidContractAddress
+    ? `${baseLink.contract_address.replace(
+        "${contractAddress}",
+        contractAddress
+      )}`
+    : "#";
 
   const [isPriceFlipped, setIsPriceFlipped] = useState(false);
 
@@ -62,7 +88,10 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
         <p className="m-0 text-2xl font-semibold">Pool Overview</p>
       </div>
       <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">
-        Contract: {router.query.id}
+        Contract:{" "}
+        <a href={link} target="_blank" rel="noopener noreferrer">
+          {router.query.id}
+        </a>
       </p>
 
       <div
