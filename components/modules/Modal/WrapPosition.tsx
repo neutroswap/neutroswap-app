@@ -89,6 +89,9 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
   });
   const [duration, setDuration] = useState(0);
   const debouncedDuration = useDebounceValue(duration, 500);
+  const totalDays = duration;
+  const months = Math.floor(totalDays / 30);
+  const remainingDays = totalDays % 30;
 
   const { data: nftPool, refetch: refetchNFTPool } = useContractRead({
     enabled: Boolean(props.pool),
@@ -350,8 +353,8 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
                 />
                 <div>
                   <p className="w-32 text-sm flex justify-end">
-                    {dayjs.duration(duration, "days").months()} months{" "}
-                    {dayjs.duration(duration, "days").days()} days
+                    {months > 0 && `${months} months`}{" "}
+                    {remainingDays > 0 && `${remainingDays} days`}
                   </p>
                 </div>
               </div>
