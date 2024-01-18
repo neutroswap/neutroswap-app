@@ -366,11 +366,11 @@ function SPNFTPool() {
                   </TableCell>
                   <TableCell className="text-center">
                     {(() => {
-                      const { base, fees, nitro, multiplier } = pool.apr;
+                      const { base, nitro, multiplier } = pool.apr;
                       const bonus = (multiplier.lock + multiplier.boost) * base;
                       const total = Object.values(multiplier).reduce(
                         (prev, curr) => prev + curr,
-                        base + fees + nitro + bonus
+                        base + nitro + bonus
                       );
                       return (
                         <div className="flex justify-center items-center">
@@ -389,10 +389,7 @@ function SPNFTPool() {
                                   <b>Bonus APR: </b>
                                   {currencyFormat(bonus, 2, 0.01)}%
                                 </p>
-                                <p className="text-xs font-medium">
-                                  <b>Fees APR: </b>
-                                  {currencyFormat(fees, 2, 0.01)}%
-                                </p>
+
                                 <p className="text-xs font-medium">
                                   <b>Nitro APR: </b>
                                   {currencyFormat(nitro, 2, 0.01)}%

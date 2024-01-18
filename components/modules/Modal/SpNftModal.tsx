@@ -222,11 +222,11 @@ function Overview(props: GetNFTPositionResponse) {
   const { address } = useAccount();
 
   const lockDurationEpoch = Math.floor(parseInt(props.endLockTime));
-  const { base, fees, nitro, multiplier } = props.apr;
+  const { base, nitro, multiplier } = props.apr;
   const bonus = (multiplier.lock + multiplier.boost) * base;
   const total = Object.values(multiplier).reduce(
     (prev, curr) => prev + curr,
-    base + fees + nitro + bonus
+    base + nitro + bonus
   );
 
   const { data } = useContractReads({

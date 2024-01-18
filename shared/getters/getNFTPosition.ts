@@ -29,7 +29,7 @@ export type Response = {
   amount: string; // in LP
   apr: {
     base: number;
-    fees: number;
+    // fees: number;
     nitro: number;
     multiplier: {
       lock: number;
@@ -137,7 +137,7 @@ export default async function getNFTPosition(
       const nitroCompatibleLPData = nitroMap.get(nftPool.lpToken);
       const aprBreakdown = aprByNftToken.get(rest.id) ?? {
         base: 0,
-        fees: 0,
+        // fees: 0,
         nitro: 0,
         multiplier: {
           lock: 0,
@@ -297,7 +297,7 @@ export default async function getNFTPosition(
           ownedNftPoolToken[index].id,
           {
             base: parseFloat(formatEther(nftPoolApr)),
-            fees: 0,
+            // fees: 0,
             nitro:
               parseFloat(formatEther(nitroPoolApr[0])) +
               parseFloat(formatEther(nitroPoolApr[1])),
