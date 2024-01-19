@@ -238,7 +238,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 $0
               </span>
               <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                Available {userLPBalance.formatted}
+                Available {formatEther(userLPBalance.raw)}
               </span>
             </div>
             <Slider
@@ -253,7 +253,6 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 setAmount((userLPBalance.raw * BigInt(value[0])) / BigInt(100));
               }}
             />
-            .
             <div className="grid grid-cols-4 gap-4 mt-4">
               <Button
                 auto
