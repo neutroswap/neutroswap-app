@@ -1,14 +1,8 @@
-import EthLogo from "@/public/logo/eth.svg";
-import NeutroLogo from "@/public/logo/neutro_token.svg";
 import EpochLogo from "@/public/logo/epoch.svg";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
 import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 import { useContractReads, useNetwork } from "wagmi";
-import {
-  NEXT_PUBLIC_DIVIDENDS_CONTRACT,
-  NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
-} from "@/shared/helpers/constants";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI } from "@/shared/abi";
 import { formatEther, formatUnits } from "viem";
 import { currencyFormat } from "@/shared/utils";
@@ -74,9 +68,9 @@ export default function Dividend() {
   const deallocationFee = formatEther(data?.[1] ?? BigInt(0));
 
   //countdown utils
-  // const protocolEarningsTime = Math.floor(Number(data?.[2]));
+  const protocolEarningsTime = Math.floor(Number(data?.[2]));
 
-  const nextCycleDate = dayjs.unix(Number(data?.[2])).format("MMMM D, YYYY");
+  // const nextCycleDate = dayjs.unix(Number(data?.[2])).format("MMMM D, YYYY");
 
   const addressToTokenInfo = useMemo(() => {
     if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
@@ -268,7 +262,10 @@ export default function Dividend() {
               <hr className="my-4 w-full border-neutral-200/80 dark:border-neutral-800/80" />
               <div className="flex flex-col justify-between items-start p-2 m-5 py-0">
                 <p className="m-0 text-left whitespace-nowrap text-sm text-muted-foreground">
-                  Next distribution is scheduled at: {nextCycleDate}
+                  Next distribution is scheduled at:{" "}
+                  <span className="inline-block">
+                    <Countdown targetEpochTime={protocolEarningsTime} />
+                  </span>
                 </p>
               </div>
             </div>
