@@ -325,9 +325,9 @@ export default function LockSpNftModal(
     //     )}
     //   </ModalContents>
     // </Modal>
-    <div className="p-4">
+    <div className="animate-in slide-in-from-right-1/4 duration-200">
       <div>
-        <p>Lock your spNFT</p>
+        <p className="font-semibold">Lock your spNFT</p>
         <p className="text-sm text-muted-foreground">
           Increase your yield by providing long-term liquidity
         </p>
