@@ -209,7 +209,8 @@ export default function AddToSpNftModal(
             return (
               <Button
                 type="submit"
-                className="w-full text-white"
+                variant="outline"
+                className="w-full text-black dark:text-white"
                 disabled={!addToPosition}
                 loading={isAddToPositionLoading}
                 onClick={() => addToPosition?.()}

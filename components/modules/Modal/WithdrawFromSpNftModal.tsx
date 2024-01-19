@@ -366,7 +366,8 @@ export default function WithdrawFromSpNftModal(
             </Button>
             <Button
               type="submit"
-              className="w-full text-white"
+              variant="outline"
+              className="w-full text-black dark:text-white"
               disabled={!withdrawPosition}
               loading={isWithdrawPositionLoading}
             >

@@ -404,6 +404,7 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
             return (
               <Button
                 type="submit"
+                variant="outline"
                 className="w-full uppercase text-xs font-semibold mt-3"
                 disabled={!wrapNFT}
                 loading={isWrappingNFTLoading}

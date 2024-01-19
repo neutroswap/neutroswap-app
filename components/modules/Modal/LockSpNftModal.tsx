@@ -398,15 +398,16 @@ export default function LockSpNftModal(
 
       <div className="flex space-x-2 mt-4">
         <Button
-          variant="outline"
           className="w-full"
+          variant="outline"
           onClick={() => props.onClose()}
         >
           Cancel
         </Button>
         <Button
           type="submit"
-          className="w-full text-white"
+          variant="outline"
+          className="w-full text-black dark:text-white"
           loading={isLockPositionLoading}
           disabled={!lockPosition}
           onClick={() => lockPosition?.()}
