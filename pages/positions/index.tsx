@@ -643,7 +643,7 @@ export const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
               "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2">
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   1
@@ -678,7 +678,7 @@ export const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
               "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2">
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   2
