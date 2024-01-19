@@ -40,7 +40,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/elements/Collapsible";
-import TokenLogo from "../TokenLogo";
 // import { PoolStatistic } from "../page";
 import { waitForTransaction } from "@wagmi/core";
 import { wrap } from "module";
@@ -274,9 +273,9 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
   const baseApr = parseFloat(formatEther(nftPoolApr ?? BigInt(0)));
   const bonusApr = baseApr * (lockBonusInPercent / 100);
 
-  //   const totalApr = useMemo(() => {
-  //     return stats.feesApr + baseApr + bonusApr;
-  //   }, [stats, baseApr, bonusApr]);
+  const totalApr = useMemo(() => {
+    return baseApr + bonusApr;
+  }, [baseApr, bonusApr]);
 
   return (
     <div className="p-3 space-y-4">
@@ -377,45 +376,15 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
               </div>
             </Form>
           </div>
-          <Collapsible className="w-full">
-            <CollapsibleTrigger className="w-full flex justify-between items-center group">
-              <div className="flex text-muted-foreground group-hover:text-foreground text-sm items-center transition-colors">
-                <p className="text-xs font-semibold uppercase tracking-wide">
-                  Total APR
-                </p>
-                <CaretDown
-                  className={cn(
-                    "flex ml-2 w-3 h-3",
-                    "group-data-[state=open]:-rotate-90"
-                  )}
-                  weight="bold"
-                />
-              </div>
-              {/* <p className="text-sm">{totalApr.toFixed(2)}%</p> */}
-            </CollapsibleTrigger>
-            <CollapsibleContent className="CollapsibleContent">
-              <div className="space-y-1 ml-2 mt-2">
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Swap Fees APR
-                  </p>
-                  {/* <p className="text-sm">{stats.feesApr.toPrecision(3)}%</p> */}
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Farm Base APR
-                  </p>
-                  <p className="text-sm">{baseApr}%</p>
-                </div>
-                <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
-                    Farm Bonus APR
-                  </p>
-                  <p className="text-sm">{bonusApr}%</p>
-                </div>
-              </div>
-            </CollapsibleContent>
-          </Collapsible>
+
+          <div className="w-full flex justify-between items-center group">
+            <div className="flex text-muted-foreground text-sm items-center">
+              <p className="text-xs font-semibold uppercase tracking-wide">
+                Total APR
+              </p>
+            </div>
+            <p className="text-sm">{totalApr.toFixed(2)}%</p>
+          </div>
 
           {(() => {
             if (!isApproved) {
