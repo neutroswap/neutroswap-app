@@ -67,7 +67,7 @@ export default function FarmPage() {
   const { address } = useAccount();
   const searchRef = useRef<any>(null);
 
-  const [activeTab, setActiveTab] = useState("1");
+  const [activeTab, setActiveTab] = useState("2");
   const [query, setQuery] = useState<string>("");
   const [allFarm, setAllFarm] = useState<Array<MergedFarm>>([]);
   const [ownedFarm, setOwnedFarm] = useState<Array<OwnedFarm>>([]);
@@ -310,7 +310,7 @@ export default function FarmPage() {
               Harvest All
             </Button>
           </div>
-          <Tabs.Item label="All Farms" value="1">
+          <Tabs.Item label="All Farms" value="1" disabled={true}>
             {!Boolean(allFarm.length) &&
               !(isFarmsLoading || isUserFarmsLoading || isSearching) && (
                 <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
@@ -628,11 +628,11 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
       </div>
 
       <Tabs
-        initialValue="1"
+        initialValue="2"
         className="w-full mt-6"
         activeClassName="font-semibold"
       >
-        <Tabs.Item label="Add" value="1">
+        <Tabs.Item label="Add" value="1" disabled={true}>
           <div className="flex flex-col justify-between w-full space-y-2.5 mt-1">
             <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
               <input
