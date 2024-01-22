@@ -141,8 +141,12 @@ export function Unboost(
   const poolBoostShare =
     (Number(userPosition?.[1]) / Number(userPosition?.[0])) * 100;
 
+  const userPositionValue = Number(userPosition?.[1]) || 0;
+
   const positionShare =
-    (Number(props.amount) / Number(userPosition?.[2] ?? 0)) * 100;
+    userPositionValue !== 0
+      ? (Number(props.amount) / userPositionValue) * 100
+      : 0;
 
   //   const multiplierDenominator1 =
   //     parseEther(props.amount) *
