@@ -64,6 +64,7 @@ import {
 } from "@/shared/helpers/constants";
 import ConnectButton from "@/components/modules/ConnectButton";
 import useUniswapPairFactory from "@/shared/hooks/useUniswapPairFactory";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -732,7 +733,7 @@ export default function Home() {
                     {({ close }) => (
                       <div>
                         <button
-                          className="w-full flex items-center space-x-2 mb-5 group"
+                          className="w-full flex items-center space-x-2 group"
                           onClick={close}
                         >
                           <ArrowSmallLeftIcon className="h-4 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500 group-hover:-translate-x-0.5 transition" />
@@ -847,32 +848,39 @@ export default function Home() {
                         )}
                         {txHash && (
                           <>
-                            <div className="flex justify-center items-center py-20 mb-5 ">
-                              <div className="mr-2 text-black dark:text-white">
-                                You sold {tokenAmount0}{" "}
-                                {tokenName0 === "WEOS" ? "EOS" : tokenName0} for{" "}
-                                {parseFloat(tokenAmount1).toFixed(3).toString()}{" "}
-                                {tokenName1 === "WEOS" ? "EOS" : tokenName1}
+                            <div className="flex flex-col justify-center items-center py-10 ">
+                              <CheckCircleIcon className=" h-40 text-green-500" />
+
+                              <div className="flex mb-5">
+                                <div className="mr-2 text-black dark:text-white">
+                                  You sold {tokenAmount0}{" "}
+                                  {tokenName0 === "WEOS" ? "EOS" : tokenName0}{" "}
+                                  for{" "}
+                                  {parseFloat(tokenAmount1)
+                                    .toFixed(3)
+                                    .toString()}{" "}
+                                  {tokenName1 === "WEOS" ? "EOS" : tokenName1}
+                                </div>
+                                <Link
+                                  href={`https://explorer.evm.eosnetwork.com/tx/${txHash}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
+                                </Link>
                               </div>
-                              <Link
-                                href={`https://explorer.evm.eosnetwork.com/tx/${txHash}`}
-                                target="_blank"
-                                rel="noreferrer"
+                              <Button
+                                onClick={resetAllSwapField}
+                                className={classNames(
+                                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                                  "text-white dark:text-amber-600",
+                                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                )}
                               >
-                                <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
-                              </Link>
+                                Swap again
+                              </Button>
                             </div>
-                            <Button
-                              onClick={resetAllSwapField}
-                              className={classNames(
-                                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                                "text-white dark:text-amber-600",
-                                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
-                              )}
-                            >
-                              Swap again
-                            </Button>
                           </>
                         )}
                       </div>
