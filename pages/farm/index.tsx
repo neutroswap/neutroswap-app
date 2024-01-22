@@ -74,7 +74,7 @@ export default function FarmPage() {
   const { address } = useAccount();
   const searchRef = useRef<any>(null);
 
-  const [activeTab, setActiveTab] = useState("1"); //TODO: CHANGE BACK THE VALUE TO 2
+  const [activeTab, setActiveTab] = useState("2");
   const [query, setQuery] = useState<string>("");
   const [allFarm, setAllFarm] = useState<Array<MergedFarm>>([]);
   const [ownedFarm, setOwnedFarm] = useState<Array<OwnedFarm>>([]);
@@ -749,7 +749,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
               <div className="text-sm space-x-2">
                 <span>
                   {!selectedRow.details.totalStaked
-                    ? "0"
+                    ? "0.00"
                     : parseFloat(selectedRow.details.totalStaked!).toFixed(
                         10
                       )}{" "}
