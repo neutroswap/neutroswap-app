@@ -209,8 +209,11 @@ export default function VaultPage() {
           <Warning className="h-5 w-5" />
           <AlertTitle>Vault has been deprecated.</AlertTitle>
           <AlertDescription>
-            Please harvest your rewards and unstake your $NEUTRO, lock it into
-            $xNEUTRO, and allocate them to{" "}
+            Please harvest all of your rewards, unstake your $NEUTRO,&nbsp;
+            <Link href="/xneutro" target="_blank">
+              lock
+            </Link>
+            &nbsp;it into $xNEUTRO, and allocate them to{" "}
             <Link href="/xneutro" target="_blank">
               Plugins
             </Link>

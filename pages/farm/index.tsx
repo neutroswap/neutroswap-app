@@ -220,8 +220,8 @@ export default function FarmPage() {
           <Warning className="h-5 w-5" />
           <AlertTitle>V1 Farm has been deprecated.</AlertTitle>
           <AlertDescription>
-            Please withdraw your deposited LP Tokens and wrap it into an spNFT
-            to continue farming. &nbsp;
+            Please harvest all of your rewards, withdraw your deposited LP
+            Tokens, and wrap it into an spNFT to continue farming. &nbsp;
             <Link
               href="https://docs.neutroswap.io/neutroswap-v2/staked-positions-spnfts"
               target="_blank"
