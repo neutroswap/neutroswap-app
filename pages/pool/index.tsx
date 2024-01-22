@@ -112,6 +112,37 @@ export default function Pool() {
         let pools = res.data;
         if (!pools) throw new Error("Failed to fetch data");
 
+        //       const dataWithApr = pools.pairs.map((item) => {
+        //         const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
+        //           return prev + parseFloat(curr.dailyTxns);
+        //         }, 0);
+
+        //         // Aggregate daily volume for each day
+        //         const dailyVolume = item.pairDayData.reduce((total, day) => {
+        //           return total + parseFloat(day.dailyVolumeUSD);
+        //         }, 0);
+
+        //         return {
+        //           ...item,
+        //           apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
+        //           dailyVolume: dailyVolume.toFixed(2), // Format the total daily volume
+        //         };
+        //       });
+
+        //       // Sort the dataWithApr array based on reserveUSD in descending order
+        //       const sortedData = dataWithApr
+        //         .slice()
+        //         .sort((a, b) => b.reserveUSD - a.reserveUSD);
+
+        //       setDataWithApr(sortedData);
+        //     } catch (error) {
+        //       console.error("Error fetching data:", error);
+        //     }
+        //   }
+
+        //   fetchData();
+        // }, []);
+
         const dataWithApr = pools.pairs.map((item) => {
           const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
             return prev + parseFloat(curr.dailyTxns);
@@ -129,8 +160,19 @@ export default function Pool() {
           };
         });
 
-        // Sort the dataWithApr array based on reserveUSD in descending order
-        const sortedData = dataWithApr
+        // Filter pools for "USDT/NEUTRO" and "NEUTRO/WEOS"
+        const filteredPools = dataWithApr.filter((pool) => {
+          const token0Symbol = pool.token0.symbol;
+          const token1Symbol = pool.token1.symbol;
+
+          return (
+            (token0Symbol === "NEUTRO" && token1Symbol === "USDTe") ||
+            (token0Symbol === "NEUTRO" && token1Symbol === "WEOS")
+          );
+        });
+
+        // Sort the filtered dataWithApr array based on reserveUSD in descending order
+        const sortedData = filteredPools
           .slice()
           .sort((a, b) => b.reserveUSD - a.reserveUSD);
 
