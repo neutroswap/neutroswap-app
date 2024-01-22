@@ -55,7 +55,8 @@ export default function Xneutro() {
 
   const allocatedAmount = useMemo(() => {
     if (!xneutroBalance) return "0";
-    return `${Number(formatEther(xneutroBalance[0])).toFixed(2)}`;
+    const totalBalance = xneutroBalance[0] + xneutroBalance[1];
+    return `${Number(formatEther(totalBalance)).toFixed(2)}`;
   }, [xneutroBalance]);
 
   const totalXneutro = useMemo(() => {
