@@ -146,77 +146,77 @@ export default function Home() {
     address: address,
   });
 
-  const { isFetching: isFetchingBalance0 } = useContractReads({
-    enabled: Boolean(address || chain?.unsupported),
-    watch: true,
-    contracts: [
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-        args: [address!],
+  const { isFetching: isFetchingBalance0, refetch: refetchBalance0 } =
+    useContractReads({
+      enabled: Boolean(address || chain?.unsupported),
+      contracts: [
+        {
+          address: token0.address,
+          abi: ERC20_ABI,
+          functionName: "balanceOf",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+          args: [address!],
+        },
+        { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
+        {
+          address: token0.address,
+          abi: ERC20_ABI,
+          functionName: "decimals",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+      ],
+      onSuccess(value) {
+        const [token0Balance, token0Symbol, token0Decimals] = value;
+        if (!token0Balance || !token0Symbol || !token0Decimals) return;
+        setBalance0({
+          decimal: Number(token0Decimals.result),
+          raw: token0Balance.result as bigint,
+          formatted: parseFloat(
+            formatUnits(
+              BigInt(Number(token0Balance.result)),
+              Number(token0Decimals.result)
+            ).toString()
+          ).toFixed(3),
+        });
+        setTokenName0(token0Symbol.result!);
       },
-      { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: "decimals",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      },
-    ],
-    onSuccess(value) {
-      const [token0Balance, token0Symbol, token0Decimals] = value;
-      if (!token0Balance || !token0Symbol || !token0Decimals) return;
-      setBalance0({
-        decimal: Number(token0Decimals),
-        raw: token0Balance.result as bigint,
-        formatted: parseFloat(
-          formatUnits(
-            BigInt(Number(token0Balance.result)),
-            Number(token0Decimals.result)
-          ).toString()
-        ).toFixed(3),
-      });
-      setTokenName0(token0Symbol.result!);
-    },
-  });
+    });
 
-  const { isFetching: isFetchingBalance1 } = useContractReads({
-    enabled: Boolean(address || chain?.unsupported),
-    watch: true,
-    contracts: [
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        args: [address!],
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+  const { isFetching: isFetchingBalance1, refetch: refetchBalance1 } =
+    useContractReads({
+      enabled: Boolean(address || chain?.unsupported),
+      contracts: [
+        {
+          address: token1.address,
+          abi: ERC20_ABI,
+          functionName: "balanceOf",
+          args: [address!],
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+        { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
+        {
+          address: token1.address,
+          abi: ERC20_ABI,
+          functionName: "decimals",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+      ],
+      onSuccess(value) {
+        const [token1Balance, token1Symbol, token1Decimals] = value;
+        if (!token1Balance || !token1Symbol || !token1Decimals) return;
+        setBalance1({
+          decimal: Number(token1Decimals.result),
+          raw: token1Balance.result as bigint,
+          formatted: parseFloat(
+            formatUnits(
+              BigInt(Number(token1Balance.result)),
+              Number(token1Decimals.result)
+            ).toString()
+          ).toFixed(3),
+        });
+        setTokenName1(token1Symbol.result!);
       },
-      { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: "decimals",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      },
-    ],
-    onSuccess(value) {
-      const [token1Balance, token1Symbol, token1Decimals] = value;
-      if (!token1Balance || !token1Symbol || !token1Decimals) return;
-      setBalance1({
-        decimal: Number(token1Decimals),
-        raw: token1Balance.result as bigint,
-        formatted: parseFloat(
-          formatUnits(
-            BigInt(Number(token1Balance.result)),
-            Number(token1Decimals.result)
-          ).toString()
-        ).toFixed(3),
-      });
-      setTokenName1(token1Symbol.result!);
-    },
-  });
+    });
 
   const poolContract = {
     address: pairs as `0x${string}`,
@@ -349,6 +349,8 @@ export default function Home() {
     setTxHash("");
     setTokenAmount0("");
     setTokenAmount1("");
+    refetchBalance0();
+    refetchBalance1();
   };
 
   const approve = async () => {
@@ -522,8 +524,8 @@ export default function Home() {
                       balance && tokenName0 === "WEOS"
                         ? balance.value
                         : balance0.raw;
-                    setTokenAmount0(formatUnits(value, token0.decimal));
-                    debouncedToken0(formatUnits(value, token0.decimal));
+                    setTokenAmount0(formatUnits(value, balance0.decimal));
+                    debouncedToken0(formatUnits(value, balance0.decimal));
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
@@ -626,8 +628,8 @@ export default function Home() {
                       balance && tokenName1 === "WEOS"
                         ? balance.value
                         : balance1.raw;
-                    setTokenAmount1(formatUnits(value, token1.decimal));
-                    debouncedToken1(formatUnits(value, token1.decimal));
+                    setTokenAmount1(formatUnits(value, balance1.decimal));
+                    debouncedToken1(formatUnits(value, balance1.decimal));
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
