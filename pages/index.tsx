@@ -529,17 +529,20 @@ export default function Home() {
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance0 && (
-                    <div className="flex space-x-1">
-                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                        {tokenName0 !== "WEOS" && balance0.formatted}
-                        {tokenName0 === "WEOS" &&
-                          Number(balance ? balance.formatted : "0").toFixed(3)}
-                      </p>
-                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                        {tokenName0 !== "WEOS" && tokenName0}
-                        {tokenName0 === "WEOS" && "EOS"}
-                      </p>
-                    </div>
+                    // <div className=" hover:dark:text-neutral-700">
+                    <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
+                      {tokenName0 !== "WEOS" && balance0.formatted}
+                      {tokenName0 === "WEOS" &&
+                        Number(balance ? balance.formatted : "0").toFixed(3)}
+                      &nbsp;
+                      {tokenName0 !== "WEOS" && tokenName0}
+                      {tokenName0 === "WEOS" && "EOS"}
+                    </p>
+                    //   {/* <p className="text-sm text-neutral-500 ">
+                    //     {tokenName0 !== "WEOS" && tokenName0}
+                    //     {tokenName0 === "WEOS" && "EOS"}
+                    //   </p>
+                    // </div> */}
                   )}
                 </div>
               </div>
