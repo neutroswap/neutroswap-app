@@ -30,7 +30,6 @@ import CirclePlus from "@/public/logo/pluscircle.svg";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import TokenDefault from "@/public/tokens_default.svg";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import {
   DEFAULT_CHAIN_ID,
   supportedChainID,

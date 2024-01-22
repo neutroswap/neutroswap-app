@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
-import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
 import NumberInput from "@/components/elements/NumberInput";
 import {
   UniswapPairFactory,

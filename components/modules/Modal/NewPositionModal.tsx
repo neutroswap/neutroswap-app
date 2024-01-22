@@ -33,7 +33,7 @@ import CirclePlus from "@/public/logo/pluscircle.svg";
 import { XCircleIcon } from "@heroicons/react/24/solid";
 import TokenDefault from "@/public/tokens_default.svg";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+
 import {
   DEFAULT_CHAIN_ID,
   supportedChainID,
@@ -43,6 +43,7 @@ import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import { XNEUTRO_ABI } from "@/shared/abi";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
+import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
 
 export default function NewPositionModal() {
   const { address } = useAccount();
