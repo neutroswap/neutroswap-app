@@ -1,6 +1,6 @@
 import EpochLogo from "@/public/logo/epoch.svg";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
-import APYLogo from "@/public/logo/apy.svg";
+import APRLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 import { useContractReads, useNetwork } from "wagmi";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI } from "@/shared/abi";
@@ -58,6 +58,11 @@ export default function Dividend() {
         abi: NEUTRO_HELPER_ABI,
         functionName: "dividendsDistributedTokensRewards",
       } as const,
+      {
+        address: NEUTRO_HELPER_CONTRACT,
+        abi: NEUTRO_HELPER_ABI,
+        functionName: "getNeutroPrice",
+      } as const,
     ],
   });
   const totalCurrentEpoch =
@@ -106,6 +111,21 @@ export default function Dividend() {
       logo: [info.logo],
     };
   }
+
+  const totalCurrentDistributionAmount =
+    data?.[4]
+      ?.map((reward) => BigInt(reward.currentDistributionAmountInUsd ?? "0"))
+      ?.reduce((total, amount) => total + amount, BigInt(0)) ?? BigInt(0);
+
+  const getNeutroPrice = formatEther(data?.[5] ?? BigInt(0));
+
+  const totalAllocationInDollar =
+    parseFloat(totalAllocation) * parseFloat(getNeutroPrice);
+
+  const totalAPR =
+    ((parseFloat(formatEther(totalCurrentDistributionAmount)) * 52) /
+      totalAllocationInDollar) *
+    100;
 
   return (
     <div className="flex flex-col items-center sm:items-start justify-center sm:justify-between py-16">
@@ -167,13 +187,13 @@ export default function Dividend() {
               <div className="flex justify-between">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    APY
+                    Total APR
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    0%
+                    {totalAPR.toFixed(2)}%
                   </span>
                 </div>
-                <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                <APRLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
               </div>
             </div>
           </div>
@@ -211,6 +231,12 @@ export default function Dividend() {
                 {!!data &&
                   data[4].map((reward, index) => {
                     const info = getRewardInfo(reward.token);
+                    const currentDistributionAmount = BigInt(
+                      reward.currentDistributionAmount ?? 0
+                    );
+                    const formattedDistributedAmount = parseFloat(
+                      formatEther(currentDistributionAmount)
+                    ).toFixed(5);
                     if (!info) return null;
                     return (
                       <div
@@ -232,11 +258,7 @@ export default function Dividend() {
                               {info.symbol}
                             </span>
                             <div className="mt-0 text-sm">
-                              {formatUnits(
-                                BigInt(reward.currentDistributionAmount ?? 0),
-                                info.decimal
-                              )}{" "}
-                              {info.symbol} &nbsp;
+                              {formattedDistributedAmount} {info.symbol} &nbsp;
                               <span className="text-neutral-500 text-xs">
                                 $
                                 {currencyFormat(
