@@ -32,10 +32,6 @@ import {
 } from "@/components/elements/Form";
 import { waitForTransaction } from "@wagmi/core";
 import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
-import {
-  NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT,
-  NEXT_PUBLIC_YIELDBOOSTER_CONTRACT,
-} from "@/shared/helpers/constants";
 import { NFT_POOL_ABI, XNEUTRO_ABI, YIELDBOOSTER_ABI } from "@/shared/abi";
 import {
   XNEUTRO_CONTRACT,
@@ -357,6 +353,7 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
           return (
             <Button
               type="submit"
+              variant="outline"
               className="w-full"
               disabled={!boost}
               loading={isBoostLoading}

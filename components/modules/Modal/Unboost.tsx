@@ -331,6 +331,7 @@ export function Unboost(
       <div className="flex space-x-2 mt-4">
         <Button
           type="submit"
+          variant="outline"
           className="w-full"
           disabled={!unboost}
           loading={isUnboostLoading}
