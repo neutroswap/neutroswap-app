@@ -8,7 +8,7 @@ import {
 } from "wagmi";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
 import { useMemo } from "react";
-import { formatUnits } from "viem";
+import { formatEther, formatUnits } from "viem";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/utils";
 import {
@@ -218,7 +218,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
   const reward = getRewardInfo(info);
 
   const formattedAmount = useMemo(() => {
-    const amountInUnits = formatUnits(BigInt(props.amount), reward.decimal);
+    const amountInUnits = formatEther(BigInt(props.amount));
     return `${Number(amountInUnits).toFixed(5)} `;
   }, [props.amount, reward.decimal]);
 
@@ -238,9 +238,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
             <span className="text-neutral-500 text-xs">
               ($
               {currencyFormat(
-                parseFloat(
-                  formatUnits(BigInt(props.amountInUsd), reward.decimal)
-                ),
+                parseFloat(formatEther(BigInt(props.amountInUsd))),
                 2,
                 0.01
               )}
