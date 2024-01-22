@@ -49,6 +49,13 @@ import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
 import { ThemeType } from "@/shared/hooks/usePrefers";
 import { waitForTransaction } from "@wagmi/core";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/elements/Alert";
+import { Warning } from "@phosphor-icons/react";
+import Link from "next/link";
 
 type MergedFarm = Farm & {
   details: {
@@ -200,7 +207,7 @@ export default function FarmPage() {
   return (
     <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-16">
       <div>
-        <div className="flex items-center space-x-3">
+        <div className="flex justify-center items-center space-x-3">
           <LeafIcon className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />
           <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
             Yield Farming
@@ -209,6 +216,22 @@ export default function FarmPage() {
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
           Earn yield by staking your LP Tokens
         </p>
+        <Alert variant="warning" className="mt-5 max-w-xl">
+          <Warning className="h-5 w-5" />
+          <AlertTitle>V1 Farm has been deprecated.</AlertTitle>
+          <AlertDescription>
+            Please withdraw your deposited LP Tokens and wrap it into an spNFT
+            to continue farming. &nbsp;
+            <Link
+              href="https://docs.neutroswap.io/neutroswap-v2/staked-positions-spnfts"
+              target="_blank"
+              className=" hover:text-blue-700 active:text-blue-500"
+            >
+              Learn more
+            </Link>
+            .
+          </AlertDescription>
+        </Alert>
       </div>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-3 my-10 box-border">
