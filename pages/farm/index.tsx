@@ -74,7 +74,7 @@ export default function FarmPage() {
   const { address } = useAccount();
   const searchRef = useRef<any>(null);
 
-  const [activeTab, setActiveTab] = useState("2");
+  const [activeTab, setActiveTab] = useState("1"); //TODO: CHANGE BACK THE VALUE TO 2
   const [query, setQuery] = useState<string>("");
   const [allFarm, setAllFarm] = useState<Array<MergedFarm>>([]);
   const [ownedFarm, setOwnedFarm] = useState<Array<OwnedFarm>>([]);
@@ -598,6 +598,17 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     },
   });
 
+  console.log(
+    "Total staked",
+    // parseFloat(selectedRow.details.totalStaked!).toFixed(10)
+    selectedRow.details.totalStaked
+  );
+  console.log(
+    "Total staked in USD",
+    // Number(selectedRow.details.totalStakedInUsd).toFixed(2)
+    selectedRow.details.totalStakedInUsd
+  );
+
   return (
     <div className="flex flex-col w-full">
       <div className="flex space-x-3 items-center">
@@ -737,10 +748,18 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
               <div className="text-xs font-bold uppercase">Deposited:</div>
               <div className="text-sm space-x-2">
                 <span>
-                  {parseFloat(selectedRow.details.totalStaked!).toFixed(10)} LP
+                  {!selectedRow.details.totalStaked
+                    ? "0"
+                    : parseFloat(selectedRow.details.totalStaked!).toFixed(
+                        10
+                      )}{" "}
+                  LP
                 </span>
                 <span className="font-semibold">
-                  ~ ${Number(selectedRow.details.totalStakedInUsd).toFixed(2)}
+                  ~ $
+                  {!selectedRow.details.totalStakedInUsd
+                    ? "0.00"
+                    : Number(selectedRow.details.totalStakedInUsd).toFixed(2)}
                 </span>
               </div>
             </div>
