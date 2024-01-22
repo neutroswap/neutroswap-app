@@ -217,6 +217,11 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
 
   const reward = getRewardInfo(info);
 
+  const formattedAmount = useMemo(() => {
+    const amountInUnits = formatUnits(BigInt(props.amount), reward.decimal);
+    return `${Number(amountInUnits).toFixed(5)} `;
+  }, [props.amount, reward.decimal]);
+
   return (
     <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
       <div className="flex items-center">
@@ -229,7 +234,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
           <span className="text-sm text-neutral-500">{reward.symbol}</span>
           <br />
           <span className="text-sm">
-            {formatUnits(BigInt(props.amount), reward.decimal)} &nbsp;
+            {formattedAmount} &nbsp;
             <span className="text-neutral-500 text-xs">
               ($
               {currencyFormat(
