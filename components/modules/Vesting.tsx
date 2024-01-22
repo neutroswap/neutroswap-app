@@ -143,13 +143,13 @@ const PendingRedeem = ({ data }: { data: any }) => {
             {" "}
             {Number(formatEther(data[1])).toFixed(2)}{" "}
           </span>
-          <span className="text-neutral-500"> xNEUTRO </span>
+          <span className="text-neutral-500 text-sm"> xNEUTRO </span>
           <span className="text-neutral-500"> &gt; </span>
           <span className="dark:text-white">
             {" "}
             {Number(formatEther(data[0])).toFixed(2)}{" "}
           </span>
-          <span className="text-neutral-500"> NEUTRO </span>
+          <span className="text-neutral-500 text-sm"> NEUTRO </span>
         </span>
         <span className="text-xs font-normal leading-4 text-neutral-500">
           Claimable in {data.date.days}d {data.date.hours}h {data.date.minutes}m
@@ -200,12 +200,12 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
             <span className="dark:text-white">
               {Number(formatEther(data[1])).toFixed(2)}
             </span>{" "}
-            <span className="text-neutral-500">xNEUTRO</span>{" "}
+            <span className="text-neutral-500 text-sm">xNEUTRO</span>{" "}
             <span className="text-neutral-500">&gt;</span>{" "}
             <span className="dark:text-white">
               {Number(formatEther(data[0])).toFixed(2)}
             </span>{" "}
-            <span className="text-neutral-500">NEUTRO</span>
+            <span className="text-neutral-500 text-sm">NEUTRO</span>
           </span>
           <span className="text-xs font-normal leading-4 text-neutral-500">
             {claimableText}
