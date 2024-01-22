@@ -181,9 +181,18 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
   });
 
   const poolBoostShare =
-    (Number(userPosition?.[1] ?? BigInt(0)) /
-      Number(userPosition?.[0] ?? BigInt(0))) *
+    Number(userPosition?.[0]) !== 0
+      ? (Number(userPosition?.[1]) / Number(userPosition?.[0])) * 100
+      : 0;
+
+  const poolBoostShareAfterValue =
+    ((Number(userPosition?.[1]) + Number(parseEther(debouncedBoostAmount))) /
+      (Number(userPosition?.[0]) + Number(parseEther(debouncedBoostAmount)))) *
     100;
+
+  const poolBoostShareAfter = isNaN(poolBoostShareAfterValue)
+    ? 0
+    : poolBoostShareAfterValue;
 
   const userPositionValue = Number(userPosition?.[1]) || 0;
 
@@ -322,7 +331,10 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
                   <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Pool boost share
                   </p>
-                  <p className="text-sm">{poolBoostShare.toFixed(2)}%</p>
+                  <p className="text-sm">
+                    {poolBoostShare.toFixed(2)}% &#x21E2;{" "}
+                    {poolBoostShareAfter.toFixed(2)}%
+                  </p>
                 </div>
               </div>
             </CollapsibleContent>

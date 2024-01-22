@@ -139,7 +139,23 @@ export function Unboost(
   });
 
   const poolBoostShare =
-    (Number(userPosition?.[1]) / Number(userPosition?.[0])) * 100;
+    Number(userPosition?.[0]) !== 0
+      ? (Number(userPosition?.[1]) / Number(userPosition?.[0])) * 100
+      : 0;
+
+  const afterUnboostedAmount =
+    Number(userPosition?.[1]) - Number(parseEther(debouncedUnboostAmount));
+  const poolBoostShareAfterValue =
+    afterUnboostedAmount >= 0
+      ? (afterUnboostedAmount /
+          (Number(userPosition?.[0]) -
+            Number(parseEther(debouncedUnboostAmount)))) *
+        100
+      : 0;
+
+  const poolBoostShareAfter = isNaN(poolBoostShareAfterValue)
+    ? 0
+    : poolBoostShareAfterValue;
 
   const userPositionValue = Number(userPosition?.[1]) || 0;
 
@@ -147,40 +163,6 @@ export function Unboost(
     userPositionValue !== 0
       ? (Number(props.amount) / userPositionValue) * 100
       : 0;
-
-  //   const multiplierDenominator1 =
-  //     parseEther(props.amount) *
-  //     parseEther(formatEther(BigInt(userPosition?.[0] ?? BigInt(0))));
-  //   const multiplierDenominator2 =
-  //     parseEther(debouncedUnboostAmount) *
-  //     parseEther(formatEther(BigInt(userPosition?.[2] ?? BigInt(0)))) *
-  //     parseEther(formatEther(BigInt(userPosition?.[3][3] ?? BigInt(0))));
-
-  //   let multiplierF;
-  //   let expectedMultiplier;
-  //   let remainingBoosted;
-  //   let multiplierAfterUnboost;
-
-  //   if (
-  //     multiplierDenominator1 === BigInt(0) ||
-  //     multiplierDenominator2 === BigInt(0)
-  //   ) {
-  //     multiplierF = 0;
-  //     expectedMultiplier = 0;
-  //     remainingBoosted = 0;
-  //     multiplierAfterUnboost = 0;
-  //   } else {
-  //     multiplierF = multiplierDenominator2 / multiplierDenominator1;
-
-  //     expectedMultiplier = (Number(multiplierF) / 100000).toFixed(3);
-  //     remainingBoosted =
-  //       parseEther(formatEther(BigInt(userAllocation.userTotalAllocation))) -
-  //       parseEther(debouncedUnboostAmount);
-
-  //     multiplierAfterUnboost =
-  //       Number(expectedMultiplier) *
-  //       (Number(remainingBoosted) / Number(userAllocation.userTotalAllocation));
-  //   }
 
   const userAlloc = BigInt(userPosition?.[1] ?? BigInt(0));
   const afterUnboosted = userAlloc - parseEther(debouncedUnboostAmount);
@@ -195,20 +177,18 @@ export function Unboost(
   const multiplierDenominator2 =
     lpAmount * (totalAlloc + parseEther(debouncedUnboostAmount));
 
-  let multiplierF;
   let expectedMultiplier;
   if (
     multiplierDenominator1 === BigInt(0) ||
     multiplierDenominator2 === BigInt(0)
   ) {
-    multiplierF = 0;
     expectedMultiplier = 1;
   } else {
-    multiplierF = multiplierDenominator1 / multiplierDenominator2;
+    let multiplierF = multiplierDenominator1 / multiplierDenominator2;
     if (multiplierF > maxBoostMultiplier) {
       multiplierF = maxBoostMultiplier;
     }
-    expectedMultiplier = Number(multiplierF) / 10000 + 1;
+    expectedMultiplier = Math.max(Number(multiplierF) / 10000 + 1, 1);
   }
 
   const balanceAfterUnboost =
@@ -315,7 +295,10 @@ export function Unboost(
                   <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Pool boost share
                   </p>
-                  <p className="text-sm">{poolBoostShare.toFixed(2)}%</p>
+                  <p className="text-sm">
+                    {poolBoostShare.toFixed(2)}% &#x21E2;{" "}
+                    {poolBoostShareAfter.toFixed(2)}%
+                  </p>
                 </div>
               </div>
             </CollapsibleContent>
