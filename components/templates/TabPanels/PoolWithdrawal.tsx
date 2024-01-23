@@ -196,6 +196,14 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     setToken1Amount(formatUnits(token1Value, token1.decimal));
   }, [token0, token1, amount, poolBalances, totalLPSupply]);
 
+  const updateExpectedAmounts = (withdrawAmount: any) => {
+    const token0Value = (withdrawAmount * poolBalances[0].raw) / totalLPSupply;
+    const token1Value = (withdrawAmount * poolBalances[1].raw) / totalLPSupply;
+    setAmount(withdrawAmount);
+    setToken0Amount(formatUnits(token0Value, token0.decimal));
+    setToken1Amount(formatUnits(token1Value, token1.decimal));
+  };
+
   // NOTE: Enable for debugging only
   // useEffect(() => {
   //   console.log([
@@ -259,8 +267,12 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 scale={0.5}
                 className="bg-transparent"
                 onClick={() => {
-                  setPercentage(25);
-                  setAmount((userLPBalance.raw * BigInt(25)) / BigInt(100));
+                  const percentage = 25;
+                  setPercentage(percentage);
+
+                  const withdrawAmount =
+                    (userLPBalance.raw * BigInt(percentage)) / BigInt(100);
+                  updateExpectedAmounts(withdrawAmount);
                 }}
               >
                 25%
@@ -270,8 +282,12 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 scale={0.5}
                 className="bg-transparent"
                 onClick={() => {
-                  setPercentage(50);
-                  setAmount((userLPBalance.raw * BigInt(50)) / BigInt(100));
+                  const percentage = 50;
+                  setPercentage(percentage);
+
+                  const withdrawAmount =
+                    (userLPBalance.raw * BigInt(percentage)) / BigInt(100);
+                  updateExpectedAmounts(withdrawAmount);
                 }}
               >
                 50%
@@ -281,8 +297,12 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 scale={0.5}
                 className="bg-transparent"
                 onClick={() => {
-                  setPercentage(75);
-                  setAmount((userLPBalance.raw * BigInt(75)) / BigInt(100));
+                  const percentage = 75;
+                  setPercentage(percentage);
+
+                  const withdrawAmount =
+                    (userLPBalance.raw * BigInt(percentage)) / BigInt(100);
+                  updateExpectedAmounts(withdrawAmount);
                 }}
               >
                 75%
@@ -292,8 +312,10 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 scale={0.5}
                 className="bg-transparent"
                 onClick={() => {
-                  setPercentage(100);
+                  const percentage = 100;
+                  setPercentage(percentage);
                   setAmount(userLPBalance.raw);
+                  updateExpectedAmounts(userLPBalance.raw);
                 }}
               >
                 MAX
