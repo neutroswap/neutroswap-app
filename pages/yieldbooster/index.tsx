@@ -162,7 +162,7 @@ export default function YieldBooster() {
                     Deallocation Fee
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {Number(data?.[1])}%
+                    {Number(deallocationFee) / 100}%
                   </span>
                 </div>
                 <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
