@@ -96,7 +96,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
     {
       // network_id: "15557",
       symbol: "xNEUTRO",
-      logo: "https://raw.githubusercontent.com/shed3/react-crypto-icons/main/src/assets/usdt.svg",
+      logo: "/logo/xneutro_token.svg",
       name: "xNEUTRO Token",
       address: "0x96A064DB6CA1D45e59756D3DAc7CD249D4D74203",
       decimal: 18,
@@ -104,7 +104,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
   ],
 };
 
-const WRAPPED_NATIVE = tokens[DEFAULT_CHAIN_ID.id][0]
+const WRAPPED_NATIVE = tokens[DEFAULT_CHAIN_ID.id][0];
 export const isWrappedNative = (address: `0x${string}`) => {
-  return getAddress(WRAPPED_NATIVE.address) === getAddress(address)
-}
+  return getAddress(WRAPPED_NATIVE.address) === getAddress(address);
+};
