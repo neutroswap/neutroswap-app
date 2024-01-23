@@ -204,19 +204,19 @@ export function Unboost(
     <Form {...form}>
       <div className="animate-in slide-in-from-right-1/4 duration-200">
         <div>
-          <p className="font-semibold">Unboost your position</p>
-          <p className="text-sm text-muted-foreground">
+          <div className="font-semibold">Unboost your position</div>
+          <span className="text-sm text-muted-foreground">
             Deallocate xNEUTRO from your position
-          </p>
+          </span>
         </div>
 
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm">Amount allocated</p>
-            <p className="text-sm text-muted-foreground">
+            <div className="text-sm">Amount allocated</div>
+            <span className="text-sm text-muted-foreground">
               Balance {formatEther(BigInt(userAllocation.userTotalAllocation))}{" "}
               xNEUTRO
-            </p>
+            </span>
           </div>
           <div className="flex items-center space-x-2 mt-1">
             <FormField
@@ -251,9 +251,9 @@ export function Unboost(
           <Collapsible className="w-full">
             <CollapsibleTrigger className="w-full flex justify-between items-center group">
               <div className="flex text-muted-foreground group-hover:text-foreground text-sm items-center transition-colors">
-                <p className="text-xs font-semibold uppercase tracking-wide">
+                <div className="text-xs font-semibold uppercase tracking-wide">
                   Boost Multiplier
-                </p>
+                </div>
                 <CaretDown
                   className={cn(
                     "flex ml-2 w-3 h-3",
@@ -263,42 +263,42 @@ export function Unboost(
                 />
               </div>
               {/* add condition if same not using arrow */}
-              <p className="text-sm">
+              <span className="text-sm">
                 x {(1 + props.apr.multiplier.boost).toFixed(3)} &#x21E2; x
                 {expectedMultiplier.toFixed(3)}
-              </p>
+              </span>
             </CollapsibleTrigger>
             <CollapsibleContent className="CollapsibleContent">
               <div className="space-y-1 ml-2 mt-2">
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                  <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Boost allocation
-                  </p>
-                  <p className="text-sm">
+                  </div>
+                  <span className="text-sm">
                     {formatEther(BigInt(userAllocation.userTotalAllocation))}{" "}
                     xNEUTRO &#x21E2;{" "}
                     {balanceAfterUnboost >= BigInt(0)
                       ? formatEther(balanceAfterUnboost)
                       : "0"}{" "}
                     xNEUTRO
-                  </p>
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                  <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Position pool share
-                  </p>
-                  <p className="text-sm">
+                  </div>
+                  <span className="text-sm">
                     {currencyFormat(positionShare, 2, 0.01)}%
-                  </p>
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                  <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Pool boost share
-                  </p>
-                  <p className="text-sm">
+                  </div>
+                  <span className="text-sm">
                     {poolBoostShare.toFixed(2)}% &#x21E2;{" "}
                     {poolBoostShareAfter.toFixed(2)}%
-                  </p>
+                  </span>
                 </div>
               </div>
             </CollapsibleContent>
@@ -306,11 +306,13 @@ export function Unboost(
 
           <div className="w-full flex justify-between items-center group">
             <div className="flex text-muted-foreground text-sm items-center">
-              <p className="text-xs font-semibold uppercase tracking-wide">
+              <div className="text-xs font-semibold uppercase tracking-wide">
                 Total APR
-              </p>
+              </div>
             </div>
-            <p className="text-sm">{currencyFormat(totalAPR, 2, 0.01)}%</p>
+            <span className="text-sm">
+              {currencyFormat(totalAPR, 2, 0.01)}%
+            </span>
           </div>
         </div>
       </div>

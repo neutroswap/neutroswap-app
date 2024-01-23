@@ -249,18 +249,18 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
     <Form {...form}>
       <div className="animate-in slide-in-from-right-1/4 duration-200">
         <div>
-          <p className="font-semibold">Boost your position</p>
-          <p className="text-sm text-muted-foreground">
+          <div className="font-semibold">Boost your position</div>
+          <span className="text-sm text-muted-foreground">
             Allocate your xNEUTRO to your position for extra yield
-          </p>
+          </span>
         </div>
 
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm">Amount</p>
-            <p className="text-sm text-muted-foreground">
+            <div className="text-sm">Amount</div>
+            <span className="text-sm text-muted-foreground">
               Balance {Number(formatEther(BigInt(balance))).toFixed(2)} xNEUTRO
-            </p>
+            </span>
           </div>
           <div className="flex items-center space-x-2 mt-1">
             <FormField
@@ -285,16 +285,16 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
             </Button>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+            <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
               Estimates
-            </p>
+            </div>
           </div>
           <Collapsible className="w-full">
             <CollapsibleTrigger className="w-full flex justify-between items-center group">
               <div className="flex text-muted-foreground group-hover:text-foreground text-sm items-center transition-colors">
-                <p className="text-xs font-semibold uppercase tracking-wide">
+                <div className="text-xs font-semibold uppercase tracking-wide">
                   Boost Multiplier
-                </p>
+                </div>
                 <CaretDown
                   className={cn(
                     "flex ml-2 w-3 h-3",
@@ -303,38 +303,38 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
                   weight="bold"
                 />
               </div>
-              <p className="text-sm">
+              <span className="text-sm">
                 x{(1 + props.apr.multiplier.boost).toFixed(3)} &#x21E2; x
                 {expectedMultiplier.toFixed(3)}
-              </p>
+              </span>
             </CollapsibleTrigger>
             <CollapsibleContent className="CollapsibleContent">
               <div className="space-y-1 ml-2 mt-2">
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                  <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Boost allocation
-                  </p>
-                  <p className="text-sm">
+                  </div>
+                  <span className="text-sm">
                     {formatEther(BigInt(userAllocation.userTotalAllocation))}{" "}
                     xNEUTRO &#x21E2; {formatEther(balanceAfterBoost)} xNEUTRO
-                  </p>
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                  <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Position pool share
-                  </p>
-                  <p className="text-sm">
+                  </div>
+                  <span className="text-sm">
                     {currencyFormat(positionShare, 2, 0.01)}%
-                  </p>
+                  </span>
                 </div>
                 <div className="flex justify-between">
-                  <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                  <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                     Pool boost share
-                  </p>
-                  <p className="text-sm">
+                  </div>
+                  <span className="text-sm">
                     {poolBoostShare.toFixed(2)}% &#x21E2;{" "}
                     {poolBoostShareAfter.toFixed(2)}%
-                  </p>
+                  </span>
                 </div>
               </div>
             </CollapsibleContent>

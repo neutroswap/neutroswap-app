@@ -282,19 +282,19 @@ function SPNFTPool() {
                       </div>
                       <div>
                         <div className="flex items-center space-x-1 mr-4">
-                          <p className="font-semibold">
+                          <span className="font-semibold">
                             {pool.assets.token0.symbol}
-                          </p>
-                          <p className="font-semibold text-muted-foreground">
+                          </span>
+                          <span className="font-semibold text-muted-foreground">
                             /
-                          </p>
-                          <p className="font-semibold">
+                          </span>
+                          <span className="font-semibold">
                             {pool.assets.token1.symbol}
-                          </p>
+                          </span>
                         </div>
-                        <p className="text-xs text-muted-foreground tracking-wide">
+                        <span className="text-xs text-muted-foreground tracking-wide">
                           #ID-{pool.tokenId}
-                        </p>
+                        </span>
                       </div>
                     </div>
                   </TableCell>
@@ -323,11 +323,11 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {pool.settings.yield_bearing === true
                                     ? "Active Yield Bearing"
                                     : "No Active Yield Bearing"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -345,11 +345,11 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {isLockActive === true
                                     ? "Active Lock"
                                     : "No Active Lock"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -367,11 +367,11 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {pool.settings.boost === true
                                     ? "Boost Active"
                                     : "No Boost Active"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -390,12 +390,12 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {pool.settings.nitro !==
                                   "0x0000000000000000000000000000000000000000"
                                     ? "Nitro Active"
                                     : "No Nitro Active"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -413,25 +413,25 @@ function SPNFTPool() {
                       );
                       return (
                         <div className="flex justify-center items-center">
-                          <p>{currencyFormat(total, 2, 0.01)}%</p>
+                          <span>{currencyFormat(total, 2, 0.01)}%</span>
                           <TooltipProvider delayDuration={0}>
                             <Tooltip>
                               <TooltipTrigger>
                                 <Info className="w-4 h-4 text-muted-foreground ml-1" />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   <b>Base APR: </b>
                                   {currencyFormat(base, 2, 0.01)}%
-                                </p>
-                                <p className="text-xs font-medium">
+                                </span>
+                                <span className="text-xs font-medium">
                                   <b>Bonus APR: </b>
                                   {currencyFormat(bonus, 2, 0.01)}%
-                                </p>
-                                <p className="text-xs font-medium">
+                                </span>
+                                <span className="text-xs font-medium">
                                   <b>Nitro APR: </b>
                                   {currencyFormat(nitro, 2, 0.01)}%
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -481,10 +481,12 @@ function BoostAllocationTable(props: BoostAllocationTable) {
 
   return (
     <div className="flex flex-col">
-      <p>
+      <span>
         {formatEther(BigInt(userAllocationInPosition ?? 0))} {""} xNEUTRO
-      </p>
-      <p className="text-muted-foreground">x{(1 + props.boost).toFixed(3)}</p>
+      </span>
+      <span className="text-muted-foreground">
+        x{(1 + props.boost).toFixed(3)}
+      </span>
     </div>
   );
 }

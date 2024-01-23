@@ -102,17 +102,19 @@ export default function YieldBoosterModal(props: Props) {
                   </div>
                   <div className="flex items-center">
                     <div className="flex items-center space-x-1 mr-2">
-                      <p className="font-semibold">
+                      <span className="font-semibold">
                         {props.data.assets.token0.name}
-                      </p>
-                      <p className="font-semibold text-muted-foreground">/</p>
-                      <p className="font-semibold">
+                      </span>
+                      <span className="font-semibold text-muted-foreground">
+                        /
+                      </span>
+                      <span className="font-semibold">
                         {props.data.assets.token1.name}
-                      </p>
+                      </span>
                     </div>
-                    <p className="text-muted-foreground tracking-wide">
+                    <span className="text-muted-foreground tracking-wide">
                       #ID-{props.data.tokenId}
-                    </p>
+                    </span>
                   </div>
                 </div>
               </div>
