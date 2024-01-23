@@ -168,7 +168,7 @@ export default function Dividend() {
               <div className="flex justify-between">
                 <div className="flex flex-col">
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Reward Current Epochs
+                    Total Reward Current Epochs
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
                     $
@@ -222,7 +222,7 @@ export default function Dividend() {
             <div className="border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg">
               <div className="flex flex-row justify-between items-start md:p-8 -mb-7">
                 <p className="m-0 text-left font-semibold whitespace-nowrap">
-                  Protocol Earnings
+                  Current Epoch Details
                 </p>
               </div>
 
