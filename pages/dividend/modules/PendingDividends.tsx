@@ -220,7 +220,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
   const formattedAmount = useMemo(() => {
     const amountInUnits = formatEther(BigInt(props.amount));
     return `${Number(amountInUnits).toFixed(5)} `;
-  }, [props.amount, reward.decimal]);
+  }, [props.amount]);
 
   return (
     <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
