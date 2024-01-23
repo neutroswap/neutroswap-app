@@ -554,6 +554,7 @@ export default function Home() {
                   {!isFetchingToken0Price && (
                     <input
                       className="w-full text-2xl bg-transparent focus:outline-none"
+                      disabled={!uniswapFactory}
                       placeholder="0.0"
                       value={tokenAmount0}
                       onChange={handleToken0Change}
@@ -661,6 +662,7 @@ export default function Home() {
                   {!isFetchingToken1Price && (
                     <input
                       className="w-full text-2xl bg-transparent focus:outline-none"
+                      disabled={!uniswapFactory}
                       placeholder="0.0"
                       value={tokenAmount1}
                       onChange={handleToken1Change}
