@@ -1,3 +1,5 @@
+export const revalidate = 30; // in seconds
+
 import { Button } from "@geist-ui/core";
 import { useEffect, useMemo, useState } from "react";
 import { ChevronRightIcon, XCircleIcon } from "@heroicons/react/20/solid";
