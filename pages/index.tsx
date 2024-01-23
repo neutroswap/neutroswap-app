@@ -155,7 +155,7 @@ export default function Home() {
           address: token0.address,
           abi: ERC20_ABI,
           functionName: "balanceOf",
-          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+          chainId: +DEFAULT_CHAIN_ID.id,
           args: [address!],
         },
         { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
@@ -192,7 +192,7 @@ export default function Home() {
           abi: ERC20_ABI,
           functionName: "balanceOf",
           args: [address!],
-          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+          chainId: +DEFAULT_CHAIN_ID.id,
         },
         { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
         {
