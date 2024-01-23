@@ -1,5 +1,13 @@
-import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
-import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
+import {
+  ERC20_ABI,
+  NEUTRO_HELPER_ABI,
+  NEUTRO_POOL_ABI,
+  NEUTRO_ROUTER_ABI,
+} from "@/shared/abi";
+import {
+  NEUTRO_HELPER_CONTRACT,
+  ROUTER_CONTRACT,
+} from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
 import {
@@ -94,6 +102,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
         +formatEther(value) >= +formatEther(userLPBalance.raw)
       );
     },
+  });
+
+  const { data: totalValueOfLiquidity } = useContractRead({
+    address: NEUTRO_HELPER_CONTRACT,
+    abi: NEUTRO_HELPER_ABI,
+    functionName: "getTotalValueOfLiquidity",
+    args: [router.query.id as `0x${string}`],
   });
 
   const { config: approveLPTokenConfig } = usePrepareContractWrite({
@@ -204,6 +219,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     setToken1Amount(formatUnits(token1Value, token1.decimal));
   };
 
+  const amountValue = parseFloat(formatEther(amount));
+  const totalValueInLiquidity = parseFloat(
+    formatEther(totalValueOfLiquidity ?? BigInt(0))
+  );
+
+  const totalValueInUsd = amountValue * totalValueInLiquidity;
+
   // NOTE: Enable for debugging only
   // useEffect(() => {
   //   console.log([
@@ -243,7 +265,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
             </div>
             <div className="flex items-center justify-between mb-4">
               <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                $0
+                ${totalValueInUsd.toFixed(2)}
               </span>
               <span className="text-sm text-neutral-500 dark:text-neutral-400">
                 Available {formatEther(userLPBalance.raw)}
