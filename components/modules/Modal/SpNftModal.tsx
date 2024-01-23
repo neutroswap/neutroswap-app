@@ -17,6 +17,7 @@ import {
   ArrowsLeftRight,
   Icon,
   CaretLeft,
+  Wallet,
 } from "@phosphor-icons/react";
 import * as Tabs from "@radix-ui/react-tabs";
 import AddToSpNftModal from "./AddToSpNftModal";
@@ -31,6 +32,7 @@ import { ResponsiveDialog } from "../ResponsiveDialog";
 import TokenLogo from "../TokenLogo";
 import { NEUTRO_HELPER_CONTRACT } from "@/shared/helpers/contract";
 import Countdown from "../Countdown";
+import { Harvest } from "./HarvestSpNftModal";
 
 type Props = {
   children: React.ReactNode;
@@ -98,13 +100,13 @@ export default function SPNFTSettingsModal(props: Props) {
         content: <MergePositionModal />,
         disabled: true,
       },
-      // {
-      //   title: "Harvest",
-      //   icon: Wallet,
-      //   content: (
-      //     <Harvest {...props.data} onClose={() => setSelected("Overview")} />
-      //   ),
-      // },
+      {
+        title: "Harvest",
+        icon: Wallet,
+        content: (
+          <Harvest {...props.data} onClose={() => setSelected("Overview")} />
+        ),
+      },
       {
         title: "Lock",
         icon: LockIcon,
