@@ -90,7 +90,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
       symbol: "xNEUTRO",
       logo: "/logo/xneutro_token.svg",
       name: "xNEUTRO Token",
-      address: "0x96A064DB6CA1D45e59756D3DAc7CD249D4D74203",
+      address: "0xA3100a831B007A12ab0a3639C99C8b2C9765c4f9",
       decimal: 18,
     },
   ],
