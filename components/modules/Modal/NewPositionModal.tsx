@@ -80,10 +80,10 @@ export default function NewPositionModal() {
   }, [balanceData]);
 
   const chainSpecificTokens = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID.id];
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
     if (!supportedChainID.includes(chain.id.toString() as any))
-      return tokens[DEFAULT_CHAIN_ID.id];
-    return tokens[chain.id as SupportedChainID];
+      return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID];
   }, [chain]);
 
   const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);

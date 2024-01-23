@@ -75,10 +75,10 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
 
   // TODO: MOVE THIS HOOKS
   const nativeToken = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID.id][0];
+    if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
     if (!supportedChainID.includes(chain.id.toString() as any))
-      return tokens[DEFAULT_CHAIN_ID.id][0];
-    return tokens[chain.id as SupportedChainID][0];
+      return tokens[DEFAULT_CHAIN_ID][0];
+    return tokens[chain.id.toString() as SupportedChainID][0];
   }, [chain]);
 
   return (

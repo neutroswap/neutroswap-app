@@ -97,7 +97,7 @@ export default function Pool() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const url = urls[DEFAULT_CHAIN_ID.id].FACTORY_GRAPH_URL;
+        const url = urls[DEFAULT_CHAIN_ID].FACTORY_GRAPH_URL;
         const client = new Client({
           url: url,
           exchanges: [cacheExchange, fetchExchange],
@@ -282,10 +282,10 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
 
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID.id];
+    if (!chain) return tokens[DEFAULT_CHAIN_ID];
     if (!supportedChainID.includes(chain.id.toString() as any))
-      return tokens[DEFAULT_CHAIN_ID.id];
-    return tokens[chain.id as SupportedChainID];
+      return tokens[DEFAULT_CHAIN_ID];
+    return tokens[chain.id.toString() as SupportedChainID];
   }, [chain]);
 
   const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);

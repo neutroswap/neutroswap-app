@@ -31,11 +31,11 @@ export const supportedChains =
     ? STAGING_ENV_CHAINS
     : LOCAL_ENV_CHAINS;
 
-// export const supportedChainID = ["17777", "15557"] as const;
-export const supportedChainID = supportedChains.map((item) => item.id);
-export type SupportedChainID = (typeof supportedChainID)[number];
-// export const DEFAULT_CHAIN_ID = (process.env.NEXT_PUBLIC_CHAIN_ID ??
-//   "17777") as SupportedChainID;
-// export type SupportedChainID = "15557" | "17777"
+export const supportedChainID = ["17777", "15557"] as const;
+// export const supportedChainID = supportedChains.map((item) => item.id);
+// export type SupportedChainID = (typeof supportedChainID)[number];
+export const DEFAULT_CHAIN_ID = (process.env.NEXT_PUBLIC_CHAIN_ID ??
+  "17777") as SupportedChainID;
+export type SupportedChainID = "15557" | "17777";
 
-export const DEFAULT_CHAIN_ID = supportedChains[0];
+// export const DEFAULT_CHAIN_ID = supportedChains[0];
