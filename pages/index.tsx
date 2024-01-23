@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/20/solid";
 import { Popover, Transition, RadioGroup } from "@headlessui/react";
 import { ArrowDownIcon } from "@heroicons/react/20/solid";
-import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
 import NumberInput from "@/components/elements/NumberInput";
 import {
   UniswapPairFactory,
@@ -64,6 +64,7 @@ import {
 } from "@/shared/helpers/constants";
 import ConnectButton from "@/components/modules/ConnectButton";
 import useUniswapPairFactory from "@/shared/hooks/useUniswapPairFactory";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -146,75 +147,77 @@ export default function Home() {
     address: address,
   });
 
-  const { isFetching: isFetchingBalance0 } = useContractReads({
-    enabled: Boolean(address || chain?.unsupported),
-    contracts: [
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-        args: [address!],
+  const { isFetching: isFetchingBalance0, refetch: refetchBalance0 } =
+    useContractReads({
+      enabled: Boolean(address || chain?.unsupported),
+      contracts: [
+        {
+          address: token0.address,
+          abi: ERC20_ABI,
+          functionName: "balanceOf",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+          args: [address!],
+        },
+        { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
+        {
+          address: token0.address,
+          abi: ERC20_ABI,
+          functionName: "decimals",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+      ],
+      onSuccess(value) {
+        const [token0Balance, token0Symbol, token0Decimals] = value;
+        if (!token0Balance || !token0Symbol || !token0Decimals) return;
+        setBalance0({
+          decimal: Number(token0Decimals.result),
+          raw: token0Balance.result as bigint,
+          formatted: parseFloat(
+            formatUnits(
+              BigInt(Number(token0Balance.result)),
+              Number(token0Decimals.result)
+            ).toString()
+          ).toFixed(3),
+        });
+        setTokenName0(token0Symbol.result!);
       },
-      { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: "decimals",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      },
-    ],
-    onSuccess(value) {
-      const [token0Balance, token0Symbol, token0Decimals] = value;
-      if (!token0Balance || !token0Symbol || !token0Decimals) return;
-      setBalance0({
-        decimal: Number(token0Decimals),
-        raw: token0Balance.result as bigint,
-        formatted: parseFloat(
-          formatUnits(
-            BigInt(Number(token0Balance.result)),
-            Number(token0Decimals.result)
-          ).toString()
-        ).toFixed(3),
-      });
-      setTokenName0(token0Symbol.result!);
-    },
-  });
+    });
 
-  const { isFetching: isFetchingBalance1 } = useContractReads({
-    enabled: Boolean(address || chain?.unsupported),
-    contracts: [
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        args: [address!],
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+  const { isFetching: isFetchingBalance1, refetch: refetchBalance1 } =
+    useContractReads({
+      enabled: Boolean(address || chain?.unsupported),
+      contracts: [
+        {
+          address: token1.address,
+          abi: ERC20_ABI,
+          functionName: "balanceOf",
+          args: [address!],
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+        { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
+        {
+          address: token1.address,
+          abi: ERC20_ABI,
+          functionName: "decimals",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+      ],
+      onSuccess(value) {
+        const [token1Balance, token1Symbol, token1Decimals] = value;
+        if (!token1Balance || !token1Symbol || !token1Decimals) return;
+        setBalance1({
+          decimal: Number(token1Decimals.result),
+          raw: token1Balance.result as bigint,
+          formatted: parseFloat(
+            formatUnits(
+              BigInt(Number(token1Balance.result)),
+              Number(token1Decimals.result)
+            ).toString()
+          ).toFixed(3),
+        });
+        setTokenName1(token1Symbol.result!);
       },
-      { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: "decimals",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      },
-    ],
-    onSuccess(value) {
-      const [token1Balance, token1Symbol, token1Decimals] = value;
-      if (!token1Balance || !token1Symbol || !token1Decimals) return;
-      setBalance1({
-        decimal: Number(token1Decimals),
-        raw: token1Balance.result as bigint,
-        formatted: parseFloat(
-          formatUnits(
-            BigInt(Number(token1Balance.result)),
-            Number(token1Decimals.result)
-          ).toString()
-        ).toFixed(3),
-      });
-      setTokenName1(token1Symbol.result!);
-    },
-  });
+    });
 
   const poolContract = {
     address: pairs as `0x${string}`,
@@ -347,6 +350,8 @@ export default function Home() {
     setTxHash("");
     setTokenAmount0("");
     setTokenAmount1("");
+    refetchBalance0();
+    refetchBalance1();
   };
 
   const approve = async () => {
@@ -520,8 +525,8 @@ export default function Home() {
                       balance && tokenName0 === "WEOS"
                         ? balance.value
                         : balance0.raw;
-                    setTokenAmount0(formatUnits(value, token0.decimal));
-                    debouncedToken0(formatUnits(value, token0.decimal));
+                    setTokenAmount0(formatUnits(value, balance0.decimal));
+                    debouncedToken0(formatUnits(value, balance0.decimal));
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
@@ -529,17 +534,14 @@ export default function Home() {
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance0 && (
-                    <div className="flex space-x-1">
-                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                        {tokenName0 !== "WEOS" && balance0.formatted}
-                        {tokenName0 === "WEOS" &&
-                          Number(balance ? balance.formatted : "0").toFixed(3)}
-                      </p>
-                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                        {tokenName0 !== "WEOS" && tokenName0}
-                        {tokenName0 === "WEOS" && "EOS"}
-                      </p>
-                    </div>
+                    <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
+                      {tokenName0 !== "WEOS" && balance0.formatted}
+                      {tokenName0 === "WEOS" &&
+                        Number(balance ? balance.formatted : "0").toFixed(3)}
+                      &nbsp;
+                      {tokenName0 !== "WEOS" && tokenName0}
+                      {tokenName0 === "WEOS" && "EOS"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -627,8 +629,8 @@ export default function Home() {
                       balance && tokenName1 === "WEOS"
                         ? balance.value
                         : balance1.raw;
-                    setTokenAmount1(formatUnits(value, token1.decimal));
-                    debouncedToken1(formatUnits(value, token1.decimal));
+                    setTokenAmount1(formatUnits(value, balance1.decimal));
+                    debouncedToken1(formatUnits(value, balance1.decimal));
                   }}
                 >
                   <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
@@ -731,7 +733,7 @@ export default function Home() {
                     {({ close }) => (
                       <div>
                         <button
-                          className="w-full flex items-center space-x-2 mb-5 group"
+                          className="w-full flex items-center space-x-2 group"
                           onClick={close}
                         >
                           <ArrowSmallLeftIcon className="h-4 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500 group-hover:-translate-x-0.5 transition" />
@@ -846,32 +848,39 @@ export default function Home() {
                         )}
                         {txHash && (
                           <>
-                            <div className="flex justify-center items-center py-20 mb-5 ">
-                              <div className="mr-2 text-black dark:text-white">
-                                You sold {tokenAmount0}{" "}
-                                {tokenName0 === "WEOS" ? "EOS" : tokenName0} for{" "}
-                                {parseFloat(tokenAmount1).toFixed(3).toString()}{" "}
-                                {tokenName1 === "WEOS" ? "EOS" : tokenName1}
+                            <div className="flex flex-col justify-center items-center py-10 ">
+                              <CheckCircleIcon className=" h-40 text-green-500" />
+
+                              <div className="flex mb-5">
+                                <div className="mr-2 text-black dark:text-white">
+                                  You sold {tokenAmount0}{" "}
+                                  {tokenName0 === "WEOS" ? "EOS" : tokenName0}{" "}
+                                  for{" "}
+                                  {parseFloat(tokenAmount1)
+                                    .toFixed(3)
+                                    .toString()}{" "}
+                                  {tokenName1 === "WEOS" ? "EOS" : tokenName1}
+                                </div>
+                                <Link
+                                  href={`https://explorer.evm.eosnetwork.com/tx/${txHash}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
+                                </Link>
                               </div>
-                              <Link
-                                href={`https://explorer.evm.eosnetwork.com/tx/${txHash}`}
-                                target="_blank"
-                                rel="noreferrer"
+                              <Button
+                                onClick={resetAllSwapField}
+                                className={classNames(
+                                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                                  "text-white dark:text-amber-600",
+                                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                )}
                               >
-                                <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
-                              </Link>
+                                Swap again
+                              </Button>
                             </div>
-                            <Button
-                              onClick={resetAllSwapField}
-                              className={classNames(
-                                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                                "text-white dark:text-amber-600",
-                                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
-                              )}
-                            >
-                              Swap again
-                            </Button>
                           </>
                         )}
                       </div>

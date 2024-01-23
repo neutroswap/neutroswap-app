@@ -9,7 +9,7 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { TokenPicker } from "@/components/modules/swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import {
   useContractRead,

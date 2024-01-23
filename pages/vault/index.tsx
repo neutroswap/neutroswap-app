@@ -51,6 +51,13 @@ import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
 import { ThemeType } from "@/shared/hooks/usePrefers";
 import { waitForTransaction } from "@wagmi/core";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/elements/Alert";
+import { Warning } from "@phosphor-icons/react";
+import Link from "next/link";
 
 type MergedVault = Vault & {
   totalDeposit?: string;
@@ -198,6 +205,21 @@ export default function VaultPage() {
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
           Lock $NEUTRO for extra rewards
         </p>
+        <Alert variant="warning" className="mt-5 max-w-xl">
+          <Warning className="h-5 w-5" />
+          <AlertTitle>Vault has been deprecated.</AlertTitle>
+          <AlertDescription>
+            Please harvest all of your rewards, unstake your $NEUTRO,&nbsp;
+            <Link href="/xneutro" target="_blank">
+              lock
+            </Link>
+            &nbsp;it into $xNEUTRO, and allocate them to{" "}
+            <Link href="/xneutro" target="_blank">
+              Plugins
+            </Link>
+            .
+          </AlertDescription>
+        </Alert>
       </div>
 
       <div className="w-full grid grid-cols-1 md:grid-cols-3 my-10 box-border">
@@ -537,11 +559,11 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
       </div>
 
       <Tabs
-        initialValue="1"
+        initialValue="2"
         className="w-full mt-6"
         activeClassName="font-semibold"
       >
-        <Tabs.Item label="Stake" value="1">
+        <Tabs.Item label="Stake" value="1" disabled={true}>
           <div className="flex flex-col justify-between w-full space-y-2.5 mt-1">
             <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
               <input
