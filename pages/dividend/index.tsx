@@ -70,7 +70,7 @@ export default function Dividend() {
     BigInt(data?.[4][1]?.currentDistributionAmountInUsd ?? 0);
 
   const totalAllocation = formatEther(data?.[0] ?? BigInt(0));
-  const deallocationFee = formatEther(data?.[1] ?? BigInt(0));
+  const deallocationFee = data?.[1] ?? BigInt(0);
 
   //countdown utils
   const protocolEarningsTime = Math.floor(Number(data?.[2]));
@@ -206,7 +206,7 @@ export default function Dividend() {
                     Deallocation Fee
                   </span>
                   <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {deallocationFee}%
+                    {Number(deallocationFee) / 100}%
                   </span>
                 </div>
                 <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
