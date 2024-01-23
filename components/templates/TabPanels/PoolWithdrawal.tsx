@@ -247,7 +247,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
           <p className="m-0 text-2xl font-semibold">Withdraw</p>
         </div>
         <p className="mt-2 mb-0 text-sm text-neutral-400 dark:text-neutral-600">
-          Withdraw the tokens you've provided as liquidity from the pool
+          Withdraw the tokens you&apos;ve provided as liquidity from the pool
         </p>
       </div>
       {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
