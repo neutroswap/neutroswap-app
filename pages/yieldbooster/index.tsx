@@ -72,8 +72,8 @@ export default function YieldBooster() {
     args: [address!],
   });
   const formattedUserAllocation = useMemo(() => {
-    if (!userAllocation) return "0";
-    return `${Number(formatEther(userAllocation!))}`;
+    if (!userAllocation) return "0.00";
+    return `${Number(formatEther(userAllocation!)).toFixed(2)}`;
   }, [userAllocation]);
 
   const { data } = useContractReads({
@@ -121,7 +121,7 @@ export default function YieldBooster() {
                   </span>
                   <div className="flex space-x-1">
                     <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {formatEther(data?.[0] ?? BigInt(0))}
+                      {Number(formatEther(data?.[0] ?? BigInt(0))).toFixed(2)}
                     </span>
                     <span className="text-sm text-neutral-500 mt-3">
                       xNEUTRO

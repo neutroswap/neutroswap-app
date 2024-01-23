@@ -214,7 +214,10 @@ export function Unboost(
           <div className="flex items-center justify-between">
             <div className="text-sm">Amount allocated</div>
             <span className="text-sm text-muted-foreground">
-              Balance {formatEther(BigInt(userAllocation.userTotalAllocation))}{" "}
+              Balance{" "}
+              {Number(
+                formatEther(BigInt(userAllocation.userTotalAllocation))
+              ).toFixed(2)}{" "}
               xNEUTRO
             </span>
           </div>
@@ -264,8 +267,7 @@ export function Unboost(
               </div>
               {/* add condition if same not using arrow */}
               <span className="text-sm">
-                x {(1 + props.apr.multiplier.boost).toFixed(3)} &#x21E2; x
-                {expectedMultiplier.toFixed(3)}
+                x {(2.0).toFixed(3)} &#x21E2; x {expectedMultiplier.toFixed(3)}
               </span>
             </CollapsibleTrigger>
             <CollapsibleContent className="CollapsibleContent">
@@ -275,10 +277,12 @@ export function Unboost(
                     Boost allocation
                   </div>
                   <span className="text-sm">
-                    {formatEther(BigInt(userAllocation.userTotalAllocation))}{" "}
+                    {Number(
+                      formatEther(BigInt(userAllocation.userTotalAllocation))
+                    ).toFixed(2)}{" "}
                     xNEUTRO &#x21E2;{" "}
                     {balanceAfterUnboost >= BigInt(0)
-                      ? formatEther(balanceAfterUnboost)
+                      ? Number(formatEther(balanceAfterUnboost)).toFixed(2)
                       : "0"}{" "}
                     xNEUTRO
                   </span>
