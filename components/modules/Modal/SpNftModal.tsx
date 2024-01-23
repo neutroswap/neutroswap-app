@@ -307,28 +307,28 @@ function Overview(props: GetNFTPositionResponse) {
     >
       <div className="flex divide-x divide-border/60 rounded-lg border border-border/60 mt-1">
         <div className="flex flex-col w-full p-2 text-center items-center justify center">
-          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+          <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
             Value
-          </p>
-          <p className="text-sm font-semibold">
+          </div>
+          <span className="text-sm font-semibold">
             ${currencyFormat(totalValue * +props.amount, 2, 0.01)}
-          </p>
+          </span>
         </div>
         <div className="flex flex-col w-full p-2 text-center items-center justify center">
-          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+          <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
             APR
-          </p>
-          <p className="text-sm font-semibold">
+          </div>
+          <span className="text-sm font-semibold">
             {currencyFormat(total, 2, 0.01)}%
-          </p>
+          </span>
         </div>
         <div className="flex flex-col w-full p-2 text-center items-center justify center">
-          <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+          <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
             Earnings
-          </p>
-          <p className="text-sm font-semibold">
+          </div>
+          <span className="text-sm font-semibold">
             ${(currencyFormat(pendingRewards * neutroPrice), 2, 0.01)}
-          </p>
+          </span>
         </div>
       </div>
 
@@ -345,26 +345,26 @@ function Overview(props: GetNFTPositionResponse) {
                 {item.icon}
               </div>
               <div>
-                <p className="font-semibold">{item.name}</p>
-                <p className="text-xs text-muted-foreground w-60 font-medium">
+                <div className="font-semibold">{item.name}</div>
+                <div className="text-xs text-muted-foreground w-60 font-medium">
                   {item.description}
-                </p>
+                </div>
               </div>
             </div>
             <div>
               {item.name === "Lock Bonus" || item.name === "Yield Booster" ? (
-                <p className="text-sm text-right">
+                <div className="text-sm text-right">
                   Multiplier: x{item.multiplier}
-                </p>
+                </div>
               ) : (
-                <p className="text-sm text-right">
+                <div className="text-sm text-right">
                   {currencyFormat(item.apr, 2, 0.01)}% APR
-                </p>
+                </div>
               )}
               {item.name === "Lock Bonus" && lockDurationEpoch > now ? (
-                <p className="text-sm text-right">
+                <div className="text-sm text-right">
                   <Countdown targetEpochTime={lockDurationEpoch} />
-                </p>
+                </div>
               ) : null}
             </div>
           </div>

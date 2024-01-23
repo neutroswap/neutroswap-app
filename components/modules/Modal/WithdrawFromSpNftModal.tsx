@@ -284,18 +284,18 @@ export default function WithdrawFromSpNftModal(
       <form onSubmit={form.handleSubmit(() => withdrawPosition?.())}>
         <div className="animate-in slide-in-from-right-1/4 duration-200">
           <div>
-            <p className="font-semibold">Withdraw from your position</p>
-            <p className="text-sm text-muted-foreground">
+            <div className="font-semibold">Withdraw from your position</div>
+            <span className="text-sm text-muted-foreground">
               Recover underlying token from this spNFT
-            </p>
+            </span>
           </div>
 
           <div className="mt-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm">Amount</p>
-              <p className="text-sm text-muted-foreground">
+              <div className="text-sm">Amount</div>
+              <span className="text-sm text-muted-foreground">
                 Balance {props.amount} LP
-              </p>
+              </span>
             </div>
             <div className="flex items-center space-x-2 mt-1">
               <FormField
@@ -329,29 +329,29 @@ export default function WithdrawFromSpNftModal(
             </div> */}
 
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+              <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
                 Estimates
-              </p>
+              </div>
               <div className="flex justify-between">
-                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                   Withdrawal Value
-                </p>
-                <p className="text-sm">
+                </div>
+                <span className="text-sm">
                   $
                   {currencyFormat(
                     +debouncedLpTokenAmount * formattedLpPrice,
                     2,
                     0.01
                   )}
-                </p>
+                </span>
               </div>
               <div className="flex justify-between">
-                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                   Remaining Value
-                </p>
-                <p className="text-sm">
+                </div>
+                <span className="text-sm">
                   ${currencyFormat(remainingValue, 2, 0.01)}
-                </p>
+                </span>
               </div>
             </div>
           </div>

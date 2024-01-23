@@ -158,6 +158,7 @@ function SPNFTPool() {
     },
     refetchOnWindowFocus: false,
   });
+  console.log(data);
 
   if (isFetching) return <Loading scale={3} />;
 
@@ -238,19 +239,19 @@ function SPNFTPool() {
                       </div>
                       <div>
                         <div className="flex items-center space-x-1 mr-4">
-                          <p className="font-semibold">
+                          <span className="font-semibold">
                             {pool.assets.token0.symbol}
-                          </p>
-                          <p className="font-semibold text-muted-foreground">
+                          </span>
+                          <span className="font-semibold text-muted-foreground">
                             /
-                          </p>
-                          <p className="font-semibold">
+                          </span>
+                          <span className="font-semibold">
                             {pool.assets.token1.symbol}
-                          </p>
+                          </span>
                         </div>
-                        <p className="text-xs text-muted-foreground tracking-wide">
+                        <span className="text-xs text-muted-foreground tracking-wide">
                           #ID-{pool.tokenId}
-                        </p>
+                        </span>
                       </div>
                     </div>
                   </TableCell>
@@ -284,11 +285,11 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {pool.settings.yield_bearing === true
                                     ? "Active Yield Bearing"
                                     : "No Active Yield Bearing"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -306,11 +307,11 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {isLockActive === true
                                     ? "Active Lock"
                                     : "No Active Lock"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -328,11 +329,11 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {pool.settings.boost === true
                                     ? "Boost Active"
                                     : "No Boost Active"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -351,12 +352,12 @@ function SPNFTPool() {
                                 />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   {pool.settings.nitro !==
                                   "0x0000000000000000000000000000000000000000"
                                     ? "Nitro Active"
                                     : "No Nitro Active"}
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -381,19 +382,19 @@ function SPNFTPool() {
                                 <Info className="w-4 h-4 text-muted-foreground ml-1" />
                               </TooltipTrigger>
                               <TooltipContent className="flex flex-col items-start">
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   <b>Base APR: </b>
                                   {currencyFormat(base, 2, 0.01)}%
-                                </p>
-                                <p className="text-xs font-medium">
+                                </span>
+                                <span className="text-xs font-medium">
                                   <b>Bonus APR: </b>
                                   {currencyFormat(bonus, 2, 0.01)}%
-                                </p>
+                                </span>
 
-                                <p className="text-xs font-medium">
+                                <span className="text-xs font-medium">
                                   <b>Nitro APR: </b>
                                   {currencyFormat(nitro, 2, 0.01)}%
-                                </p>
+                                </span>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
@@ -529,32 +530,32 @@ function LiquidityPool() {
               </TableCell>
               <TableCell className="text-left">
                 <div className="flex flex-col text-xs text-muted-foreground">
-                  <p>
+                  <span>
                     {currencyCompactFormat(
                       (Number(liquidityTokenBalance) /
                         Number(pair.totalSupply)) *
                         Number(pair.reserve0)
                     )}{" "}
                     ${pair.token0.symbol}
-                  </p>
-                  <p>
+                  </span>
+                  <span>
                     {currencyCompactFormat(
                       (Number(liquidityTokenBalance) /
                         Number(pair.totalSupply)) *
                         Number(pair.reserve1)
                     )}{" "}
                     ${pair.token1.symbol}
-                  </p>
+                  </span>
                 </div>
               </TableCell>
               <TableCell className="text-left">
-                <p>
+                <span>
                   {(
                     (Number(liquidityTokenBalance) / Number(pair.totalSupply)) *
                     100
                   ).toFixed(2)}
                   %
-                </p>
+                </span>
               </TableCell>
               <TableCell className="flex justify-end text-right">
                 <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />

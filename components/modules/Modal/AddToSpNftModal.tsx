@@ -118,18 +118,18 @@ export default function AddToSpNftModal(
     <Form {...form}>
       <div className="animate-in slide-in-from-right-1/4 duration-200">
         <div>
-          <p className="font-semibold">Add more LP to your spNFT</p>
-          <p className="text-sm text-muted-foreground">
+          <div className="font-semibold">Add more LP to your spNFT</div>
+          <span className="text-sm text-muted-foreground">
             Stake your spNFT into genesis pool to earn extra yield
-          </p>
+          </span>
         </div>
 
         <div className="mt-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm">Amount</p>
-            <p className="text-sm text-muted-foreground">
+            <div className="text-sm">Amount</div>
+            <span className="text-sm text-muted-foreground">
               Balance {formatEther(BigInt(balance))} LP
-            </p>
+            </span>
           </div>
           <div className="flex items-center space-x-2 mt-1">
             <FormField
@@ -154,30 +154,30 @@ export default function AddToSpNftModal(
             </Button>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+            <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
               Estimates
-            </p>
+            </div>
             <div className="flex justify-between">
-              <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+              <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                 Deposit Value
-              </p>
-              <p className="text-sm">
+              </div>
+              <span className="text-sm">
                 $
                 {currencyFormat(
                   +formatEther(ownedLpInUSD ?? BigInt(0)) * +props.amount,
                   2,
                   0.01
                 )}
-              </p>
+              </span>
             </div>
 
             <div className="w-full flex justify-between items-center group">
               <div className="flex text-muted-foreground text-sm items-center">
-                <p className="text-xs font-semibold uppercase tracking-wide">
+                <div className="text-xs font-semibold uppercase tracking-wide">
                   Total APR
-                </p>
+                </div>
               </div>
-              <p className="text-sm">{totalAPR}%</p>
+              <span className="text-sm">{totalAPR}%</span>
             </div>
           </div>
         </div>

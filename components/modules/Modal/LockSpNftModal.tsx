@@ -327,18 +327,18 @@ export default function LockSpNftModal(
     // </Modal>
     <div className="animate-in slide-in-from-right-1/4 duration-200">
       <div>
-        <p className="font-semibold">Lock your spNFT</p>
-        <p className="text-sm text-muted-foreground">
+        <div className="font-semibold">Lock your spNFT</div>
+        <span className="text-sm text-muted-foreground">
           Increase your yield by providing long-term liquidity
-        </p>
+        </span>
       </div>
 
       <div className="mt-4">
         <div className="flex items-center justify-between space-x-4">
           <div>
-            <p className="text-sm whitespace-nowrap leading-none">
+            <div className="text-sm whitespace-nowrap leading-none">
               Lock Duration
-            </p>
+            </div>
           </div>
           <Slider
             defaultValue={[remainingTimeInDays]}
@@ -349,7 +349,9 @@ export default function LockSpNftModal(
             min={Math.max(remainingTimeInDays, 0)}
           />
           <div>
-            <p className="w-16 text-sm flex justify-end">{duration} days</p>
+            <span className="w-16 text-sm flex justify-end">
+              {duration} days
+            </span>
           </div>
         </div>
 
@@ -360,38 +362,38 @@ export default function LockSpNftModal(
           >
             Set Max
           </button>
-          <p className="flex text-xs text-muted-foreground whitespace-nowrap justify-end">
+          <span className="flex text-xs text-muted-foreground whitespace-nowrap justify-end">
             {lockBonusInPercent}% lock bonus{" "}
             {lockBonusInPercent / 100 + 1 > 1
               ? `(x${(lockBonusInPercent / 100 + 1).toFixed(2)})`
               : ""}
-          </p>
+          </span>
         </div>
 
         <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+          <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
             Estimates
-          </p>
+          </div>
           <div className="flex justify-between">
-            <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+            <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
               Deposit Value
-            </p>
-            <p className="text-sm">
+            </div>
+            <span className="text-sm">
               $
               {currencyFormat(
                 +formatEther(ownedLpInUSD ?? BigInt(0)) * +props.amount,
                 2,
                 0.01
               )}
-            </p>
+            </span>
           </div>
           <div className="w-full flex justify-between items-center group">
             <div className="flex text-muted-foreground group-hover:text-foreground text-sm items-center transition-colors">
-              <p className="text-xs font-semibold uppercase tracking-wide">
+              <div className="text-xs font-semibold uppercase tracking-wide">
                 Total APR
-              </p>
+              </div>
             </div>
-            <p className="text-sm">{totalAPR}%</p>
+            <span className="text-sm">{totalAPR}%</span>
           </div>
         </div>
       </div>
