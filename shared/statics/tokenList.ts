@@ -96,7 +96,7 @@ export const tokens: Record<SupportedChainID, Array<Token>> = {
   ],
 };
 
-const WRAPPED_NATIVE = tokens[DEFAULT_CHAIN_ID][0];
+const WRAPPED_NATIVE = tokens[DEFAULT_CHAIN_ID.id][0];
 export const isWrappedNative = (address: `0x${string}`) => {
   return getAddress(WRAPPED_NATIVE.address) === getAddress(address);
 };

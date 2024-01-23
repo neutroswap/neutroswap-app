@@ -61,7 +61,7 @@ export default function YieldBooster() {
   const { address } = useAccount();
 
   const nftClient = new Client({
-    url: urls[DEFAULT_CHAIN_ID].NFT_GRAPH_URL,
+    url: urls[DEFAULT_CHAIN_ID.id].NFT_GRAPH_URL,
     exchanges: [cacheExchange, fetchExchange],
   });
 

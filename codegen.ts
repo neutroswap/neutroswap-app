@@ -12,19 +12,19 @@ const config: CodegenConfig = {
   ignoreNoDocuments: true, // for better experience with the watcher
   generates: {
     "./shared/gql/types/nft/": {
-      schema: urls[DEFAULT_CHAIN_ID].NFT_GRAPH_URL,
+      schema: urls[DEFAULT_CHAIN_ID.id].NFT_GRAPH_URL,
       documents: ["./shared/gql/queries/nft.ts"],
       preset: "client",
       plugins: [],
     },
     "./shared/gql/types/factory/": {
-      schema: urls[DEFAULT_CHAIN_ID].FACTORY_GRAPH_URL,
+      schema: urls[DEFAULT_CHAIN_ID.id].FACTORY_GRAPH_URL,
       documents: ["./shared/gql/queries/factory.ts"],
       preset: "client",
       plugins: [],
     },
     "./shared/gql/types/launchpad/": {
-      schema: urls[DEFAULT_CHAIN_ID].LAUNCHPAD_GRAPH_URL,
+      schema: urls[DEFAULT_CHAIN_ID.id].LAUNCHPAD_GRAPH_URL,
       documents: ["./shared/gql/queries/launchpad.ts"],
       preset: "client",
       plugins: [],

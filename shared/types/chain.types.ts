@@ -1,4 +1,6 @@
+import { NEXT_PUBLIC_CHAIN_ID } from './../helpers/constants';
 import { eos, eosTestnet } from "@wagmi/core/chains";
+
 
 export const customEosTestnet = {
   ...eosTestnet,
@@ -31,11 +33,20 @@ export const supportedChains =
     ? STAGING_ENV_CHAINS
     : LOCAL_ENV_CHAINS;
 
-export const supportedChainID = ["17777", "15557"] as const;
-// export const supportedChainID = supportedChains.map((item) => item.id);
-// export type SupportedChainID = (typeof supportedChainID)[number];
-export const DEFAULT_CHAIN_ID = (process.env.NEXT_PUBLIC_CHAIN_ID ??
-  "17777") as SupportedChainID;
-export type SupportedChainID = "15557" | "17777";
+// export const supportedChainID = ["17777", "15557"] as const;
+export const supportedChainID = supportedChains.map((item) => item.id);
+export type SupportedChainID = (typeof supportedChainID)[number];
+// export const DEFAULT_CHAIN_ID = (process.env.NEXT_PUBLIC_CHAIN_ID ??
+//   "17777") as SupportedChainID;
+// export type SupportedChainID = "15557" | "17777";
 
-// export const DEFAULT_CHAIN_ID = supportedChains[0];
+export const DEFAULT_CHAIN_ID = (() => {
+  const NEXT_PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID; // Assuming it's an environment variable
+
+  if (NEXT_PUBLIC_CHAIN_ID === "15557") {
+    return supportedChains[0];
+  } else {
+    return supportedChains[1];
+  }
+})();
+

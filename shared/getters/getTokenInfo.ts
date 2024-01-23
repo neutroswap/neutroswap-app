@@ -3,9 +3,10 @@ import { ERC20_ABI } from "../abi";
 import { publicClient } from "../types/client";
 import { Token } from "../types/tokens.types";
 import { tokens } from "../statics/tokenList";
+import { DEFAULT_CHAIN_ID } from "../types/chain.types";
 
 const tokenMap = new Map(
-  tokens[publicClient.chain.id].map((item) => [getAddress(item.address), item])
+  tokens[DEFAULT_CHAIN_ID.id].map((item) => [getAddress(item.address), item])
 );
 
 export function getTokenImageUrl(token: `0x${string}`): string {

@@ -56,10 +56,10 @@ export const TokenPicker: FC<TokenPickerProps> = (props) => {
 
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID];
+    if (!chain) return tokens[DEFAULT_CHAIN_ID.id];
     if (!supportedChainID.includes(chain.id as any))
-      return tokens[DEFAULT_CHAIN_ID];
-    return tokens[chain.id.toString() as SupportedChainID];
+      return tokens[DEFAULT_CHAIN_ID.id];
+    return tokens[chain.id as SupportedChainID];
   }, [chain]);
 
   const filteredTokens = chainSpecificTokens.filter(

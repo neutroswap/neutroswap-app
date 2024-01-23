@@ -80,10 +80,7 @@ export default function Dividend() {
   const addressToTokenInfo = useMemo(() => {
     if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
     return new Map(
-      tokens[chain.id.toString() as SupportedChainID].map((item) => [
-        item.address,
-        item,
-      ])
+      tokens[chain.id as SupportedChainID].map((item) => [item.address, item])
     );
   }, [chain]);
 

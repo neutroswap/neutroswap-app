@@ -46,19 +46,19 @@ export type Response = {
 
 //NOTE: Lowercase contract address map
 const addressToTokenLogoMap = new Map(
-  tokens[DEFAULT_CHAIN_ID].map((item) => [
+  tokens[DEFAULT_CHAIN_ID.id].map((item) => [
     item.address.toLowerCase(),
     item.logo,
   ])
 );
 
 const factoryClient = new Client({
-  url: urls[DEFAULT_CHAIN_ID].FACTORY_GRAPH_URL,
+  url: urls[DEFAULT_CHAIN_ID.id].FACTORY_GRAPH_URL,
   exchanges: [cacheExchange, fetchExchange],
 });
 
 const nftClient = new Client({
-  url: urls[DEFAULT_CHAIN_ID].NFT_GRAPH_URL,
+  url: urls[DEFAULT_CHAIN_ID.id].NFT_GRAPH_URL,
   exchanges: [cacheExchange, fetchExchange],
 });
 
