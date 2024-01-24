@@ -241,7 +241,7 @@ function Overview(props: GetNFTPositionResponse) {
       {
         address: NEUTRO_HELPER_CONTRACT,
         abi: NEUTRO_HELPER_ABI,
-        functionName: "getTotalValueOfLiquidity",
+        functionName: "getTokenPrice",
         args: [props.lpToken],
       } as const,
       {

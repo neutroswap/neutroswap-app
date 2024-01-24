@@ -108,7 +108,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
   const { data: totalValueOfLiquidity } = useContractRead({
     address: NEUTRO_HELPER_CONTRACT,
     abi: NEUTRO_HELPER_ABI,
-    functionName: "getTotalValueOfLiquidity",
+    functionName: "getTokenPrice",
     args: [router.query.id as `0x${string}`],
   });
 
