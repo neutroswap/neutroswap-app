@@ -207,6 +207,8 @@ export default function PoolDetails() {
       },
     ],
     onSuccess: (value) => {
+      console.log(value);
+      console.log(router.query.id);
       setUserLPBalance({
         decimal: 18,
         raw: value[0].result as bigint,

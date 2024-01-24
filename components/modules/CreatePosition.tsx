@@ -42,6 +42,7 @@ import {
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
 import { GetPairQuery } from "@/shared/gql/types/factory/graphql";
+import { classNames } from "@/shared/helpers/classNamer";
 dayjs.extend(duration);
 
 type CreatePositionModalProps = {
@@ -120,6 +121,8 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
     if (isPreferNative && isWrappedNative(token0.address)) return false;
     return +formatUnits(allowance0, token0.decimal) < Number(token0Amount);
   }, [token0, isPreferNative, token0Amount, allowance0]);
+  console.log("isToken0NeedApproval", isToken0NeedApproval);
+  console.log("allowance0", allowance0);
 
   const isToken1NeedApproval = useMemo(() => {
     if (isPreferNative && isWrappedNative(token1.address)) return false;
@@ -212,10 +215,10 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
   return (
     <div className="p-3 space-y-4">
       <div>
-        <p className="font-semibold">Create spNFT Position</p>
-        <p className="text-sm text-muted-foreground">
-          Start earning yield by depositing assets to NEUTRO
-        </p>
+        <div className="font-semibold">Create spNFT Position</div>
+        <div className="text-sm text-muted-foreground">
+          Start earning yield by holding your spNFT
+        </div>
       </div>
 
       {!isNFTPoolFound && (
@@ -230,7 +233,13 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
           </Alert>
           <Button
             name="createNFTPool"
-            className={cn("w-full uppercase font-semibold tracking-tight")}
+            className={classNames(
+              "!flex !items-center !mt-4 !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+              "text-white dark:text-amber-600",
+              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+              "disabled:opacity-50"
+            )}
             loading={isCreatingNFTPool}
             disabled={!createNFTPool}
             onClick={() => createNFTPool?.()}
@@ -245,9 +254,9 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
           <div className="mt-4">
             <div className="flex items-center justify-between space-x-4">
               <div>
-                <p className="text-sm whitespace-nowrap leading-none">
+                <div className="text-sm whitespace-nowrap leading-none">
                   Lock Duration
-                </p>
+                </div>
               </div>
               <Slider
                 defaultValue={[0]}
@@ -257,10 +266,10 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
                 step={1}
               />
               <div>
-                <p className="w-32 text-sm flex justify-end">
+                <div className="w-32 text-sm flex justify-end">
                   {dayjs.duration(duration, "days").months()} months{" "}
                   {dayjs.duration(duration, "days").days()} days
-                </p>
+                </div>
               </div>
             </div>
 
@@ -271,52 +280,52 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
               >
                 Set Max
               </button>
-              <p className="flex text-xs text-muted-foreground whitespace-nowrap justify-end">
+              <div className="flex text-xs text-muted-foreground whitespace-nowrap justify-end">
                 {lockBonusInPercent}% lock bonus{" "}
                 {lockBonusInPercent / 100 + 1 > 1
                   ? `(x${(lockBonusInPercent / 100 + 1).toFixed(2)})`
                   : ""}
-              </p>
+              </div>
             </div>
 
             <div className="space-y-1">
-              <p className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+              <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
                 Estimates
-              </p>
+              </div>
               <div className="flex justify-between">
-                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                   Min. {token0.symbol}
-                </p>
+                </div>
                 <div className="flex items-center space-x-1">
-                  <p className="text-sm">
+                  <div className="text-sm">
                     {currencyFormat(+formatUnits(token0Min, token0.decimal), 5)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
+                  </div>
+                  <div className="text-sm text-muted-foreground">
                     ${token0.symbol}
-                  </p>
+                  </div>
                 </div>
               </div>
               <div className="flex justify-between">
-                <p className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+                <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
                   Min. {token1.symbol}
-                </p>
+                </div>
                 <div className="flex items-center space-x-1">
-                  <p className="text-sm">
+                  <div className="text-sm">
                     {currencyFormat(+formatUnits(token1Min, token1.decimal), 5)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
+                  </div>
+                  <div className="text-sm text-muted-foreground">
                     ${token1.symbol}
-                  </p>
+                  </div>
                 </div>
               </div>
 
               <div className="w-full flex justify-between items-center ">
                 <div className="flex text-muted-foreground  text-sm items-center">
-                  <p className="text-xs font-semibold uppercase tracking-wide">
+                  <div className="text-xs font-semibold uppercase tracking-wide">
                     Total APR
-                  </p>
+                  </div>
                 </div>
-                <p className="text-sm">{totalApr.toFixed(2)}%</p>
+                <div className="text-sm">{totalApr.toFixed(2)}%</div>
               </div>
             </div>
           </div>
@@ -324,7 +333,12 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
           {(isToken0NeedApproval || isToken1NeedApproval) && (
             <Button
               scale={1.25}
-              className="w-full !mt-2"
+              className={classNames(
+                "!flex !items-center !py-5 !w-full !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                "text-white dark:text-amber-600",
+                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+              )}
               loading={isApprovingToken0 || isApprovingToken1}
               onClick={() => {
                 if (isToken0NeedApproval) return approveToken0?.();
@@ -351,7 +365,12 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
             <Button
               scale={1.25}
               name="directlyCreatePosition"
-              className="w-full !mt-2"
+              className={classNames(
+                "!flex !items-center !py-5 !w-full !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                "text-white dark:text-amber-600",
+                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+              )}
               loading={
                 isDirectlyCreatingPosition || isSimulatingDirectlyCreatePosition
               }

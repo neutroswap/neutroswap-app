@@ -103,7 +103,18 @@ export default function PoolPosition() {
         </span>
         <Modal>
           <ModalOpenButton>
-            <Button auto className="!mt-2" iconRight={<PlusIcon />}>
+            <Button
+              auto
+              className={classNames(
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                "text-white dark:text-amber-600",
+                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+              )}
+              iconRight={
+                <PlusIcon className="text-white dark:text-amber-600" />
+              }
+            >
               Add Liquidity
             </Button>
           </ModalOpenButton>
@@ -178,16 +189,39 @@ function SPNFTPool() {
               start earning.
             </p>
 
-            <div className="flex space-x-4 mt-4">
-              <Button
+            <div className="flex space-x-2 mt-4">
+              {/* <Button
                 className="!mt-2"
                 onClick={() => window.location.reload()}
+              >
+                Refresh
+              </Button> */}
+              <Button
+                auto
+                onClick={() => window.location.reload()}
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                )}
               >
                 Refresh
               </Button>
               <Modal>
                 <ModalOpenButton>
-                  <Button className="!mt-2">Add Liquidity</Button>
+                  {/* <Button className="!mt-2">Add Liquidity</Button> */}
+                  <Button
+                    auto
+                    className={classNames(
+                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                      "text-white dark:text-amber-600",
+                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                    )}
+                  >
+                    Add Liquidity
+                  </Button>
                 </ModalOpenButton>
                 <ModalContents>
                   {({ close }) => <AddLiquidityModal handleClose={close} />}
@@ -447,15 +481,38 @@ function LiquidityPool() {
             </p>
 
             <div className="flex space-x-4 mt-4">
-              <Button
+              {/* <Button
                 className="!mt-2"
                 onClick={() => window.location.reload()}
+              >
+                Refresh
+              </Button> */}
+              <Button
+                auto
+                onClick={() => window.location.reload()}
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                )}
               >
                 Refresh
               </Button>
               <Modal>
                 <ModalOpenButton>
-                  <Button className="!mt-2">Add Liquidity</Button>
+                  {/* <Button className="!mt-2">Add Liquidity</Button> */}
+                  <Button
+                    auto
+                    className={classNames(
+                      "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                      "text-white dark:text-amber-600",
+                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                    )}
+                  >
+                    Add Liquidity
+                  </Button>
                 </ModalOpenButton>
                 <ModalContents>
                   {({ close }) => <AddLiquidityModal handleClose={close} />}
@@ -646,9 +703,9 @@ export const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           >
             <div className="flex items-center justify-between p-2">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-500 dark:text-neutral-600">
+                <div className="text-sm text-neutral-500 dark:text-neutral-600">
                   1
-                </p>
+                </div>
                 <img
                   alt={`${selectedToken.name} Icon`}
                   src={selectedToken.logo}
@@ -681,9 +738,9 @@ export const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           >
             <div className="flex items-center justify-between p-2">
               <div className="flex items-center space-x-4">
-                <p className="text-sm text-neutral-500 dark:text-neutral-600">
+                <div className="text-sm text-neutral-500 dark:text-neutral-600">
                   2
-                </p>
+                </div>
                 <img
                   alt={`${selectedToken.name} Icon`}
                   src={selectedToken.logo}
@@ -706,12 +763,11 @@ export const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
         <Button
           scale={1.25}
           className={classNames(
-            "!w-full !mt-4 !bg-transparent !rounded-lg",
-            "!border-neutral-300 dark:!border-neutral-700",
-            "hover:!border-neutral-400 dark:hover:!border-neutral-600",
-            "focus:!border-neutral-400 dark:focus:!border-neutral-600",
-            "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
-            "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+            "!flex !items-center !mt-4 !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+            "text-white dark:text-amber-600",
+            "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
           )}
           disabled={isError}
           loading={isFetchingGetPair}
@@ -726,12 +782,11 @@ export const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           <Button
             scale={1.25}
             className={classNames(
-              "!w-full !mt-4 !bg-transparent !rounded-lg",
-              "!border-neutral-300 dark:!border-neutral-700",
-              "hover:!border-neutral-400 dark:hover:!border-neutral-600",
-              "focus:!border-neutral-400 dark:focus:!border-neutral-600",
-              "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
-              "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+              "!flex !items-center !mt-4 !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+              "text-white dark:text-amber-600",
+              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+              "disabled:opacity-50"
             )}
             disabled={!createPair}
             loading={isCreatingPair}

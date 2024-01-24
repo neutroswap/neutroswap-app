@@ -54,7 +54,7 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
   return (
     <Listbox value={selected} onChange={setSelected}>
       <div className="relative mt-1 z-10">
-        <Listbox.Button className="relative cursor-default rounded-lg py-2 pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300">
+        <Listbox.Button className="relative cursor-default rounded-lg pr-10 text-left focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-orange-300">
           <div className="flex space-x-2 items-center">
             <img
               alt={`${selected.symbol} Icon`}

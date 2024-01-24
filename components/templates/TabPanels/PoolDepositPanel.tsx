@@ -1,22 +1,12 @@
-import { ERC20_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
+import { NEUTRO_ROUTER_ABI } from "@/shared/abi";
 import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
-import { BigNumber } from "ethers";
 import { formatUnits, parseUnits } from "viem";
-import { ChangeEvent, useCallback, useMemo, useState } from "react";
-import {
-  useAccount,
-  useBalance,
-  useContractReads,
-  useContractWrite,
-  useNetwork,
-  usePrepareContractWrite,
-} from "wagmi";
+import { useCallback, useMemo, useState } from "react";
+import { useAccount, useBalance, useNetwork } from "wagmi";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
-import { Currency } from "@/shared/types/currency.types";
-import dayjs from "dayjs";
 import NativeTokenPicker from "@/components/modules/Swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/utils";
 import { isWrappedNative, tokens } from "@/shared/statics/tokenList";
@@ -27,7 +17,7 @@ import {
 } from "@/shared/types/chain.types";
 import { useApprove } from "@/shared/hooks/useApprove";
 import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
-import { getContract, waitForTransaction } from "@wagmi/core";
+import { getContract } from "@wagmi/core";
 import { useAddLiquidity } from "@/shared/hooks/useAddLiquidityETH";
 import { useDebounce } from "@/shared/hooks/useDebounce";
 import { Tabs, TabsList, TabsTrigger } from "@/components/elements/Tabs";
@@ -35,23 +25,10 @@ import { TabsContent } from "@radix-ui/react-tabs";
 import { ResponsiveDialog } from "@/components/modules/ResponsiveDialog";
 import { useRouter } from "next/router";
 import { CreatePositionModal } from "@/components/modules/CreatePosition";
+import { PoolDepositPanelProps } from "./PoolDeposit";
 import { classNames } from "@/shared/helpers/classNamer";
 
-export type PoolDepositPanelProps = {
-  balances: Currency[];
-  token0: Token;
-  token1: Token;
-  // token0Amount: string;
-  // token1Amount: string;
-  priceRatio: [number, number];
-  reserves: readonly [bigint, bigint, number] | undefined;
-  refetchReserves: (options?: any) => Promise<any>;
-  refetchAllBalance: (options?: any) => Promise<any>;
-  refetchUserBalances: (options?: any) => Promise<any>;
-  isNewPool: boolean;
-};
-
-const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
+export const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   const {
     balances,
     token0,
@@ -218,7 +195,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
   //     BigNumber.from(dayjs().add(5, 'minutes').unix()).toString() // deadline
   //   ])
   // }, [token0, token1, token0Amount, token1Amount, token0Min, token1Min, address, deadline])
-
   const formattedBigBalance = useCallback(
     (balance: bigint, token: Token) => {
       if (isWrappedNative(token.address)) {
@@ -250,16 +226,12 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     if (!allowance0) return true;
     return +formatUnits(allowance0, token0.decimal) < Number(token0Amount);
   }, [token0, isPreferNative, nativeToken, allowance0, token0Amount]);
-  console.log(token0.name);
-  console.log(allowance0);
-  console.log("isToken0NeedApproval", isToken0NeedApproval);
 
   const isToken1NeedApproval = useMemo(() => {
     if (isPreferNative && token1.address === nativeToken.address) return false;
     if (!allowance1) return true;
     return +formatUnits(allowance1, token1.decimal) < Number(token1Amount);
   }, [token1, isPreferNative, nativeToken, allowance1, token1Amount]);
-  console.log("isToken1NeedApproval", isToken1NeedApproval);
 
   return (
     <div className="">
@@ -316,7 +288,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 <Button
                   auto
                   className={classNames(
-                    "!flex !items-center !py-3 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                    "!flex !items-center !py-5 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
                     "text-white dark:text-amber-600",
                     "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
                     "!border !border-orange-600/50 dark:border-orange-400/[.12]",
@@ -389,13 +361,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 )}
                 <Button
                   auto
-                  className={classNames(
-                    "!flex !items-center !py-3 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                    "disabled:opacity-50"
-                  )}
                   scale={0.33}
                   disabled={!balances}
                   onClick={() => {
@@ -446,16 +411,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
               <TabsContent value="nft">
                 <ResponsiveDialog.Root shouldScaleBackground>
                   <ResponsiveDialog.Trigger>
-                    <Button
-                      scale={1.25}
-                      className={classNames(
-                        "!flex !items-center !py-5 !min-w-0 !w-full !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                        "disabled:opacity-50"
-                      )}
-                    >
+                    <Button scale={1.25} className="w-full !mt-2">
                       Create spNFT
                     </Button>
                   </ResponsiveDialog.Trigger>
@@ -490,13 +446,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                   {(isToken0NeedApproval || isToken1NeedApproval) && (
                     <Button
                       scale={1.25}
-                      className={classNames(
-                        "!flex !items-center !py-5 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                        "disabled:opacity-50"
-                      )}
+                      className="!mt-2"
                       loading={isApprovingToken0 || isApprovingToken1}
                       onClick={() => {
                         if (isToken0NeedApproval) return approveToken0?.();
@@ -514,13 +464,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                         <Button
                           name="addLiquidityETH"
                           scale={1.25}
-                          className={classNames(
-                            "!flex !items-center !py-5 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                            "text-white dark:text-amber-600",
-                            "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                            "disabled:opacity-50"
-                          )}
+                          className="!mt-2"
                           loading={
                             isAddingLiquidity || isSimulatingAddLiquidity
                           }
@@ -534,13 +478,7 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                         <Button
                           name="addLiquidity"
                           scale={1.25}
-                          className={classNames(
-                            "!flex !items-center !py-5 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                            "text-white dark:text-amber-600",
-                            "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                            "disabled:opacity-50"
-                          )}
+                          className="!mt-2"
                           loading={
                             isAddingLiquidity || isSimulatingAddLiquidity
                           }
@@ -588,5 +526,3 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     </div>
   );
 };
-
-export default PoolDepositPanel;

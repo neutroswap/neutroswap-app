@@ -9,7 +9,7 @@ import {
 import { useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import InputGroup from "@/components/elements/InputGroup";
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import { Input } from "@/components/elements/Input";
 import {
   useAccount,
@@ -28,6 +28,8 @@ import {
 import { waitForTransaction } from "@wagmi/core";
 import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import { NEUTRO_CONTRACT, XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
+import WalletIcon from "@/public/icons/wallet.svg";
+import { classNames } from "@/shared/helpers/classNamer";
 
 export default function ConvertForm() {
   const { chain } = useNetwork();
@@ -152,7 +154,26 @@ export default function ConvertForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputGroup
+                    <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                      <input
+                        type="number"
+                        placeholder="0.0"
+                        className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                        {...field}
+                      ></input>
+                      <div
+                        className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                        onClick={() =>
+                          form.setValue(
+                            "convertNeutroToXneutro",
+                            availableNeutro
+                          )
+                        }
+                      >
+                        MAX
+                      </div>
+                    </div>
+                    {/* <InputGroup
                       suffix={
                         <button
                           type="button"
@@ -174,15 +195,16 @@ export default function ConvertForm() {
                         placeholder="0.00"
                         {...field}
                       ></Input>
-                    </InputGroup>
+                    </InputGroup> */}
                   </FormControl>
                 </FormItem>
               )}
             ></FormField>
           </div>
           <div className="flex justify-end text-xs text-neutral-500 -mt-2">
-            <div>
-              <span className="mr-2">wallet balance:</span>
+            <div className="flex items-center">
+              {/* <span className="mr-2">wallet balance:</span> */}
+              <WalletIcon className="mr-1 w-3 h-3 md:w-4 md:h-4 text-neutral-400 dark:text-neutral-600" />
               <span>{availableNeutro} NEUTRO</span>
             </div>
           </div>
@@ -190,8 +212,12 @@ export default function ConvertForm() {
             if (!isApproved) {
               return (
                 <Button
-                  type="button"
-                  variant="outline"
+                  className={classNames(
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                    "text-white dark:text-amber-600",
+                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                  )}
                   disabled={!approveNeutro}
                   loading={isApprovingNeutro}
                   onClick={() => approveNeutro?.()}
@@ -202,8 +228,12 @@ export default function ConvertForm() {
             }
             return (
               <Button
-                type="submit"
-                variant="outline"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                )}
                 disabled={!convertNeutro}
                 loading={isConvertNeutroLoading}
               >

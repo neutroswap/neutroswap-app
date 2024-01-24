@@ -33,7 +33,8 @@ import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
 import { formatEther, formatUnits, parseEther } from "viem";
 import dayjs from "dayjs";
 import { CaretDown, Warning } from "@phosphor-icons/react";
-import { Button } from "@/components/elements/Button";
+// import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import { cn, currencyFormat } from "@/shared/utils";
 import {
   Collapsible,
@@ -55,6 +56,8 @@ import {
   NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
   NEXT_PUBLIC_NFT_POOL_FACTORY_CONTRACT,
 } from "@/shared/helpers/constants";
+import { classNames } from "@/shared/helpers/classNamer";
+import WalletIcon from "@/public/icons/wallet.svg";
 
 type WrapPositionModalProps = {
   pool: `0x${string}`;
@@ -161,7 +164,7 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
     useContractWrite({
       ...approveLpTokenConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchLpTokenInfo();
         await retryWrapNFTConfig();
       },
@@ -169,7 +172,7 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
 
   const isApproved = useMemo(() => {
     // let formattedAllowance = formatEther(BigInt(allowanceLp ?? 0));
-    return formatEther(allowance) >= (debouncedLpTokenAmount ?? "0");
+    return allowance >= (parseEther(debouncedLpTokenAmount) ?? "0");
   }, [debouncedLpTokenAmount, allowance]);
 
   useContractRead({
@@ -280,10 +283,10 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
   return (
     <div className="p-3 space-y-4">
       <div>
-        <p className="font-semibold">Wrap LP to spNFT Position</p>
-        <p className="text-sm text-muted-foreground">
+        <div className="font-semibold">Wrap LP to spNFT Position</div>
+        <div className="text-sm text-muted-foreground">
           Start earning yield by depositing assets to NEUTRO
-        </p>
+        </div>
       </div>
 
       {!isNFTPoolFound && (
@@ -298,7 +301,12 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
           </Alert>
           <Button
             name="createNFTPool"
-            className={cn("w-full uppercase font-semibold tracking-tight")}
+            className={classNames(
+              "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+              "text-white dark:text-amber-600",
+              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+            )}
             loading={isCreatingNFTPool}
             disabled={!createNFTPool}
             onClick={() => createNFTPool?.()}
@@ -313,10 +321,13 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
           <div className="mt-4">
             <Form {...form}>
               <div className="flex items-center justify-between">
-                <p className="text-sm">Amount</p>
-                <p className="text-sm text-muted-foreground">
-                  Balance {formatEther(ownedLP)} LP
-                </p>
+                <div className="text-sm">Amount</div>
+                <div className="flex">
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
+                  <div className="text-sm text-muted-foreground">
+                    {formatEther(ownedLP)} LP
+                  </div>
+                </div>
               </div>
               <div className="flex items-center space-x-2 mt-1">
                 <FormField
@@ -325,23 +336,32 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
                   render={({ field }) => (
                     <FormItem className="w-full">
                       <FormControl>
-                        <Input type="number" placeholder="0.00" {...field} />
+                        <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                          <input
+                            type="number"
+                            placeholder="0.0"
+                            className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                            {...field}
+                          ></input>
+                          <div
+                            className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                            onClick={() =>
+                              form.setValue("lpToken", formatEther(ownedLP))
+                            }
+                          >
+                            MAX
+                          </div>
+                        </div>
                       </FormControl>
                     </FormItem>
                   )}
                 />
-                <Button
-                  className="text-sm"
-                  onClick={() => form.setValue("lpToken", formatEther(ownedLP))}
-                >
-                  MAX
-                </Button>
               </div>
               <div className="flex items-center justify-between space-x-4 mt-4">
                 <div>
-                  <p className="text-sm whitespace-nowrap leading-none">
+                  <div className="text-sm whitespace-nowrap leading-none">
                     Lock Duration
-                  </p>
+                  </div>
                 </div>
                 <Slider
                   defaultValue={[0]}
@@ -351,10 +371,11 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
                   step={1}
                 />
                 <div>
-                  <p className="w-32 text-sm flex justify-end">
+                  <div className="w-32 text-sm flex justify-end">
+                    {months === 0 && remainingDays === 0 && "0 months 0 days"}
                     {months > 0 && `${months} months`}{" "}
                     {remainingDays > 0 && `${remainingDays} days`}
-                  </p>
+                  </div>
                 </div>
               </div>
 
@@ -367,32 +388,36 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
                 >
                   Set Max
                 </button>
-                <p className="flex text-xs text-muted-foreground whitespace-nowrap justify-end">
+                <div className="flex text-xs text-muted-foreground whitespace-nowrap justify-end">
                   {lockBonusInPercent}% lock bonus{" "}
                   {lockBonusInPercent / 100 + 1 > 1
                     ? `(x${(lockBonusInPercent / 100 + 1).toFixed(2)})`
                     : ""}
-                </p>
+                </div>
               </div>
             </Form>
           </div>
 
           <div className="w-full flex justify-between items-center group">
             <div className="flex text-muted-foreground text-sm items-center">
-              <p className="text-xs font-semibold uppercase tracking-wide">
+              <div className="text-xs font-semibold uppercase tracking-wide">
                 Total APR
-              </p>
+              </div>
             </div>
-            <p className="text-sm">{totalApr.toFixed(2)}%</p>
+            <div className="text-sm">{totalApr.toFixed(2)}%</div>
           </div>
 
           {(() => {
             if (!isApproved) {
               return (
                 <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full uppercase text-xs font-semibold mt-3"
+                  className={classNames(
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                    "text-white dark:text-amber-600",
+                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
+                  )}
                   disabled={!approveLpToken}
                   loading={isApprovingLpToken}
                   onClick={() => approveLpToken?.()}
@@ -403,9 +428,13 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
             }
             return (
               <Button
-                type="submit"
-                variant="outline"
-                className="w-full uppercase text-xs font-semibold mt-3"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 disabled={!wrapNFT}
                 loading={isWrappingNFTLoading}
                 onClick={() => wrapNFT?.()}

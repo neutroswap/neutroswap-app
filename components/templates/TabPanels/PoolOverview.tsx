@@ -89,7 +89,12 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
       </div>
       <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">
         Contract:{" "}
-        <a href={link} target="_blank" rel="noopener noreferrer">
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-blue-500 active:text-blue-700"
+        >
           {router.query.id}
         </a>
       </p>
@@ -136,7 +141,17 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
             </p>
             <ResponsiveDialog.Root shouldScaleBackground>
               <ResponsiveDialog.Trigger>
-                <Button>Convert to spNFT</Button>
+                <Button
+                  auto
+                  className={classNames(
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                    "text-white dark:text-amber-600",
+                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                  )}
+                >
+                  Convert to spNFT
+                </Button>
               </ResponsiveDialog.Trigger>
               <ResponsiveDialog.Content>
                 <WrapPositionModal

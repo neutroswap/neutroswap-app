@@ -13,7 +13,7 @@ export const useBalanceAndAllowance = (
     enabled: Boolean(address),
     scopeKey: `${token}_balance_and_allowance`,
     blockTag: "latest",
-    cacheOnBlock: true,
+    // cacheOnBlock: true,
     allowFailure: false,
     contracts: [
       {

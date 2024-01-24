@@ -41,6 +41,7 @@ import {
   SupportedChainID,
 } from "@/shared/types/chain.types";
 import { waitForTransaction } from "@wagmi/core";
+import { classNames } from "@/shared/helpers/classNamer";
 
 type PoolWithdrawalPanelProps = {
   balances: Currency[];
@@ -286,8 +287,14 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
             <div className="grid grid-cols-4 gap-4 mt-4">
               <Button
                 auto
+                className={classNames(
+                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 scale={0.5}
-                className="bg-transparent"
                 onClick={() => {
                   const percentage = 25;
                   setPercentage(percentage);
@@ -302,7 +309,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               <Button
                 auto
                 scale={0.5}
-                className="bg-transparent"
+                className={classNames(
+                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 onClick={() => {
                   const percentage = 50;
                   setPercentage(percentage);
@@ -317,7 +330,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               <Button
                 auto
                 scale={0.5}
-                className="bg-transparent"
+                className={classNames(
+                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 onClick={() => {
                   const percentage = 75;
                   setPercentage(percentage);
@@ -332,7 +351,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               <Button
                 auto
                 scale={0.5}
-                className="bg-transparent"
+                className={classNames(
+                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 onClick={() => {
                   const percentage = 100;
                   setPercentage(percentage);
@@ -412,7 +437,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               {!isLPTokenApproved && (
                 <Button
                   scale={1.25}
-                  className="!mt-2"
+                  className={classNames(
+                    "!flex !items-center !mt-2 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                    "text-white dark:text-amber-600",
+                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
+                  )}
                   loading={isApprovingLPToken}
                   onClick={() => approveLPToken?.()}
                 >
@@ -425,7 +456,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                     <Button
                       name="removeLiquidity"
                       scale={1.25}
-                      className="!mt-2"
+                      className={classNames(
+                        "!flex !items-center !mt-2 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                        "text-white dark:text-amber-600",
+                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                        "disabled:opacity-50"
+                      )}
                       loading={
                         isRemovingLiquidity || isSimulatingRemoveLiquidity
                       }
@@ -439,7 +476,13 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                     <Button
                       name="removeLiquidityETH"
                       scale={1.25}
-                      className="!mt-2"
+                      className={classNames(
+                        "!flex !items-center !mt-2 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                        "text-white dark:text-amber-600",
+                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                        "disabled:opacity-50"
+                      )}
                       loading={
                         isRemovingLiquidityETH || isSimulatingRemoveLiquidityETH
                       }

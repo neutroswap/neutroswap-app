@@ -199,10 +199,34 @@ export default function Pool() {
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
           Add or Remove liquidity to Neutroswap pool
         </p>
+        <div className="my-5 box-border">
+          <div className="flex flex-col justify-center items-center px-1 py-3 md:px-10 md:py-7 rounded-xl md:border border-neutral-200/80 dark:border-neutral-800/80">
+            <div className="mb-2 text-xs font-bold uppercase text-neutral-500">
+              Pool Total Value Locked
+            </div>
+            {/* {!isUserFarmsLoading && !isFarmsLoading && ( */}
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+              {/* ${currencyFormat(+farms?.tvl!)} */} $100,000
+            </div>
+            {/* )} */}
+            {/* {isUserFarmsLoading && isFarmsLoading && <Spinner className="mt-5" />} */}
+          </div>
+        </div>
         <div className="flex justify-end">
           <Modal>
             <ModalOpenButton>
-              <Button auto className="!mt-2" iconRight={<PlusIcon />}>
+              <Button
+                auto
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                )}
+                iconRight={
+                  <PlusIcon className="text-white dark:text-amber-600" />
+                }
+              >
                 Add Liquidity
               </Button>
             </ModalOpenButton>

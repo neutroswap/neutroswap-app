@@ -9,7 +9,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import InputGroup from "@/components/elements/InputGroup";
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import { Input } from "@/components/elements/Input";
 import {
   useAccount,
@@ -27,6 +27,7 @@ import { Slider } from "@/components/elements/Slider";
 import { waitForTransaction } from "@wagmi/core";
 import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
+import { classNames } from "@/shared/helpers/classNamer";
 
 const DEFAULT_PERCENTAGE = 50;
 const DAY_PER_PERCENTAGE = 3.36; // ((max redeem duration in days  - min redeem duration in days) / default percentage)
@@ -189,7 +190,26 @@ export default function RedeemForm() {
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <InputGroup
+                    <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                      <input
+                        type="number"
+                        placeholder="0.0"
+                        className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                        {...field}
+                      ></input>
+                      <div
+                        className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                        onClick={() =>
+                          form.setValue(
+                            "redeemXneutroToNeutro",
+                            availableXneutro
+                          )
+                        }
+                      >
+                        MAX
+                      </div>
+                    </div>
+                    {/* <InputGroup
                       suffix={
                         <button
                           type="button"
@@ -211,7 +231,7 @@ export default function RedeemForm() {
                         placeholder="0.00"
                         {...field}
                       ></Input>
-                    </InputGroup>
+                    </InputGroup> */}
                   </FormControl>
                 </FormItem>
               )}
@@ -261,10 +281,13 @@ export default function RedeemForm() {
             if (!isApproved) {
               return (
                 <Button
-                  type="button"
-                  variant="outline"
+                  className={classNames(
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                    "text-white dark:text-amber-600",
+                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                  )}
                   disabled={!approveXneutro}
-                  loadingText="Approving xNEUTRO"
                   loading={isApprovingXneutro}
                   onClick={() => approveXneutro?.()}
                 >
@@ -274,8 +297,12 @@ export default function RedeemForm() {
             }
             return (
               <Button
-                type="submit"
-                variant="outline"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-amber-600",
+                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                )}
                 disabled={!redeemXneutro}
                 loading={isRedeemXneutroLoading}
               >
