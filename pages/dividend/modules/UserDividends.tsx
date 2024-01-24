@@ -68,29 +68,29 @@ export default function UserDividends() {
     <div className="col-span-5 mt-8 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
       <div>
         <div className="flex flex-row items-center w-full md:p-8 justify-between">
-          <p className="m-0 text-left font-semibold whitespace-nowrap">
+          <p className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
             Your allocation
           </p>
-          <div className="flex space-x-4">
+          <div className="flex space-x-4 mr-4 sm:mr-0">
             <DeallocateDividendModal />
             <AllocateDividendModal />
           </div>
         </div>
         <div className="flex flex-col md:pl-8 m-0">
           <div className="grid grid-cols-2 gap-2">
-            <div>
+            <div className="ml-4 sm:m-0">
               <span className="text-sm text-neutral-500">Total Allocation</span>
               <div className="mt-1 text-sm">
                 {formatEther(data?.[2][0] ?? BigInt(0))} xNEUTRO
               </div>
             </div>
-            <div>
+            <div className="ml-4 sm:m-0">
               <span className="text-sm text-neutral-500">Total Share</span>
               <div className="mt-1 text-sm">
                 {userAllocationInPercent.toFixed(2)}%
               </div>
             </div>
-            <div>
+            <div className="ml-4 sm:m-0">
               <span className="text-sm text-neutral-500">
                 Manual Allocation
               </span>
@@ -98,7 +98,7 @@ export default function UserDividends() {
                 {formatEther(data?.[2][1] ?? BigInt(0))} xNEUTRO
               </div>
             </div>
-            <div>
+            <div className="ml-4 sm:m-0">
               <span className="text-sm text-neutral-500">
                 Redeem Allocation
               </span>

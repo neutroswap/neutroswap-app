@@ -140,9 +140,9 @@ export default function Dividend() {
       </div>
 
       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-      <div className="flex w-full box-border">
-        <div className="grid grid-cols-12 w-full box-border space-x-3">
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+      <div className="flex w-full box-border overflow-x-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border space-x-3">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -163,7 +163,7 @@ export default function Dividend() {
             </div>
           </div>
 
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -182,7 +182,7 @@ export default function Dividend() {
             </div>
           </div>
 
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -198,7 +198,7 @@ export default function Dividend() {
             </div>
           </div>
 
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -216,51 +216,52 @@ export default function Dividend() {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 w-full box-border space-x-3">
-        <div className="col-span-7 w-full mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border space-x-3">
+        <div className="sm:col-span-7 w-full mt-8">
           <div className="flex flex-col rounded">
             <div className="border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg">
-              <div className="flex flex-row justify-between items-start md:p-8 -mb-7">
-                <p className="m-0 text-left font-semibold whitespace-nowrap">
-                  Current Epoch Details
-                </p>
-              </div>
+              <div className="flex flex-col">
+                <div className="flex flex-row justify-between items-start md:p-8 -mb-7">
+                  <span className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
+                    Current Epoch Details
+                  </span>
+                </div>
 
-              {/* Need to change numbering format */}
-              <div className="flex">
-                {!!data &&
-                  data[4].map((reward, index) => {
-                    const info = getRewardInfo(reward.token);
-                    const currentDistributionAmount = BigInt(
-                      reward.currentDistributionAmount ?? 0
-                    );
-                    const formattedDistributedAmount = parseFloat(
-                      formatEther(currentDistributionAmount)
-                    ).toFixed(5);
-                    if (!info) return null;
-                    return (
-                      <div
-                        className="flex w-1/2 items-center md:pl-8 m-0"
-                        key={index}
-                      >
-                        <div className="flex items-center">
-                          <div className="flex">
-                            {info.logo.map((logo) => (
-                              <TokenLogo
-                                className="w-8 h-8"
-                                src={logo}
-                                key={logo}
-                              />
-                            ))}
-                          </div>
-                          <div className="ml-2">
-                            <span className="text-sm text-neutral-500">
-                              {info.symbol}
-                            </span>
-                            <div className="mt-0 text-sm">
-                              {formattedDistributedAmount} {info.symbol} &nbsp;
-                              <span className="text-neutral-500 text-xs">
-                                $
+                <div className="flex flex-wrap">
+                  {!!data &&
+                    data[4].map((reward, index) => {
+                      const info = getRewardInfo(reward.token);
+                      const currentDistributionAmount = BigInt(
+                        reward.currentDistributionAmount ?? 0
+                      );
+                      const formattedDistributedAmount = parseFloat(
+                        formatEther(currentDistributionAmount)
+                      ).toFixed(5);
+                      if (!info) return null;
+                      return (
+                        <div
+                          className="flex w-full sm:w-1/2 items-center mt-4 sm:mt-0 pl-0 sm:pl-8 m-4 sm:m-0"
+                          key={index}
+                        >
+                          <div className="flex items-center">
+                            <div className="flex">
+                              {info.logo.map((logo) => (
+                                <TokenLogo
+                                  className="w-8 h-8"
+                                  src={logo}
+                                  key={logo}
+                                />
+                              ))}
+                            </div>
+                            <div className="ml-2">
+                              <span className="text-sm text-neutral-500">
+                                {info.symbol}
+                              </span>
+                              <div className="mt-0 text-sm">
+                                <span className="text-neutral-500 text-xs">
+                                  {formattedDistributedAmount} {info.symbol}
+                                </span>
+                                &nbsp;$
                                 {currencyFormat(
                                   parseFloat(
                                     formatEther(
@@ -272,16 +273,17 @@ export default function Dividend() {
                                   2,
                                   0.01
                                 )}
-                              </span>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                </div>
               </div>
 
               <hr className="my-4 w-full border-neutral-200/80 dark:border-neutral-800/80" />
+
               <div className="flex flex-col justify-between items-start p-2 m-5 py-0">
                 <p className="m-0 text-left whitespace-nowrap text-sm text-muted-foreground">
                   Next distribution is scheduled at:{" "}
@@ -293,6 +295,7 @@ export default function Dividend() {
             </div>
           </div>
         </div>
+
         <UserDividends />
       </div>
     </div>
