@@ -30,6 +30,26 @@ const Navbar: React.FC<Props> = () => {
         hidden: false,
       },
       {
+        label: "spNFT",
+        value: "/positions",
+        hidden: false,
+      },
+      {
+        label: "xNEUTRO",
+        value: "/xneutro",
+        hidden: false,
+      },
+      {
+        label: "Analytics",
+        value: "/analytics",
+        hidden: false,
+      },
+      {
+        label: "Launchpad",
+        value: "/launchpad",
+        hidden: false,
+      },
+      {
         label: "Farm",
         value: "/farm",
         hidden: false,
@@ -40,38 +60,18 @@ const Navbar: React.FC<Props> = () => {
         hidden: false,
       },
       {
-        label: "Launchpad",
-        value: "/launchpad",
-        hidden: false,
+        label: "Presales",
+        value: "/presales",
+        hidden: true,
       },
       {
         label: "Dividend",
         value: "/dividend",
-        hidden: false,
-      },
-      {
-        label: "Analytics",
-        value: "/analytics",
-        hidden: false,
-      },
-      {
-        label: "XNeutro",
-        value: "/xneutro",
-        hidden: false,
-      },
-      {
-        label: "Position",
-        value: "/positions",
-        hidden: false,
+        hidden: true,
       },
       {
         label: "Boost",
         value: "/yieldbooster",
-        hidden: false,
-      },
-      {
-        label: "Presales",
-        value: "/presales",
         hidden: true,
       },
     ];
