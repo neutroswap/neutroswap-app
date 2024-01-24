@@ -34,7 +34,7 @@ import { Slider } from "@/components/elements/Slider";
 import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
 import { tokens } from "@/shared/statics/tokenList";
-import NativeTokenPicker from "@/components/modules/Swap/NativeTokenPicker";
+import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import {
   DEFAULT_CHAIN_ID,
   supportedChainID,

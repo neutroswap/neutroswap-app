@@ -7,7 +7,7 @@ import { useAccount, useBalance, useNetwork } from "wagmi";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input, Spinner } from "@geist-ui/core";
-import NativeTokenPicker from "@/components/modules/Swap/NativeTokenPicker";
+import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import { currencyFormat } from "@/shared/utils";
 import { isWrappedNative, tokens } from "@/shared/statics/tokenList";
 import {

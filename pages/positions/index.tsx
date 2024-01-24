@@ -44,7 +44,7 @@ import {
   PlusIcon,
   XCircleIcon,
 } from "@heroicons/react/20/solid";
-import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { ThemeType } from "@/shared/hooks/usePrefers";
 import {
   Modal,
