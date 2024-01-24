@@ -99,7 +99,7 @@ export function Navigation() {
         <NavigationMenuItem>
           <NavigationMenuTrigger>Pool</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px] p-2">
+            <ul className="grid w-[400px]">
               {poolRoutes.map((route) => (
                 <ListItem
                   key={route.title}
@@ -140,7 +140,7 @@ export function Navigation() {
         <NavigationMenuItem>
           <NavigationMenuTrigger>xNEUTRO</NavigationMenuTrigger>
           <NavigationMenuContent>
-            <ul className="grid w-[400px] p-2">
+            <ul className="grid w-[400px]">
               {xNEUTRORoutes.map((route) => (
                 <ListItem
                   key={route.title}
@@ -206,9 +206,9 @@ const ListItem = React.forwardRef<
               <div className="text-sm font-semibold leading-none tracking-tight uppercase">
                 {title}
               </div>
-              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
+              <span className="line-clamp-2 text-sm leading-snug text-muted-foreground mt-1">
                 {children}
-              </p>
+              </span>
             </div>
           </div>
         </a>

@@ -35,21 +35,21 @@ export function Harvest(
       },
     });
 
-  const { data: neutroAmount } = useContractRead({
+  const { data: totalRewards } = useContractRead({
     address: props.id,
     abi: NFT_POOL_ABI,
     functionName: "pendingRewards",
     args: [BigInt(props.tokenId)],
   });
 
-  const neutroPercentage = BigInt(200);
-  const xNeutroPercentage = BigInt(800);
+  const xNeutroPercentage = BigInt(80);
 
-  const neutroAmountFormatted =
-    neutroAmount !== undefined ? neutroAmount : BigInt(0);
+  const totalRewardsFormatted =
+    totalRewards !== undefined ? totalRewards : BigInt(0);
 
   const xNeutroAmount =
-    (neutroAmountFormatted / neutroPercentage) * xNeutroPercentage;
+    (totalRewardsFormatted * xNeutroPercentage) / BigInt(100);
+  const neutroAmount = totalRewardsFormatted - xNeutroAmount;
 
   return (
     <div className="animate-in slide-in-from-right-1/4 duration-200">
@@ -68,7 +68,7 @@ export function Harvest(
           <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
             NEUTRO
           </div>
-          <span className="text-sm">{formatEther(neutroAmountFormatted)}</span>
+          <span className="text-sm">{formatEther(neutroAmount)}</span>
         </div>
         <div className="flex justify-between">
           <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">

@@ -150,9 +150,9 @@ export default function Xneutro() {
       </div>
 
       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-      <div className="flex w-full box-border">
-        <div className="grid grid-cols-12 w-full box-border space-x-3">
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+      <div className="flex w-full box-border overflow-x-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border space-x-3">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -170,7 +170,7 @@ export default function Xneutro() {
             </div>
           </div>
 
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -186,7 +186,7 @@ export default function Xneutro() {
             </div>
           </div>
 
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -202,7 +202,7 @@ export default function Xneutro() {
             </div>
           </div>
 
-          <div className="col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -220,172 +220,175 @@ export default function Xneutro() {
         </div>
       </div>
 
-      <div className="grid grid-cols-12 w-full box-border space-x-3">
-        <div className="col-span-4 mt-8 flex flex-col ">
-          <Card className="flex flex-col gap-4">
-            <CardContent>
-              <Tab.Group>
-                <Tab.List className="flex items-center gap-4 border-b border-neutral-300 dark:border-neutral-700">
-                  <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
-                    Convert
-                  </Tab>
-                  <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
-                    Redeem
-                  </Tab>
-                </Tab.List>
-                <Tab.Panels>
-                  <Tab.Panel>
-                    <ConvertForm />
-                  </Tab.Panel>
-                  <Tab.Panel>
-                    <RedeemForm />
-                  </Tab.Panel>
-                </Tab.Panels>
-              </Tab.Group>
-            </CardContent>
-          </Card>
-          <VestingXneutro />
-        </div>
+      <div className="flex w-full box-border overflow-x-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border space-x-3">
+          <div className="sm:col-span-4 mt-8 flex flex-col">
+            <Card className="flex flex-col gap-4">
+              <CardContent>
+                <Tab.Group>
+                  <Tab.List className="flex items-center gap-4 border-b border-neutral-300 dark:border-neutral-700">
+                    <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
+                      Convert
+                    </Tab>
+                    <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
+                      Redeem
+                    </Tab>
+                  </Tab.List>
+                  <Tab.Panels>
+                    <Tab.Panel>
+                      <ConvertForm />
+                    </Tab.Panel>
+                    <Tab.Panel>
+                      <RedeemForm />
+                    </Tab.Panel>
+                  </Tab.Panels>
+                </Tab.Group>
+              </CardContent>
+            </Card>
+            <VestingXneutro />
+          </div>
 
-        {/* The other column */}
-        <div className="col-span-8 mt-8 flex flex-col">
-          {/* Dividends */}
-          <Card>
-            <Link href="/dividend">
-              <div className="flex justify-between items-center mt-2">
-                <DividendLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
-                <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                  <span className="text-amber-500 text-sm font-semibold">
-                    Stake →
-                  </span>
-                </div>
-              </div>
-              <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
-                Dividends
-              </div>
-              <span className="text-sm text-neutral-500 ml-9 mt-1">
-                Earn yield from protocol earnings by staking your xNEUTRO here.
-              </span>
-              <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
-                <div className="flex- grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Your Allocation
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    {formattedUserDividendAllocation} xNEUTRO
+          <div className="sm:col-span-8 mt-8 flex flex-col">
+            <Card>
+              <Link href="/dividend">
+                <div className="flex justify-between items-center mt-2">
+                  <DividendLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                    <span className="text-amber-500 text-sm font-semibold">
+                      Stake →
+                    </span>
                   </div>
                 </div>
-                <div className="flex-grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Total Allocations
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    {dividendTotalAllocation} xNEUTRO
+                <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+                  Dividends
+                </div>
+                <div className="text-sm text-neutral-500 mt-1 ml-9 sm:ml-9">
+                  Earn yield from protocol earnings by staking your xNEUTRO
+                  here.
+                </div>
+
+                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row">
+                  <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
+                    <span className="text-xs text-neutral-500">
+                      Your Allocation
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      {formattedUserDividendAllocation} xNEUTRO
+                    </div>
+                  </div>
+                  <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
+                    <span className="text-xs text-neutral-500">
+                      Total Allocations
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      {dividendTotalAllocation} xNEUTRO
+                    </div>
+                  </div>
+                  <div className="flex-grow">
+                    <span className="text-xs text-neutral-500">
+                      Deallocation Fee
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      {formattedDividendDeallocationFee}%
+                    </div>
                   </div>
                 </div>
-                <div className="flex-grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Deallocation Fee
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    {formattedDividendDeallocationFee}%
+              </Link>
+            </Card>
+            {/* Yield Booster */}
+            <Card className="mt-5">
+              <Link href="/yieldbooster">
+                <div className="flex justify-between items-center mt-2">
+                  <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                    <span className="text-amber-500 text-sm font-semibold">
+                      Stake →
+                    </span>
                   </div>
                 </div>
-              </div>
-            </Link>
-          </Card>
-          {/* Yield Booster */}
-          <Card className="mt-5">
-            <Link href="/yieldbooster">
-              <div className="flex justify-between items-center mt-2">
-                <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
-                <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                  <span className="text-amber-500 text-sm font-semibold">
-                    Stake →
-                  </span>
+                <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+                  Yield Booster
                 </div>
-              </div>
-              <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
-                Yield Booster
-              </div>
-              <span className="text-sm text-neutral-500 ml-9 mt-1">
-                Boost your staking yields by up to +100% by adding xNEUTRO to
-                any eligible position.
-              </span>
-              <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
-                <div className="flex- grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Your Allocation
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    {formattedUserYieldBoosterAllocation} xNEUTRO
+                <div className="text-sm text-neutral-500 mt-1 ml-9 sm:ml-9">
+                  Boost your staking yields by up to +100% by adding xNEUTRO to
+                  any eligible position.
+                </div>
+                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row">
+                  <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
+                    <span className="text-xs text-neutral-500">
+                      Your Allocation
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      {formattedUserYieldBoosterAllocation} xNEUTRO
+                    </div>
+                  </div>
+                  <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
+                    <span className="text-xs text-neutral-500">
+                      Total Allocations
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      {yieldBoosterTotalAllocation} xNEUTRO
+                    </div>
+                  </div>
+                  <div className="flex-grow">
+                    <span className="text-xs text-neutral-500">
+                      Deallocation Fee
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      {formattedYieldBoosterDeallocationFee}%
+                    </div>
                   </div>
                 </div>
-                <div className="flex-grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Total Allocations
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    {yieldBoosterTotalAllocation} xNEUTRO
+              </Link>
+            </Card>
+
+            {/* Launchpad */}
+            <Card className="mt-5">
+              <Link href="/launchpad">
+                <div className="flex justify-between items-center mt-2">
+                  <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                    <span className="text-amber-500 text-sm font-semibold">
+                      Stake →
+                    </span>
                   </div>
                 </div>
-                <div className="flex-grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Deallocation Fee
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    {formattedYieldBoosterDeallocationFee}%
+                <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
+                  Launchpad
+                </div>
+                <div className="text-sm text-neutral-500 mt-1 ml-9 sm:ml-0">
+                  Get perks and benefits from every project on Neutroswap&apos;s
+                  launchpad by staking your xNEUTRO here.
+                </div>
+                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row">
+                  <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
+                    <span className="text-xs text-neutral-500">
+                      Your Allocation
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      0
+                    </div>
+                  </div>
+                  <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
+                    <span className="text-xs text-neutral-500">
+                      Total Allocations
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      0
+                    </div>
+                  </div>
+                  <div className="flex-grow">
+                    <span className="text-xs text-neutral-500">
+                      Deallocation Fee
+                    </span>
+                    <div className="mt-1 text-sm text-neutral-500 dark:text-white">
+                      0
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
-          </Card>
-          {/* Launchpad */}
-          <Card className="mt-5">
-            <Link href="/launchpad">
-              <div className="flex justify-between items-center mt-2">
-                <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
-                <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                  <span className="text-amber-500 text-sm font-semibold">
-                    Stake →
-                  </span>
-                </div>
-              </div>
-              <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
-                Launchpad
-              </div>
-              <span className="text-sm text-neutral-500 ml-9 mt-1">
-                Get perks and benefits from every project on Neutroswap&apos;s
-                launchpad by staking your xNEUTRO here.
-              </span>
-              <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex">
-                <div className="flex- grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Your Allocation
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    0
-                  </div>
-                </div>
-                <div className="flex-grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Total Allocations
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    0
-                  </div>
-                </div>
-                <div className="flex-grow flex flex-col">
-                  <span className="text-xs text-neutral-500">
-                    Deallocation Fee
-                  </span>
-                  <div className="mt-1 text-sm text-neutral-500 dark:text-white">
-                    0
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </Card>
+              </Link>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
