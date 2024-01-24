@@ -38,7 +38,8 @@ interface VaultDetails {
   apr: string;
 }
 
-let NEUTRO_PRICE: any;
+let CACHED_NEUTRO_PRICE: any = null;
+let LAST_FETCHED_NEUTRO_PRICE = 0;
 let CHAIN_NAME: string;
 let RPC: string;
 let CHAIN_ID: any;
@@ -90,9 +91,6 @@ export async function getAllVaults(): Promise<Vault[] | null> {
 export async function composeData(
   vaults: Vault[] | null
 ): Promise<Vaults | null> {
-  let tokenPrice = await getPrice("neutroswap");
-  NEUTRO_PRICE = tokenPrice["neutroswap"].usd;
-
   const provider = new ethers.providers.JsonRpcProvider(RPC, {
     chainId: CHAIN_ID,
     name: CHAIN_NAME,
@@ -163,7 +161,7 @@ export async function composeData(
       const rps = rpsResult[0].returnValues[3];
       const totalStaked = stakedResult[0].returnValues[0];
 
-      vault.tokenPrice = parseFloat(NEUTRO_PRICE);
+      vault.tokenPrice = parseFloat(CACHED_NEUTRO_PRICE);
       vault.totalStaked = formatEther(BigNumber.from(totalStaked.hex));
       vault.valueOfVault = (vault.tokenPrice * parseFloat(vault.totalStaked))
         .toFixed(2)
@@ -189,7 +187,7 @@ export async function composeData(
 
 export function calculateApr(rps: string, valueOfVault: string): string {
   const SEC_IN_YEAR = parseFloat("31536000");
-  const neutroPrice = parseFloat(NEUTRO_PRICE);
+  const neutroPrice = parseFloat(CACHED_NEUTRO_PRICE);
 
   const rewardPerSec = parseFloat(rps);
   const value = parseFloat(valueOfVault);
@@ -206,6 +204,21 @@ export async function getPrice(id: string): Promise<any> {
     vs_currencies: "usd",
   });
   return tokenPrice;
+}
+
+export async function cachingNeutroPrice() {
+  const currentTime = Date.now();
+
+  try {
+    if (!CACHED_NEUTRO_PRICE || currentTime - LAST_FETCHED_NEUTRO_PRICE >= 5 * 60 * 1000) {
+      const newPrice = await getPrice("neutroswap");
+      CACHED_NEUTRO_PRICE = newPrice["neutroswap"].usd;
+      LAST_FETCHED_NEUTRO_PRICE = currentTime;
+    }
+    console.log("Fetched $NEUTRO effective price", CACHED_NEUTRO_PRICE);
+  } catch (error) {
+    console.error("Error fetching Neutro price:", error);
+  }
 }
 
 function _whichLock(id: number): number {
@@ -232,6 +245,7 @@ export default async function handler(
   switch (method) {
     case "GET":
       try {
+        await cachingNeutroPrice();
         let result = await getAllVaults();
         let data = await composeData(result);
         let response = {
