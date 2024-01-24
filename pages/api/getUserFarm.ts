@@ -15,6 +15,8 @@ import { CallContext } from "ethereum-multicall/dist/esm/models";
 import { CoinGeckoClient, SimplePriceResponse } from "coingecko-api-v3";
 
 let NEUTRO_PRICE: any;
+let ALL_TOKEN_PRICES_CACHED: any = null;
+let LAST_FETCHED_TOKEN_PRICES = 0;
 
 const coingecko = new CoinGeckoClient({
   timeout: 10000,
@@ -226,21 +228,11 @@ export async function composeData(
 }
 
 export async function addTokenPrice(
-  farmHoldings: FarmHoldings
+  farmHoldings: FarmHoldings,
+  tokenPrices: any
 ): Promise<FarmHoldings> {
-  // const NEUTRO_PRICE = Number(process.env.NEUTRO_PRICE) || 0.01;
 
-  // Construct an array of all the token symbols to fetch prices for
-  const tokens = farmHoldings.farms
-    .map((farm) => [farm.token0gecko, farm.token1gecko])
-    .flat();
-  // .filter((token) => token !== 'neutro');
-
-  // Fetch the token prices for all the tokens
-  // console.log(tokens)
-  const tokenPrices = await getPrice(tokens.join(","));
   NEUTRO_PRICE = tokenPrices["neutroswap"].usd;
-  // console.log(tokenPrices)
 
   // Update the token prices on each farm
   const farmsWithPrices = farmHoldings.farms.map((farm) => {
@@ -878,6 +870,22 @@ export async function getPrice(id: string): Promise<any> {
   return tokenPrice;
 }
 
+export async function cachingTokenPrice(farmsData: any) {
+  // Construct an array of all the token symbols to fetch prices for
+  const tokens = farmsData
+    .map((farm: any) => [farm.token0gecko, farm.token1gecko])
+    .flat()
+
+  const currentTime = Date.now();
+
+  if (ALL_TOKEN_PRICES_CACHED && currentTime - LAST_FETCHED_TOKEN_PRICES < 5 * 60 * 1000) {
+  } else {
+    const newPrice = await getPrice(tokens);
+    ALL_TOKEN_PRICES_CACHED = newPrice;
+    LAST_FETCHED_TOKEN_PRICES = currentTime;
+  }
+}
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -897,7 +905,10 @@ export default async function handler(
         if (!data) {
           throw Error("error multicall");
         }
-        let tp = await addTokenPrice(data);
+        // cached the token prices
+        await cachingTokenPrice(data.farms);
+        console.log("Fetched all effective prices", ALL_TOKEN_PRICES_CACHED)
+        let tp = await addTokenPrice(data, ALL_TOKEN_PRICES_CACHED);
         let a = await totalValueOfLiquidity(tp);
         let response = {
           data: a,
