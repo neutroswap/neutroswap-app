@@ -110,9 +110,9 @@ export default function YieldBooster() {
         </p>
       </div>
       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-      <div className="flex w-full box-border">
-        <div className="grid grid-cols-12 w-full box-border space-x-3">
-          <div className="col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+      <div className="flex flex-col md:flex-row w-full box-border">
+        <div className="md:grid grid-cols-12 w-full box-border space-x-3">
+          <div className="col-span-12 md:col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -133,7 +133,7 @@ export default function YieldBooster() {
             </div>
           </div>
 
-          <div className="col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="col-span-12 md:col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mt-4 md:mt-0">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -154,7 +154,7 @@ export default function YieldBooster() {
             </div>
           </div>
 
-          <div className="col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+          <div className="col-span-12 md:col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mt-4 md:mt-0">
             <div className="px-2 py-1">
               <div className="flex justify-between">
                 <div className="flex flex-col">
@@ -171,6 +171,7 @@ export default function YieldBooster() {
           </div>
         </div>
       </div>
+
       <div className="flex flex-col sm:flex-row w-full space-y-6 sm:space-y-0 sm:space-x-6 mt-8">
         <div className="w-full space-y-6">
           <Provider value={nftClient}>
