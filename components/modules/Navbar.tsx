@@ -237,7 +237,7 @@ const Navbar: React.FC<Props> = () => {
           <Tabs
             hideDivider
             onChange={(route) => router.push(route)}
-            className="block lg:hidden !w-full"
+            className="block sm:hidden md:hidden !w-full"
             initialValue={"/" + router.asPath.split("/")[1]}
           >
             {tabs.map((tab) => {
