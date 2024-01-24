@@ -116,14 +116,17 @@ export default function Pool() {
         if (!pools) throw new Error("Failed to fetch data");
 
         const dataWithApr = pools.pairs.map((item) => {
-          const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
-            return prev + parseFloat(curr.dailyTxns);
-          }, 0);
+          // const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
+          //   return prev + parseFloat(curr.dailyTxns);
+          // }, 0);
 
           // Aggregate daily volume for each day
           const dailyVolume = item.pairDayData.reduce((total, day) => {
             return total + parseFloat(day.dailyVolumeUSD);
           }, 0);
+
+          const fees = dailyVolume * 0.003;
+          const sevenDaysFeeUsd = fees * 7;
 
           return {
             ...item,
@@ -226,8 +229,8 @@ export default function Pool() {
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-60">Asset</TableHead>
               <TableHead className="text-right">Liquidity</TableHead>
-
               <TableHead className="text-right">Volume 24H</TableHead>
+              <TableHead className="text-right">APR</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -266,6 +269,9 @@ export default function Pool() {
                 </TableCell>
                 <TableCell className="text-right">
                   ${pool.dailyVolume}
+                </TableCell>
+                <TableCell className="text-right">
+                  {pool.apr.toFixed(2)}%
                 </TableCell>
                 <TableCell className="flex justify-end text-right">
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />
