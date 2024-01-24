@@ -140,76 +140,90 @@ export default function Dividend() {
       </div>
 
       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-      <div className="flex w-full box-border overflow-x-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border space-x-3">
-          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
-            <div className="px-2 py-1">
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Total Allocation
-                  </span>
-                  <div className="flex space-x-1">
-                    <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                      {Number(totalAllocation).toFixed(2)}
-                    </span>
-                    <span className="text-sm text-neutral-500 mt-3">
-                      xNEUTRO
-                    </span>
+      <div className="flex flex-col md:flex-row w-full box-border">
+        <div className="flex flex-col md:flex-row w-full box-border">
+          <div className="md:flex md:space-x-3 w-full box-border">
+            <div className="md:w-1/4">
+              <div className="col-span-12 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+                <div className="px-2 py-1">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                        Total xNEUTRO
+                      </span>
+                      <div className="flex space-x-1">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                          {Number(totalAllocation).toFixed(2)}
+                        </span>
+                        <span className="text-sm text-neutral-500 mt-3">
+                          xNEUTRO
+                        </span>
+                      </div>
+                    </div>
+                    <AllocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
                   </div>
                 </div>
-                <AllocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
               </div>
             </div>
-          </div>
 
-          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
-            <div className="px-2 py-1">
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Total Reward Current Epochs
-                  </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    $
-                    {currencyFormat(
-                      parseFloat(formatEther(BigInt(totalCurrentEpoch)))
-                    )}
-                  </span>
+            <div className="md:w-1/4 mt-4 md:mt-0">
+              <div className="col-span-12 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+                <div className="px-2 py-1">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                        Total Reward Current Epochs
+                      </span>
+                      <div className="flex space-x-1">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                          $
+                          {currencyFormat(
+                            parseFloat(formatEther(BigInt(totalCurrentEpoch)))
+                          )}
+                        </span>
+                      </div>
+                    </div>
+                    <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                  </div>
                 </div>
-                <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
               </div>
             </div>
-          </div>
 
-          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
-            <div className="px-2 py-1">
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Total APR
-                  </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {totalAPR.toFixed(2)}%
-                  </span>
+            <div className="md:w-1/4 mt-4 md:mt-0">
+              <div className="col-span-12 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+                <div className="px-2 py-1">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                        Total APR
+                      </span>
+                      <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                        {totalAPR.toFixed(2)}%
+                      </span>
+                    </div>
+                    <APRLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                  </div>
                 </div>
-                <APRLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
               </div>
             </div>
-          </div>
 
-          <div className="sm:col-span-3 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded mb-4">
-            <div className="px-2 py-1">
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Deallocation Fee
-                  </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
-                    {Number(deallocationFee) / 100}%
-                  </span>
+            <div className="md:w-1/4 mt-4 md:mt-0">
+              <div className="col-span-12 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+                <div className="px-2 py-1">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                        Deallocation Fee
+                      </span>
+                      <div className="flex space-x-1">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                          {Number(deallocationFee) / 100}%
+                        </span>
+                      </div>
+                    </div>
+                    <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                  </div>
                 </div>
-                <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
               </div>
             </div>
           </div>
