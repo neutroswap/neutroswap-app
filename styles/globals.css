@@ -196,3 +196,7 @@ body {
 ul li::before {
   content: none !important;
 }
+
+ul {
+  margin: 8pt 8pt 8pt 8pt !important;
+}
