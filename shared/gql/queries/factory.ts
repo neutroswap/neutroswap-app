@@ -59,6 +59,9 @@ export const getPositions = graphql(`
 
 export const getPoolListQuery = graphql(`
   query GetPoolList($start_date: Int!) {
+    neutroFactories {
+      totalLiquidityUSD
+    }
     pairs {
       id
       token0 {
