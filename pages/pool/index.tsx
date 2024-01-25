@@ -191,7 +191,7 @@ export default function Pool() {
     <div className="py-16">
       <div className="mb-8">
         <div className="flex justify-center items-center space-x-3">
-          <PoolIcon className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />{" "}
+          <PoolIcon className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1" />{" "}
           <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
             Liquidity Pool
           </p>
@@ -205,7 +205,7 @@ export default function Pool() {
               Pool Total Value Locked
             </div>
             {/* {!isUserFarmsLoading && !isFarmsLoading && ( */}
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
               {/* ${currencyFormat(+farms?.tvl!)} */} $100,000
             </div>
             {/* )} */}
@@ -219,12 +219,13 @@ export default function Pool() {
                 auto
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                  "text-white dark:text-primary",
+                  "!bg-primary/80 hover:bg-primary dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
                 )}
                 iconRight={
-                  <PlusIcon className="text-white dark:text-amber-600" />
+                  <PlusIcon className="text-white dark:text-primary" />
                 }
               >
                 Add Liquidity
@@ -439,12 +440,11 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
         <Button
           scale={1.25}
           className={classNames(
-            "!w-full !mt-4 !bg-transparent !rounded-lg",
-            "!border-neutral-300 dark:!border-neutral-700",
-            "hover:!border-neutral-400 dark:hover:!border-neutral-600",
-            "focus:!border-neutral-400 dark:focus:!border-neutral-600",
-            "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
-            "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
+            "!flex !items-center !mt-4 !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
           )}
           disabled={isError}
           loading={isFetchingGetPair}

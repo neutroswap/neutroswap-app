@@ -316,9 +316,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 <Button
                   auto
                   className={classNames(
-                    "!flex !items-center !py-3 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!flex !items-center !py-3 !transition-all !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                     "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                     "disabled:opacity-50"
                   )}
@@ -390,9 +390,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                 <Button
                   auto
                   className={classNames(
-                    "!flex !items-center !py-3 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!flex !items-center !py-3 !transition-all !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                     "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                     "disabled:opacity-50"
                   )}
@@ -449,9 +449,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                     <Button
                       scale={1.25}
                       className={classNames(
-                        "!flex !items-center !py-5 !min-w-0 !w-full !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                         "disabled:opacity-50"
                       )}
@@ -491,9 +491,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                     <Button
                       scale={1.25}
                       className={classNames(
-                        "!flex !items-center !py-5 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                         "disabled:opacity-50"
                       )}
@@ -515,9 +515,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                           name="addLiquidityETH"
                           scale={1.25}
                           className={classNames(
-                            "!flex !items-center !py-5 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                            "text-white dark:text-amber-600",
-                            "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                            "text-white dark:text-primary",
+                            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                             "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                             "disabled:opacity-50"
                           )}
@@ -535,9 +535,9 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
                           name="addLiquidity"
                           scale={1.25}
                           className={classNames(
-                            "!flex !items-center !py-5 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                            "text-white dark:text-amber-600",
-                            "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                            "text-white dark:text-primary",
+                            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                             "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                             "disabled:opacity-50"
                           )}

@@ -234,9 +234,9 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
           <Button
             name="createNFTPool"
             className={classNames(
-              "!flex !items-center !mt-4 !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-              "text-white dark:text-amber-600",
-              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+              "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+              "text-white dark:text-primary",
+              "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
               "!border !border-orange-600/50 dark:border-orange-400/[.12]",
               "disabled:opacity-50"
             )}
@@ -334,10 +334,11 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
             <Button
               scale={1.25}
               className={classNames(
-                "!flex !items-center !py-5 !w-full !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                "text-white dark:text-amber-600",
-                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
               )}
               loading={isApprovingToken0 || isApprovingToken1}
               onClick={() => {
@@ -366,10 +367,11 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
               scale={1.25}
               name="directlyCreatePosition"
               className={classNames(
-                "!flex !items-center !py-5 !w-full !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                "text-white dark:text-amber-600",
-                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
               )}
               loading={
                 isDirectlyCreatingPosition || isSimulatingDirectlyCreatePosition

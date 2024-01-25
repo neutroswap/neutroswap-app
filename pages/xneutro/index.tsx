@@ -160,12 +160,12 @@ export default function Xneutro() {
                     Total xNEUTRO
                   </span>
                   <div className="flex space-x-1">
-                    <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                    <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                       {totalXneutro}
                     </span>
                   </div>
                 </div>
-                <WalletLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                <WalletLogo className="w-7 h-7 text-primary rounded-full mt-3" />
               </div>
             </div>
           </div>
@@ -177,11 +177,11 @@ export default function Xneutro() {
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
                     Available xNEUTRO
                   </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                     {availableXneutro}
                   </span>
                 </div>
-                <LockLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                <LockLogo className="w-7 h-7 text-primary rounded-full mt-3" />
               </div>
             </div>
           </div>
@@ -193,11 +193,11 @@ export default function Xneutro() {
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
                     Allocated xNEUTRO
                   </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                     {allocatedAmount}
                   </span>
                 </div>
-                <LockedLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                <LockedLogo className="w-7 h-7 text-primary rounded-full mt-3" />
               </div>
             </div>
           </div>
@@ -209,11 +209,11 @@ export default function Xneutro() {
                   <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
                     Redeeming xNEUTRO
                   </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                     {redeemingAmount}
                   </span>
                 </div>
-                <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                <EpochLogo className="w-7 h-7 text-primary rounded-full mt-3" />
               </div>
             </div>
           </div>
@@ -227,10 +227,10 @@ export default function Xneutro() {
               <CardContent>
                 <Tab.Group>
                   <Tab.List className="flex items-center gap-4 border-b border-neutral-300 dark:border-neutral-700">
-                    <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
+                    <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-primary ui-selected:text-primary sm:text-base">
                       Convert
                     </Tab>
-                    <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-amber-500 ui-selected:text-amber-500 sm:text-base">
+                    <Tab className="px-1 pb-3 text-sm font-semibold leading-6 text-neutral-500 focus:outline-none ui-selected:border-b-2 ui-selected:border-primary ui-selected:text-primary sm:text-base">
                       Redeem
                     </Tab>
                   </Tab.List>
@@ -252,9 +252,9 @@ export default function Xneutro() {
             <Card>
               <Link href="/dividend">
                 <div className="flex justify-between items-center mt-2">
-                  <DividendLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                  <DividendLogo className="w-7 h-7 m-4 mx-10 text-primary" />
                   <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                    <span className="text-amber-500 text-sm font-semibold">
+                    <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
                   </div>
@@ -299,9 +299,9 @@ export default function Xneutro() {
             <Card className="mt-5">
               <Link href="/yieldbooster">
                 <div className="flex justify-between items-center mt-2">
-                  <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                  <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-primary" />
                   <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                    <span className="text-amber-500 text-sm font-semibold">
+                    <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
                   </div>
@@ -346,9 +346,9 @@ export default function Xneutro() {
             <Card className="mt-5">
               <Link href="/launchpad">
                 <div className="flex justify-between items-center mt-2">
-                  <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-amber-500" />
+                  <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-primary" />
                   <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
-                    <span className="text-amber-500 text-sm font-semibold">
+                    <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
                   </div>
@@ -356,7 +356,7 @@ export default function Xneutro() {
                 <div className="text-xl font-bold ml-9 mt-2 text-black dark:text-white">
                   Launchpad
                 </div>
-                <div className="text-sm text-neutral-500 mt-1 ml-9 sm:ml-0">
+                <div className="text-sm text-neutral-500 mt-1 ml-9 sm:ml-9">
                   Get perks and benefits from every project on Neutroswap&apos;s
                   launchpad by staking your xNEUTRO here.
                 </div>

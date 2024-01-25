@@ -143,13 +143,18 @@ export default function SPNFTSettingsModal(props: Props) {
                       value={title}
                       disabled={disabled}
                       className={cn(
-                        "flex flex-col items-center w-full p-3 text-muted-foreground hover:text-foreground data-[state=active]:text-primary focus:outline-ring rounded transition group",
+                        "flex flex-col items-center w-full p-3 text-foreground hover:text-foreground data-[state=active]:text-primary focus:outline-ring rounded transition group",
                         hidden && "sr-only",
                         disabled &&
-                          "opacity-50 cursor-not-allowed hover:text-muted-foreground"
+                          "opacity-50 cursor-not-allowed text-muted-foreground"
                       )}
                     >
-                      <Icon className={cn("w-5 h-5 mb-2")} />
+                      <Icon
+                        className={cn(
+                          "w-5 h-5 mb-2 text-primary",
+                          disabled && "text-muted-foreground"
+                        )}
+                      />
                       <span className="text-xs font-semibold leading-none -mb-px">
                         {title}
                       </span>
@@ -311,7 +316,7 @@ function Overview(props: GetNFTPositionResponse) {
     >
       <div className="flex divide-x divide-border/60 rounded-lg border border-border/60 mt-1">
         <div className="flex flex-col w-full p-2 text-center items-center justify center">
-          <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+          <div className="text-foreground text-xs font-semibold uppercase tracking-wide">
             Value
           </div>
           <span className="text-sm font-semibold">
@@ -319,7 +324,7 @@ function Overview(props: GetNFTPositionResponse) {
           </span>
         </div>
         <div className="flex flex-col w-full p-2 text-center items-center justify center">
-          <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+          <div className="text-foreground text-xs font-semibold uppercase tracking-wide">
             APR
           </div>
           <span className="text-sm font-semibold">
@@ -327,7 +332,7 @@ function Overview(props: GetNFTPositionResponse) {
           </span>
         </div>
         <div className="flex flex-col w-full p-2 text-center items-center justify center">
-          <div className="text-muted-foreground text-xs font-semibold uppercase tracking-wide">
+          <div className="text-foreground text-xs font-semibold uppercase tracking-wide">
             Earnings
           </div>
           <span className="text-sm font-semibold">
@@ -349,7 +354,7 @@ function Overview(props: GetNFTPositionResponse) {
                 {item.icon}
               </div>
               <div>
-                <div className="font-semibold">{item.name}</div>
+                <div className="font-semibold text-foreground">{item.name}</div>
                 <div className="text-xs text-muted-foreground w-60 font-medium">
                   {item.description}
                 </div>

@@ -20,6 +20,7 @@ import { tokens } from "@/shared/statics/tokenList";
 import { SupportedChainID } from "@/shared/types/chain.types";
 import getPairInfo from "@/shared/getters/getPairInfo";
 import TokenLogo from "@/components/modules/TokenLogo";
+import { classNames } from "@/shared/helpers/classNamer";
 
 interface Reward extends Omit<Token, "logo"> {
   logo: string[];
@@ -110,7 +111,13 @@ export default function PendingDividends() {
         </p>
         <div className="flex space-x-4">
           <Button
-            className="px-4 py-2 text-white border bg-amber-500 border-orange-600/50 text-xs font-semibold hover:bg-amber-600 rounded"
+            className={classNames(
+              "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm",
+              "text-white dark:text-primary",
+              "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+              "disabled:opacity-50"
+            )}
             onClick={() => harvestAll?.()}
             loading={isLoadingHarvestAll}
             disabled={!harvestAll}
@@ -252,7 +259,13 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
           onClick={() => harvest?.()}
           loading={isLoadingHarvest}
           disabled={!harvest}
-          className="px-5 py-2 border bg-grey-500 text-xs font-semibold rounded"
+          className={classNames(
+            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
+          )}
         >
           Claim
         </Button>

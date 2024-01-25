@@ -437,11 +437,14 @@ export default function Home() {
             )}
           >
             <div className="flex justify-between items-center mb-2">
-              <span className="text-lg font-semibold"> Swap </span>
+              <span className="text-lg font-semibold text-foreground">
+                {" "}
+                Swap{" "}
+              </span>
               <Popover className="relative flex items-center">
                 <>
                   <Popover.Button>
-                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer text-neutral-500 hover:text-inherit transition" />
+                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer text-muted-foreground hover:text-primary transition" />
                   </Popover.Button>
                   <Transition
                     as={Fragment}
@@ -510,13 +513,13 @@ export default function Home() {
 
             <div
               className={classNames(
-                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "py-2 px-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
                 "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
               )}
             >
               <div className="flex justify-between">
                 <div className="flex items-center">
-                  <p className="text-sm text-neutral-500 mr-2">You Sell</p>
+                  <p className="text-sm text-muted-foreground mr-2">You Sell</p>
                 </div>
                 <div
                   className="flex items-center cursor-pointer"
@@ -530,12 +533,12 @@ export default function Home() {
                     debouncedToken0(formatUnits(value, balance0.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
                   {isFetchingBalance0 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance0 && (
-                    <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
+                    <p className="text-sm text-muted-foreground hover:text-foreground/80">
                       {tokenName0 !== "WEOS" && balance0.formatted}
                       {tokenName0 === "WEOS" &&
                         Number(balance ? balance.formatted : "0").toFixed(3)}
@@ -607,7 +610,7 @@ export default function Home() {
                 <div className="transition-transform rotate-0 group-hover:rotate-180">
                   <ArrowDownIcon
                     strokeWidth={3}
-                    className="w-5 h-5 text-neutral-700 dark:text-neutral-100"
+                    className="w-5 h-5 text-muted-foreground hover:text-primary"
                   />
                 </div>
               </button>
@@ -615,13 +618,13 @@ export default function Home() {
 
             <div
               className={classNames(
-                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "py-2 px-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
                 "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
               )}
             >
               <div className="flex justify-between">
                 <div className="flex items-center">
-                  <p className="text-sm text-neutral-500 mr-2">You Buy</p>
+                  <p className="text-sm text-muted-foreground mr-2">You Buy</p>
                 </div>
                 <div
                   className="flex items-center cursor-pointer "
@@ -635,12 +638,12 @@ export default function Home() {
                     debouncedToken1(formatUnits(value, balance1.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
                   {isFetchingBalance1 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance1 && (
-                    <div className="flex space-x-1 text-neutral-500 hover:dark:text-neutral-700">
+                    <div className="flex space-x-1 text-muted-foreground hover:text-foreground/80">
                       <p className="text-sm">
                         {tokenName1 !== "WEOS" && balance1.formatted}
                         {tokenName1 === "WEOS" &&
@@ -721,12 +724,16 @@ export default function Home() {
                     <Button
                       className={classNames(
                         "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                         "disabled:opacity-50"
                       )}
-                      disabled={isInsufficientLiquidity}
+                      disabled={
+                        isInsufficientLiquidity ||
+                        !tokenAmount0 ||
+                        !tokenAmount1
+                      }
                     >
                       {isInsufficientLiquidity && "Insufficient Liquidity"}
                       {!isInsufficientLiquidity && "Swap"}
@@ -736,10 +743,10 @@ export default function Home() {
                     {({ close }) => (
                       <div>
                         <button
-                          className="w-full flex items-center space-x-2 group"
+                          className="w-full flex items-center space-x-1 group text-foreground hover:text-primary"
                           onClick={close}
                         >
-                          <ArrowSmallLeftIcon className="h-4 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500 group-hover:-translate-x-0.5 transition" />
+                          <ArrowSmallLeftIcon className="h-4 cursor-pointer group-hover:-translate-x-0.5 transition" />
                           <p className="m-0 text-neutral-600 dark:text-neutral-400">
                             Back
                           </p>
@@ -748,15 +755,20 @@ export default function Home() {
                           <>
                             <div className="text-left flex items-center justify-between ">
                               <div className="flex flex-col ">
-                                <div className="text-2xl mb-1 font-medium text-black dark:text-white">
+                                <div className="text-2xl mb-1 font-medium text-foreground">
                                   Buy{" "}
-                                  {parseFloat(tokenAmount1)
-                                    .toFixed(3)
-                                    .toString()}{" "}
+                                  <span className="text-primary">
+                                    {parseFloat(tokenAmount1)
+                                      .toFixed(3)
+                                      .toString()}{" "}
+                                  </span>
                                   {tokenName1 === "WEOS" ? "EOS" : tokenName1}
                                 </div>
-                                <div className="text-lg text-black/60 dark:text-neutral-400 font-medium">
-                                  Sell {tokenAmount0}{" "}
+                                <div className="text-lg text-muted-foreground font-medium">
+                                  Sell{" "}
+                                  <span className="text-primary">
+                                    {tokenAmount0}{" "}
+                                  </span>
                                   {tokenName0 === "WEOS" ? "EOS" : tokenName0}
                                 </div>
                               </div>
@@ -769,28 +781,28 @@ export default function Home() {
                             <div className="text-left p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-neutral-900/75 rounded-lg">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex flex-col max-w-xs">
-                                  <div className="font-medium text-black dark:text-neutral-300">
+                                  <div className="font-medium text-foreground">
                                     Slippage
                                   </div>
-                                  <div className="font-light text-sm text-black/60 dark:text-neutral-400">
+                                  <div className="font-light text-sm text-muted-foreground">
                                     The slippage you set for the trade
                                   </div>
                                 </div>
-                                <div className="text-black dark:text-neutral-300">
+                                <div className="text-foreground">
                                   {slippage}%
                                 </div>
                               </div>
                               <div className="flex items-center justify-between">
                                 <div className="flex flex-col max-w-xs">
-                                  <div className="font-medium text-black dark:text-neutral-300">
+                                  <div className="font-medium text-foreground">
                                     Minimal received
                                   </div>
-                                  <div className="font-light text-sm text-black/60 dark:text-neutral-400">
+                                  <div className="font-light text-sm text-muted-foreground">
                                     The minimum amount you are <br />{" "}
                                     guaranteeed to receive
                                   </div>
                                 </div>
-                                <div className="text-black dark:text-neutral-300">
+                                <div className="text-foreground">
                                   {parseFloat(tokenMin1).toFixed(3).toString()}{" "}
                                   ${tokenName1}
                                 </div>
@@ -798,7 +810,7 @@ export default function Home() {
                             </div>
                             <div className="p-3 my-5 flex bg-neutral-100/75 dark:bg-neutral-900/75 rounded-lg items-center justify-between">
                               <div className="flex flex-col max-w-xs">
-                                <div className="font-medium text-black dark:text-neutral-300">
+                                <div className="font-medium text-foreground">
                                   Recipient
                                 </div>
                               </div>
@@ -808,7 +820,7 @@ export default function Home() {
                                 }`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-sm"
+                                className="text-sm active:text-blue-600"
                               >
                                 {truncateEthAddress(address as string)}
                               </Link>
@@ -821,9 +833,10 @@ export default function Home() {
                                     disabled={!tokenAmount0 || !isConnected}
                                     className={classNames(
                                       "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                                      "text-white dark:text-amber-600",
-                                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                      "text-white dark:text-primary",
+                                      "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                                      "disabled:opacity-50"
                                     )}
                                     loading={isLoading}
                                   >
@@ -836,9 +849,10 @@ export default function Home() {
                                     disabled={!tokenAmount0 || !isConnected}
                                     className={classNames(
                                       "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                                      "text-white dark:text-amber-600",
-                                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                      "text-white dark:text-primary",
+                                      "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                                      "disabled:opacity-50"
                                     )}
                                     loading={isLoading}
                                   >

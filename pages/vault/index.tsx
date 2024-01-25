@@ -197,7 +197,7 @@ export default function VaultPage() {
     <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-16">
       <div>
         <div className="flex items-center justify-center space-x-3">
-          <VaultIcon className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />
+          <VaultIcon className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1" />
           <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
             Vault
           </p>
@@ -228,7 +228,7 @@ export default function VaultPage() {
             Vault Total Value Locked
           </div>
           {!isUserVaultsLoading && !isVaultsLoading && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
               ${currencyFormat(+vaults?.totalVaultValue!)}
             </div>
           )}
@@ -241,7 +241,7 @@ export default function VaultPage() {
             Your Staked Assets
           </div>
           {!isUserVaultsLoading && !isVaultsLoading && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
               ${currencyFormat(+userVaults?.totalHoldingsInUsd!)}
             </div>
           )}
@@ -254,7 +254,7 @@ export default function VaultPage() {
             Unclaimed Rewards
           </div>
           {!isUserVaultsLoading && !isVaultsLoading && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
               ${currencyFormat(+userVaults?.totalPendingTokensInUsd!)}
             </div>
           )}
@@ -307,9 +307,10 @@ export default function VaultPage() {
             onClick={() => harvestAll?.()}
             className={classNames(
               "!flex !items-center !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-              "text-white dark:text-amber-600",
-              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-              "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+              "text-white dark:text-primary",
+              "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+              "disabled:opacity-50"
             )}
           >
             Harvest All
@@ -549,9 +550,15 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
           disabled={!harvest}
           onClick={() => harvest?.()}
           loading={isHarvesting}
-          iconRight={<BanknotesIcon className="w-4 h-4 opacity-90" />}
+          iconRight={
+            <BanknotesIcon className="w-4 h-4 opacity-90 text-primary" />
+          }
           className={classNames(
-            "border-neutral-300 dark:border-neutral-800 hover:border-neutral-700 bg-transparent text-black dark:text-neutral-200 disabled:opacity-50"
+            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
           )}
         >
           Harvest
@@ -573,7 +580,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
                 className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
-                className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                 onClick={() => setStakeAmount(formatEther(neutroTokenBalance!))}
               >
                 MAX
@@ -633,7 +640,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
                 className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
-                className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                 onClick={() =>
                   setUnstakeAmount(selectedRow.totalDeposit ?? "0")
                 }
@@ -674,10 +681,10 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
               onClick={() => unstake?.()}
               className={classNames(
                 "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                "text-white dark:text-amber-600",
-                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                 "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                "disabled:opacity-50"
               )}
             >
               Unstake NEUTRO

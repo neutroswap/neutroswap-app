@@ -288,9 +288,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               <Button
                 auto
                 className={classNames(
-                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                   "disabled:opacity-50"
                 )}
@@ -310,9 +310,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 auto
                 scale={0.5}
                 className={classNames(
-                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                   "disabled:opacity-50"
                 )}
@@ -331,9 +331,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 auto
                 scale={0.5}
                 className={classNames(
-                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                   "disabled:opacity-50"
                 )}
@@ -352,9 +352,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 auto
                 scale={0.5}
                 className={classNames(
-                  "!flex !items-center !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                   "disabled:opacity-50"
                 )}
@@ -438,9 +438,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 <Button
                   scale={1.25}
                   className={classNames(
-                    "!flex !items-center !mt-2 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                     "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                     "disabled:opacity-50"
                   )}
@@ -457,9 +457,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                       name="removeLiquidity"
                       scale={1.25}
                       className={classNames(
-                        "!flex !items-center !mt-2 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                         "disabled:opacity-50"
                       )}
@@ -477,9 +477,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                       name="removeLiquidityETH"
                       scale={1.25}
                       className={classNames(
-                        "!flex !items-center !mt-2 !min-w-0 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                         "disabled:opacity-50"
                       )}

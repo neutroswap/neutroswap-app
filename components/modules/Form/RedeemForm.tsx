@@ -28,6 +28,7 @@ import { waitForTransaction } from "@wagmi/core";
 import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
 import { classNames } from "@/shared/helpers/classNamer";
+import WalletIcon from "@/public/icons/wallet.svg";
 
 const DEFAULT_PERCENTAGE = 50;
 const DAY_PER_PERCENTAGE = 3.36; // ((max redeem duration in days  - min redeem duration in days) / default percentage)
@@ -198,7 +199,7 @@ export default function RedeemForm() {
                         {...field}
                       ></input>
                       <div
-                        className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                        className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                         onClick={() =>
                           form.setValue(
                             "redeemXneutroToNeutro",
@@ -209,38 +210,15 @@ export default function RedeemForm() {
                         MAX
                       </div>
                     </div>
-                    {/* <InputGroup
-                      suffix={
-                        <button
-                          type="button"
-                          className="mr-1.5 mt-2 rounded-md px-2.5 py-1.5 text-sm font-semibold uppercase leading-5 text-neutral-600"
-                          onClick={() =>
-                            form.setValue(
-                              "redeemXneutroToNeutro",
-                              availableXneutro
-                            )
-                          }
-                        >
-                          Max
-                        </button>
-                      }
-                    >
-                      <Input
-                        type="number"
-                        className="mt-2"
-                        placeholder="0.00"
-                        {...field}
-                      ></Input>
-                    </InputGroup> */}
                   </FormControl>
                 </FormItem>
               )}
             ></FormField>
           </div>
           <div className="flex justify-end text-xs text-neutral-500 -mt-2">
-            <div>
-              <span className="mr-2">wallet balance:</span>
-              <span>{availableXneutro} xNEUTRO</span>
+            <div className="flex items-center">
+              <WalletIcon className="mr-1 w-3 h-3 md:w-4 md:h-4 text-neutral-400 dark:text-neutral-600" />
+              <span>{availableXneutro} NEUTRO</span>
             </div>
           </div>
           <div className="flex justify-between mt-3">
@@ -283,9 +261,10 @@ export default function RedeemForm() {
                 <Button
                   className={classNames(
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
                   )}
                   disabled={!approveXneutro}
                   loading={isApprovingXneutro}
@@ -299,9 +278,10 @@ export default function RedeemForm() {
               <Button
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
                 )}
                 disabled={!redeemXneutro}
                 loading={isRedeemXneutroLoading}

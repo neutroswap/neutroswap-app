@@ -215,7 +215,7 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
           <button
             disabled={!finalizeRedeem}
             onClick={() => finalizeRedeem?.()}
-            className="rounded-md px-3.5 py-2 text-sm font-semibold text-amber-500 hover:bg-amber-50 hover:text-amber-600"
+            className="rounded-md px-3.5 py-2 text-sm font-semibold text-primary hover:bg-amber-50 hover:text-primary/90"
           >
             Claim NEUTRO
           </button>

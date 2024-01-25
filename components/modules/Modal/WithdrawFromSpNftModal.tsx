@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import {
   Form,
   FormControl,
@@ -284,7 +284,9 @@ export default function WithdrawFromSpNftModal(
       <form onSubmit={form.handleSubmit(() => withdrawPosition?.())}>
         <div className="animate-in slide-in-from-right-1/4 duration-200">
           <div>
-            <div className="font-semibold">Withdraw from your position</div>
+            <div className="font-semibold text-foreground">
+              Withdraw from your position
+            </div>
             <span className="text-sm text-muted-foreground">
               Recover underlying token from this spNFT
             </span>
@@ -304,19 +306,24 @@ export default function WithdrawFromSpNftModal(
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormControl>
-                      <Input type="number" placeholder="0.00" {...field} />
+                      <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                        <input
+                          type="number"
+                          placeholder="0.0"
+                          className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                          {...field}
+                        ></input>
+                        <div
+                          className="mr-3 text-sm text-primary cursor-pointer font-semibold"
+                          onClick={() => form.setValue("lpToken", props.amount)} // TODO: change amount to read contract
+                        >
+                          MAX
+                        </div>
+                      </div>
                     </FormControl>
                   </FormItem>
                 )}
               />
-              <Button
-                type="button"
-                variant="outline"
-                className="text-sm"
-                onClick={() => form.setValue("lpToken", props.amount)} // change amount to read contract
-              >
-                MAX
-              </Button>
             </div>
             {/* <div className="flex items-center space-x-2 mt-2">
               <Checkbox id="autobind" />
@@ -329,7 +336,7 @@ export default function WithdrawFromSpNftModal(
             </div> */}
 
             <div className="space-y-1">
-              <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+              <div className="text-xs text-foreground font-semibold uppercase tracking-wide mt-6 mb-2">
                 Estimates
               </div>
               <div className="flex justify-between">
@@ -358,18 +365,28 @@ export default function WithdrawFromSpNftModal(
 
           <div className="flex space-x-2 mt-4">
             <Button
-              variant="outline"
-              className="w-full"
+              className={classNames(
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
+              )}
               onClick={() => props.onClose()}
             >
               Cancel
             </Button>
             <Button
-              type="submit"
-              variant="outline"
-              className="w-full text-black dark:text-white"
+              className={classNames(
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
+              )}
               disabled={!withdrawPosition}
               loading={isWithdrawPositionLoading}
+              onClick={() => withdrawPosition?.()}
             >
               Remove position
             </Button>

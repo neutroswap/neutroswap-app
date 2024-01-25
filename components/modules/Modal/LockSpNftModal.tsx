@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import { Form } from "@/components/elements/Form";
 import MiniButton from "@/components/elements/MiniButton";
 import {
@@ -36,6 +36,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
 import { CaretDown } from "@phosphor-icons/react";
 import { NEUTRO_HELPER_CONTRACT } from "@/shared/helpers/contract";
+import { classNames } from "@/shared/helpers/classNamer";
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
@@ -327,7 +328,7 @@ export default function LockSpNftModal(
     // </Modal>
     <div className="animate-in slide-in-from-right-1/4 duration-200">
       <div>
-        <div className="font-semibold">Lock your spNFT</div>
+        <div className="font-semibold text-foreground">Lock your spNFT</div>
         <span className="text-sm text-muted-foreground">
           Increase your yield by providing long-term liquidity
         </span>
@@ -371,7 +372,7 @@ export default function LockSpNftModal(
         </div>
 
         <div className="space-y-1">
-          <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+          <div className="text-xs text-foreground font-semibold uppercase tracking-wide mt-6 mb-2">
             Estimates
           </div>
           <div className="flex justify-between">
@@ -400,16 +401,25 @@ export default function LockSpNftModal(
 
       <div className="flex space-x-2 mt-4">
         <Button
-          className="w-full"
-          variant="outline"
+          className={classNames(
+            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
+          )}
           onClick={() => props.onClose()}
         >
           Cancel
         </Button>
         <Button
-          type="submit"
-          variant="outline"
-          className="w-full text-black dark:text-white"
+          className={classNames(
+            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
+          )}
           loading={isLockPositionLoading}
           disabled={!lockPosition}
           onClick={() => lockPosition?.()}

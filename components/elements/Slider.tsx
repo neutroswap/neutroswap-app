@@ -42,7 +42,7 @@ const Slider = React.forwardRef<
       )}
     >
       <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-900">
-        <SliderPrimitive.Range className="absolute h-full bg-orange-500 dark:bg-orange-800" />
+        <SliderPrimitive.Range className="absolute h-full bg-primary dark:bg-primary" />
       </SliderPrimitive.Track>
       {/* <span
         className={classNames(
@@ -65,7 +65,7 @@ const Slider = React.forwardRef<
         onMouseLeave={() => setIsHovered(false)}
         className={classNames(
           "block h-3 w-3 rounded-full hover:scale-125 transition-all",
-          "bg-orange-800 dark:bg-orange-500",
+          "bg-primary dark:bg-primary",
           "disabled:pointer-events-none disabled:opacity-50",
           "border-1.5 border-neutral-400 dark:border-neutral-800",
           "focus:outline-none focus:ring-1 focus:ring-neutral-400 focus:ring-offset-2 dark:focus:ring-neutral-500 dark:focus:ring-offset-neutral-900"

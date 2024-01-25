@@ -68,10 +68,10 @@ export default function UserDividends() {
     <div className="col-span-5 mt-8 flex flex-col rounded border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm dark:shadow-dark-lg">
       <div>
         <div className="flex flex-row items-center w-full md:p-8 justify-between">
-          <p className="m-0 text-left font-semibold whitespace-nowrap">
+          <div className="text-left font-semibold whitespace-nowrap">
             Your allocation
-          </p>
-          <div className="flex space-x-4">
+          </div>
+          <div className="flex space-x-2">
             <DeallocateDividendModal />
             <AllocateDividendModal />
           </div>

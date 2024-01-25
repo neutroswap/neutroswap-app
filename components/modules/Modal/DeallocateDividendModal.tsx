@@ -27,12 +27,13 @@ import {
   useContractWrite,
   usePrepareContractWrite,
 } from "wagmi";
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import useDebounceValue from "@/shared/hooks/useDebounceValue";
 import {
   DIVIDENDS_CONTRACT,
   XNEUTRO_CONTRACT,
 } from "@/shared/helpers/contract";
+import { classNames } from "@/shared/helpers/classNamer";
 
 export default function AllocateDividendModal() {
   const { address } = useAccount();
@@ -92,7 +93,18 @@ export default function AllocateDividendModal() {
   return (
     <Modal>
       <ModalOpenButton>
-        <button className="border rounded px-3 py-1 font-semibold">-</button>
+        <Button
+          scale={0.25}
+          className={classNames(
+            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm !text-base",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
+          )}
+        >
+          -
+        </Button>
       </ModalOpenButton>
       <ModalContents>
         {() => (
@@ -112,29 +124,25 @@ export default function AllocateDividendModal() {
                     render={({ field }) => (
                       <FormItem>
                         <FormControl>
-                          <InputGroup
-                            suffix={
-                              <button
-                                type="button"
-                                className="mt-2 mr-4 items-center justify-center rounded-md text-sm font-semibold uppercase leading-5 text-neutral-600"
-                                onClick={() =>
-                                  form.setValue(
-                                    "deallocateXneutro",
-                                    availableAllocatedXneutro
-                                  )
-                                }
-                              >
-                                MAX
-                              </button>
-                            }
-                          >
-                            <Input
+                          <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                            <input
                               type="number"
-                              className="mt-2"
-                              placeholder="0.00"
+                              placeholder="0.0"
+                              className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
                               {...field}
-                            ></Input>
-                          </InputGroup>
+                            ></input>
+                            <div
+                              className="mr-3 text-sm text-primary cursor-pointer font-semibold"
+                              onClick={() =>
+                                form.setValue(
+                                  "deallocateXneutro",
+                                  availableAllocatedXneutro
+                                )
+                              }
+                            >
+                              MAX
+                            </div>
+                          </div>
                         </FormControl>
                       </FormItem>
                     )}
@@ -147,11 +155,16 @@ export default function AllocateDividendModal() {
                   </div>
                 </div>
                 <Button
-                  type="submit"
-                  className="w-full mt-5 text-neutral-500"
-                  variant="outline"
+                  className={classNames(
+                    "!flex !items-center !py-5 !mt-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
+                  )}
                   disabled={!deallocate}
                   loading={isLoadingDeallocate}
+                  onClick={() => deallocate?.()}
                 >
                   Deallocate xNEUTRO
                 </Button>

@@ -144,10 +144,11 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
                 <Button
                   auto
                   className={classNames(
-                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm ",
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
                   )}
                 >
                   Convert to spNFT
@@ -181,8 +182,8 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
             <p className="m-0 text-neutral-500 text-sm">Assets in Pool</p>
             <div className="space-y-3 mt-4">
               <div className="flex space-x-4 items-center">
-                <div className="flex items-center px-2 py-1 bg-orange-300/20 rounded-lg">
-                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">
+                <div className="flex items-center px-2 py-1 bg-primary/20 rounded-lg">
+                  <span className="text-primary dark:text-primary text-xs font-medium">
                     50%
                   </span>
                 </div>
@@ -201,8 +202,8 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
                 </div>
               </div>
               <div className="flex space-x-4 items-center">
-                <div className="flex items-center px-2 py-1 bg-orange-300/20 rounded-lg">
-                  <span className="text-orange-600 dark:text-orange-400 text-xs font-medium">
+                <div className="flex items-center px-2 py-1 bg-primary/20 rounded-lg">
+                  <span className="text-primary dark:text-primary text-xs font-medium">
                     50%
                   </span>
                 </div>

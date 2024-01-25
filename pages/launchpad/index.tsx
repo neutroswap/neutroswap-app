@@ -16,7 +16,7 @@ export default function Launchpad() {
       <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-16">
         <div>
           <div className="flex items-center justify-center space-x-3">
-            <Rocket className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />
+            <Rocket className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1" />
             <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
               Launchpad
             </p>
@@ -34,10 +34,11 @@ export default function Launchpad() {
               data-tally-width="800"
               data-tally-auto-close="-2000"
               className={classNames(
-                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-sm",
-                "text-white dark:text-amber-600",
-                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                "!flex !items-center !py-5 !transition-all !w-full  !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
               )}
             >
               Apply to Launch
@@ -45,7 +46,7 @@ export default function Launchpad() {
           </div>
         </div>
 
-        <div className="grid w-full h-80 grid-cols-3 gap-6 mt-2 ">
+        <div className="grid w-full h-80 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-2 ">
           <div className="flex flex-col w-full items-center justify-center rounded-lg border-[3px] border-dashed">
             <Plus className="w-12 h-12 text-muted-foreground/50" />
             <p className="text-muted-foreground font-medium mt-2">
