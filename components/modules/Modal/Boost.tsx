@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import {
   Collapsible,
   CollapsibleContent,
@@ -37,6 +37,8 @@ import {
   XNEUTRO_CONTRACT,
   YIELDBOOSTER_CONTRACT,
 } from "@/shared/helpers/contract";
+import WalletIcon from "@/public/icons/wallet.svg";
+import { classNames } from "@/shared/helpers/classNamer";
 
 export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
   const { address } = useAccount();
@@ -258,9 +260,12 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
         <div className="mt-4">
           <div className="flex items-center justify-between">
             <div className="text-sm">Amount</div>
-            <span className="text-sm text-muted-foreground">
-              Balance {Number(formatEther(BigInt(balance))).toFixed(2)} xNEUTRO
-            </span>
+            <div className="flex items-center">
+              <WalletIcon className="mr-1 w-3 h-3 md:w-4 md:h-4 text-neutral-400 dark:text-neutral-600" />
+              <span className="text-sm">
+                {Number(formatEther(BigInt(balance))).toFixed(2)} xNEUTRO
+              </span>
+            </div>
           </div>
           <div className="flex items-center space-x-2 mt-1">
             <FormField
@@ -269,20 +274,26 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
-                    <Input type="number" placeholder="0.00" {...field} />
+                    <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                      <input
+                        type="number"
+                        placeholder="0.0"
+                        className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                        {...field}
+                      ></input>
+                      <div
+                        className="mr-3 text-sm text-primary cursor-pointer font-semibold"
+                        onClick={() =>
+                          form.setValue("boost", formatEther(BigInt(balance)))
+                        }
+                      >
+                        MAX
+                      </div>
+                    </div>
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button
-              variant="outline"
-              className="text-sm"
-              onClick={() =>
-                form.setValue("boost", formatEther(BigInt(balance)))
-              }
-            >
-              MAX
-            </Button>
           </div>
           <div className="space-y-1">
             <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
@@ -355,9 +366,13 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
           if (!isApproved) {
             return (
               <Button
-                type="button"
-                variant="outline"
-                className="w-full"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 disabled={!approveUsage}
                 loading={isApprovingUsage}
                 onClick={() => approveUsage?.()}
@@ -368,9 +383,13 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
           }
           return (
             <Button
-              type="submit"
-              variant="outline"
-              className="w-full"
+              className={classNames(
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
+              )}
               disabled={!boost}
               loading={isBoostLoading}
               onClick={() => boost?.()}

@@ -344,7 +344,7 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
                             {...field}
                           ></input>
                           <div
-                            className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                            className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                             onClick={() =>
                               form.setValue("lpToken", formatEther(ownedLP))
                             }
@@ -413,8 +413,8 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
                 <Button
                   className={classNames(
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                    "text-white dark:text-primary",
+                    "!bg-primary/80 hover:bg-primary dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                     "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                     "disabled:opacity-50"
                   )}
@@ -430,8 +430,8 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
               <Button
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "text-white dark:text-primary",
+                  "!bg-primary/80 hover:bg-primary dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                   "disabled:opacity-50"
                 )}

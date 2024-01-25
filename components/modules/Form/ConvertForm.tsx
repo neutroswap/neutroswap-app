@@ -162,7 +162,7 @@ export default function ConvertForm() {
                         {...field}
                       ></input>
                       <div
-                        className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                        className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                         onClick={() =>
                           form.setValue(
                             "convertNeutroToXneutro",
@@ -173,29 +173,6 @@ export default function ConvertForm() {
                         MAX
                       </div>
                     </div>
-                    {/* <InputGroup
-                      suffix={
-                        <button
-                          type="button"
-                          className="mr-1.5 mt-2 rounded-md px-2.5 py-1.5 text-sm font-semibold uppercase leading-5 text-neutral-600"
-                          onClick={() =>
-                            form.setValue(
-                              "convertNeutroToXneutro",
-                              availableNeutro
-                            )
-                          }
-                        >
-                          Max
-                        </button>
-                      }
-                    >
-                      <Input
-                        type="number"
-                        className="mt-2"
-                        placeholder="0.00"
-                        {...field}
-                      ></Input>
-                    </InputGroup> */}
                   </FormControl>
                 </FormItem>
               )}
@@ -203,7 +180,6 @@ export default function ConvertForm() {
           </div>
           <div className="flex justify-end text-xs text-neutral-500 -mt-2">
             <div className="flex items-center">
-              {/* <span className="mr-2">wallet balance:</span> */}
               <WalletIcon className="mr-1 w-3 h-3 md:w-4 md:h-4 text-neutral-400 dark:text-neutral-600" />
               <span>{availableNeutro} NEUTRO</span>
             </div>
@@ -214,9 +190,10 @@ export default function ConvertForm() {
                 <Button
                   className={classNames(
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                    "text-white dark:text-amber-600",
-                    "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
                   )}
                   disabled={!approveNeutro}
                   loading={isApprovingNeutro}
@@ -230,12 +207,14 @@ export default function ConvertForm() {
               <Button
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
                 )}
                 disabled={!convertNeutro}
                 loading={isConvertNeutroLoading}
+                onClick={() => convertNeutro?.()}
               >
                 Convert NEUTRO
               </Button>

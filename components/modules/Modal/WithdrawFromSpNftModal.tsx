@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import {
   Form,
   FormControl,
@@ -83,208 +83,13 @@ export default function WithdrawFromSpNftModal(
   const remainingValue = +props.amount - +debouncedLpTokenAmount;
 
   return (
-    // <Modal>
-    //   <ModalOpenButton>
-    //     <MiniButton type="button">
-    //       <ArrowUpTrayIcon className="w-7 h-7 mx-auto text-amber-500" />
-    //     </MiniButton>
-    //   </ModalOpenButton>
-
-    //   <ModalContents>
-    //     {({ close }) => (
-    //       <Form {...form}>
-    //         {/* <form onSubmit={form.handleSubmit(onSubmit)}> */}
-    //         <div className="box-border relative">
-    //           <XCircleIcon
-    //             onClick={() => close()}
-    //             className="h-6 cursor-pointer text-black dark:text-white opacity-50 absolute right-0"
-    //           />
-    //           <div className="flex items-center justify-between">
-    //             <div className="flex items-center justify-center w-full text-xl font-bold text-neutral-500 ">
-    //               Token Name
-    //             </div>
-    //           </div>
-
-    //           <div className="flex justify-center items-center mt-2 gap-2">
-    //             <span className="text-amber-500 text-xl font-semibold">
-    //               Withdraw
-    //             </span>
-    //             <span className="text-xl font-semibold text-black dark:text-white">
-    //               from your position
-    //             </span>
-    //           </div>
-
-    //           <div className="flex justify-center">
-    //             <div className="text-neutral-500">
-    //               Recover underlying tokens from a spNFT
-    //             </div>
-    //           </div>
-
-    //           <div className="mb-2 font-medium bg-neutral-800 rounded-sm mt-2">
-    //             <div className="px-2 py-1">Amount</div>
-    //           </div>
-
-    //           <div className="text-xs text-neutral-500">
-    //             You need to own ETH-USDC.e LP tokens to directly add more
-    //             liquidity to this position. If that&apos;s not the case, head to
-    //             the&nbsp;
-    //             <Link
-    //               href="/pool"
-    //               className="text-neutral-500 hover:text-amber-500"
-    //             >
-    //               liquidity page
-    //             </Link>
-    //             &nbsp;first.
-    //           </div>
-
-    //           <FormField
-    //             control={form.control}
-    //             name="allocateXneutro"
-    //             render={({ field }) => (
-    //               <FormItem>
-    //                 <FormControl>
-    //                   <InputGroup
-    //                     suffix={
-    //                       <button
-    //                         type="button"
-    //                         className="mt-2 mr-4 items-center justify-center rounded-md text-sm font-semibold uppercase leading-5 text-neutral-600"
-    //                         // onClick={() =>
-    //                         //   form.setValue(
-    //                         //     "addLiquidity",
-    //                         //     availableLpToken
-    //                         //   )
-    //                         // }
-    //                       >
-    //                         MAX
-    //                       </button>
-    //                     }
-    //                   >
-    //                     <Input
-    //                       type="number"
-    //                       className="mt-2 !py-[12px]"
-    //                       placeholder="0.00"
-    //                       {...field}
-    //                     ></Input>
-    //                   </InputGroup>
-    //                 </FormControl>
-    //               </FormItem>
-    //             )}
-    //           ></FormField>
-
-    //           <div className="flex justify-end text-xs text-neutral-500 mt-2">
-    //             <div>
-    //               <span>Wallet Balance:</span>
-    //               {/* <span> {availableXneutro} xNEUTRO</span> */}
-    //             </div>
-    //           </div>
-
-    //           <div className="mt-4 font-medium bg-neutral-800 rounded-sm">
-    //             <div className="px-2 py-1">Options</div>
-    //           </div>
-
-    //           <div className="w-full mt-2 px-2 ">
-    //             <RadioGroup
-    //               value={isAutoUnbind}
-    //               onChange={setIsAutoUnbind}
-    //               className="flex justify-between"
-    //             >
-    //               <RadioGroup.Label className="flex flex-col ">
-    //                 <span>LP auto-unbind</span>
-    //                 <span className="text-xs text-neutral-500">
-    //                   Auto unbind your underlying LP tokens
-    //                 </span>
-    //               </RadioGroup.Label>
-    //               <div className="flex items-center bg-neutral-800 cursor-pointer rounded-md p-1">
-    //                 <RadioGroup.Option value={true}>
-    //                   {({ checked }) => (
-    //                     <div
-    //                       className={classNames(
-    //                         checked
-    //                           ? "text-neutral-900 dark:text-neutral-900 bg-white dark:bg-amber-500 shadow"
-    //                           : "text-neutral-500 dark:text-neutral-400 ",
-    //                         "p-1 rounded-md text-sm "
-    //                       )}
-    //                     >
-    //                       ON
-    //                     </div>
-    //                   )}
-    //                 </RadioGroup.Option>
-    //                 <RadioGroup.Option value={false}>
-    //                   {({ checked }) => (
-    //                     <div
-    //                       className={classNames(
-    //                         checked
-    //                           ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-900 shadow"
-    //                           : "text-neutral-500 dark:text-neutral-400",
-    //                         "p-1 rounded-md text-sm"
-    //                       )}
-    //                     >
-    //                       OFF
-    //                     </div>
-    //                   )}
-    //                 </RadioGroup.Option>
-    //               </div>
-    //             </RadioGroup>
-    //           </div>
-
-    //           <div className="mt-4 font-medium bg-neutral-800 rounded-sm">
-    //             <div className="px-2 py-1">Estimates</div>
-    //           </div>
-
-    //           <div className="flex flex-col px-2 mt-2 text-sm">
-    //             <div className="w-full flex justify-between">
-    //               <div>Withdrawal Amount</div>
-    //               <div className="text-black dark:text-white">$0.2</div>
-    //             </div>
-
-    //             <div className="w-full flex justify-between">
-    //               <div>Remaining Amount</div>
-    //               <div className="text-black dark:text-white">$0.2</div>
-    //             </div>
-    //           </div>
-
-    //           <div className="flex gap-2 mt-4">
-    //             <Button
-    //               type="button"
-    //               variant="outline"
-    //               onClick={close}
-    //               className="!text-black !dark:text-white"
-    //             >
-    //               Cancel
-    //             </Button>
-    //             {/* {!isApproved && (
-    //             <Button
-    //               type="submit"
-    //               variant="outline"
-    //               disabled={!approve}
-    //               loading={isLoadingApprove}
-    //             >
-    //               Approve
-    //             </Button>
-    //           )} */}
-    //             {/* {!!isApproved && ( */}
-    //             <Button
-    //               type="submit"
-    //               variant="solid"
-    //               // disabled={!addLiquidity}
-    //               // loading={isLoadingAddLiquidity}
-    //               className="!text-black dark:text-white"
-    //             >
-    //               Withdraw
-    //             </Button>
-    //             {/* )} */}
-    //           </div>
-    //         </div>
-    //         {/* </form> */}
-    //       </Form>
-    //     )}
-    //   </ModalContents>
-    // </Modal>
     <Form {...form}>
       <form onSubmit={form.handleSubmit(() => withdrawPosition?.())}>
         <div className="animate-in slide-in-from-right-1/4 duration-200">
           <div>
-            <div className="font-semibold">Withdraw from your position</div>
+            <div className="font-semibold text-foreground">
+              Withdraw from your position
+            </div>
             <span className="text-sm text-muted-foreground">
               Recover underlying token from this spNFT
             </span>
@@ -304,32 +109,27 @@ export default function WithdrawFromSpNftModal(
                 render={({ field }) => (
                   <FormItem className="w-full">
                     <FormControl>
-                      <Input type="number" placeholder="0.00" {...field} />
+                      <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                        <input
+                          type="number"
+                          placeholder="0.0"
+                          className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                          {...field}
+                        ></input>
+                        <div
+                          className="mr-3 text-sm text-primary cursor-pointer font-semibold"
+                          onClick={() => form.setValue("lpToken", props.amount)}
+                        >
+                          MAX
+                        </div>
+                      </div>
                     </FormControl>
                   </FormItem>
                 )}
               />
-              <Button
-                type="button"
-                variant="outline"
-                className="text-sm"
-                onClick={() => form.setValue("lpToken", props.amount)} // change amount to read contract
-              >
-                MAX
-              </Button>
             </div>
-            {/* <div className="flex items-center space-x-2 mt-2">
-              <Checkbox id="autobind" />
-              <label
-                htmlFor="autobind"
-                className="text-sm mt-1 select-none leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Auto unbind your LP token
-              </label>
-            </div> */}
-
             <div className="space-y-1">
-              <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+              <div className="text-xs text-foreground font-semibold uppercase tracking-wide mt-6 mb-2">
                 Estimates
               </div>
               <div className="flex justify-between">
@@ -358,18 +158,28 @@ export default function WithdrawFromSpNftModal(
 
           <div className="flex space-x-2 mt-4">
             <Button
-              variant="outline"
-              className="w-full"
+              className={classNames(
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
+              )}
               onClick={() => props.onClose()}
             >
               Cancel
             </Button>
             <Button
-              type="submit"
-              variant="outline"
-              className="w-full text-black dark:text-white"
+              className={classNames(
+                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
+              )}
               disabled={!withdrawPosition}
               loading={isWithdrawPositionLoading}
+              onClick={() => withdrawPosition?.()}
             >
               Remove position
             </Button>

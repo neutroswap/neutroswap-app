@@ -89,6 +89,7 @@ export default function FarmPage() {
     isLoading: isFarmsLoading,
     error: isFarmsError,
   } = useFarmList();
+
   const {
     data: userFarms,
     isLoading: isUserFarmsLoading,
@@ -109,6 +110,7 @@ export default function FarmPage() {
       });
       setMergedData(combinedData);
       setAllFarm(combinedData);
+      setOwnedFarm(userFarms.farms);
     }
     combineData();
   }, [farms, userFarms]);
@@ -208,7 +210,7 @@ export default function FarmPage() {
     <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-16">
       <div>
         <div className="flex justify-center items-center space-x-3">
-          <LeafIcon className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />
+          <LeafIcon className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1" />
           <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
             Yield Farming
           </p>
@@ -221,7 +223,7 @@ export default function FarmPage() {
           <AlertTitle>V1 Farm has been deprecated.</AlertTitle>
           <AlertDescription>
             Please harvest all of your rewards, withdraw your deposited LP
-            Tokens, and wrap it into an spNFT to continue farming. &nbsp;
+            Tokens, and wrap it into an spNFT to continue farming.{" "}
             <Link
               href="https://docs.neutroswap.io/neutroswap-v2/staked-positions-spnfts"
               target="_blank"
@@ -240,7 +242,7 @@ export default function FarmPage() {
             Farm Total Value Locked
           </div>
           {!isUserFarmsLoading && !isFarmsLoading && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
               ${currencyFormat(+farms?.tvl!)}
             </div>
           )}
@@ -251,7 +253,7 @@ export default function FarmPage() {
             Your Staked Assets
           </div>
           {!isUserFarmsLoading && !isFarmsLoading && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
               ${currencyFormat(+userFarms?.holdings!)}
             </div>
           )}
@@ -262,7 +264,7 @@ export default function FarmPage() {
             Unclaimed Rewards
           </div>
           {!isUserFarmsLoading && !isFarmsLoading && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
               ${currencyFormat(+userFarms?.totalPendingTokenInUsd!)}
             </div>
           )}
@@ -325,9 +327,10 @@ export default function FarmPage() {
               onClick={() => harvestAll?.()}
               className={classNames(
                 "!flex !items-center !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                "text-white dark:text-amber-600",
-                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                "disabled:opacity-50"
               )}
             >
               Harvest All
@@ -425,7 +428,7 @@ export default function FarmPage() {
                 <Loading spaceRatio={2.5} />
               </div>
             )}
-            {!!ownedFarm.length && (
+            {!!Boolean(ownedFarm.length) && (
               <div className="overflow-x-scroll">
                 <Table
                   data={ownedFarm}
@@ -598,17 +601,6 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     },
   });
 
-  console.log(
-    "Total staked",
-    // parseFloat(selectedRow.details.totalStaked!).toFixed(10)
-    selectedRow.details.totalStaked
-  );
-  console.log(
-    "Total staked in USD",
-    // Number(selectedRow.details.totalStakedInUsd).toFixed(2)
-    selectedRow.details.totalStakedInUsd
-  );
-
   return (
     <div className="flex flex-col w-full">
       <div className="flex space-x-3 items-center">
@@ -652,9 +644,15 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
           disabled={!harvest}
           onClick={() => harvest?.()}
           loading={isHarvesting}
-          iconRight={<BanknotesIcon className="w-4 h-4 opacity-90" />}
+          iconRight={
+            <BanknotesIcon className="w-4 h-4 opacity-90 text-white dark:text-primary " />
+          }
           className={classNames(
-            "border-neutral-300 dark:border-neutral-800 hover:border-neutral-700 bg-transparent text-black dark:text-neutral-200 disabled:opacity-50"
+            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
           )}
         >
           Harvest
@@ -676,7 +674,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
                 className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
-                className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                 onClick={() => setStakeAmount(formatEther(lpTokenBalance!))}
               >
                 MAX
@@ -736,7 +734,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
                 className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
               ></input>
               <div
-                className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
+                className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                 onClick={() =>
                   setUnstakeAmount(selectedRow.details.totalStaked ?? "0")
                 }
@@ -769,10 +767,10 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
               onClick={() => unstake?.()}
               className={classNames(
                 "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                "text-white dark:text-amber-600",
-                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                "text-white dark:text-primary",
+                "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                 "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                "disabled:opacity-50 disabled:cursor-not-allowed"
+                "disabled:opacity-50"
               )}
             >
               Unstake LP Tokens

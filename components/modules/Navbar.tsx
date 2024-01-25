@@ -85,25 +85,6 @@ const Navbar: React.FC<Props> = () => {
             <Link href="/">
               <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
             </Link>
-            {/* <Tabs
-            hideDivider
-            hideBorder
-            onChange={(route) => router.push(route)}
-            className="hidden lg:block !w-full"
-            initialValue={"/" + router.asPath.split("/")[1]}
-          >
-            {tabs.map((tab) => {
-              if (tab.hidden) return null;
-              return (
-                <Tabs.Item
-                  key={tab.label}
-                  label={tab.label}
-                  value={tab.value}
-                />
-              );
-            })}
-          </Tabs> */}
-
             <Navigation />
           </div>
           <div className="flex space-x-2">
@@ -233,7 +214,7 @@ const Navbar: React.FC<Props> = () => {
           </div>
         </div>
 
-        <div className="submenu__inner">
+        <div className="submenu__inner !normal-case">
           <Tabs
             hideDivider
             onChange={(route) => router.push(route)}
@@ -247,7 +228,7 @@ const Navbar: React.FC<Props> = () => {
                   key={tab.label}
                   label={tab.label}
                   value={tab.value}
-                  className="!p-0"
+                  className="!p-0 "
                 />
               );
             })}
@@ -258,6 +239,8 @@ const Navbar: React.FC<Props> = () => {
         {`
           .submenu__inner :global(.content) {
             display: none;
+            text-transform: none;
+            !important
           }
         `}
       </style>

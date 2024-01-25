@@ -7,6 +7,7 @@ import {
 import EpochLogo from "@/public/logo/epoch.svg";
 import APYLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
+import WalletIcon from "@/public/icons/wallet.svg";
 
 import { useTheme, Loading, Button } from "@geist-ui/core";
 import { cn, currencyFormat } from "@/shared/utils";
@@ -122,7 +123,7 @@ export default function YieldBooster() {
                         Total Allocation
                       </span>
                       <div className="flex space-x-1">
-                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                           {Number(formatEther(data?.[0] ?? BigInt(0))).toFixed(
                             2
                           )}
@@ -132,7 +133,7 @@ export default function YieldBooster() {
                         </span>
                       </div>
                     </div>
-                    <AllocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                    <AllocationLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
               </div>
@@ -147,7 +148,7 @@ export default function YieldBooster() {
                         Your Allocation
                       </span>
                       <div className="flex space-x-1">
-                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                           {formattedUserAllocation}
                         </span>
                         <span className="text-sm text-neutral-500 mt-3">
@@ -155,7 +156,7 @@ export default function YieldBooster() {
                         </span>
                       </div>
                     </div>
-                    <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                    <EpochLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
               </div>
@@ -169,11 +170,11 @@ export default function YieldBooster() {
                       <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
                         Deallocation Fee
                       </span>
-                      <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                      <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                         {Number(deallocationFee) / 100}%
                       </span>
                     </div>
-                    <APYLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                    <APYLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
               </div>

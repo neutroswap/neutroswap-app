@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/elements/Button";
+import { Button } from "@geist-ui/core";
 import {
   Form,
   FormControl,
@@ -24,6 +24,8 @@ import { useBalanceAndAllowance } from "@/shared/hooks/useBalanceAndAllowance";
 import { ERC20_ABI, NEUTRO_HELPER_ABI, NFT_POOL_ABI } from "@/shared/abi";
 import { waitForTransaction } from "@wagmi/core";
 import { NEUTRO_HELPER_CONTRACT } from "@/shared/helpers/contract";
+import WalletIcon from "@/public/icons/wallet.svg";
+import { classNames } from "@/shared/helpers/classNamer";
 
 export default function AddToSpNftModal(
   props: GetNFTPositionResponse & { onClose: () => void }
@@ -118,7 +120,9 @@ export default function AddToSpNftModal(
     <Form {...form}>
       <div className="animate-in slide-in-from-right-1/4 duration-200">
         <div>
-          <div className="font-semibold">Add more LP to your spNFT</div>
+          <div className="font-semibold text-foreground">
+            Add more LP to your spNFT
+          </div>
           <span className="text-sm text-muted-foreground">
             Stake your spNFT into genesis pool to earn extra yield
           </span>
@@ -127,9 +131,10 @@ export default function AddToSpNftModal(
         <div className="mt-4">
           <div className="flex items-center justify-between">
             <div className="text-sm">Amount</div>
-            <span className="text-sm text-muted-foreground">
-              Balance {formatEther(BigInt(balance))} LP
-            </span>
+            <div className="flex items-center">
+              <WalletIcon className="mr-1 w-3 h-3 md:w-4 md:h-4 text-neutral-400 dark:text-neutral-600" />
+              <span className="text-sm">{formatEther(BigInt(balance))} LP</span>
+            </div>
           </div>
           <div className="flex items-center space-x-2 mt-1">
             <FormField
@@ -138,23 +143,29 @@ export default function AddToSpNftModal(
               render={({ field }) => (
                 <FormItem className="w-full">
                   <FormControl>
-                    <Input type="number" placeholder="0.00" {...field} />
+                    <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                      <input
+                        type="number"
+                        placeholder="0.0"
+                        className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                        {...field}
+                      ></input>
+                      <div
+                        className="mr-3 text-sm text-primary cursor-pointer font-semibold"
+                        onClick={() =>
+                          form.setValue("lpToken", formatEther(BigInt(balance)))
+                        }
+                      >
+                        MAX
+                      </div>
+                    </div>
                   </FormControl>
                 </FormItem>
               )}
             />
-            <Button
-              variant="outline"
-              className="text-sm"
-              onClick={() =>
-                form.setValue("lpToken", formatEther(BigInt(balance)))
-              }
-            >
-              MAX
-            </Button>
           </div>
           <div className="space-y-1">
-            <div className="text-xs font-semibold uppercase tracking-wide mt-6 mb-2">
+            <div className="text-xs text-foreground font-semibold uppercase tracking-wide mt-6 mb-2">
               Estimates
             </div>
             <div className="flex justify-between">
@@ -184,8 +195,13 @@ export default function AddToSpNftModal(
 
         <div className="flex space-x-2 mt-4">
           <Button
-            variant="outline"
-            className="w-full"
+            className={classNames(
+              "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+              "text-white dark:text-primary",
+              "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+              "disabled:opacity-50"
+            )}
             onClick={() => props.onClose()}
           >
             Cancel
@@ -195,9 +211,13 @@ export default function AddToSpNftModal(
             if (!isApproved) {
               return (
                 <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
+                  className={classNames(
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                    "text-white dark:text-primary",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
+                  )}
                   disabled={!approveLp}
                   loading={isApprovingLp}
                   onClick={() => approveLp?.()}
@@ -208,9 +228,13 @@ export default function AddToSpNftModal(
             }
             return (
               <Button
-                type="submit"
-                variant="outline"
-                className="w-full text-black dark:text-white"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 disabled={!addToPosition}
                 loading={isAddToPositionLoading}
                 onClick={() => addToPosition?.()}

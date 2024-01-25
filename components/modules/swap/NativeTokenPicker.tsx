@@ -96,7 +96,7 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
                 className={({ active }) =>
                   classNames(
                     "relative cursor-pointer select-none py-2 px-2 mb-0 mx-1 rounded-lg before:hidden transition group",
-                    active && "bg-orange-100/50 dark:bg-orange-400/[.08]",
+                    active && "bg-primary/10 dark:bg-primary/[.08]",
                     !active && "text-gray-900"
                   )
                 }
@@ -115,8 +115,8 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
                       />
                       <span
                         className={classNames(
-                          "block truncate font-medium group-hover:text-orange-900 group-hover:dark:text-orange-300 transition",
-                          selected && "text-orange-900 dark:text-orange-300",
+                          "block truncate font-medium group-hover:text-primary group-hover:dark:text-primary/30 transition",
+                          selected && "text-primary dark:text-primary/30",
                           !selected && "text-neutral-500"
                         )}
                       >
@@ -124,7 +124,7 @@ const NativeTokenPicker: React.FC<NativeTokenPicker> = (props) => {
                       </span>
                     </div>
                     {selected ? (
-                      <span className="flex items-center text-amber-600">
+                      <span className="flex items-center text-primary">
                         <CheckIcon className="h-4 w-4" aria-hidden="true" />
                       </span>
                     ) : null}

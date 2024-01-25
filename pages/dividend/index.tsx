@@ -149,10 +149,10 @@ export default function Dividend() {
                   <div className="flex justify-between">
                     <div className="flex flex-col">
                       <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                        Total xNEUTRO
+                        Total <span className="normal-case">xNEUTRO</span>
                       </span>
                       <div className="flex space-x-1">
-                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                           {Number(totalAllocation).toFixed(2)}
                         </span>
                         <span className="text-sm text-neutral-500 mt-3">
@@ -160,7 +160,7 @@ export default function Dividend() {
                         </span>
                       </div>
                     </div>
-                    <AllocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                    <AllocationLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
               </div>
@@ -175,7 +175,7 @@ export default function Dividend() {
                         Total Reward Current Epochs
                       </span>
                       <div className="flex space-x-1">
-                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                           $
                           {currencyFormat(
                             parseFloat(formatEther(BigInt(totalCurrentEpoch)))
@@ -183,7 +183,7 @@ export default function Dividend() {
                         </span>
                       </div>
                     </div>
-                    <EpochLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                    <EpochLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
               </div>
@@ -197,11 +197,11 @@ export default function Dividend() {
                       <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
                         Total APR
                       </span>
-                      <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                      <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                         {totalAPR.toFixed(2)}%
                       </span>
                     </div>
-                    <APRLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                    <APRLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
               </div>
@@ -216,12 +216,12 @@ export default function Dividend() {
                         Deallocation Fee
                       </span>
                       <div className="flex space-x-1">
-                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
                           {Number(deallocationFee) / 100}%
                         </span>
                       </div>
                     </div>
-                    <DeallocationLogo className="w-7 h-7 text-amber-500 rounded-full mt-3" />
+                    <DeallocationLogo className="w-7 h-7 text-primary  rounded-full mt-3" />
                   </div>
                 </div>
               </div>
