@@ -64,6 +64,8 @@ let CHAIN_ID: any;
 let MULTICALL_ADDR: string;
 let FARM_CONTRACT: string;
 let NEUTRO_PRICE: any
+let ALL_TOKEN_PRICES_CACHED: any = null;
+let LAST_FETCHED_TOKEN_PRICES = 0;
 
 export async function getAllFarms(): Promise<Farm[] | null> {
   const { data: network, } = await supabaseClient
@@ -133,16 +135,7 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
 
   if (!farms) { return null }
 
-  let rpcCalls = []
   let totalLpCalls = []
-
-  // get all pids
-  const rps: CallContext[] = farms.map(farm => ({
-    reference: 'rps',
-    methodName: 'poolRewardsPerSec',
-    methodParameters: [farm.pid]
-  }));
-  rpcCalls.push(...rps)
 
   // get all pids
   const totalLps: CallContext[] = farms.map(farm => ({
@@ -160,13 +153,6 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
   })
 
   let contractCallContext: ContractCallContext[] = []
-  let call1 = 'rpcCalls'
-  contractCallContext.push({
-    reference: call1,
-    contractAddress: FARM_CONTRACT,
-    abi: NEUTRO_FARM_ABI as any,
-    calls: rpcCalls
-  })
 
   let call2 = 'totalLpCalls'
   contractCallContext.push({
@@ -182,23 +168,22 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
 
   let tvl = 0;
   for (const farm of farms) {
-    const rpsResult = contractCalls.results[call1].callsReturnContext.filter(res => res.methodParameters[0] === farm.pid);
     const stakedResult = contractCalls.results[call2].callsReturnContext.filter(res => res.methodParameters[0] === farm.pid);
 
-    if (rpsResult) {
-      // const liquidity = result[0].returnValues;
-      const rps = rpsResult[0].returnValues[3];
-      const totalStaked = stakedResult[0].returnValues[0];
-      farm.totalStaked = formatEther(BigNumber.from(totalStaked)),
 
-        farm.details = {
-          // totalSupplyLpToken: "0",
-          apr: BigNumber.from(1).toString(),
-          // apr: await calculateApr(rps[0].hex, liquidity[0].hex),
-          // rps: parseEther(BigNumber.from(rps[0].hex).toString()).toNumber().toFixed(2)
-          rps: formatEther(BigNumber.from(rps[0].hex))
-        };
-    }
+    // const liquidity = result[0].returnValues;
+    const rps = 0
+    const totalStaked = stakedResult[0].returnValues[0];
+    farm.totalStaked = formatEther(BigNumber.from(totalStaked)),
+
+      farm.details = {
+        // totalSupplyLpToken: "0",
+        apr: BigNumber.from(1).toString(),
+        // apr: await calculateApr(rps[0].hex, liquidity[0].hex),
+        // rps: parseEther(BigNumber.from(rps[0].hex).toString()).toNumber().toFixed(2)
+        rps: formatEther(0)
+      };
+
     // const totalLiquidity = parseFloat(farm.details?.totalLiquidity ?? '0');
     // tvl += totalLiquidity;
   }
@@ -211,18 +196,8 @@ export async function composeData(farms: Farm[] | null): Promise<YieldFarm | nul
   return result
 }
 
-// export async function calculateApr(yieldFarm: YieldFarm, rps: BigNumber, totalLiqiudity: BigNumber): Promise<{ apr: BigNumber[], updatedFarms: Farm[] }> {
-export async function addTokenPrice(yieldFarm: YieldFarm): Promise<YieldFarm> {
-  // const NEUTRO_PRICE = Number(process.env.NEUTRO_PRICE) || 0.01;
+export async function addTokenPrice(yieldFarm: YieldFarm, tokenPrices: any): Promise<YieldFarm> {
 
-  // Construct an array of all the token symbols to fetch prices for
-  const tokens = yieldFarm.farms
-    .map((farm) => [farm.token0gecko, farm.token1gecko])
-    .flat()
-
-  // Fetch the token prices for all the tokens
-  // console.log(tokens)
-  const tokenPrices = await getPrice(tokens.join(','));
   NEUTRO_PRICE = tokenPrices["neutroswap"].usd
 
   // Update the token prices on each farm
@@ -340,11 +315,9 @@ export async function calculateApr(yieldFarm: YieldFarm): Promise<YieldFarm> {
     farm.details.apr = apr.toFixed(2).toString()
   }
 
-  let sortedByAPR = yieldFarm.farms.sort((a: any, b: any) => b.details?.apr - a.details?.apr)
-
   const result: YieldFarm = {
     tvl: yieldFarm.tvl,
-    farms: sortedByAPR
+    farms: yieldFarm.farms
   }
 
   return result
@@ -356,6 +329,22 @@ export async function getPrice(id: string): Promise<any> {
     vs_currencies: 'usd'
   })
   return tokenPrice
+}
+
+export async function cachingTokenPrice(farmsData: any) {
+  // Construct an array of all the token symbols to fetch prices for
+  const tokens = farmsData
+    .map((farm: any) => [farm.token0gecko, farm.token1gecko])
+    .flat()
+
+  const currentTime = Date.now();
+
+  if (ALL_TOKEN_PRICES_CACHED && currentTime - LAST_FETCHED_TOKEN_PRICES < 5 * 60 * 1000) {
+  } else {
+    const newPrice = await getPrice(tokens);
+    ALL_TOKEN_PRICES_CACHED = newPrice;
+    LAST_FETCHED_TOKEN_PRICES = currentTime;
+  }
 }
 
 export default async function handler(
@@ -372,7 +361,9 @@ export default async function handler(
         if (!data) {
           throw Error('error multicall')
         }
-        let tp = await addTokenPrice(data)
+        // cached the token prices
+        await cachingTokenPrice(data.farms);
+        let tp = await addTokenPrice(data, ALL_TOKEN_PRICES_CACHED)
         let vol = await totalValueOfLiquidity(tp);
         if (!vol) {
           throw Error('error multicall')
