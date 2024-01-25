@@ -214,7 +214,7 @@ const Navbar: React.FC<Props> = () => {
           </div>
         </div>
 
-        <div className="submenu__inner">
+        <div className="submenu__inner !normal-case">
           <Tabs
             hideDivider
             onChange={(route) => router.push(route)}
@@ -228,7 +228,7 @@ const Navbar: React.FC<Props> = () => {
                   key={tab.label}
                   label={tab.label}
                   value={tab.value}
-                  className="!p-0"
+                  className="!p-0 "
                 />
               );
             })}
@@ -239,6 +239,8 @@ const Navbar: React.FC<Props> = () => {
         {`
           .submenu__inner :global(.content) {
             display: none;
+            text-transform: none;
+            !important
           }
         `}
       </style>
