@@ -6,9 +6,9 @@ import {
   useNetwork,
   usePrepareContractWrite,
 } from "wagmi";
-import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI, XNEUTRO_ABI } from "@/shared/abi";
+import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI } from "@/shared/abi";
 import { useMemo } from "react";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 import { waitForTransaction } from "@wagmi/core";
 import { currencyFormat } from "@/shared/utils";
 import {
@@ -105,7 +105,7 @@ export default function PendingDividends() {
 
   return (
     <div className="-space-y-12">
-      <div className="flex flex-row items-center justify-between w-full md:p-8 md:pt-0">
+      <div className="flex flex-row items-center justify-between w-full md:p-8 md:pt-0 mb-8">
         <p className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
           Your dividends
         </p>
@@ -126,15 +126,20 @@ export default function PendingDividends() {
           </Button>
         </div>
       </div>
-
-      {!!data &&
-        data[0].map((reward, index) => {
-          const info = getRewardInfo(reward.token);
-          if (!info) return;
-          return (
-            <AllocationReward key={index} props={reward} info={reward.token} />
-          );
-        })}
+      <div className="grid grid-cols-2 sm:flex flex-col">
+        {!!data &&
+          data[0].map((reward, index) => {
+            const info = getRewardInfo(reward.token);
+            if (!info) return;
+            return (
+              <AllocationReward
+                key={index}
+                props={reward}
+                info={reward.token}
+              />
+            );
+          })}
+      </div>
     </div>
   );
 }
@@ -230,14 +235,14 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
   }, [props.amount]);
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between w-full sm:p-8 sm:mt-0">
-      <div className="flex items-center flex-wrap sm:flex-nowrap mt-20 sm:mt-0">
+    <div className="flex flex-row items-center justify-between sm:p-8 sm:mt-0 ">
+      <div className="flex flex-wrap items-center mt-16 m-4 sm:m-0 sm:mt-0">
         <div className="flex">
           {reward.logo.map((logo) => (
             <TokenLogo className="w-8 h-8" src={logo} key={logo} />
           ))}
         </div>
-        <div className="ml-2">
+        <div className="ml-2 -mt-2">
           <span className="text-sm text-neutral-500">{reward.symbol}</span>
           <br />
           <span className="text-sm">
@@ -260,11 +265,12 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
           loading={isLoadingHarvest}
           disabled={!harvest}
           className={classNames(
-            "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm",
+            "!flex !items-center !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm",
             "text-white dark:text-primary",
             "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
             "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-            "disabled:opacity-50"
+            "disabled:opacity-50",
+            "hidden sm:block"
           )}
         >
           Claim
