@@ -43,7 +43,7 @@ import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import { XNEUTRO_ABI } from "@/shared/abi";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
-import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 
 export default function NewPositionModal() {
   const { address } = useAccount();

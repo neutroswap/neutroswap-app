@@ -34,7 +34,7 @@ import { Slider } from "@/components/elements/Slider";
 import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
 import { tokens } from "@/shared/statics/tokenList";
-import NativeTokenPicker from "@/components/modules/Swap/NativeTokenPicker";
+import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
 import {
   DEFAULT_CHAIN_ID,
   supportedChainID,
@@ -108,7 +108,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
   const { data: totalValueOfLiquidity } = useContractRead({
     address: NEUTRO_HELPER_CONTRACT,
     abi: NEUTRO_HELPER_ABI,
-    functionName: "getTotalValueOfLiquidity",
+    functionName: "getTokenPrice",
     args: [router.query.id as `0x${string}`],
   });
 

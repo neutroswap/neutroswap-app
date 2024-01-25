@@ -106,7 +106,7 @@ export default function PendingDividends() {
   return (
     <div className="-space-y-12">
       <div className="flex flex-row items-center justify-between w-full md:p-8 md:pt-0">
-        <p className="m-0 text-left font-semibold whitespace-nowrap">
+        <p className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
           Your dividends
         </p>
         <div className="flex space-x-4">
@@ -230,8 +230,8 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
   }, [props.amount]);
 
   return (
-    <div className="flex flex-row items-center justify-between w-full md:p-8 md:mt-0">
-      <div className="flex items-center">
+    <div className="flex flex-col sm:flex-row items-center justify-between w-full sm:p-8 sm:mt-0">
+      <div className="flex items-center flex-wrap sm:flex-nowrap mt-20 sm:mt-0">
         <div className="flex">
           {reward.logo.map((logo) => (
             <TokenLogo className="w-8 h-8" src={logo} key={logo} />
@@ -254,7 +254,7 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
           </span>
         </div>
       </div>
-      <div>
+      <div className="mt-4 sm:mt-0 flex items-center">
         <Button
           onClick={() => harvest?.()}
           loading={isLoadingHarvest}

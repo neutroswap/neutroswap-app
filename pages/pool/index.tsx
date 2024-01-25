@@ -11,7 +11,7 @@ import {
   ModalContents,
   ModalOpenButton,
 } from "@/components/elements/Modal";
-import { TokenPicker } from "@/components/modules/Swap/TokenPicker";
+import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
 import {
   useContractRead,
@@ -95,6 +95,7 @@ export default function Pool() {
       apr: number;
     }[]
   >([]);
+  const [totalLiquidityUSD, setTotalLiquidityUSD] = useState<number[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -114,46 +115,18 @@ export default function Pool() {
         let pools = res.data;
         if (!pools) throw new Error("Failed to fetch data");
 
-        //       const dataWithApr = pools.pairs.map((item) => {
-        //         const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
-        //           return prev + parseFloat(curr.dailyTxns);
-        //         }, 0);
-
-        //         // Aggregate daily volume for each day
-        //         const dailyVolume = item.pairDayData.reduce((total, day) => {
-        //           return total + parseFloat(day.dailyVolumeUSD);
-        //         }, 0);
-
-        //         return {
-        //           ...item,
-        //           apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
-        //           dailyVolume: dailyVolume.toFixed(2), // Format the total daily volume
-        //         };
-        //       });
-
-        //       // Sort the dataWithApr array based on reserveUSD in descending order
-        //       const sortedData = dataWithApr
-        //         .slice()
-        //         .sort((a, b) => b.reserveUSD - a.reserveUSD);
-
-        //       setDataWithApr(sortedData);
-        //     } catch (error) {
-        //       console.error("Error fetching data:", error);
-        //     }
-        //   }
-
-        //   fetchData();
-        // }, []);
-
         const dataWithApr = pools.pairs.map((item) => {
-          const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
-            return prev + parseFloat(curr.dailyTxns);
-          }, 0);
+          // const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
+          //   return prev + parseFloat(curr.dailyTxns);
+          // }, 0);
 
           // Aggregate daily volume for each day
           const dailyVolume = item.pairDayData.reduce((total, day) => {
             return total + parseFloat(day.dailyVolumeUSD);
           }, 0);
+
+          const fees = dailyVolume * 0.003;
+          const sevenDaysFeeUsd = fees * 7;
 
           return {
             ...item,
@@ -178,6 +151,15 @@ export default function Pool() {
           .slice()
           .sort((a, b) => b.reserveUSD - a.reserveUSD);
 
+        const totalLiquidityUsd = pools.neutroFactories.map((item) =>
+          parseFloat(item.totalLiquidityUSD)
+        );
+
+        const formattedTotalLiquidityUsd = totalLiquidityUsd
+          .filter((value) => !isNaN(value))
+          .map((value) => Math.floor(value));
+
+        setTotalLiquidityUSD(formattedTotalLiquidityUsd);
         setDataWithApr(sortedData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -204,12 +186,9 @@ export default function Pool() {
             <div className="mb-2 text-xs font-bold uppercase text-neutral-500">
               Pool Total Value Locked
             </div>
-            {/* {!isUserFarmsLoading && !isFarmsLoading && ( */}
             <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-              {/* ${currencyFormat(+farms?.tvl!)} */} $100,000
+              ${totalLiquidityUSD}
             </div>
-            {/* )} */}
-            {/* {isUserFarmsLoading && isFarmsLoading && <Spinner className="mt-5" />} */}
           </div>
         </div>
         <div className="flex justify-end">
@@ -248,8 +227,8 @@ export default function Pool() {
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-60">Asset</TableHead>
               <TableHead className="text-right">Liquidity</TableHead>
-
               <TableHead className="text-right">Volume 24H</TableHead>
+              <TableHead className="text-right">APR</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -288,6 +267,9 @@ export default function Pool() {
                 </TableCell>
                 <TableCell className="text-right">
                   ${pool.dailyVolume}
+                </TableCell>
+                <TableCell className="text-right">
+                  {pool.apr.toFixed(2)}%
                 </TableCell>
                 <TableCell className="flex justify-end text-right">
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />

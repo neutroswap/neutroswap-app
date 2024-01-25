@@ -111,67 +111,78 @@ export default function YieldBooster() {
         </p>
       </div>
       <hr className="w-full border-neutral-200/80 dark:border-neutral-800/80 my-5" />
-      <div className="flex w-full box-border">
-        <div className="grid grid-cols-12 w-full box-border space-x-3">
-          <div className="col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
-            <div className="px-2 py-1">
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Total Allocation
-                  </span>
-                  <div className="flex space-x-1">
-                    <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                      {Number(formatEther(data?.[0] ?? BigInt(0))).toFixed(2)}
-                    </span>
-                    <span className="text-sm text-neutral-500 mt-3">
-                      xNEUTRO
-                    </span>
+      <div className="flex flex-col md:flex-row w-full box-border">
+        <div className="flex flex-col md:flex-row w-full box-border">
+          <div className="md:flex md:space-x-3 w-full box-border">
+            <div className="md:w-1/3">
+              <div className="col-span-12 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+                <div className="px-2 py-1">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                        Total Allocation
+                      </span>
+                      <div className="flex space-x-1">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
+                          {Number(formatEther(data?.[0] ?? BigInt(0))).toFixed(
+                            2
+                          )}
+                        </span>
+                        <span className="text-sm text-neutral-500 mt-3">
+                          xNEUTRO
+                        </span>
+                      </div>
+                    </div>
+                    <AllocationLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
-                <AllocationLogo className="w-7 h-7 text-primary rounded-full mt-3" />
               </div>
             </div>
-          </div>
 
-          <div className="col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
-            <div className="px-2 py-1">
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Your Allocation
-                  </span>
-                  <div className="flex space-x-1">
-                    <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                      {formattedUserAllocation}
-                    </span>
-                    <span className="text-sm text-neutral-500 mt-3">
-                      xNEUTRO
-                    </span>
+            <div className="md:w-1/3 mt-4 md:mt-0">
+              <div className="col-span-12 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+                <div className="px-2 py-1">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                        Your Allocation
+                      </span>
+                      <div className="flex space-x-1">
+                        <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
+                          {formattedUserAllocation}
+                        </span>
+                        <span className="text-sm text-neutral-500 mt-3">
+                          xNEUTRO
+                        </span>
+                      </div>
+                    </div>
+                    <EpochLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
-                <EpochLogo className="w-7 h-7 text-primary rounded-full mt-3" />
               </div>
             </div>
-          </div>
 
-          <div className="col-span-4 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
-            <div className="px-2 py-1">
-              <div className="flex justify-between">
-                <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                    Deallocation Fee
-                  </span>
-                  <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                    {Number(deallocationFee) / 100}%
-                  </span>
+            <div className="md:w-1/3 mt-4 md:mt-0">
+              <div className="col-span-12 p-2 border border-neutral-200/80 dark:border-neutral-800/80 rounded">
+                <div className="px-2 py-1">
+                  <div className="flex justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
+                        Deallocation Fee
+                      </span>
+                      <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
+                        {Number(deallocationFee) / 100}%
+                      </span>
+                    </div>
+                    <APYLogo className="w-7 h-7 text-primary rounded-full mt-3" />
+                  </div>
                 </div>
-                <APYLogo className="w-7 h-7 text-primary rounded-full mt-3" />
               </div>
             </div>
           </div>
         </div>
       </div>
+
       <div className="flex flex-col sm:flex-row w-full space-y-6 sm:space-y-0 sm:space-x-6 mt-8">
         <div className="w-full space-y-6">
           <Provider value={nftClient}>

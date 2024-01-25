@@ -141,7 +141,7 @@ export default function LockSpNftModal(
   const { data: ownedLpInUSD } = useContractRead({
     address: NEUTRO_HELPER_CONTRACT,
     abi: NEUTRO_HELPER_ABI,
-    functionName: "getTotalValueOfLiquidity",
+    functionName: "getTokenPrice",
     args: [props.lpToken],
   });
 
