@@ -166,14 +166,6 @@ export async function composeData(
   }));
   calls.push(...userInfo);
 
-  // get all pids
-  const pendingTokens: CallContext[] = farms.map((farm) => ({
-    reference: "pending",
-    methodName: "pendingTokens",
-    methodParameters: [farm.pid, address],
-  }));
-  calls.push(...pendingTokens);
-
   const multicall = new Multicall({
     multicallCustomContractAddress: MULTICALL_ADDR,
     ethersProvider: provider,
@@ -202,12 +194,11 @@ export async function composeData(
 
     if (result) {
       const totalStaked = result[0].returnValues[0];
-      const pendingTokens = result[1].returnValues[3];
 
       farm.details = {
         totalStaked: formatEther(BigNumber.from(totalStaked.hex)),
         totalStakedInUsd: "",
-        pendingTokens: formatEther(BigNumber.from(pendingTokens[0].hex)),
+        pendingTokens: formatEther(0),
         pendingTokensInUsd: "",
       };
     }
@@ -907,6 +898,7 @@ export default async function handler(
         }
         // cached the token prices
         await cachingTokenPrice(data.farms);
+        console.log("Fetched all effective prices", ALL_TOKEN_PRICES_CACHED)
         let tp = await addTokenPrice(data, ALL_TOKEN_PRICES_CACHED);
         let a = await totalValueOfLiquidity(tp);
         let response = {

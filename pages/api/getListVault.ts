@@ -101,16 +101,7 @@ export async function composeData(
     return null;
   }
 
-  let rpcCalls = [];
   let totalLpCalls = [];
-
-  // get all pids
-  const rps: CallContext[] = vaults.map((vault) => ({
-    reference: "rps",
-    methodName: "poolRewardsPerSec",
-    methodParameters: [vault.pid],
-  }));
-  rpcCalls.push(...rps);
 
   // get all pids
   const totalLps: CallContext[] = vaults.map((vault) => ({
@@ -128,13 +119,6 @@ export async function composeData(
   });
 
   let contractCallContext: ContractCallContext[] = [];
-  let call1 = "rpcCalls";
-  contractCallContext.push({
-    reference: call1,
-    contractAddress: VAULT_CONTRACT,
-    abi: NEUTRO_VAULT_ABI as any,
-    calls: rpcCalls,
-  });
 
   let call2 = "totalLpCalls";
   contractCallContext.push({
@@ -150,32 +134,29 @@ export async function composeData(
 
   let totalVaultValue = 0;
   for (const vault of vaults) {
-    const rpsResult = contractCalls.results[call1].callsReturnContext.filter(
-      (res) => res.methodParameters[0] === vault.pid
-    );
     const stakedResult = contractCalls.results[call2].callsReturnContext.filter(
       (res) => res.methodParameters[0] === vault.pid
     );
 
-    if (rpsResult) {
-      const rps = rpsResult[0].returnValues[3];
-      const totalStaked = stakedResult[0].returnValues[0];
 
-      vault.tokenPrice = parseFloat(CACHED_NEUTRO_PRICE);
-      vault.totalStaked = formatEther(BigNumber.from(totalStaked.hex));
-      vault.valueOfVault = (vault.tokenPrice * parseFloat(vault.totalStaked))
-        .toFixed(2)
-        .toString();
-      vault.details = {
-        apr: calculateApr(
-          formatEther(BigNumber.from(rps[0].hex)),
-          vault.valueOfVault
-        ),
-        rps: formatEther(BigNumber.from(rps[0].hex)),
-      };
-      totalVaultValue += parseFloat(vault.valueOfVault);
-    }
+    const rps = 0
+    const totalStaked = stakedResult[0].returnValues[0];
+
+    vault.tokenPrice = parseFloat(CACHED_NEUTRO_PRICE);
+    vault.totalStaked = formatEther(BigNumber.from(totalStaked.hex));
+    vault.valueOfVault = (vault.tokenPrice * parseFloat(vault.totalStaked))
+      .toFixed(2)
+      .toString();
+    vault.details = {
+      apr: calculateApr(
+        formatEther(0),
+        vault.valueOfVault
+      ),
+      rps: formatEther(0),
+    };
+    totalVaultValue += parseFloat(vault.valueOfVault);
   }
+
 
   let result: Vaults = {
     totalVaultValue: totalVaultValue.toFixed(2).toString(),

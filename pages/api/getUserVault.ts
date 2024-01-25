@@ -107,14 +107,6 @@ export async function composeData(
   calls.push(...userInfo);
 
   // get all pids
-  const pendingTokens: CallContext[] = vaults.map((vault) => ({
-    reference: "pending",
-    methodName: "pendingTokens",
-    methodParameters: [vault.pid, address],
-  }));
-  calls.push(...pendingTokens);
-
-  // get all pids
   const unlockAt: CallContext[] = vaults.map((vault) => ({
     reference: "unlockAt",
     methodName: "userLockedUntil",
@@ -152,9 +144,9 @@ export async function composeData(
 
     if (result) {
       const totalStaked = result[0].returnValues[0];
-      const pendingTokens = result[1].returnValues[3];
+      const pendingTokens = 0
       const unlockTime = BigNumber.from(
-        result[2].returnValues[0].hex
+        result[1].returnValues[0].hex
       ).toString();
 
       vault.totalDeposit = parseFloat(
@@ -165,7 +157,7 @@ export async function composeData(
       )
         .toFixed(2)
         .toString();
-      vault.pendingTokens = formatEther(BigNumber.from(pendingTokens[0].hex));
+      vault.pendingTokens = formatEther(0);
       vault.pendingTokensInUsd = (
         parseFloat(vault.pendingTokens) * parseFloat(CACHED_NEUTRO_PRICE)
       )
@@ -212,6 +204,8 @@ export async function cachingNeutroPrice() {
     CACHED_NEUTRO_PRICE = newPrice["neutroswap"].usd;
     LAST_FETCHED_NEUTRO_PRICE = currentTime;
   }
+
+  console.log("Fetched $NEUTRO effective price", CACHED_NEUTRO_PRICE)
 }
 
 export default async function handler(

@@ -454,11 +454,7 @@ export default function FarmPage() {
                   <Table.Column
                     prop="pending"
                     label="Total Staked"
-                    render={(_value, rowData: any) => (
-                      <span>
-                        {currencyFormat(Number(rowData.details.totalStaked))} LP
-                      </span>
-                    )}
+                    render={(_value, rowData: any) => <span>{Number(rowData.details.totalStaked).toFixed(8)} LP</span>}
                   />
                   <Table.Column
                     prop="details"
