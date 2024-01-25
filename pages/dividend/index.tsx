@@ -4,7 +4,7 @@ import APRLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
 import { useContractReads, useNetwork } from "wagmi";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI } from "@/shared/abi";
-import { formatEther, formatUnits } from "viem";
+import { formatEther } from "viem";
 import { currencyFormat } from "@/shared/utils";
 import Countdown from "@/components/modules/Countdown";
 import UserDividends from "./modules/UserDividends";
@@ -18,7 +18,6 @@ import { tokens } from "@/shared/statics/tokenList";
 import { SupportedChainID } from "@/shared/types/chain.types";
 import getPairInfo from "@/shared/getters/getPairInfo";
 import TokenLogo from "@/components/modules/TokenLogo";
-import dayjs from "dayjs";
 
 interface Reward extends Omit<Token, "logo"> {
   logo: string[];
@@ -221,7 +220,7 @@ export default function Dividend() {
                         </span>
                       </div>
                     </div>
-                    <DeallocationLogo className="w-7 h-7 text-primary  rounded-full mt-3" />
+                    <DeallocationLogo className="w-7 h-7 text-primary rounded-full mt-3" />
                   </div>
                 </div>
               </div>
@@ -309,7 +308,6 @@ export default function Dividend() {
             </div>
           </div>
         </div>
-
         <UserDividends />
       </div>
     </div>
