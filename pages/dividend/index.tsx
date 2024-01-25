@@ -230,7 +230,7 @@ export default function Dividend() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border space-x-3">
+      <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border sm:space-x-3">
         <div className="sm:col-span-7 w-full mt-8">
           <div className="flex flex-col rounded">
             <div className="border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg">

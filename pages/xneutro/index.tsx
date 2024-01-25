@@ -235,7 +235,7 @@ export default function Xneutro() {
       </div>
 
       <div className="flex w-full box-border overflow-x-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border space-x-3">
+        <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border sm:space-x-3">
           <div className="sm:col-span-4 mt-8 flex flex-col">
             <Card className="flex flex-col gap-4">
               <CardContent>
