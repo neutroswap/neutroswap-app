@@ -34,15 +34,22 @@ const Footer: React.FC<Props> = ({ handleThemeSwitch }) => {
             <Button
               auto
               onClick={handleThemeSwitch}
+              className="z-0"
               icon={
                 <>
-                  {theme.type as ThemeType === "ndark" && <MoonIcon className="w-4 h-4" />}
-                  {theme.type as ThemeType === "nlight" && <SunIcon className="w-4 h-4" />}
+                  {(theme.type as ThemeType) === "ndark" && (
+                    <MoonIcon className="w-4 h-4" />
+                  )}
+                  {(theme.type as ThemeType) === "nlight" && (
+                    <SunIcon className="w-4 h-4" />
+                  )}
                 </>
               }
               scale={2 / 3}
               px={0.6}
-            >{theme.type.slice(1)}</Button>
+            >
+              {theme.type.slice(1)}
+            </Button>
           </div>
         </div>
       </div>

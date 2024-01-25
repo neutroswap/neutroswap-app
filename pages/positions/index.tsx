@@ -131,19 +131,19 @@ export default function PoolPosition() {
 
       <Tabs defaultValue="spnft" className="w-full">
         <TabsList>
-          <TabsTrigger value="spnft">spNFT</TabsTrigger>
           <TabsTrigger value="lp">Liquidity V2</TabsTrigger>
+          <TabsTrigger value="spnft">spNFT</TabsTrigger>
         </TabsList>
+        <TabsContent value="lp">
+          <Provider value={factoryClient}>
+            <LiquidityPool />
+          </Provider>
+        </TabsContent>
         <TabsContent value="spnft">
           <Provider value={nftClient}>
             <QueryClientProvider client={queryClient}>
               <SPNFTPool />
             </QueryClientProvider>
-          </Provider>
-        </TabsContent>
-        <TabsContent value="lp">
-          <Provider value={factoryClient}>
-            <LiquidityPool />
           </Provider>
         </TabsContent>
       </Tabs>

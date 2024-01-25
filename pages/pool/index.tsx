@@ -40,7 +40,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { cn, currencyCompactFormat } from "@/shared/utils";
 dayjs.extend(utc);
-
+import { currencyFormat } from "@/shared/utils";
 import {
   Table,
   TableBody,
@@ -95,7 +95,7 @@ export default function Pool() {
       apr: number;
     }[]
   >([]);
-  const [totalLiquidityUSD, setTotalLiquidityUSD] = useState<number[]>([]);
+  const [totalLiquidityUSD, setTotalLiquidityUSD] = useState<number>(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -155,11 +155,11 @@ export default function Pool() {
           parseFloat(item.totalLiquidityUSD)
         );
 
-        const formattedTotalLiquidityUsd = totalLiquidityUsd
-          .filter((value) => !isNaN(value))
-          .map((value) => Math.floor(value));
+        // const formattedTotalLiquidityUsd = totalLiquidityUsd
+        //   .filter((value) => !isNaN(value))
+        //   .map((value) => Math.floor(value));
 
-        setTotalLiquidityUSD(formattedTotalLiquidityUsd);
+        setTotalLiquidityUSD(totalLiquidityUsd[0] || 0);
         setDataWithApr(sortedData);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -187,7 +187,7 @@ export default function Pool() {
               Pool Total Value Locked
             </div>
             <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-              ${totalLiquidityUSD}
+              ${currencyFormat(totalLiquidityUSD)}
             </div>
           </div>
         </div>
