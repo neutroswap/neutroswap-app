@@ -16,6 +16,8 @@ import { formatEther } from "viem";
 import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
 import { multicall } from "@wagmi/core";
+import { Button } from "@geist-ui/core";
+import { classNames } from "@/shared/helpers/classNamer";
 
 export default function VestingXneutro() {
   const { address } = useAccount();
@@ -212,13 +214,18 @@ const ClaimableRedeem = ({ data }: { data: any }) => {
           </span>
         </div>
         {claimableText === "Claimable" && (
-          <button
+          <Button
             disabled={!finalizeRedeem}
             onClick={() => finalizeRedeem?.()}
-            className="rounded-md px-3.5 py-2 text-sm font-semibold text-primary hover:bg-amber-50 hover:text-primary/90"
+            className={classNames(
+              "!flex !items-center !px-3.5 !py-2 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-sm",
+              "text-white dark:text-amber-600",
+              "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+              "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+            )}
           >
             Claim NEUTRO
-          </button>
+          </Button>
         )}
       </div>
     </div>
