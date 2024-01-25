@@ -347,13 +347,11 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
               {isToken0NeedApproval ? (
                 <div className="flex items-center">
                   <p className="-mb-0.5">Approve {token0.symbol}</p>
-                  <TokenLogo className="w-4 h-4 ml-2" src={token0.logo} />
                 </div>
               ) : (
                 isToken1NeedApproval && (
                   <div className="flex items-center">
                     <p className="-mb-0.5">Approve {token1.symbol}</p>
-                    <TokenLogo className="w-4 h-4 ml-2" src={token1.logo} />
                   </div>
                 )
               )}
