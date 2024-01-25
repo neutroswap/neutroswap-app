@@ -169,7 +169,7 @@ export default function SPNFTSettingsModal(props: Props) {
             <Tabs.Content
               key={title}
               value={title}
-              className="w-full focus-visible:outline-none text-muted-foreground"
+              className="w-full focus-visible:outline-none text-muted-foreground box-border"
             >
               <div className="px-4 py-2 border-b border-border/60">
                 {selected === items[0].title && (
