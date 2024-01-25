@@ -168,7 +168,6 @@ function SPNFTPool() {
     },
     refetchOnWindowFocus: false,
   });
-  console.log(data);
 
   if (isFetching) return <Loading scale={3} />;
 
@@ -189,12 +188,6 @@ function SPNFTPool() {
             </p>
 
             <div className="flex space-x-2 mt-4">
-              {/* <Button
-                className="!mt-2"
-                onClick={() => window.location.reload()}
-              >
-                Refresh
-              </Button> */}
               <Button
                 auto
                 onClick={() => window.location.reload()}
@@ -209,7 +202,6 @@ function SPNFTPool() {
               </Button>
               <Modal>
                 <ModalOpenButton>
-                  {/* <Button className="!mt-2">Add Liquidity</Button> */}
                   <Button
                     auto
                     className={classNames(
@@ -481,12 +473,6 @@ function LiquidityPool() {
             </p>
 
             <div className="flex space-x-4 mt-4">
-              {/* <Button
-                className="!mt-2"
-                onClick={() => window.location.reload()}
-              >
-                Refresh
-              </Button> */}
               <Button
                 auto
                 onClick={() => window.location.reload()}
@@ -501,7 +487,6 @@ function LiquidityPool() {
               </Button>
               <Modal>
                 <ModalOpenButton>
-                  {/* <Button className="!mt-2">Add Liquidity</Button> */}
                   <Button
                     auto
                     className={classNames(

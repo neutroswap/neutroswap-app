@@ -121,8 +121,6 @@ export const CreatePositionModal = (props: CreatePositionModalProps) => {
     if (isPreferNative && isWrappedNative(token0.address)) return false;
     return +formatUnits(allowance0, token0.decimal) < Number(token0Amount);
   }, [token0, isPreferNative, token0Amount, allowance0]);
-  console.log("isToken0NeedApproval", isToken0NeedApproval);
-  console.log("allowance0", allowance0);
 
   const isToken1NeedApproval = useMemo(() => {
     if (isPreferNative && isWrappedNative(token1.address)) return false;

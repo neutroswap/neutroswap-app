@@ -137,7 +137,6 @@ export default function Home() {
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
     args: [token0.address, token1.address],
   });
-  console.log("pairs", pairs);
 
   const uniswapPair = useUniswapPairFactory({
     token0: token0.address,

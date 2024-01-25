@@ -250,16 +250,12 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
     if (!allowance0) return true;
     return +formatUnits(allowance0, token0.decimal) < Number(token0Amount);
   }, [token0, isPreferNative, nativeToken, allowance0, token0Amount]);
-  console.log(token0.name);
-  console.log(allowance0);
-  console.log("isToken0NeedApproval", isToken0NeedApproval);
 
   const isToken1NeedApproval = useMemo(() => {
     if (isPreferNative && token1.address === nativeToken.address) return false;
     if (!allowance1) return true;
     return +formatUnits(allowance1, token1.decimal) < Number(token1Amount);
   }, [token1, isPreferNative, nativeToken, allowance1, token1Amount]);
-  console.log("isToken1NeedApproval", isToken1NeedApproval);
 
   return (
     <div className="">
@@ -272,8 +268,6 @@ const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
           Deposit tokens to the pool to start earning trading fees
         </p>
       </div>
-      {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
-
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mt-8">
         <div className="w-full col-span-7">
           <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">

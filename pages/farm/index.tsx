@@ -601,17 +601,6 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     },
   });
 
-  console.log(
-    "Total staked",
-    // parseFloat(selectedRow.details.totalStaked!).toFixed(10)
-    selectedRow.details.totalStaked
-  );
-  console.log(
-    "Total staked in USD",
-    // Number(selectedRow.details.totalStakedInUsd).toFixed(2)
-    selectedRow.details.totalStakedInUsd
-  );
-
   return (
     <div className="flex flex-col w-full">
       <div className="flex space-x-3 items-center">

@@ -274,7 +274,7 @@ export function Unboost(
                   weight="bold"
                 />
               </div>
-              {/* add condition if same not using arrow */}
+              {/* TODO: add condition if same not using arrow */}
               <span className="text-sm">
                 x {(2.0).toFixed(3)} &#x21E2; x {expectedMultiplier.toFixed(3)}
               </span>

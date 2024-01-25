@@ -244,8 +244,6 @@ export const PoolDepositPanel: React.FC<PoolDepositPanelProps> = (props) => {
           Deposit tokens to the pool to start earning trading fees
         </p>
       </div>
-      {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
-
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mt-8">
         <div className="w-full col-span-7">
           <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">

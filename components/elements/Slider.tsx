@@ -44,22 +44,6 @@ const Slider = React.forwardRef<
       <SliderPrimitive.Track className="relative h-1 w-full grow overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-900">
         <SliderPrimitive.Range className="absolute h-full bg-primary dark:bg-primary" />
       </SliderPrimitive.Track>
-      {/* <span
-        className={classNames(
-          "px-2 py-1 text-xs font-medium bg-neutral-100 dark:bg-neutral-800 rounded-lg",
-          "border border-neutral-200 dark:border-transparent",
-          isHovered && "block animate-in slide-in-from-bottom-4 zoom-in-50",
-          !isHovered && "hidden animate-out slide-out-to-bottom-4 zoom-out-50"
-          // "-translate-x-[50%]"
-        )}
-        style={{
-          position: "absolute",
-          bottom: "1.25rem",
-          left: `calc(${value}% - 0.75rem - ${value[0] / 100}rem)`,
-        }}
-      >
-        {value}%
-      </span> */}
       <SliderPrimitive.Thumb
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}

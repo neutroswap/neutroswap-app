@@ -85,25 +85,6 @@ const Navbar: React.FC<Props> = () => {
             <Link href="/">
               <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
             </Link>
-            {/* <Tabs
-            hideDivider
-            hideBorder
-            onChange={(route) => router.push(route)}
-            className="hidden lg:block !w-full"
-            initialValue={"/" + router.asPath.split("/")[1]}
-          >
-            {tabs.map((tab) => {
-              if (tab.hidden) return null;
-              return (
-                <Tabs.Item
-                  key={tab.label}
-                  label={tab.label}
-                  value={tab.value}
-                />
-              );
-            })}
-          </Tabs> */}
-
             <Navigation />
           </div>
           <div className="flex space-x-2">

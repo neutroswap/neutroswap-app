@@ -198,30 +198,6 @@ export default function AllocateDividendModal() {
                               MAX
                             </div>
                           </div>
-
-                          {/* <InputGroup
-                            suffix={
-                              <button
-                                type="button"
-                                className="mt-2 mr-4 items-center justify-center rounded-md text-sm font-semibold uppercase leading-5 text-neutral-600"
-                                onClick={() =>
-                                  form.setValue(
-                                    "allocateXneutro",
-                                    availableXneutro
-                                  )
-                                }
-                              >
-                                MAX
-                              </button>
-                            }
-                          >
-                            <Input
-                              type="number"
-                              className="mt-2"
-                              placeholder="0.00"
-                              {...field}
-                            ></Input>
-                          </InputGroup> */}
                         </FormControl>
                       </FormItem>
                     )}

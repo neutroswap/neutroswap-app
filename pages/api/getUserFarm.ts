@@ -907,7 +907,6 @@ export default async function handler(
         }
         // cached the token prices
         await cachingTokenPrice(data.farms);
-        console.log("Fetched all effective prices", ALL_TOKEN_PRICES_CACHED)
         let tp = await addTokenPrice(data, ALL_TOKEN_PRICES_CACHED);
         let a = await totalValueOfLiquidity(tp);
         let response = {

@@ -285,6 +285,7 @@ export default function RedeemForm() {
                 )}
                 disabled={!redeemXneutro}
                 loading={isRedeemXneutroLoading}
+                onClick={() => redeemXneutro?.()}
               >
                 Redeem xNEUTRO
               </Button>
