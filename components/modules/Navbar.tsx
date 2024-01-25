@@ -50,7 +50,7 @@ const Navbar: React.FC<Props> = () => {
         hidden: false,
       },
       {
-        label: "Farm",
+        label: "Farm V1",
         value: "/farm",
         hidden: false,
       },

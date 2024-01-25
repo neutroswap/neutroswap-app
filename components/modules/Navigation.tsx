@@ -119,7 +119,7 @@ export function Navigation() {
             className={cn(navigationMenuTriggerStyle())}
             href="/farm"
           >
-            <span>Farm</span>
+            <span>Farm V1</span>
           </NavigationMenuLink>
           <NavigationMenuContent>
             <NavigationMenuLink>Link</NavigationMenuLink>
