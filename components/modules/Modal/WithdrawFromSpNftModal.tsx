@@ -118,7 +118,7 @@ export default function WithdrawFromSpNftModal(
                         ></input>
                         <div
                           className="mr-3 text-sm text-primary cursor-pointer font-semibold"
-                          onClick={() => form.setValue("lpToken", props.amount)} // TODO: change amount to read contract
+                          onClick={() => form.setValue("lpToken", props.amount)}
                         >
                           MAX
                         </div>
