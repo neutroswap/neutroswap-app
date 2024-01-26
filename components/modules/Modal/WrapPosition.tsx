@@ -58,6 +58,8 @@ import {
 } from "@/shared/helpers/constants";
 import { classNames } from "@/shared/helpers/classNamer";
 import WalletIcon from "@/public/icons/wallet.svg";
+import { Router } from "lucide-react";
+import { useRouter } from "next/router";
 
 type WrapPositionModalProps = {
   pool: `0x${string}`;
@@ -69,6 +71,8 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
   // const { pool, stats, onSuccess: handleSuccess } = props;
   const { chain } = useNetwork();
   const { address } = useAccount();
+
+  const router = useRouter();
 
   const [ownedLP, setOwnedLP] = useState(BigInt(0));
 
@@ -245,6 +249,7 @@ export const WrapPositionModal = (props: WrapPositionModalProps) => {
     ...wrapNFTConfig,
     onSuccess: async (tx) => {
       await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+      router.push("/positions");
     },
   });
 
