@@ -89,7 +89,6 @@ export default function FarmPage() {
     isLoading: isFarmsLoading,
     error: isFarmsError,
   } = useFarmList();
-
   const {
     data: userFarms,
     isLoading: isUserFarmsLoading,
@@ -109,6 +108,23 @@ export default function FarmPage() {
         return { ...temp, details: farmDetails };
       });
       setMergedData(combinedData);
+      // Sort the pools array
+      combinedData.sort((a, b) => {
+        // Check if name contains 'Deprecated'
+        const aIsDeprecated = a.name.includes("Deprecated");
+        const bIsDeprecated = b.name.includes("Deprecated");
+
+        if (!aIsDeprecated && bIsDeprecated) {
+          // a should come before b
+          return -1;
+        } else if (aIsDeprecated && !bIsDeprecated) {
+          // a should come after b
+          return 1;
+        }
+
+        // If both have 'Deprecated' or neither, maintain original order
+        return 0;
+      });
       setAllFarm(combinedData);
       setOwnedFarm(userFarms.farms);
     }
@@ -454,7 +470,11 @@ export default function FarmPage() {
                   <Table.Column
                     prop="pending"
                     label="Total Staked"
-                    render={(_value, rowData: any) => <span>{Number(rowData.details.totalStaked).toFixed(8)} LP</span>}
+                    render={(_value, rowData: any) => (
+                      <span>
+                        {Number(rowData.details.totalStaked).toFixed(8)} LP
+                      </span>
+                    )}
                   />
                   <Table.Column
                     prop="details"
