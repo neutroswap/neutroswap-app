@@ -1,8 +1,19 @@
 // import { Inter } from 'next/font/google'
-import { Button, Code, Input, Loading, Modal, Page, Spinner, Table, Tabs, Text, useModal, useTheme } from "@geist-ui/core";
 import {
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
+  Button,
+  Code,
+  Input,
+  Loading,
+  Modal,
+  Page,
+  Spinner,
+  Table,
+  Tabs,
+  Text,
+  useModal,
+  useTheme,
+} from "@geist-ui/core";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { BigNumber } from "ethers";
 import { classNames } from "@/shared/helpers/classNamer";
@@ -21,8 +32,12 @@ import { formatEther } from "ethers/lib/utils.js";
 import debounce from "lodash/debounce";
 import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
-import useFarmList, { AvailableFarm } from "@/shared/hooks/fetcher/farms/useFarmList";
-import useUserFarms, { OwnedFarm } from "@/shared/hooks/fetcher/farms/useUserFarms";
+import useFarmList, {
+  AvailableFarm,
+} from "@/shared/hooks/fetcher/farms/useFarmList";
+import useUserFarms, {
+  OwnedFarm,
+} from "@/shared/hooks/fetcher/farms/useUserFarms";
 import { Farm } from "@/shared/types/farm.types";
 import { currencyFormat } from "@/shared/helpers/currencyFormat";
 import { TableColumnRender } from "@geist-ui/core/esm/table";
@@ -30,7 +45,7 @@ import OffloadedModal from "@/components/modules/OffloadedModal";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import JsonSearch from "search-array";
 
-import LeafIcon from "@/public/icons/leaf.svg"
+import LeafIcon from "@/public/icons/leaf.svg";
 import NoContentDark from "@/public/states/empty/dark.svg";
 import NoContentLight from "@/public/states/empty/light.svg";
 import { ThemeType } from "@/shared/hooks/usePrefers";
@@ -45,7 +60,7 @@ type MergedFarm = Farm & {
     apr: string;
     rps: string;
   };
-}
+};
 
 export default function FarmPage() {
   const theme = useTheme();
@@ -53,7 +68,7 @@ export default function FarmPage() {
   const searchRef = useRef<any>(null);
 
   const [activeTab, setActiveTab] = useState("1");
-  const [query, setQuery] = useState<string>('');
+  const [query, setQuery] = useState<string>("");
   const [allFarm, setAllFarm] = useState<Array<MergedFarm>>([]);
   const [ownedFarm, setOwnedFarm] = useState<Array<OwnedFarm>>([]);
   const [mergedData, setMergedData] = useState<Array<MergedFarm>>([]);
@@ -62,20 +77,47 @@ export default function FarmPage() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearching, setIsSearching] = useState<boolean>(false);
 
-  const { data: farms, isLoading: isFarmsLoading, error: isFarmsError } = useFarmList()
-  const { data: userFarms, isLoading: isUserFarmsLoading, error: isUserFarmsError } = useUserFarms(address)
+  const {
+    data: farms,
+    isLoading: isFarmsLoading,
+    error: isFarmsError,
+  } = useFarmList();
+  const {
+    data: userFarms,
+    isLoading: isUserFarmsLoading,
+    error: isUserFarmsError,
+  } = useUserFarms(address);
 
   useEffect(() => {
     function combineData() {
       if (!farms) return;
       if (!userFarms) return;
       const combinedData = farms.farms.map((farm: AvailableFarm) => {
-        const userExactFarm = userFarms.farms.find((userFarm: any) => farm.name === userFarm.name)
+        const userExactFarm = userFarms.farms.find(
+          (userFarm: any) => farm.name === userFarm.name
+        );
         const temp = Object.assign({}, farm, userExactFarm);
-        const farmDetails = { ...farm.details, ...userExactFarm?.details }
-        return { ...temp, details: farmDetails }
+        const farmDetails = { ...farm.details, ...userExactFarm?.details };
+        return { ...temp, details: farmDetails };
       });
       setMergedData(combinedData);
+      // Sort the pools array
+      combinedData.sort((a, b) => {
+        // Check if name contains 'Deprecated'
+        const aIsDeprecated = a.name.includes("Deprecated");
+        const bIsDeprecated = b.name.includes("Deprecated");
+
+        if (!aIsDeprecated && bIsDeprecated) {
+          // a should come before b
+          return -1;
+        } else if (aIsDeprecated && !bIsDeprecated) {
+          // a should come after b
+          return 1;
+        }
+
+        // If both have 'Deprecated' or neither, maintain original order
+        return 0;
+      });
       setAllFarm(combinedData);
     }
     combineData();
@@ -98,47 +140,53 @@ export default function FarmPage() {
   });
 
   const resetAllFarm = () => {
-    setQuery('');
+    setQuery("");
     setAllFarm(mergedData);
     searchRef.current.value = "";
-  }
+  };
 
   const resetOwnedFarm = () => {
     if (!userFarms) throw new Error("No user farms data");
-    setQuery('');
+    setQuery("");
     setOwnedFarm(userFarms.farms);
     searchRef.current.value = "";
-  }
+  };
 
   const handleSearchAll = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
     setIsSearching(true);
     if (!Boolean(e.target.value)) {
       resetAllFarm();
       return setIsSearching(false);
-    };
+    }
     setQuery(e.target.value);
     // farm data lookup based on e.target.value
     const fullTextSearch = new JsonSearch(mergedData);
-    const results: MergedFarm[] = fullTextSearch.query(e.target.value)
+    const results: MergedFarm[] = fullTextSearch.query(e.target.value);
     setAllFarm(results);
     return setIsSearching(false);
-  })
+  });
 
-  const handleSearchOwnedFarm = debounce(async (e: ChangeEvent<HTMLInputElement>) => {
-    setIsSearching(true);
-    if (!Boolean(e.target.value)) {
-      resetOwnedFarm();
+  const handleSearchOwnedFarm = debounce(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      setIsSearching(true);
+      if (!Boolean(e.target.value)) {
+        resetOwnedFarm();
+        return setIsSearching(false);
+      }
+      setQuery(e.target.value);
+      // farm data lookup based on e.target.value
+      const fullTextSearch = new JsonSearch(userFarms?.farms);
+      const results: OwnedFarm[] = fullTextSearch.query(e.target.value);
+      setOwnedFarm(results);
       return setIsSearching(false);
-    };
-    setQuery(e.target.value);
-    // farm data lookup based on e.target.value
-    const fullTextSearch = new JsonSearch(userFarms?.farms);
-    const results: OwnedFarm[] = fullTextSearch.query(e.target.value)
-    setOwnedFarm(results);
-    return setIsSearching(false);
-  })
+    }
+  );
 
-  const farmNameColumnHandler: TableColumnRender<MergedFarm> = (value, rowData, index) => {
+  const farmNameColumnHandler: TableColumnRender<MergedFarm> = (
+    value,
+    rowData,
+    index
+  ) => {
     return (
       <div className="flex space-x-3 items-center my-5">
         <div className="flex -space-x-2 relative z-0">
@@ -158,13 +206,13 @@ export default function FarmPage() {
           />
         </div>
         <div className="space-x-1 font-semibold text-neutral-800 dark:text-neutral-200">
-          <span>{rowData.name.split('-')[0]}</span>
+          <span>{rowData.name.split("-")[0]}</span>
           <span className="text-neutral-400 dark:text-neutral-600">/</span>
-          <span>{rowData.name.split('-')[1]}</span>
+          <span>{rowData.name.split("-")[1]}</span>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="flex flex-col items-center justify-center max-w-5xl mx-auto py-16">
@@ -182,31 +230,37 @@ export default function FarmPage() {
 
       <div className="w-full grid grid-cols-1 md:grid-cols-3 my-10 box-border">
         <div className="w-full px-1 py-3 md:px-10 md:py-7 rounded-l-xl md:border border-neutral-200/80 dark:border-neutral-800/80">
-          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Total Value Locked</div>
-          {(!isUserFarmsLoading && !isFarmsLoading) && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">${currencyFormat(+farms?.tvl!)}</div>
+          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">
+            Total Value Locked
+          </div>
+          {!isUserFarmsLoading && !isFarmsLoading && (
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+              ${currencyFormat(+farms?.tvl!)}
+            </div>
           )}
-          {(isUserFarmsLoading && isFarmsLoading) && (
-            <Spinner className="mt-5" />
-          )}
+          {isUserFarmsLoading && isFarmsLoading && <Spinner className="mt-5" />}
         </div>
         <div className="w-full px-1 py-3 md:px-10 md:py-7 md:border-t md:border-b border-neutral-200/80 dark:border-neutral-800/80">
-          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Your Staked Assets</div>
-          {(!isUserFarmsLoading && !isFarmsLoading) && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">${currencyFormat(+userFarms?.holdings!)}</div>
+          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">
+            Your Staked Assets
+          </div>
+          {!isUserFarmsLoading && !isFarmsLoading && (
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+              ${currencyFormat(+userFarms?.holdings!)}
+            </div>
           )}
-          {(isUserFarmsLoading && isFarmsLoading) && (
-            <Spinner className="mt-5" />
-          )}
+          {isUserFarmsLoading && isFarmsLoading && <Spinner className="mt-5" />}
         </div>
         <div className="w-full px-1 py-3 md:px-10 md:py-7 rounded-r-xl md:border border-neutral-200/80 dark:border-neutral-800/80">
-          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">Unclaimed Rewards</div>
-          {(!isUserFarmsLoading && !isFarmsLoading) && (
-            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">${currencyFormat(+userFarms?.totalPendingTokenInUsd!)}</div>
+          <div className="mb-2 text-xs font-bold uppercase text-neutral-500">
+            Unclaimed Rewards
+          </div>
+          {!isUserFarmsLoading && !isFarmsLoading && (
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-yellow-500 font-semibold">
+              ${currencyFormat(+userFarms?.totalPendingTokenInUsd!)}
+            </div>
           )}
-          {(isUserFarmsLoading && isFarmsLoading) && (
-            <Spinner className="mt-5" />
-          )}
+          {isUserFarmsLoading && isFarmsLoading && <Spinner className="mt-5" />}
         </div>
       </div>
 
@@ -218,9 +272,9 @@ export default function FarmPage() {
           hideBorder
           activeClassName="font-semibold"
           onChange={(value) => {
-            setActiveTab(value)
-            resetOwnedFarm()
-            resetAllFarm()
+            setActiveTab(value);
+            resetOwnedFarm();
+            resetAllFarm();
           }}
         >
           <div className="flex items-center justify-between md:justify-end space-x-4 w-full mt-0 md:-mt-14 mb-4">
@@ -245,7 +299,9 @@ export default function FarmPage() {
                 />
               )}
 
-              {!query && <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />}
+              {!query && (
+                <MagnifyingGlassIcon className="flex inset-0 h-6 text-neutral-400" />
+              )}
               {query && (
                 <button
                   onClick={() => resetAllFarm()}
@@ -272,19 +328,21 @@ export default function FarmPage() {
             </Button>
           </div>
           <Tabs.Item label="All Farms" value="1">
-            {(!Boolean(allFarm.length) && !(isFarmsLoading || isUserFarmsLoading || isSearching)) && (
-              <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
-                {theme.type as ThemeType === "nlight" && (
-                  <NoContentLight className="w-40 h-40 opacity-75" />
-                )}
-                {theme.type as ThemeType === "ndark" && (
-                  <NoContentDark className="w-40 h-40 opacity-75" />
-                )}
-                <p className="text-neutral-500 w-3/4 text-center">
-                  No farms with <Code>{query}</Code> found. Try to use search with contract address instead of token name.
-                </p>
-              </div>
-            )}
+            {!Boolean(allFarm.length) &&
+              !(isFarmsLoading || isUserFarmsLoading || isSearching) && (
+                <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
+                  {(theme.type as ThemeType) === "nlight" && (
+                    <NoContentLight className="w-40 h-40 opacity-75" />
+                  )}
+                  {(theme.type as ThemeType) === "ndark" && (
+                    <NoContentDark className="w-40 h-40 opacity-75" />
+                  )}
+                  <p className="text-neutral-500 w-3/4 text-center">
+                    No farms with <Code>{query}</Code> found. Try to use search
+                    with contract address instead of token name.
+                  </p>
+                </div>
+              )}
             {(isFarmsLoading || isUserFarmsLoading || isSearching) && (
               <div className="my-5">
                 <Loading spaceRatio={2.5} />
@@ -316,36 +374,46 @@ export default function FarmPage() {
                   <Table.Column
                     prop="details"
                     label="Rewards 24h"
-                    render={(value) => <span>{currencyFormat(Number(value.rps) * 86400)} NEUTRO</span>}
+                    render={(value) => (
+                      <span>
+                        {currencyFormat(Number(value.rps) * 86400)} NEUTRO
+                      </span>
+                    )}
                   />
                   <Table.Column
                     prop="apr"
                     label="APR"
-                    render={(_value, rowData: MergedFarm | any) => <span>{+rowData.details.apr} %</span>}
+                    render={(_value, rowData: MergedFarm | any) => (
+                      <span>{+rowData.details.apr} %</span>
+                    )}
                   />
                 </Table>
               </div>
             )}
           </Tabs.Item>
           <Tabs.Item label="My Farms" value="2">
-            {(!Boolean(ownedFarm.length) && !(isUserFarmsLoading || isSearching)) && (
-              <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
-                {theme.type as ThemeType === "nlight" && (
-                  <NoContentLight className="w-40 h-40 opacity-75" />
-                )}
-                {theme.type as ThemeType === "ndark" && (
-                  <NoContentDark className="w-40 h-40 opacity-75" />
-                )}
-                <p className="text-neutral-500 w-3/4 text-center">
-                  {!!query && (
-                    <span>No farms with <Code>{query}</Code> found. Try to use search with contract address instead of token name.</span>
+            {!Boolean(ownedFarm.length) &&
+              !(isUserFarmsLoading || isSearching) && (
+                <div className="flex flex-col items-center w-full p-8 border-2 border-dashed border-neutral-200/60 dark:border-neutral-900 rounded-xl box-border">
+                  {(theme.type as ThemeType) === "nlight" && (
+                    <NoContentLight className="w-40 h-40 opacity-75" />
                   )}
-                  {!query && (
-                    <span>No owned farm found, add LP to start farming.</span>
+                  {(theme.type as ThemeType) === "ndark" && (
+                    <NoContentDark className="w-40 h-40 opacity-75" />
                   )}
-                </p>
-              </div>
-            )}
+                  <p className="text-neutral-500 w-3/4 text-center">
+                    {!!query && (
+                      <span>
+                        No farms with <Code>{query}</Code> found. Try to use
+                        search with contract address instead of token name.
+                      </span>
+                    )}
+                    {!query && (
+                      <span>No owned farm found, add LP to start farming.</span>
+                    )}
+                  </p>
+                </div>
+              )}
             {(isUserFarmsLoading || isSearching) && (
               <div className="my-5">
                 <Loading spaceRatio={2.5} />
@@ -377,12 +445,21 @@ export default function FarmPage() {
                   <Table.Column
                     prop="pending"
                     label="Total Staked"
-                    render={(_value, rowData: any) => <span>{Number(rowData.details.totalStaked).toFixed(8)} LP</span>}
+                    render={(_value, rowData: any) => (
+                      <span>
+                        {Number(rowData.details.totalStaked).toFixed(8)} LP
+                      </span>
+                    )}
                   />
                   <Table.Column
                     prop="details"
                     label="Pending Reward"
-                    render={(_value, rowData) => <span>{currencyFormat(Number(rowData.details.pendingTokens))} NEUTRO</span>}
+                    render={(_value, rowData) => (
+                      <span>
+                        {currencyFormat(Number(rowData.details.pendingTokens))}{" "}
+                        NEUTRO
+                      </span>
+                    )}
                   />
                 </Table>
               </div>
@@ -395,8 +472,9 @@ export default function FarmPage() {
         isOpen={isOpen}
         onClose={() => {
           setSelectedRow(undefined);
-          setIsOpen(false)
-        }}>
+          setIsOpen(false);
+        }}
+      >
         {selectedRow && <FarmRow selectedRow={selectedRow} />}
       </OffloadedModal>
     </div>
@@ -448,7 +526,9 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
     functionName: "allowance",
     args: [address!, NEXT_PUBLIC_FARM_CONTRACT as `0x${string}`],
     onSuccess(value) {
-      setIsLpTokenApproved(+formatEther(value) >= +formatEther(lpTokenBalance!));
+      setIsLpTokenApproved(
+        +formatEther(value) >= +formatEther(lpTokenBalance!)
+      );
     },
   });
 
@@ -537,17 +617,21 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
           />
         </div>
         <div className="space-x-1 font-semibold text-neutral-800 dark:text-neutral-200 text-lg">
-          <span>{selectedRow.name.split('-')[0]}</span>
+          <span>{selectedRow.name.split("-")[0]}</span>
           <span className="text-neutral-400 dark:text-neutral-600">/</span>
-          <span>{selectedRow.name.split('-')[1]}</span>
+          <span>{selectedRow.name.split("-")[1]}</span>
         </div>
       </div>
 
       <div className="flex items-center justify-between w-full mt-10">
         <div className="space-y-1 mb-5 text-left">
-          <span className="text-xs font-bold uppercase text-neutral-500">Earned Rewards</span>
+          <span className="text-xs font-bold uppercase text-neutral-500">
+            Earned Rewards
+          </span>
           <div className="flex space-x-2 items-end justify-center text-3xl">
-            <span className="font-bold text-black dark:text-white">{parseFloat(selectedRow.details.pendingTokens ?? "0").toFixed(2)}</span>
+            <span className="font-bold text-black dark:text-white">
+              {parseFloat(selectedRow.details.pendingTokens ?? "0").toFixed(2)}
+            </span>
             <span className="text-base text-neutral-500">$NEUTRO</span>
           </div>
         </div>
@@ -558,7 +642,7 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
           loading={isHarvesting}
           iconRight={<BanknotesIcon className="w-4 h-4 opacity-90" />}
           className={classNames(
-            "border-neutral-300 dark:border-neutral-800 hover:border-neutral-700 bg-transparent text-black dark:text-neutral-200 disabled:opacity-50",
+            "border-neutral-300 dark:border-neutral-800 hover:border-neutral-700 bg-transparent text-black dark:text-neutral-200 disabled:opacity-50"
           )}
         >
           Harvest
@@ -589,7 +673,11 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Available:</div>
               <div className="text-sm space-x-2">
-                <span>{!!lpTokenBalance && Number(formatEther(lpTokenBalance)).toFixed(10)}{" "} LP</span>
+                <span>
+                  {!!lpTokenBalance &&
+                    Number(formatEther(lpTokenBalance)).toFixed(10)}{" "}
+                  LP
+                </span>
               </div>
             </div>
             {!isLpTokenApproved && (
@@ -637,7 +725,9 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
               ></input>
               <div
                 className="mr-3 text-sm text-amber-600 cursor-pointer font-semibold"
-                onClick={() => setUnstakeAmount(selectedRow.details.totalStaked)}
+                onClick={() =>
+                  setUnstakeAmount(selectedRow.details.totalStaked)
+                }
               >
                 MAX
               </div>
@@ -645,8 +735,12 @@ const FarmRow = ({ selectedRow }: { selectedRow: MergedFarm }) => {
             <div className="flex items-center justify-between text-neutral-500">
               <div className="text-xs font-bold uppercase">Deposited:</div>
               <div className="text-sm space-x-2">
-                <span>{parseFloat(selectedRow.details.totalStaked!).toFixed(10)} LP</span>
-                <span className="font-semibold">~ ${Number(selectedRow.details.totalStakedInUsd).toFixed(2)}</span>
+                <span>
+                  {parseFloat(selectedRow.details.totalStaked!).toFixed(10)} LP
+                </span>
+                <span className="font-semibold">
+                  ~ ${Number(selectedRow.details.totalStakedInUsd).toFixed(2)}
+                </span>
               </div>
             </div>
             <Button
