@@ -124,6 +124,8 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
     ...boostConfig,
     onSuccess: async (tx) => {
       await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+      refetchBalanceAndAllowance();
+      form.setValue("boost", "");
     },
   });
 
@@ -238,9 +240,8 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
 
   //checking whether the token is approved or not
   const isApproved = useMemo(() => {
-    let formattedAllowance = formatEther(BigInt(allowanceUsage ?? 0));
-    return +formattedAllowance >= +debouncedBoostAmount;
-  }, [debouncedBoostAmount, allowanceUsage]);
+    return allowanceUsage! >= parseEther(debouncedBoostAmount);
+  }, [allowanceUsage, debouncedBoostAmount]);
 
   const onSubmit = async () => {
     setIsLoading(true);
@@ -251,7 +252,9 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
     <Form {...form}>
       <div className="animate-in slide-in-from-right-1/4 duration-200">
         <div>
-          <div className="font-semibold">Boost your position</div>
+          <div className="font-semibold text-foreground">
+            Boost your position
+          </div>
           <span className="text-sm text-muted-foreground">
             Allocate your xNEUTRO to your position for extra yield
           </span>
@@ -368,7 +371,7 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
               <Button
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                  "text-white dark:text-primary",
+                  "text-white dark:text-primary !normal-case",
                   "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                   "disabled:opacity-50"
@@ -377,7 +380,7 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
                 loading={isApprovingUsage}
                 onClick={() => approveUsage?.()}
               >
-                Approve
+                Approve xNEUTRO
               </Button>
             );
           }
@@ -385,7 +388,7 @@ export function Boost(props: GetNFTPositionResponse & { onClose: () => void }) {
             <Button
               className={classNames(
                 "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                "text-white dark:text-primary",
+                "text-white dark:text-primary !normal-case",
                 "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                 "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                 "disabled:opacity-50"

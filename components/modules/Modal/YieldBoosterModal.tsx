@@ -100,7 +100,7 @@ export default function YieldBoosterModal(props: Props) {
                       src={props.data.assets.token1.logo}
                     />
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center text-foreground">
                     <div className="flex items-center space-x-1 mr-2">
                       <span className="font-semibold">
                         {props.data.assets.token0.name}
