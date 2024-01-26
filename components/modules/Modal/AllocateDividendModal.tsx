@@ -168,7 +168,7 @@ export default function AllocateDividendModal() {
             {/* <form onSubmit={form.handleSubmit(onSubmit)}> */}
             <div className="box-border">
               <div className="flex flex-col gap-1">
-                <div className="text-xl font-bold text-muted-foreground">
+                <div className="text-xl font-bold text-foreground">
                   Allocate xNEUTRO
                 </div>
               </div>
@@ -213,7 +213,7 @@ export default function AllocateDividendModal() {
                     <Button
                       className={classNames(
                         "!flex !items-center !py-5 !mt-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                        "text-white dark:text-primary",
+                        "text-white dark:text-primary !normal-case",
                         "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                         "disabled:opacity-50"

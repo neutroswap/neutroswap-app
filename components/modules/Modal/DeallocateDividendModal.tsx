@@ -113,7 +113,7 @@ export default function AllocateDividendModal() {
           <Form {...form}>
             <div className="box-border">
               <div className="flex flex-col gap-1">
-                <div className="text-xl font-bold text-muted-foreground">
+                <div className="text-xl font-bold text-foreground">
                   Deallocate xNEUTRO
                 </div>
               </div>

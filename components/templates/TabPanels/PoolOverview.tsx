@@ -145,7 +145,7 @@ const PoolOverviewPanel: React.FC<PoolOverviewPanelProps> = (props) => {
                   auto
                   className={classNames(
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm ",
-                    "text-white dark:text-primary",
+                    "text-white dark:text-primary !normal-case",
                     "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                     "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                     "disabled:opacity-50"

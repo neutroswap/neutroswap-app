@@ -759,7 +759,7 @@ export const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
           loading={isFetchingGetPair}
           onClick={() => router.push(`/pool/${existingPool}`)}
         >
-          <span>Enter pool</span>
+          <span>Enter Pool</span>
           <ArrowRightIcon className="w-4 h-4 ml-2" />
         </Button>
       )}

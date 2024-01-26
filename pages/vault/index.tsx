@@ -551,7 +551,7 @@ const VaultRow = ({ selectedRow }: { selectedRow: MergedVault }) => {
           onClick={() => harvest?.()}
           loading={isHarvesting}
           iconRight={
-            <BanknotesIcon className="w-4 h-4 opacity-90 text-primary" />
+            <BanknotesIcon className="w-4 h-4 text-white dark:text-primary opacity-90 text-primary" />
           }
           className={classNames(
             "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",

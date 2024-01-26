@@ -267,7 +267,7 @@ export default function Xneutro() {
               <Link href="/dividend">
                 <div className="flex justify-between items-center mt-2">
                   <DividendLogo className="w-7 h-7 m-4 mx-10 text-primary" />
-                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6 rounded-sm">
                     <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
@@ -314,7 +314,7 @@ export default function Xneutro() {
               <Link href="/yieldbooster">
                 <div className="flex justify-between items-center mt-2">
                   <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-primary" />
-                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6 rounded-sm">
                     <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
@@ -361,7 +361,7 @@ export default function Xneutro() {
               <Link href="/launchpad">
                 <div className="flex justify-between items-center mt-2">
                   <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-primary" />
-                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6 rounded-sm">
                     <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
