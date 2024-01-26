@@ -10,10 +10,10 @@ type Urls = {
 export const urls: Record<SupportedChainID, Urls> = {
   "17777": {
     FACTORY_GRAPH_URL:
-      "https://testnet.dbi.foundation/subgraphs/name/neutro-amm",
+      "https://mainnet.dbi.foundation/subgraphs/name/neutro-amm",
     LAUNCHPAD_GRAPH_URL:
-      "https://testnet.dbi.foundation/subgraphs/name/neutro-launchpad",
-    NFT_GRAPH_URL: "https://testnet.dbi.foundation/subgraphs/name/neutro-nftPool",
+      "https://mainnet.dbi.foundation/subgraphs/name/neutro-launchpad",
+    NFT_GRAPH_URL: "https://mainnet.dbi.foundation/subgraphs/name/neutro-nftPool",
   },
 
   "15557": {
