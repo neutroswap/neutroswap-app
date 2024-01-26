@@ -382,7 +382,7 @@ function SPNFTPool() {
                                   {pool.settings.nitro !==
                                   "0x0000000000000000000000000000000000000000"
                                     ? "Nitro Active"
-                                    : "No Nitro Active"}
+                                    : "No Nitro Active (Coming Soon)"}
                                 </span>
                               </TooltipContent>
                             </Tooltip>
