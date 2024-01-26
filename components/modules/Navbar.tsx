@@ -40,7 +40,7 @@ const Navbar: React.FC<Props> = () => {
       },
       {
         label: "Analytics",
-        value: "/analytics",
+        value: "https://analytics.neutroswap.io/",
         hidden: false,
       },
       {
