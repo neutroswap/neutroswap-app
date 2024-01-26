@@ -97,6 +97,22 @@ export default function Pool() {
   >([]);
   const [totalLiquidityUSD, setTotalLiquidityUSD] = useState<number>(0);
 
+  type Urls = {
+    pair1_address: string;
+    pair2_address: string;
+  };
+
+  const getLpTokenAddress: Record<SupportedChainID, Urls> = {
+    "17777": {
+      pair1_address: "0xc7f5264ee4b832e5ac55fb8b9028f414ca164218",
+      pair2_address: "0xb3fb2548287bcadd5a045270b3182c1fc6318684",
+    },
+    "15557": {
+      pair1_address: "0xafd8de90c836af0cf449614d8bc7a1521c6a638d",
+      pair2_address: "0xf67f0d0d0c99f0eab675c1b25538e9f5faaa4021",
+    },
+  };
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -116,10 +132,6 @@ export default function Pool() {
         if (!pools) throw new Error("Failed to fetch data");
 
         const dataWithApr = pools.pairs.map((item) => {
-          // const sevenDaysFeeUsd = item.pairDayData.reduce((prev, curr) => {
-          //   return prev + parseFloat(curr.dailyTxns);
-          // }, 0);
-
           // Aggregate daily volume for each day
           const dailyVolume = item.pairDayData.reduce((total, day) => {
             return total + parseFloat(day.dailyVolumeUSD);
@@ -136,13 +148,11 @@ export default function Pool() {
         });
 
         // Filter pools for "USDT/NEUTRO" and "NEUTRO/WEOS"
+        const lpAddresses = getLpTokenAddress[DEFAULT_CHAIN_ID.id];
         const filteredPools = dataWithApr.filter((pool) => {
-          const token0Symbol = pool.token0.symbol;
-          const token1Symbol = pool.token1.symbol;
-
           return (
-            (token0Symbol === "NEUTRO" && token1Symbol === "USDTe") ||
-            (token0Symbol === "NEUTRO" && token1Symbol === "WEOS")
+            pool.id == lpAddresses.pair1_address ||
+            pool.id == lpAddresses.pair2_address
           );
         });
 
@@ -168,6 +178,8 @@ export default function Pool() {
 
     fetchData();
   }, []);
+
+  console.log(dataWithApr);
 
   return (
     <div className="py-16">
