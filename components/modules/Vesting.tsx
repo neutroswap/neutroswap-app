@@ -15,7 +15,7 @@ import { Card, CardContent } from "@/components/elements/Card";
 import { formatEther } from "viem";
 import { NEXT_PUBLIC_XNEUTRO_TOKEN_CONTRACT } from "@/shared/helpers/constants";
 import { XNEUTRO_CONTRACT } from "@/shared/helpers/contract";
-import { multicall } from "@wagmi/core";
+import { multicall, waitForTransaction } from "@wagmi/core";
 import { Button } from "@geist-ui/core";
 import { classNames } from "@/shared/helpers/classNamer";
 
@@ -135,10 +135,13 @@ const PendingRedeem = ({ data }: { data: any }) => {
   const { write: cancelRedeem, isLoading: isLoadingCancelRedeem } =
     useContractWrite({
       ...cancelRedeemConfig,
+      onSuccess: async (tx) => {
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+      },
     });
 
   return (
-    <div className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2">
+    <div className="flex items-center justify-between rounded-lg border px-3 py-2">
       <div className="flex flex-col gap-1">
         <span className="text-sm font-semibold leading-6 sm:text-base">
           <span className="dark:text-white">
@@ -157,13 +160,21 @@ const PendingRedeem = ({ data }: { data: any }) => {
           Claimable in {data.date.days}d {data.date.hours}h {data.date.minutes}m
         </span>
       </div>
-      <button
+      <Button
         disabled={!cancelRedeem}
+        scale={0.25}
         onClick={() => cancelRedeem?.()}
-        className="rounded-md px-3.5 py-2 text-sm font-semibold text-red-700 hover:bg-red-50 hover:text-red-800"
+        loading={isLoadingCancelRedeem}
+        className={classNames(
+          "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm !text-base !normal-case",
+          "text-white dark:text-primary",
+          "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+          "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+          "disabled:opacity-50"
+        )}
       >
         Cancel
-      </button>
+      </Button>
     </div>
   );
 };

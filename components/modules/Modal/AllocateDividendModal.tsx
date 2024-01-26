@@ -126,24 +126,25 @@ export default function AllocateDividendModal() {
   const { write: allocate, isLoading: isLoadingAllocate } = useContractWrite({
     ...allocateConfig,
     onSuccess: async (tx) => {
-      await waitForTransaction({ hash: tx.hash });
+      await waitForTransaction({ hash: tx.hash, confirmations: 8 });
       await refetchAllowance();
+      form.setValue("allocateXneutro", "");
     },
   });
 
   //onSubmit handler
-  const onSubmit = async () => {
-    setIsLoading(true);
-    if (!address) return new Error("Not connected");
+  // const onSubmit = async () => {
+  //   setIsLoading(true);
+  //   if (!address) return new Error("Not connected");
 
-    if (!isApproved) {
-      approve?.();
-    }
+  //   if (!isApproved) {
+  //     approve?.();
+  //   }
 
-    if (isApproved) {
-      allocate?.();
-    }
-  };
+  //   if (isApproved) {
+  //     allocate?.();
+  //   }
+  // };
 
   return (
     <Modal>
@@ -164,89 +165,86 @@ export default function AllocateDividendModal() {
       <ModalContents>
         {() => (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
-              <div className="box-border">
-                <div className="flex flex-col gap-1">
-                  <div className="text-xl font-bold text-muted-foreground">
-                    Allocate xNEUTRO
-                  </div>
+            {/* <form onSubmit={form.handleSubmit(onSubmit)}> */}
+            <div className="box-border">
+              <div className="flex flex-col gap-1">
+                <div className="text-xl font-bold text-foreground">
+                  Allocate xNEUTRO
                 </div>
-                <div className="flex flex-col">
-                  <div className="mt-2 text-muted-foreground">Amount</div>
-                  <FormField
-                    control={form.control}
-                    name="allocateXneutro"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
-                            <input
-                              type="number"
-                              placeholder="0.0"
-                              className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
-                              {...field}
-                            ></input>
-                            <div
-                              className="mr-3 text-sm text-primary cursor-pointer font-semibold"
-                              onClick={() =>
-                                form.setValue(
-                                  "deallocateXneutro",
-                                  availableXneutro
-                                )
-                              }
-                            >
-                              MAX
-                            </div>
+              </div>
+              <div className="flex flex-col">
+                <div className="mt-2 text-muted-foreground">Amount</div>
+                <FormField
+                  control={form.control}
+                  name="allocateXneutro"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                          <input
+                            type="number"
+                            placeholder="0.0"
+                            className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                            {...field}
+                          ></input>
+                          <div
+                            className="mr-3 text-sm text-primary cursor-pointer font-semibold"
+                            onClick={() =>
+                              form.setValue("allocateXneutro", availableXneutro)
+                            }
+                          >
+                            MAX
                           </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  ></FormField>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                ></FormField>
+              </div>
+              <div className="flex justify-end text-xs text-neutral-500 mt-2">
+                <div>
+                  <span>Wallet Balance:</span>
+                  <span> {availableXneutro} xNEUTRO</span>
                 </div>
-                <div className="flex justify-end text-xs text-neutral-500 mt-2">
-                  <div>
-                    <span>Wallet Balance:</span>
-                    <span> {availableXneutro} xNEUTRO</span>
-                  </div>
-                </div>
-                {(() => {
-                  if (!isApproved) {
-                    return (
-                      <Button
-                        className={classNames(
-                          "!flex !items-center !py-5 !mt-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                          "text-white dark:text-primary",
-                          "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
-                          "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                          "disabled:opacity-50"
-                        )}
-                        disabled={!approve}
-                        loading={isLoadingApprove}
-                        onClick={() => approve?.()}
-                      >
-                        Approve xNEUTRO
-                      </Button>
-                    );
-                  }
+              </div>
+              {(() => {
+                if (!isApproved) {
                   return (
                     <Button
                       className={classNames(
                         "!flex !items-center !py-5 !mt-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                        "text-white dark:text-primary",
+                        "text-white dark:text-primary !normal-case",
                         "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                         "disabled:opacity-50"
                       )}
-                      disabled={!allocate}
-                      loading={isLoadingAllocate}
-                      onClick={() => allocateXneutro?.()}
+                      disabled={!approve}
+                      loading={isLoadingApprove}
+                      onClick={() => approve?.()}
                     >
-                      Allocate xNEUTRO
+                      Approve xNEUTRO
                     </Button>
                   );
-                })()}
-              </div>
-            </form>
+                }
+                return (
+                  <Button
+                    className={classNames(
+                      "!flex !items-center !py-5 !mt-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                      "text-white dark:text-primary !normal-case",
+                      "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                      "disabled:opacity-50"
+                    )}
+                    disabled={!allocate}
+                    loading={isLoadingAllocate}
+                    onClick={() => allocate?.()}
+                  >
+                    Allocate xNEUTRO
+                  </Button>
+                );
+              })()}
+            </div>
+            {/* </form> */}
           </Form>
         )}
       </ModalContents>

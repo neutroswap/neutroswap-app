@@ -118,7 +118,8 @@ export default function ConvertForm() {
     useContractWrite({
       ...convertNeutroConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+        form.setValue("convertNeutroToXneutro", "");
       },
     });
 
@@ -126,14 +127,14 @@ export default function ConvertForm() {
     useContractWrite({
       ...approveNeutroConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchNeutroInfo();
         await retryConvertNeutroConfig();
       },
     });
 
   const isApproved = useMemo(() => {
-    return Number(allowance) >= Number(debouncedConvertNeutroToXneutro ?? "0");
+    return allowance >= parseEther(debouncedConvertNeutroToXneutro ?? "0");
   }, [allowance, debouncedConvertNeutroToXneutro]);
 
   return (

@@ -108,14 +108,14 @@ export default function RedeemForm() {
     useContractWrite({
       ...approveXneutroConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchXneutroInfo();
         await retryRedeemXneutroConfig();
       },
     });
 
   const isApproved = useMemo(() => {
-    return Number(allowance) >= Number(debouncedRedeemXneutroToNeutro ?? "0");
+    return allowance >= parseEther(debouncedRedeemXneutroToNeutro ?? "0");
   }, [allowance, debouncedRedeemXneutroToNeutro]);
 
   const neutroRedeemDuration = useMemo(() => {
@@ -169,7 +169,8 @@ export default function RedeemForm() {
     useContractWrite({
       ...redeemXneutroConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+        form.setValue("redeemXneutroToNeutro", "");
       },
     });
 
@@ -261,7 +262,7 @@ export default function RedeemForm() {
                 <Button
                   className={classNames(
                     "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                    "text-white dark:text-primary",
+                    "text-white dark:text-primary !normal-case",
                     "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                     "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                     "disabled:opacity-50"
@@ -278,7 +279,7 @@ export default function RedeemForm() {
               <Button
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base !normal-case",
-                  "text-white dark:text-primary",
+                  "text-white dark:text-primary !normal-case",
                   "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]",
                   "disabled:opacity-50"

@@ -1,9 +1,8 @@
 import { Button, Tabs, Text, useTheme } from "@geist-ui/core";
 import Logo from "@/public/logo.svg";
-import AltLogo from "@/public/alt_logo.svg";
 import { useRouter } from "next/router";
-import { MoonIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
-import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNamer";
@@ -55,7 +54,7 @@ const Navbar: React.FC<Props> = () => {
         hidden: false,
       },
       {
-        label: "Vault",
+        label: "Vault V1",
         value: "/vault",
         hidden: false,
       },

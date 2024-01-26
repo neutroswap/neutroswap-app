@@ -50,7 +50,7 @@ export default function AllocateDividendModal() {
 
   //Get xNEUTRO balance & allowance for Dividend Plugin
   const [allocatedBalance, setAllocatedBalance] = useState("0");
-  const { refetch: allocated, isFetching: isFetchingAllocated } =
+  const { refetch: refetchAllocated, isFetching: isFetchingAllocated } =
     useContractRead({
       enabled: Boolean(address!),
       address: XNEUTRO_CONTRACT,
@@ -86,7 +86,9 @@ export default function AllocateDividendModal() {
     useContractWrite({
       ...deallocateConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+        await refetchAllocated();
+        form.setValue("deallocateXneutro", "");
       },
     });
 
@@ -109,67 +111,65 @@ export default function AllocateDividendModal() {
       <ModalContents>
         {() => (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(() => deallocate?.())}>
-              <div className="box-border">
-                <div className="flex flex-col gap-1">
-                  <div className="text-xl font-bold text-muted-foreground">
-                    Deallocate xNEUTRO
-                  </div>
-                </div>
-                <div className="flex flex-col">
-                  <div className="mt-2 text-muted-foreground">Amount</div>
-                  <FormField
-                    control={form.control}
-                    name="deallocateXneutro"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
-                            <input
-                              type="number"
-                              placeholder="0.0"
-                              className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
-                              {...field}
-                            ></input>
-                            <div
-                              className="mr-3 text-sm text-primary cursor-pointer font-semibold"
-                              onClick={() =>
-                                form.setValue(
-                                  "deallocateXneutro",
-                                  availableAllocatedXneutro
-                                )
-                              }
-                            >
-                              MAX
-                            </div>
-                          </div>
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  ></FormField>
-                </div>
-                <div className="flex justify-end text-xs text-neutral-500 mt-2">
-                  <div>
-                    <span>Allocated Balance:</span>
-                    <span> {availableAllocatedXneutro} xNEUTRO</span>
-                  </div>
-                </div>
-                <Button
-                  className={classNames(
-                    "!flex !items-center !py-5 !mt-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                    "text-white dark:text-primary",
-                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
-                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                    "disabled:opacity-50"
-                  )}
-                  disabled={!deallocate}
-                  loading={isLoadingDeallocate}
-                  onClick={() => deallocate?.()}
-                >
+            <div className="box-border">
+              <div className="flex flex-col gap-1">
+                <div className="text-xl font-bold text-foreground">
                   Deallocate xNEUTRO
-                </Button>
+                </div>
               </div>
-            </form>
+              <div className="flex flex-col">
+                <div className="mt-2 text-muted-foreground">Amount</div>
+                <FormField
+                  control={form.control}
+                  name="deallocateXneutro"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <div className="flex justify-between items-center bg-neutral-200/50 dark:bg-neutral-900/50 rounded-lg">
+                          <input
+                            type="number"
+                            placeholder="0.0"
+                            className="bg-transparent text-black dark:text-white !px-4 !py-3 !rounded-lg !box-border"
+                            {...field}
+                          ></input>
+                          <div
+                            className="mr-3 text-sm text-primary cursor-pointer font-semibold"
+                            onClick={() =>
+                              form.setValue(
+                                "deallocateXneutro",
+                                availableAllocatedXneutro
+                              )
+                            }
+                          >
+                            MAX
+                          </div>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                ></FormField>
+              </div>
+              <div className="flex justify-end text-xs text-neutral-500 mt-2">
+                <div>
+                  <span>Allocated Balance:</span>
+                  <span> {availableAllocatedXneutro} xNEUTRO</span>
+                </div>
+              </div>
+              <Button
+                className={classNames(
+                  "!flex !items-center !py-5 !mt-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                  "text-white dark:text-primary !normal-case",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
+                disabled={!deallocate}
+                loading={isLoadingDeallocate}
+                onClick={() => deallocate?.()}
+              >
+                Deallocate xNEUTRO
+              </Button>
+            </div>
           </Form>
         )}
       </ModalContents>

@@ -88,10 +88,15 @@ export function Unboost(
     ...unboostConfig,
     onSuccess: async (tx) => {
       await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+      await refetchUserAllocationInYieldBooster();
+      form.setValue("unboost", "");
     },
   });
 
-  const { data: userAllocationInYieldBooster } = useContractRead({
+  const {
+    data: userAllocationInYieldBooster,
+    refetch: refetchUserAllocationInYieldBooster,
+  } = useContractRead({
     address: YIELDBOOSTER_CONTRACT,
     abi: YIELDBOOSTER_ABI,
     functionName: "getUserPositionAllocation",

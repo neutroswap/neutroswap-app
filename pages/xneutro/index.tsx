@@ -267,7 +267,7 @@ export default function Xneutro() {
               <Link href="/dividend">
                 <div className="flex justify-between items-center mt-2">
                   <DividendLogo className="w-7 h-7 m-4 mx-10 text-primary" />
-                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6 rounded-sm">
                     <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
@@ -281,7 +281,7 @@ export default function Xneutro() {
                   here.
                 </div>
 
-                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row">
+                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row rounded-lg">
                   <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
                     <span className="text-xs text-neutral-500">
                       Your Allocation
@@ -314,7 +314,7 @@ export default function Xneutro() {
               <Link href="/yieldbooster">
                 <div className="flex justify-between items-center mt-2">
                   <YieldboosterLogo className="w-7 h-7 m-4 mx-10 text-primary" />
-                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6 rounded-sm">
                     <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
@@ -327,7 +327,7 @@ export default function Xneutro() {
                   Boost your staking yields by up to +100% by adding xNEUTRO to
                   any eligible position.
                 </div>
-                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row">
+                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row rounded-lg">
                   <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
                     <span className="text-xs text-neutral-500">
                       Your Allocation
@@ -361,7 +361,7 @@ export default function Xneutro() {
               <Link href="/launchpad">
                 <div className="flex justify-between items-center mt-2">
                   <LaunchpadLogo className="w-7 h-7 m-4 mx-10 text-primary" />
-                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6">
+                  <div className="px-3 py-1 border border-neutral-200 dark:border-neutral-800 mr-6 rounded-sm">
                     <span className="text-primary text-sm font-semibold">
                       Stake →
                     </span>
@@ -374,7 +374,7 @@ export default function Xneutro() {
                   Get perks and benefits from every project on Neutroswap&apos;s
                   launchpad by staking your xNEUTRO here.
                 </div>
-                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row">
+                <div className="border border-neutral-200 dark:border-neutral-800 mt-4 px-4 py-2 m-9 flex flex-col sm:flex-row rounded-lg">
                   <div className="flex-grow mb-2 sm:mb-0 sm:mr-4">
                     <span className="text-xs text-neutral-500">
                       Your Allocation
