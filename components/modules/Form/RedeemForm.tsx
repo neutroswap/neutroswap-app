@@ -108,14 +108,14 @@ export default function RedeemForm() {
     useContractWrite({
       ...approveXneutroConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchXneutroInfo();
         await retryRedeemXneutroConfig();
       },
     });
 
   const isApproved = useMemo(() => {
-    return Number(allowance) >= Number(debouncedRedeemXneutroToNeutro ?? "0");
+    return allowance >= parseEther(debouncedRedeemXneutroToNeutro ?? "0");
   }, [allowance, debouncedRedeemXneutroToNeutro]);
 
   const neutroRedeemDuration = useMemo(() => {
@@ -169,7 +169,8 @@ export default function RedeemForm() {
     useContractWrite({
       ...redeemXneutroConfig,
       onSuccess: async (tx) => {
-        await waitForTransaction({ hash: tx.hash });
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+        form.setValue("redeemXneutroToNeutro", "");
       },
     });
 
