@@ -1,11 +1,8 @@
 "use client";
 
 import {
-  ArrowSquareOut,
-  Book,
   ChartDonut,
   ChartPieSlice,
-  Dna,
   Icon,
   Lightning,
   SealCheck,
@@ -22,6 +19,8 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "../ui/navigation-menu";
+import LeafIcon from "@/public/icons/leaf.svg";
+import VaultIcon from "@/public/icons/vault.svg";
 
 const poolRoutes: {
   title: string;
@@ -81,6 +80,27 @@ const xNEUTRORoutes: {
   },
 ];
 
+const v1Routes: {
+  title: string;
+  href: string;
+  icon: Icon;
+  description: string;
+  hidden?: boolean;
+}[] = [
+  {
+    title: "Farm V1",
+    href: "/farm",
+    icon: LeafIcon,
+    description: "Earn yield by staking your LP Tokens",
+  },
+  {
+    title: "Vault V1",
+    href: "/vault",
+    icon: VaultIcon,
+    description: "Lock $NEUTRO for extra rewards",
+  },
+];
+
 export function Navigation() {
   return (
     <NavigationMenu delayDuration={0} className="hidden sm:flex">
@@ -94,6 +114,24 @@ export function Navigation() {
           </NavigationMenuLink>
           <NavigationMenuContent>
             <NavigationMenuLink>Link</NavigationMenuLink>
+          </NavigationMenuContent>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <NavigationMenuTrigger>V1</NavigationMenuTrigger>
+          <NavigationMenuContent>
+            <ul className="grid w-[400px]">
+              {v1Routes.map((route) => (
+                <ListItem
+                  key={route.title}
+                  title={route.title}
+                  href={route.href}
+                  icon={route.icon}
+                  className={route.hidden ? "hidden" : ""}
+                >
+                  {route.description}
+                </ListItem>
+              ))}
+            </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
         <NavigationMenuItem>
@@ -114,29 +152,6 @@ export function Navigation() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuLink
-            className={cn(navigationMenuTriggerStyle())}
-            href="/farm"
-          >
-            <span>Farm V1</span>
-          </NavigationMenuLink>
-          <NavigationMenuContent>
-            <NavigationMenuLink>Link</NavigationMenuLink>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <NavigationMenuLink
-            className={cn(navigationMenuTriggerStyle())}
-            href="/vault"
-          >
-            <span>Vault</span>
-          </NavigationMenuLink>
-          <NavigationMenuContent>
-            <NavigationMenuLink>Link</NavigationMenuLink>
-          </NavigationMenuContent>
-        </NavigationMenuItem>
-
         <NavigationMenuItem>
           <NavigationMenuTrigger>xNEUTRO</NavigationMenuTrigger>
           <NavigationMenuContent>
