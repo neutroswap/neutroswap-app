@@ -1,16 +1,16 @@
 import { Button, Tabs, Text, useTheme } from "@geist-ui/core";
 import Logo from "@/public/logo.svg";
-import AltLogo from "@/public/alt_logo.svg";
 import { useRouter } from "next/router";
-import { MoonIcon, QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
-import { ChevronDownIcon, SunIcon } from "@heroicons/react/20/solid";
+import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { classNames } from "@/shared/helpers/classNamer";
 import { ArrowPathIcon } from "@heroicons/react/24/solid";
 import { useMemo } from "react";
+import { Navigation } from "./Navigation";
 
-interface Props { }
+interface Props {}
 
 const Navbar: React.FC<Props> = () => {
   const router = useRouter();
@@ -21,62 +21,71 @@ const Navbar: React.FC<Props> = () => {
       {
         label: "Swap",
         value: "/",
-        hidden: false
+        hidden: false,
       },
       {
         label: "Pool",
         value: "/pool",
-        hidden: false
+        hidden: false,
       },
       {
-        label: "Farm",
-        value: "/farm",
-        hidden: false
+        label: "spNFT",
+        value: "/positions",
+        hidden: false,
       },
       {
-        label: "Vault",
-        value: "/vault",
-        hidden: false
+        label: "xNEUTRO",
+        value: "/xneutro",
+        hidden: false,
+      },
+      {
+        label: "Analytics",
+        value: "https://analytics.neutroswap.io/",
+        hidden: false,
       },
       {
         label: "Launchpad",
         value: "/launchpad",
-        hidden: false
+        hidden: false,
       },
       {
-        label: "Analytics",
-        value: "/analytics",
-        hidden: false
+        label: "Farm V1",
+        value: "/farm",
+        hidden: false,
+      },
+      {
+        label: "Vault V1",
+        value: "/vault",
+        hidden: false,
       },
       {
         label: "Presales",
         value: "/presales",
-        hidden: true
-      }
-    ]
-  }, [])
+        hidden: true,
+      },
+      {
+        label: "Dividend",
+        value: "/dividend",
+        hidden: true,
+      },
+      {
+        label: "Boost",
+        value: "/yieldbooster",
+        hidden: true,
+      },
+    ];
+  }, []);
 
   return (
     <>
-      <div
-        className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-lg z-10 p-0"
-      >
-        <div className="flex items-center justify-between max-w-7xl mx-auto pt-3 md:py-3 px-4 lg:px-0  submenu__inner">
-          <Link href="/">
-            <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
-          </Link>
-          <Tabs
-            hideDivider
-            hideBorder
-            onChange={(route) => router.push(route)}
-            className="hidden lg:block !w-full"
-            initialValue={"/" + router.asPath.split("/")[1]}
-          >
-            {tabs.map((tab) => {
-              if (tab.hidden) return null
-              return <Tabs.Item key={tab.label} label={tab.label} value={tab.value} />
-            })}
-          </Tabs>
+      <div className="fixed top-0 w-full border-b-[0.5px] border-neutral-300 dark:border-white/[.15] bg-gradient-to-b from-white dark:from-black to-transparent backdrop-blur-lg z-10 p-0">
+        <div className="flex items-center justify-between max-w-7xl mx-auto px-4 lg:px-0  submenu__inner">
+          <div className="flex items-center">
+            <Link href="/">
+              <Logo className="h-6 lg:h-6 text-black dark:text-white mr-4" />
+            </Link>
+            <Navigation />
+          </div>
           <div className="flex space-x-2">
             <ConnectButton.Custom>
               {({
@@ -204,16 +213,23 @@ const Navbar: React.FC<Props> = () => {
           </div>
         </div>
 
-        <div className="submenu__inner">
+        <div className="submenu__inner !normal-case">
           <Tabs
             hideDivider
             onChange={(route) => router.push(route)}
-            className="block lg:hidden !w-full"
+            className="block sm:hidden md:hidden !w-full"
             initialValue={"/" + router.asPath.split("/")[1]}
           >
             {tabs.map((tab) => {
-              if (tab.hidden) return null
-              return <Tabs.Item key={tab.label} label={tab.label} value={tab.value} className="!p-0" />
+              if (tab.hidden) return null;
+              return (
+                <Tabs.Item
+                  key={tab.label}
+                  label={tab.label}
+                  value={tab.value}
+                  className="!p-0 "
+                />
+              );
             })}
           </Tabs>
         </div>
@@ -222,6 +238,8 @@ const Navbar: React.FC<Props> = () => {
         {`
           .submenu__inner :global(.content) {
             display: none;
+            text-transform: none;
+            !important
           }
         `}
       </style>

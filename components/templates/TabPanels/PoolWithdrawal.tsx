@@ -1,11 +1,32 @@
-import { ERC20_ABI, NEUTRO_POOL_ABI, NEUTRO_ROUTER_ABI } from "@/shared/abi";
-import { ROUTER_CONTRACT } from "@/shared/helpers/contract";
+import {
+  ERC20_ABI,
+  NEUTRO_HELPER_ABI,
+  NEUTRO_POOL_ABI,
+  NEUTRO_ROUTER_ABI,
+} from "@/shared/abi";
+import {
+  NEUTRO_HELPER_CONTRACT,
+  ROUTER_CONTRACT,
+} from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { BigNumber } from "ethers";
-import { formatEther, formatUnits, getAddress, parseEther } from "ethers/lib/utils.js";
+import {
+  formatEther,
+  formatUnits,
+  getAddress,
+  parseEther,
+  parseUnits,
+} from "viem";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { useAccount, useContractRead, useContractReads, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
+import {
+  useAccount,
+  useContractRead,
+  useContractReads,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+} from "wagmi";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/solid";
 import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Button, Input } from "@geist-ui/core";
@@ -14,140 +35,197 @@ import { Currency } from "@/shared/types/currency.types";
 import dayjs from "dayjs";
 import { tokens } from "@/shared/statics/tokenList";
 import NativeTokenPicker from "@/components/modules/swap/NativeTokenPicker";
-import { DEFAULT_CHAIN_ID, supportedChainID, SupportedChainID } from "@/shared/types/chain.types";
-import { parseBigNumber } from "@/shared/helpers/parseBigNumber";
+import {
+  DEFAULT_CHAIN_ID,
+  supportedChainID,
+  SupportedChainID,
+} from "@/shared/types/chain.types";
+import { waitForTransaction } from "@wagmi/core";
+import { classNames } from "@/shared/helpers/classNamer";
 
 type PoolWithdrawalPanelProps = {
-  balances: Currency[],
-  token0: Token,
-  token1: Token,
-  totalLPSupply: BigNumber,
-  userLPBalance: Currency,
-  poolBalances: Currency[],
+  balances: Currency[];
+  token0: Token;
+  token1: Token;
+  totalLPSupply: bigint;
+  userLPBalance: Currency;
+  poolBalances: Currency[];
   refetchAllBalance: (options?: any) => Promise<any>;
   refetchUserBalances: (options?: any) => Promise<any>;
-}
+};
 
 // TODO: move slippage to state or store
 const SLIPPAGE = 50;
 
 const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
-  const { token0, token1, totalLPSupply, userLPBalance, poolBalances, refetchAllBalance, refetchUserBalances } = props;
+  const {
+    token0,
+    token1,
+    totalLPSupply,
+    userLPBalance,
+    poolBalances,
+    refetchAllBalance,
+    refetchUserBalances,
+  } = props;
 
   const router = useRouter();
   const { address } = useAccount();
   const { chain } = useNetwork();
 
-  const [token0Amount, setToken0Amount] = useState<string>();
-  const [token1Amount, setToken1Amount] = useState<string>();
+  const [token0Amount, setToken0Amount] = useState("");
+  const [token1Amount, setToken1Amount] = useState("");
   const [percentage, setPercentage] = useState(33);
-  const [amount, setAmount] = useState<BigNumber>(BigNumber.from(0));
+  const [amount, setAmount] = useState(BigInt(0));
 
   const [isLPTokenApproved, setIsLPTokenApproved] = useState(false);
 
   // TODO: MOVE THIS HOOKS
   const nativeToken = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID][0];
-    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID][0];
-    return tokens[chain.id.toString() as SupportedChainID][0]
+    if (!chain) return tokens[DEFAULT_CHAIN_ID.id][0];
+    if (!supportedChainID.includes(chain.id as any))
+      return tokens[DEFAULT_CHAIN_ID.id][0];
+    return tokens[chain.id as SupportedChainID][0];
   }, [chain]);
 
   const [isPreferNative, setIsPreferNative] = useState(
     token0.address === nativeToken.address ||
-    token1.address === nativeToken.address
+      token1.address === nativeToken.address
   );
 
   const { data: allowance, refetch: refetchAllowance } = useContractRead({
     enabled: Boolean(address && router.query.id),
     address: router.query.id as `0x${string}`,
     abi: ERC20_ABI,
-    functionName: 'allowance',
+    functionName: "allowance",
     args: [address!, ROUTER_CONTRACT],
     onSuccess(value) {
-      setIsLPTokenApproved(+formatEther(value) >= +formatEther(userLPBalance.raw));
+      setIsLPTokenApproved(
+        +formatEther(value) >= +formatEther(userLPBalance.raw)
+      );
     },
-  })
+  });
+
+  const { data: totalValueOfLiquidity } = useContractRead({
+    address: NEUTRO_HELPER_CONTRACT,
+    abi: NEUTRO_HELPER_ABI,
+    functionName: "getTokenPrice",
+    args: [router.query.id as `0x${string}`],
+  });
 
   const { config: approveLPTokenConfig } = usePrepareContractWrite({
     enabled: Boolean(router.query.id),
     address: router.query.id as `0x${string}`,
     abi: NEUTRO_POOL_ABI,
-    functionName: 'approve',
+    functionName: "approve",
     args: [
       ROUTER_CONTRACT,
-      BigNumber.from("115792089237316195423570985008687907853269984665640564039457584007913129639935")
-    ]
-  })
-  const { isLoading: isApprovingLPToken, write: approveLPToken } = useContractWrite({
-    ...approveLPTokenConfig,
-    onSuccess: async (result) => {
-      await result.wait();
-      await refetchAllowance();
-    }
-  })
+      BigInt(
+        "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+      ),
+    ],
+  });
+  const { isLoading: isApprovingLPToken, write: approveLPToken } =
+    useContractWrite({
+      ...approveLPTokenConfig,
+      onSuccess: async (result) => {
+        await waitForTransaction({ hash: result.hash, confirmations: 8 });
+        await refetchAllowance();
+      },
+    });
 
-  const { config: removeLiquidityConfig, isFetching: isSimulatingRemoveLiquidity } = usePrepareContractWrite({
-    enabled: Boolean(token0 && token1 && amount && !!token0Amount && !!token1Amount && address),
+  const {
+    config: removeLiquidityConfig,
+    isFetching: isSimulatingRemoveLiquidity,
+  } = usePrepareContractWrite({
+    enabled: Boolean(
+      token0 && token1 && amount && !!token0Amount && !!token1Amount && address
+    ),
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
-    functionName: 'removeLiquidity',
+    functionName: "removeLiquidity",
     args: [
       token0.address, // tokenA
       token1.address, // tokenB
       amount, // liquidity
-      parseBigNumber(token0Amount, token0.decimal), // amountAMin
-      parseBigNumber(token1Amount, token1.decimal), // amountAMin
+      parseUnits(token0Amount!.toString(), token0.decimal), // amountAMin
+      parseUnits(token1Amount!.toString(), token1.decimal), // amountAMin
       // !!token0Amount ? parseEther(token0Amount!) : parseEther("0"), // amountAMin
       // !!token1Amount ? parseEther(token1Amount!) : parseEther("0"), // amountBMin
       address!, // address
-      BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
+      BigInt(dayjs().add(5, "minutes").unix()), // deadline
     ],
-  })
-  const {
-    isLoading: isRemovingLiquidity,
-    write: removeLiquidity
-  } = useContractWrite({
-    ...removeLiquidityConfig,
-    onSuccess: async (tx) => {
-      await tx.wait()
-      await refetchAllBalance();
-      await refetchUserBalances();
-    }
-  })
+  });
+  const { isLoading: isRemovingLiquidity, write: removeLiquidity } =
+    useContractWrite({
+      ...removeLiquidityConfig,
+      onSuccess: async (tx) => {
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+        await refetchAllBalance();
+        await refetchUserBalances();
+      },
+    });
 
-  const { config: removeLiquidityETHConfig, isFetching: isSimulatingRemoveLiquidityETH } = usePrepareContractWrite({
-    enabled: Boolean(token0 && token1 && amount && !!token0Amount && !!token1Amount && address),
+  const {
+    config: removeLiquidityETHConfig,
+    isFetching: isSimulatingRemoveLiquidityETH,
+  } = usePrepareContractWrite({
+    enabled: Boolean(
+      token0 && token1 && amount && !!token0Amount && !!token1Amount && address
+    ),
     address: ROUTER_CONTRACT,
     abi: NEUTRO_ROUTER_ABI,
-    functionName: 'removeLiquidityETH',
+    functionName: "removeLiquidityETH",
     args: [
       token0.address === nativeToken.address ? token1.address : token0.address, // token
       amount, // liquidity
-      token0.address === nativeToken.address ? parseBigNumber(token1Amount, token1.decimal) : parseBigNumber(token0Amount, token0.decimal), // amountTokenMin
-      token0.address === nativeToken.address ? parseBigNumber(token0Amount, token0.decimal) : parseBigNumber(token1Amount, token1.decimal), // amountETHMin
+      token0.address === nativeToken.address
+        ? parseUnits(token1Amount!.toString(), token1.decimal)
+        : parseUnits(token0Amount!.toString(), token0.decimal), // amountTokenMin
+      token0.address === nativeToken.address
+        ? parseUnits(token0Amount!.toString(), token0.decimal)
+        : parseUnits(token1Amount!.toString(), token1.decimal), // amountETHMin
       address!, // address
-      BigNumber.from(dayjs().add(5, 'minutes').unix()) // deadline
+      BigInt(dayjs().add(5, "minutes").unix()), // deadline
     ],
-  })
-  const {
-    isLoading: isRemovingLiquidityETH,
-    write: removeLiquidityETH
-  } = useContractWrite({
-    ...removeLiquidityETHConfig,
-    onSuccess: async (tx) => {
-      await tx.wait()
-      await refetchAllBalance();
-      await refetchUserBalances();
-    }
-  })
+  });
+  const { isLoading: isRemovingLiquidityETH, write: removeLiquidityETH } =
+    useContractWrite({
+      ...removeLiquidityETHConfig,
+      onSuccess: async (tx) => {
+        await waitForTransaction({ hash: tx.hash, confirmations: 8 });
+        await refetchAllBalance();
+        await refetchUserBalances();
+      },
+    });
 
   useEffect(() => {
-    if (amount.isZero() || totalLPSupply.isZero()) return;
-    const token0Value = amount.mul(poolBalances[0].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
-    const token1Value = amount.mul(poolBalances[1].raw).mul(10000 - SLIPPAGE).div(10000).div(totalLPSupply);
+    if (amount !== BigInt(0) || totalLPSupply !== BigInt(0)) return;
+    const token0Value =
+      (amount * poolBalances[0].raw * BigInt(10000 - SLIPPAGE)) /
+      BigInt(10000) /
+      totalLPSupply;
+    const token1Value =
+      (amount * poolBalances[1].raw * BigInt(10000 - SLIPPAGE)) /
+      BigInt(10000) /
+      totalLPSupply;
     setToken0Amount(formatUnits(token0Value, token0.decimal));
     setToken1Amount(formatUnits(token1Value, token1.decimal));
-  }, [token0, token1, amount, poolBalances, totalLPSupply])
+  }, [token0, token1, amount, poolBalances, totalLPSupply]);
+
+  const updateExpectedAmounts = (withdrawAmount: any) => {
+    const token0Value = (withdrawAmount * poolBalances[0].raw) / totalLPSupply;
+    const token1Value = (withdrawAmount * poolBalances[1].raw) / totalLPSupply;
+    setAmount(withdrawAmount);
+    setToken0Amount(formatUnits(token0Value, token0.decimal));
+    setToken1Amount(formatUnits(token1Value, token1.decimal));
+  };
+
+  const amountValue = parseFloat(formatEther(amount));
+  const totalValueInLiquidity = parseFloat(
+    formatEther(totalValueOfLiquidity ?? BigInt(0))
+  );
+
+  const totalValueInUsd = amountValue * totalValueInLiquidity;
 
   // NOTE: Enable for debugging only
   // useEffect(() => {
@@ -170,14 +248,14 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
           <p className="m-0 text-2xl font-semibold">Withdraw</p>
         </div>
         <p className="mt-2 mb-0 text-sm text-neutral-400 dark:text-neutral-600">
-          Deposit tokens to the pool to start earning trading fees
+          Withdraw the tokens you&apos;ve provided as liquidity from the pool
         </p>
       </div>
-      {/* <p className="mt-2 text-sm text-neutral-400 dark:text-neutral-600">Contract: {router.query.id}</p> */}
-
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 mt-4">
         <div className="w-full mt-4 col-span-7">
-          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">Amount to withdraw</p>
+          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">
+            Amount to withdraw
+          </p>
           <div className="flex flex-col py-5 px-7 border border-neutral-200 dark:border-neutral-800 rounded-lg ">
             <div className="flex items-center justify-between mb-2">
               <span className="m-0 text-2xl font-semibold bg-transparent w-full">
@@ -185,8 +263,12 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               </span>
             </div>
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-neutral-500 dark:text-neutral-400">$0</span>
-              <span className="text-sm text-neutral-500 dark:text-neutral-400">Available {userLPBalance.formatted}</span>
+              <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                ${totalValueInUsd.toFixed(2)}
+              </span>
+              <span className="text-sm text-neutral-500 dark:text-neutral-400">
+                Available {formatEther(userLPBalance.raw)}
+              </span>
             </div>
             <Slider
               step={10}
@@ -194,20 +276,30 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               defaultValue={[percentage]}
               value={[percentage]}
               onValueChange={(value) => {
-                setPercentage(value[0])
+                setPercentage(value[0]);
               }}
               onValueCommit={(value) => {
-                setAmount(userLPBalance.raw.mul(value[0]).div(100));
+                setAmount((userLPBalance.raw * BigInt(value[0])) / BigInt(100));
               }}
             />
             <div className="grid grid-cols-4 gap-4 mt-4">
               <Button
                 auto
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 scale={0.5}
-                className="bg-transparent"
                 onClick={() => {
-                  setPercentage(25)
-                  setAmount(userLPBalance.raw.mul(25).div(100));
+                  const percentage = 25;
+                  setPercentage(percentage);
+
+                  const withdrawAmount =
+                    (userLPBalance.raw * BigInt(percentage)) / BigInt(100);
+                  updateExpectedAmounts(withdrawAmount);
                 }}
               >
                 25%
@@ -215,10 +307,20 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               <Button
                 auto
                 scale={0.5}
-                className="bg-transparent"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 onClick={() => {
-                  setPercentage(50)
-                  setAmount(userLPBalance.raw.mul(50).div(100));
+                  const percentage = 50;
+                  setPercentage(percentage);
+
+                  const withdrawAmount =
+                    (userLPBalance.raw * BigInt(percentage)) / BigInt(100);
+                  updateExpectedAmounts(withdrawAmount);
                 }}
               >
                 50%
@@ -226,10 +328,20 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               <Button
                 auto
                 scale={0.5}
-                className="bg-transparent"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 onClick={() => {
-                  setPercentage(75)
-                  setAmount(userLPBalance.raw.mul(75).div(100));
+                  const percentage = 75;
+                  setPercentage(percentage);
+
+                  const withdrawAmount =
+                    (userLPBalance.raw * BigInt(percentage)) / BigInt(100);
+                  updateExpectedAmounts(withdrawAmount);
                 }}
               >
                 75%
@@ -237,10 +349,18 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               <Button
                 auto
                 scale={0.5}
-                className="bg-transparent"
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
                 onClick={() => {
-                  setPercentage(100)
+                  const percentage = 100;
+                  setPercentage(percentage);
                   setAmount(userLPBalance.raw);
+                  updateExpectedAmounts(userLPBalance.raw);
                 }}
               >
                 MAX
@@ -249,7 +369,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
           </div>
         </div>
         <div className="w-full col-span-7">
-          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">Expected to receive</p>
+          <p className="mt-0 mb-2 font-medium text-neutral-500 dark:text-neutral-400">
+            Expected to receive
+          </p>
           <div className="flex flex-col py-5 px-7 border border-neutral-200 dark:border-neutral-800 rounded-lg ">
             <div className="flex items-center justify-between">
               <div className="flex space-x-2 items-center">
@@ -313,11 +435,17 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
               {!isLPTokenApproved && (
                 <Button
                   scale={1.25}
-                  className="!mt-2"
+                  className={classNames(
+                    "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                    "text-white dark:text-primary !normal-case",
+                    "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                    "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                    "disabled:opacity-50"
+                  )}
                   loading={isApprovingLPToken}
                   onClick={() => approveLPToken?.()}
                 >
-                  Approve LP token
+                  Approve LP Token
                 </Button>
               )}
               {isLPTokenApproved && (
@@ -326,8 +454,16 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                     <Button
                       name="removeLiquidity"
                       scale={1.25}
-                      className="!mt-2"
-                      loading={isRemovingLiquidity || isSimulatingRemoveLiquidity}
+                      className={classNames(
+                        "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                        "disabled:opacity-50"
+                      )}
+                      loading={
+                        isRemovingLiquidity || isSimulatingRemoveLiquidity
+                      }
                       disabled={!removeLiquidity}
                       onClick={() => removeLiquidity?.()}
                     >
@@ -338,8 +474,16 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                     <Button
                       name="removeLiquidityETH"
                       scale={1.25}
-                      className="!mt-2"
-                      loading={isRemovingLiquidityETH || isSimulatingRemoveLiquidityETH}
+                      className={classNames(
+                        "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                        "disabled:opacity-50"
+                      )}
+                      loading={
+                        isRemovingLiquidityETH || isSimulatingRemoveLiquidityETH
+                      }
                       disabled={!removeLiquidityETH}
                       onClick={() => removeLiquidityETH?.()}
                     >
@@ -352,25 +496,29 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
           </div>
         </div>
         {/*  NOTE: FOR DEBUGGING ONLY */}
-        {process.env.NODE_ENV !== 'production' && (
+        {process.env.NODE_ENV !== "production" && (
           <div className="w-full mt-4 col-span-5">
             <pre>
-              {JSON.stringify({
-                isPreferNative: isPreferNative,
-                slippage: SLIPPAGE + "%",
-                isToken0WEOS: token0.address === nativeToken.address,
-                isToken1WEOS: token1.address === nativeToken.address,
-                token0Amount: token0Amount,
-                token1Amount: token1Amount,
-                LPbalance: formatEther(userLPBalance.raw),
-                LPAllowance: formatEther(allowance ?? "0")
-              }, null, 4)}
+              {JSON.stringify(
+                {
+                  isPreferNative: isPreferNative,
+                  slippage: SLIPPAGE + "%",
+                  isToken0WEOS: token0.address === nativeToken.address,
+                  isToken1WEOS: token1.address === nativeToken.address,
+                  token0Amount: token0Amount,
+                  token1Amount: token1Amount,
+                  LPbalance: formatEther(userLPBalance.raw),
+                  LPAllowance: formatEther(allowance ?? BigInt(0)),
+                },
+                null,
+                4
+              )}
             </pre>
           </div>
         )}
       </div>
-    </div >
-  )
-}
+    </div>
+  );
+};
 
 export default PoolWithdrawalPanel;

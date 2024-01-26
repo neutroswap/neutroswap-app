@@ -2,14 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+  --foreground: 20 14.3% 4.1%;
+
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14.3% 4.1%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 20 14.3% 4.1%;
+
+  --border: 20 5.9% 90%;
+  --input: 20 5.9% 90%;
+
+  --primary: 0 100% 67.06%; /* #FF5757 */
+  --primary-foreground: 60 9.1% 97.8%;
+
+  --secondary: 60 4.8% 95.9%;
+  --secondary-foreground: 24 9.8% 10%;
+
+  --accent: 60 4.8% 95.9%;
+  --accent-foreground: 24 9.8% 10%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+
+  --ring: 24.6 95% 53.1%;
+
+  --radius: 0.95rem;
+  }
+ 
+  .dark {
+    --background: 20 14.3% 4.1%;
+    --foreground: 0 0% 100%;
+  
+    --muted: 12 6.5% 15.1%;
+    --muted-foreground: 24 5.4% 63.9%;
+  
+    --popover: 20 14.3% 4.1%;
+    --popover-foreground: 60 9.1% 97.8%;
+  
+    --card: 20 14.3% 4.1%;
+    --card-foreground: 60 9.1% 97.8%;
+  
+    --border: 12 6.5% 15.1%;
+    --input: 12 6.5% 15.1%;
+  
+    --primary: 0 100% 67.06%; /* #FF5757 */
+    --primary-foreground: 60 9.1% 97.8%;
+  
+    --secondary: 0 0% 14.9% /* #27272a */
+    --secondary-foreground: 60 9.1% 97.8%;
+  
+    --accent: 0 0% 14.9%; /* #27272a */
+    --accent-foreground: 60 9.1% 97.8%;
+  
+    --destructive: 0 72.2% 50.6%;
+    --destructive-foreground: 60 9.1% 97.8%;
+  
+    --ring: 20.5 90.2% 48.2%;
+  }
+}
+
+@keyframes rotate-360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .collapse > .view > .title > h3 {
-  @apply text-sm text-neutral-500 !important
+  @apply text-sm text-neutral-500 !important;
 }
 .collapse > .view > .subtitle {
-  @apply hidden !important
+  @apply hidden !important;
 }
 
 @layer base {
+  * {
+    @apply border-border;
+  }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button {
     -webkit-appearance: none;
@@ -21,15 +99,15 @@ body {
   overflow: visible !important;
 }
 
-#__next{
+#__next {
   overflow: visible !important;
 }
 
 .two-column-table tbody tr td:nth-child(2) .cell {
-  @apply flex justify-end
+  @apply flex justify-end;
 }
 .two-column-table thead tr th:nth-child(2) .thead-box {
-  @apply flex justify-end
+  @apply flex justify-end;
 }
 
 .recharts-tooltip-wrapper > .border {
@@ -61,5 +139,62 @@ body {
   @apply stroke-white dark:stroke-neutral-800 stroke-2 !important;
 }
 .recharts-surface > text {
-  @apply fill-neutral-500 dark:fill-neutral-200
+  @apply fill-neutral-500 dark:fill-neutral-200;
+}
+
+.rounded-cut {
+  @apply relative before:content-[''] before:absolute before:top-0 before:right-0 before:w-0 before:border-t-[1rem] before:border-l-[1rem];
+}
+
+@keyframes rotate-360 {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.CollapsibleContent {
+  overflow: hidden;
+}
+.CollapsibleContent[data-state="open"] {
+  animation: slideDown 200ms ease-out;
+}
+.CollapsibleContent[data-state="closed"] {
+  animation: slideUp 200ms ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.border {
+  box-sizing: border-box;
+}
+
+/* p {
+  margin: 0 !important;
+} */
+
+ul li::before {
+  content: none !important;
+}
+
+ul {
+  margin: 8pt 8pt 8pt 8pt !important;
 }

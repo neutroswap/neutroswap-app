@@ -1,17 +1,11 @@
-import { Text, Button, Loading, useTheme } from "@geist-ui/core";
+export const revalidate = 30; // in seconds
+
+import { Button } from "@geist-ui/core";
 import { useEffect, useMemo, useState } from "react";
-import NoContentDark from "@/public/states/empty/dark.svg";
-import NoContentLight from "@/public/states/empty/light.svg";
-import { Disclosure } from "@headlessui/react";
-import {
-  ChevronRightIcon,
-  ChevronUpIcon,
-  XCircleIcon,
-} from "@heroicons/react/20/solid";
-import { BigNumberish, ethers } from "ethers";
-import { formatEther } from "ethers/lib/utils.js";
+import { ChevronRightIcon, XCircleIcon } from "@heroicons/react/20/solid";
+import { BigNumberish } from "ethers";
 import { classNames } from "@/shared/helpers/classNamer";
-import { ArrowRightIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/solid";
+import { ArrowRightIcon, PlusIcon } from "@heroicons/react/24/solid";
 import {
   Modal,
   ModalContents,
@@ -19,18 +13,45 @@ import {
 } from "@/components/elements/Modal";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
 import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
-import { useAccount, useContract, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from "wagmi";
+import {
+  useContractRead,
+  useContractWrite,
+  useNetwork,
+  usePrepareContractWrite,
+} from "wagmi";
 import { FACTORY_CONTRACT } from "@/shared/helpers/contract";
 import { useRouter } from "next/router";
-import { handleImageFallback } from "@/shared/helpers/handleImageFallback";
 import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";
-import { decimalFormat } from "@/shared/helpers/decimalFormat";
-import Link from "next/link";
-import { ThemeType } from "@/shared/hooks/usePrefers";
-import { DEFAULT_CHAIN_ID, SupportedChainID, supportedChainID } from "@/shared/types/chain.types";
+import {
+  DEFAULT_CHAIN_ID,
+  SupportedChainID,
+  supportedChainID,
+} from "@/shared/types/chain.types";
 
-import PoolIcon from "@/public/icons/pool.svg"
+import PoolIcon from "@/public/icons/pool.svg";
+import { waitForTransaction } from "@wagmi/core";
+import { decodeAbiParameters, parseAbiParameters } from "viem";
+import { urls } from "@/shared/config/urls";
+import { Client, cacheExchange, fetchExchange } from "urql";
+import { getPoolListQuery } from "@/shared/gql/queries/factory";
+
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import { cn, currencyCompactFormat } from "@/shared/utils";
+dayjs.extend(utc);
+import { currencyFormat } from "@/shared/utils";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/elements/Table";
+import { getTokenImageUrl } from "@/shared/getters/getTokenInfo";
+import TokenLogo from "@/components/modules/TokenLogo";
+import { ChevronRight } from "lucide-react";
 
 type PositionsResponse = {
   network_id: string;
@@ -46,29 +67,125 @@ type PositionsResponse = {
 };
 
 export default function Pool() {
-  const theme = useTheme();
-  const { address } = useAccount();
+  const [dataWithApr, setDataWithApr] = useState<
+    {
+      id: string;
+      token0: {
+        id: string;
+        symbol: string;
+        name: string;
+      };
+      token1: {
+        id: string;
+        symbol: string;
+        name: string;
+      };
+      reserve0: any;
+      reserve1: any;
+      reserveUSD: any;
+      reserveEOS: any;
+      trackedReserveEOS: any;
+      untrackedVolumeUSD: any;
+      token0Price: any;
+      token1Price: any;
+      volumeUSD: any;
+      dailyVolume: string;
+      txCount: any;
+      pairDayData: any[];
+      apr: number;
+    }[]
+  >([]);
+  const [totalLiquidityUSD, setTotalLiquidityUSD] = useState<number>(0);
 
-  const [positions, setPositions] = useState<Array<PositionsResponse>>([]);
-  const [isFetchingPool, setIsFetchingPool] = useState(false);
+  type Urls = {
+    pair1_address: string;
+    pair2_address: string;
+  };
+
+  const getLpTokenAddress: Record<SupportedChainID, Urls> = {
+    "17777": {
+      pair1_address: "0xc7f5264ee4b832e5ac55fb8b9028f414ca164218",
+      pair2_address: "0xb3fb2548287bcadd5a045270b3182c1fc6318684",
+    },
+    "15557": {
+      pair1_address: "0xafd8de90c836af0cf449614d8bc7a1521c6a638d",
+      pair2_address: "0xf67f0d0d0c99f0eab675c1b25538e9f5faaa4021",
+    },
+  };
 
   useEffect(() => {
-    if (!address) return;
-    (async () => {
-      setIsFetchingPool(true);
-      const req = await fetch(`/api/getUserLP?userAddress=${address}`)
-      // const req = await fetch(`/api/getUserLP?userAddress=0x222da5f13d800ff94947c20e8714e103822ff716`);
-      const response = await req.json();
-      setPositions(response.data);
-      setIsFetchingPool(false);
-    })();
-  }, [address]);
+    async function fetchData() {
+      try {
+        const url = urls[DEFAULT_CHAIN_ID.id].FACTORY_GRAPH_URL;
+        const client = new Client({
+          url: url,
+          exchanges: [cacheExchange, fetchExchange],
+        });
+
+        const res = await client
+          .query(getPoolListQuery, {
+            start_date: dayjs().utc().subtract(7, "days").startOf("day").unix(),
+          })
+          .toPromise();
+
+        let pools = res.data;
+        if (!pools) throw new Error("Failed to fetch data");
+
+        const dataWithApr = pools.pairs.map((item) => {
+          // Aggregate daily volume for each day
+          const dailyVolume = item.pairDayData.reduce((total, day) => {
+            return total + parseFloat(day.dailyVolumeUSD);
+          }, 0);
+
+          const fees = dailyVolume * 0.003;
+          const sevenDaysFeeUsd = fees * 7;
+
+          return {
+            ...item,
+            apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
+            dailyVolume: dailyVolume.toFixed(2), // Format the total daily volume
+          };
+        });
+
+        // Filter pools for "USDT/NEUTRO" and "NEUTRO/WEOS"
+        const lpAddresses = getLpTokenAddress[DEFAULT_CHAIN_ID.id];
+        const filteredPools = dataWithApr.filter((pool) => {
+          return (
+            pool.id == lpAddresses.pair1_address ||
+            pool.id == lpAddresses.pair2_address
+          );
+        });
+
+        // Sort the filtered dataWithApr array based on reserveUSD in descending order
+        const sortedData = filteredPools
+          .slice()
+          .sort((a, b) => b.reserveUSD - a.reserveUSD);
+
+        const totalLiquidityUsd = pools.neutroFactories.map((item) =>
+          parseFloat(item.totalLiquidityUSD)
+        );
+
+        // const formattedTotalLiquidityUsd = totalLiquidityUsd
+        //   .filter((value) => !isNaN(value))
+        //   .map((value) => Math.floor(value));
+
+        setTotalLiquidityUSD(totalLiquidityUsd[0] || 0);
+        setDataWithApr(sortedData);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  console.log(dataWithApr);
 
   return (
     <div className="py-16">
-      <div>
+      <div className="mb-8">
         <div className="flex justify-center items-center space-x-3">
-          <PoolIcon className="w-7 h-7 md:w-8 md:h-8 text-neutral-700 dark:text-neutral-300 mt-1" />
+          <PoolIcon className="w-7 h-7 md:w-8 md:h-8 text-primary mt-1" />{" "}
           <p className="m-0 text-center text-3xl md:text-4xl font-semibold">
             Liquidity Pool
           </p>
@@ -76,134 +193,103 @@ export default function Pool() {
         <p className="m-0 text-center text-base text-neutral-400 mt-2">
           Add or Remove liquidity to Neutroswap pool
         </p>
-      </div>
-      <div className="flex justify-center items-center">
-        <div className="mt-8 flex items-center text-center rounded-lg md:border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg w-full max-w-3xl">
-          {!positions.length && !isFetchingPool && (
-            <div className="flex flex-col items-center w-full md:p-8">
-              {theme.type as ThemeType === "nlight" && (
-                <NoContentLight className="w-40 h-40 opacity-75" />
-              )}
-              {theme.type as ThemeType === "ndark" && (
-                <NoContentDark className="w-40 h-40 opacity-75" />
-              )}
-              <p className="text-neutral-500 w-3/4">
-                You do not have any liquidity positions. Add some liquidity to
-                start earning.
-              </p>
-
-              <Modal>
-                <ModalOpenButton>
-                  <Button className="!mt-2">Add Liquidity</Button>
-                </ModalOpenButton>
-                <ModalContents>
-                  {({ close }) => <AddLiquidityModal handleClose={close} />}
-                </ModalContents>
-              </Modal>
+        <div className="my-5 box-border">
+          <div className="flex flex-col justify-center items-center px-1 py-3 md:px-10 md:py-7 rounded-xl md:border border-neutral-200/80 dark:border-neutral-800/80">
+            <div className="mb-2 text-xs font-bold uppercase text-neutral-500">
+              Pool Total Value Locked
             </div>
-          )}
-
-          {!positions.length && isFetchingPool && (
-            <div className="flex py-40 w-full">
-              <Loading scale={3} />
+            <div className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
+              ${currencyFormat(totalLiquidityUSD)}
             </div>
-          )}
-
-          {!!positions.length && (
-            <div className="md:p-8 w-full">
-              {positions.map((position) => (
-                <Link key={position.address} href={`/pool/${position.address}`}>
-                  <div
-                    className={classNames(
-                      "mb-4 flex flex-col justify-center w-full rounded-lg group transition",
-                      "bg-transparent dark:bg-neutral-900/75 hover:dark:bg-neutral-800/60",
-                      "border border-neutral-200 dark:border-transparent",
-                      "text-black dark:text-white"
-                    )}
-                  >
-                    <div className="flex items-center justify-between py-3 px-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex -space-x-2 relative z-0">
-                            <img
-                              alt={`${position.token0.symbol} Icon`}
-                              src={position.token0.logo}
-                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
-                              onError={(e) => {
-                                handleImageFallback(position.token0.symbol, e);
-                              }}
-                            />
-                            <img
-                              alt={`${position.token1.symbol} Icon`}
-                              src={position.token1.logo}
-                              className="h-6 rounded-full bg-black dark:bg-white ring-4 ring-white dark:ring-neutral-900"
-                              onError={(e) => {
-                                handleImageFallback(position.token1.symbol, e);
-                              }}
-                            />
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-left font-medium text-lg">
-                              {position.token0.symbol}
-                            </span>
-                            <span className="text-left font-medium text-lg opacity-25">
-                              /
-                            </span>
-                            <span className="text-left font-medium text-lg">
-                              {position.token1.symbol}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="flex text-sm space-x-4">
-                          <div className="flex space-x-2">
-                            <span className="opacity-50">Pool share</span>
-                            <span className="font-semibold">
-                              {decimalFormat(
-                                Number(formatEther(position.poolShare)) * 100,
-                                2
-                              )}
-                              %
-                            </span>
-                          </div>
-                          <div className="flex space-x-2">
-                            <span className="opacity-50">Owned LP token</span>
-                            <span className="font-semibold">
-                              {decimalFormat(
-                                Number(formatEther(position.userBalance)),
-                                2
-                              )}{" "}
-                              {position.symbol}
-                            </span>
-                          </div>
-
-                          {/* NOTE: Show token0 and token1 balance in each pool */}
-                          {/* <div className="flex space-x-2"> */}
-                          {/*   <span className="opacity-50">{position.token0.symbol}</span> */}
-                          {/*   <span className="font-semibold">{0} {position.token0.symbol}</span> */}
-                          {/* </div> */}
-                          {/* <div className="flex space-x-2"> */}
-                          {/*   <span className="opacity-50">{position.token1.symbol}</span> */}
-                          {/*   <span className="font-semibold">{0} {position.token1.symbol}</span> */}
-                          {/* </div> */}
-                        </div>
-                      </div>
-                      <ChevronRightIcon className="w-6 h-6 group-hover:translate-x-1 transition" />
-                    </div>
-                  </div>
-                </Link>
-              ))}
-
-              <Modal>
-                <ModalOpenButton>
-                  <Button className="!mt-2">Add Liquidity</Button>
-                </ModalOpenButton>
-                <ModalContents>
-                  {({ close }) => <AddLiquidityModal handleClose={close} />}
-                </ModalContents>
-              </Modal>
-            </div>
-          )}
+          </div>
         </div>
+        <div className="flex justify-end">
+          <Modal>
+            <ModalOpenButton>
+              <Button
+                auto
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary/80 hover:bg-primary dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
+                iconRight={
+                  <PlusIcon className="text-white dark:text-primary" />
+                }
+              >
+                Add Liquidity
+              </Button>
+            </ModalOpenButton>
+            <ModalContents>
+              {({ close }) => <AddLiquidityModal handleClose={close} />}
+            </ModalContents>
+          </Modal>
+        </div>
+      </div>
+
+      <div
+        className={cn(
+          "relative flex flex-col w-full border rounded-lg bg-white dark:bg-neutral-900/50 shadow-lg shadow-slate-200 dark:shadow-black/50 overflow-hidden"
+        )}
+      >
+        <Table>
+          <TableHeader className="border-b">
+            <TableRow className="hover:bg-transparent">
+              <TableHead className="w-60">Asset</TableHead>
+              <TableHead className="text-right">Liquidity</TableHead>
+              <TableHead className="text-right">Volume 24H</TableHead>
+              <TableHead className="text-right">APR</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {dataWithApr.map((pool) => (
+              <TableRow
+                key={pool.id}
+                className="cursor-pointer group"
+                href={`/pool/${pool.id}`}
+              >
+                <TableCell className="flex items-center space-x-4">
+                  <div className="flex -space-x-2.5 flex-shrink-0">
+                    <TokenLogo
+                      className="w-7 h-7 ring-2 ring-background"
+                      src={getTokenImageUrl(pool.token0.id as `0x${string}`)}
+                    />
+                    <TokenLogo
+                      className="w-7 h-7 ring-2 ring-background"
+                      src={getTokenImageUrl(pool.token1.id as `0x${string}`)}
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-left font-medium">
+                      {pool.token0.symbol}
+                    </span>
+                    <span className="text-left font-medium text-muted-foreground opacity-25">
+                      /
+                    </span>
+                    <span className="text-left font-medium">
+                      {pool.token1.symbol}
+                    </span>
+                  </div>
+                </TableCell>
+                <TableCell className="font-medium text-right">
+                  ${currencyCompactFormat(pool.reserveUSD)}
+                </TableCell>
+                <TableCell className="text-right">
+                  ${pool.dailyVolume}
+                </TableCell>
+                <TableCell className="text-right">
+                  {pool.apr.toFixed(2)}%
+                </TableCell>
+                <TableCell className="flex justify-end text-right">
+                  <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
@@ -217,9 +303,10 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
 
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID];
-    if (!supportedChainID.includes(chain.id.toString() as any)) return tokens[DEFAULT_CHAIN_ID];
-    return tokens[chain.id.toString() as SupportedChainID]
+    if (!chain) return tokens[DEFAULT_CHAIN_ID.id];
+    if (!supportedChainID.includes(chain.id as any))
+      return tokens[DEFAULT_CHAIN_ID.id];
+    return tokens[chain.id as SupportedChainID];
   }, [chain]);
 
   const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
@@ -242,19 +329,21 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
     functionName: "createPair",
     args: [token0.address, token1.address],
   });
-  const { isLoading: isCreatingPair, write: createPair } =
-    useContractWrite({
-      ...createPairConfig,
-      address: token1.address,
-      onSuccess: async (result) => {
-        const tx = await result.wait();
-        const decodedResult = ethers.utils.defaultAbiCoder.decode(
-          ['address', 'uint256'],
-          tx.logs[0].data
-        )
-        router.push(`/pool/${decodedResult[0]}`);
-      },
-    });
+  const { isLoading: isCreatingPair, write: createPair } = useContractWrite({
+    ...createPairConfig,
+    // address: token1.address,
+    onSuccess: async (result) => {
+      const tx = await waitForTransaction({
+        hash: result.hash,
+        confirmations: 8,
+      });
+      const decodedResult = decodeAbiParameters(
+        parseAbiParameters("address , uint256"),
+        tx.logs[0].data
+      );
+      router.push(`/pool/${decodedResult[0]}`);
+    },
+  });
 
   return (
     <div className="w-full">
@@ -283,7 +372,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
               "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2">
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   1
@@ -318,7 +407,7 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
               "hover:bg-neutral-200/75 hover:dark:bg-neutral-800/60"
             )}
           >
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between p-2">
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-neutral-500 dark:text-neutral-600">
                   2
@@ -342,24 +431,23 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
       </TokenPicker>
       {(!existingPool ||
         existingPool !== "0x0000000000000000000000000000000000000000") && (
-          <Button
-            scale={1.25}
-            className={classNames(
-              "!w-full !mt-4 !bg-transparent !rounded-lg",
-              "!border-neutral-300 dark:!border-neutral-700",
-              "hover:!border-neutral-400 dark:hover:!border-neutral-600",
-              "focus:!border-neutral-400 dark:focus:!border-neutral-600",
-              "focus:hover:!border-neutral-400 dark:focus:hover:!border-neutral-600",
-              "disabled:opacity-50 disabled:hover:!border-neutral-300 disabled:dark:hover:!border-neutral-700"
-            )}
-            disabled={isError}
-            loading={isFetchingGetPair}
-            onClick={() => router.push(`/pool/${existingPool}`)}
-          >
-            <span>Enter pool</span>
-            <ArrowRightIcon className="w-4 h-4 ml-2" />
-          </Button>
-        )}
+        <Button
+          scale={1.25}
+          className={classNames(
+            "!flex !items-center !mt-4 !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+            "text-white dark:text-primary",
+            "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+            "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+            "disabled:opacity-50"
+          )}
+          disabled={isError}
+          loading={isFetchingGetPair}
+          onClick={() => router.push(`/pool/${existingPool}`)}
+        >
+          <span>Enter pool</span>
+          <ArrowRightIcon className="w-4 h-4 ml-2" />
+        </Button>
+      )}
       {existingPool === "0x0000000000000000000000000000000000000000" && (
         <div>
           <Button

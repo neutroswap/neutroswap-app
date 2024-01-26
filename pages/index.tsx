@@ -25,7 +25,7 @@ import {
   useAccount,
   useContractReads,
   useNetwork,
-  useSigner,
+  useWalletClient,
   useBalance,
 } from "wagmi";
 import { ERC20_ABI, NEUTRO_FACTORY_ABI, NEUTRO_POOL_ABI } from "@/shared/abi";
@@ -33,7 +33,7 @@ import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
 import debounce from "lodash/debounce";
-import { formatUnits } from "ethers/lib/utils.js";
+import { formatUnits } from "viem";
 import { tokens } from "@/shared/statics/tokenList";
 import { Token } from "@/shared/types/tokens.types";
 import {
@@ -64,6 +64,7 @@ import {
 } from "@/shared/helpers/constants";
 import ConnectButton from "@/components/modules/ConnectButton";
 import useUniswapPairFactory from "@/shared/hooks/useUniswapPairFactory";
+import { CheckCircleIcon } from "@heroicons/react/24/solid";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -84,17 +85,17 @@ export default function Home() {
 
   const [balance0, setBalance0] = useState<Currency>({
     decimal: 18,
-    raw: BigNumber.from(0),
+    raw: BigInt(0),
     formatted: "0.00",
   });
   const [balance1, setBalance1] = useState<Currency>({
     decimal: 18,
-    raw: BigNumber.from(0),
+    raw: BigInt(0),
     formatted: "0.00",
   });
   const [eosBalance, setEosBalance] = useState<Currency>({
     decimal: 18,
-    raw: BigNumber.from(0),
+    raw: BigInt(0),
     formatted: "0.00",
   });
   const [tokenName0, setTokenName0] = useState("");
@@ -115,10 +116,10 @@ export default function Home() {
 
   // TODO: MOVE THIS HOOKS
   const chainSpecificTokens = useMemo(() => {
-    if (!chain) return tokens[DEFAULT_CHAIN_ID];
-    if (!supportedChainID.includes(chain.id.toString() as any))
-      return tokens[DEFAULT_CHAIN_ID];
-    return tokens[chain.id.toString() as SupportedChainID];
+    if (!chain) return tokens[DEFAULT_CHAIN_ID.id];
+    if (!supportedChainID.includes(chain.id as any))
+      return tokens[DEFAULT_CHAIN_ID.id];
+    return tokens[chain.id as SupportedChainID];
   }, [chain]);
 
   const [token0, setToken0] = useState<Token>(chainSpecificTokens[0]);
@@ -144,71 +145,79 @@ export default function Home() {
     isNative: isPreferNative,
     slippage: slippage,
     address: address,
-  })
-
-  const { isFetching: isFetchingBalance0 } = useContractReads({
-    enabled: Boolean(address || chain?.unsupported),
-    contracts: [
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-        args: [address!],
-      },
-      { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
-      {
-        address: token0.address,
-        abi: ERC20_ABI,
-        functionName: "decimals",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
-      },
-    ],
-    onSuccess(value) {
-      const [token0Balance, token0Symbol, token0Decimals] = value;
-      if (!token0Balance || !token0Symbol || !token0Decimals) return;
-      setBalance0({
-        decimal: token0Decimals.toNumber(),
-        raw: token0Balance,
-        formatted: parseFloat(
-          formatUnits(token0Balance.toString(), token0Decimals.toNumber()).toString()
-        ).toFixed(3),
-      });
-      setTokenName0(token0Symbol);
-    },
   });
 
-  const { isFetching: isFetchingBalance1 } = useContractReads({
-    enabled: Boolean(address || chain?.unsupported),
-    contracts: [
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: "balanceOf",
-        args: [address!],
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+  const { isFetching: isFetchingBalance0, refetch: refetchBalance0 } =
+    useContractReads({
+      enabled: Boolean(address || chain?.unsupported),
+      contracts: [
+        {
+          address: token0.address,
+          abi: ERC20_ABI,
+          functionName: "balanceOf",
+          chainId: +DEFAULT_CHAIN_ID.id,
+          args: [address!],
+        },
+        { address: token0.address, abi: ERC20_ABI, functionName: "symbol" },
+        {
+          address: token0.address,
+          abi: ERC20_ABI,
+          functionName: "decimals",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+      ],
+      onSuccess(value) {
+        const [token0Balance, token0Symbol, token0Decimals] = value;
+        if (!token0Balance || !token0Symbol || !token0Decimals) return;
+        setBalance0({
+          decimal: Number(token0Decimals.result),
+          raw: token0Balance.result as bigint,
+          formatted: parseFloat(
+            formatUnits(
+              BigInt(Number(token0Balance.result)),
+              Number(token0Decimals.result)
+            ).toString()
+          ).toFixed(3),
+        });
+        setTokenName0(token0Symbol.result!);
       },
-      { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
-      {
-        address: token1.address,
-        abi: ERC20_ABI,
-        functionName: "decimals",
-        chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+    });
+
+  const { isFetching: isFetchingBalance1, refetch: refetchBalance1 } =
+    useContractReads({
+      enabled: Boolean(address || chain?.unsupported),
+      contracts: [
+        {
+          address: token1.address,
+          abi: ERC20_ABI,
+          functionName: "balanceOf",
+          args: [address!],
+          chainId: +DEFAULT_CHAIN_ID.id,
+        },
+        { address: token1.address, abi: ERC20_ABI, functionName: "symbol" },
+        {
+          address: token1.address,
+          abi: ERC20_ABI,
+          functionName: "decimals",
+          chainId: Number(NEXT_PUBLIC_CHAIN_ID),
+        },
+      ],
+      onSuccess(value) {
+        const [token1Balance, token1Symbol, token1Decimals] = value;
+        if (!token1Balance || !token1Symbol || !token1Decimals) return;
+        setBalance1({
+          decimal: Number(token1Decimals.result),
+          raw: token1Balance.result as bigint,
+          formatted: parseFloat(
+            formatUnits(
+              BigInt(Number(token1Balance.result)),
+              Number(token1Decimals.result)
+            ).toString()
+          ).toFixed(3),
+        });
+        setTokenName1(token1Symbol.result!);
       },
-    ],
-    onSuccess(value) {
-      const [token1Balance, token1Symbol, token1Decimals] = value;
-      if (!token1Balance || !token1Symbol || !token1Decimals) return;
-      setBalance1({
-        decimal: token1Decimals.toNumber(),
-        raw: token1Balance,
-        formatted: parseFloat(
-          formatUnits(token1Balance.toString(), token1Decimals.toNumber()).toString()
-        ).toFixed(3),
-      });
-      setTokenName1(token1Symbol);
-    },
-  });
+    });
 
   const poolContract = {
     address: pairs as `0x${string}`,
@@ -216,29 +225,34 @@ export default function Home() {
   };
 
   const { refetch: refetchReserves } = useContractReads({
-    enabled: Boolean(token0 && token1 && (pairs !== '0x0000000000000000000000000000000000000000')),
+    enabled: Boolean(
+      token0 && token1 && pairs !== "0x0000000000000000000000000000000000000000"
+    ),
     contracts: [
-      { ...poolContract, functionName: "token0" },
-      { ...poolContract, functionName: "token1" },
-      { ...poolContract, functionName: "getReserves" }
+      { ...poolContract, functionName: "token0" } as const,
+      { ...poolContract, functionName: "token1" } as const,
+      { ...poolContract, functionName: "getReserves" } as const,
     ],
     onSuccess(response) {
       const [t0, t1, reserves] = response;
-      const cp = +formatUnits(reserves._reserve0, token0.decimal) * +formatUnits(reserves._reserve1, token1.decimal)
+      const cp =
+        +formatUnits(reserves.result?.[0]!, token0.decimal) *
+        +formatUnits(reserves.result?.[1]!, token1.decimal);
       setConstantProduct(cp);
-      if (token0.address === t0) {
-        const r0 = +formatUnits(reserves._reserve0, token0.decimal);
-        const r1 = +formatUnits(reserves._reserve1, token1.decimal);
+      if (token0.address === t0.result) {
+        const r0 = +formatUnits(reserves.result?.[0]!, token0.decimal);
+        const r1 = +formatUnits(reserves.result?.[1]!, token1.decimal);
         setReserves([r0, cp / r0]);
         setMarketPrice(r0 / r1); // reserve0 as quotient
       }
-      if (token0.address === t1) { // reverse reserve number
-        const r0 = +formatUnits(reserves._reserve1, token0.decimal);
-        const r1 = +formatUnits(reserves._reserve0, token1.decimal);
+      if (token0.address === t1.result) {
+        // reverse reserve number
+        const r0 = +formatUnits(reserves.result?.[1]!, token0.decimal);
+        const r1 = +formatUnits(reserves.result?.[0]!, token1.decimal);
         setReserves([r0, cp / r0]);
-        setMarketPrice(r0 / r1) // reserve0 as quotient
+        setMarketPrice(r0 / r1); // reserve0 as quotient
       }
-    }
+    },
   });
 
   useEffect(() => {
@@ -250,7 +264,7 @@ export default function Home() {
         setUniswapFactory(factory);
         setInsufficientLiquidity(false);
       } catch (error) {
-        setUniswapFactory(undefined)
+        setUniswapFactory(undefined);
         setInsufficientLiquidity(true);
       }
     };
@@ -259,10 +273,10 @@ export default function Home() {
     return () => {
       setTokenAmount0("");
       setTokenAmount1("");
-    }
+    };
   }, [uniswapPair]);
 
-  const { data: signer } = useSigner({
+  const { data: signer } = useWalletClient({
     chainId: Number(NEXT_PUBLIC_CHAIN_ID),
   });
 
@@ -271,13 +285,14 @@ export default function Home() {
     setTokenMin1(tradeContext.minAmountConvertQuote as string);
     setTokenEst1(tradeContext.expectedConvertQuote as string);
 
-    const isToken0WrappedNative = getAddress(token0.address) === getAddress(NEXT_PUBLIC_WEOS_ADDRESS!);
-    if (isPreferNative && isToken0WrappedNative) return setIsApproved(true)
-    return setIsApproved(tradeContext.hasEnoughAllowance)
+    const isToken0WrappedNative =
+      getAddress(token0.address) === getAddress(NEXT_PUBLIC_WEOS_ADDRESS!);
+    if (isPreferNative && isToken0WrappedNative) return setIsApproved(true);
+    return setIsApproved(tradeContext.hasEnoughAllowance);
   }, [tradeContext, isPreferNative, token0]);
 
   const isAmount0Invalid = () => {
-    let value: BigNumber;
+    let value: bigint;
     if (tokenName0 === "WEOS" && balance) value = balance.value;
     else value = balance0.raw;
     return Number(tokenAmount0) > +formatUnits(value, token0.decimal);
@@ -335,6 +350,8 @@ export default function Home() {
     setTxHash("");
     setTokenAmount0("");
     setTokenAmount1("");
+    refetchBalance0();
+    refetchBalance1();
   };
 
   const approve = async () => {
@@ -343,10 +360,14 @@ export default function Home() {
     if (!signer) throw new Error("No signer");
 
     if (tradeContext.approvalTransaction) {
-      const approved = await signer.sendTransaction(
-        tradeContext.approvalTransaction
-      );
-      await approved.wait();
+      // const approved = await signer.sendTransaction(
+      //   tradeContext.approvalTransaction
+      // );
+      const approved = await signer.sendTransaction({
+        to: tradeContext.approvalTransaction.to as `0x${string}`,
+        data: tradeContext.approvalTransaction.data as `0x${string}`,
+        value: BigInt(tradeContext.approvalTransaction.value),
+      });
       setIsLoading(false);
       setIsApproved(true);
     }
@@ -358,11 +379,12 @@ export default function Home() {
     if (!signer) throw new Error("No signer");
 
     try {
-      const tradeTransaction = await signer.sendTransaction(
-        tradeContext.transaction
-      );
-      const tradeReceipt = await tradeTransaction.wait();
-      setTxHash(tradeReceipt.transactionHash);
+      const tradeReceipt = await signer.sendTransaction({
+        to: tradeContext.transaction.to as `0x${string}`,
+        data: tradeContext.transaction.data as `0x${string}`,
+        value: BigInt(tradeContext.transaction.value),
+      });
+      setTxHash(tradeReceipt);
       setIsLoading(false);
       tradeContext.destroy();
     } catch (error) {
@@ -385,8 +407,8 @@ export default function Home() {
     // console.log('cp', constantProduct);
     // console.log('impact', (1 - (marketPrice / newMarketPrice)) * 100);
 
-    return (1 - (marketPrice / newMarketPrice)) * 100
-  }, [tokenAmount0, marketPrice, constantProduct, reserves])
+    return (1 - marketPrice / newMarketPrice) * 100;
+  }, [tokenAmount0, marketPrice, constantProduct, reserves]);
 
   if (!isMounted) {
     return <Spinner />;
@@ -406,17 +428,22 @@ export default function Home() {
 
       <div className="flex flex-col items-center justify-center min-h-[80%] pt-16">
         <div className="w-full max-w-lg">
-          <div className={classNames(
-            "mt-8 rounded-xl p-0 md:p-4",
-            "shadow-none md:shadow-dark-sm md:dark:shadow-dark-lg",
-            "border-0 md:border border-neutral-200/60 dark:border-neutral-800/50"
-          )}>
+          <div
+            className={classNames(
+              "mt-8 rounded-xl p-0 md:p-4",
+              "shadow-none md:shadow-dark-sm md:dark:shadow-dark-lg",
+              "border-0 md:border border-neutral-200/60 dark:border-neutral-800/50"
+            )}
+          >
             <div className="flex justify-between items-center mb-2">
-              <span className="text-lg font-semibold"> Swap </span>
+              <span className="text-lg font-semibold text-foreground">
+                {" "}
+                Swap{" "}
+              </span>
               <Popover className="relative flex items-center">
                 <>
                   <Popover.Button>
-                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer text-neutral-500 hover:text-inherit transition" />
+                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer text-muted-foreground hover:text-primary transition" />
                   </Popover.Button>
                   <Transition
                     as={Fragment}
@@ -485,13 +512,13 @@ export default function Home() {
 
             <div
               className={classNames(
-                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "py-2 px-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
                 "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
               )}
             >
               <div className="flex justify-between">
                 <div className="flex items-center">
-                  <p className="text-sm text-neutral-500 mr-2">You Sell</p>
+                  <p className="text-sm text-muted-foreground mr-2">You Sell</p>
                 </div>
                 <div
                   className="flex items-center cursor-pointer"
@@ -501,26 +528,23 @@ export default function Home() {
                       balance && tokenName0 === "WEOS"
                         ? balance.value
                         : balance0.raw;
-                    setTokenAmount0(formatUnits(value, token0.decimal));
-                    debouncedToken0(formatUnits(value, token0.decimal));
+                    setTokenAmount0(formatUnits(value, balance0.decimal));
+                    debouncedToken0(formatUnits(value, balance0.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
                   {isFetchingBalance0 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance0 && (
-                    <div className="flex space-x-1">
-                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                        {tokenName0 !== "WEOS" && balance0.formatted}
-                        {tokenName0 === "WEOS" &&
-                          Number(balance ? balance.formatted : "0").toFixed(3)}
-                      </p>
-                      <p className="text-sm text-neutral-500 hover:dark:text-neutral-700">
-                        {tokenName0 !== "WEOS" && tokenName0}
-                        {tokenName0 === "WEOS" && "EOS"}
-                      </p>
-                    </div>
+                    <p className="text-sm text-muted-foreground hover:text-foreground/80">
+                      {tokenName0 !== "WEOS" && balance0.formatted}
+                      {tokenName0 === "WEOS" &&
+                        Number(balance ? balance.formatted : "0").toFixed(3)}
+                      &nbsp;
+                      {tokenName0 !== "WEOS" && tokenName0}
+                      {tokenName0 === "WEOS" && "EOS"}
+                    </p>
                   )}
                 </div>
               </div>
@@ -532,6 +556,7 @@ export default function Home() {
                   {!isFetchingToken0Price && (
                     <input
                       className="w-full text-2xl bg-transparent focus:outline-none"
+                      disabled={!uniswapFactory}
                       placeholder="0.0"
                       value={tokenAmount0}
                       onChange={handleToken0Change}
@@ -584,7 +609,7 @@ export default function Home() {
                 <div className="transition-transform rotate-0 group-hover:rotate-180">
                   <ArrowDownIcon
                     strokeWidth={3}
-                    className="w-5 h-5 text-neutral-700 dark:text-neutral-100"
+                    className="w-5 h-5 text-muted-foreground hover:text-primary"
                   />
                 </div>
               </button>
@@ -592,13 +617,13 @@ export default function Home() {
 
             <div
               className={classNames(
-                "p-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
+                "py-2 px-4 bg-neutral-100/75 dark:bg-neutral-900/50 rounded-lg box-border transition",
                 "border border-transparent focus-within:border-neutral-200 focus-within:dark:border-neutral-800/50"
               )}
             >
               <div className="flex justify-between">
                 <div className="flex items-center">
-                  <p className="text-sm text-neutral-500 mr-2">You Buy</p>
+                  <p className="text-sm text-muted-foreground mr-2">You Buy</p>
                 </div>
                 <div
                   className="flex items-center cursor-pointer "
@@ -608,16 +633,16 @@ export default function Home() {
                       balance && tokenName1 === "WEOS"
                         ? balance.value
                         : balance1.raw;
-                    setTokenAmount1(formatUnits(value, token1.decimal));
-                    debouncedToken1(formatUnits(value, token1.decimal));
+                    setTokenAmount1(formatUnits(value, balance1.decimal));
+                    debouncedToken1(formatUnits(value, balance1.decimal));
                   }}
                 >
-                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-neutral-400 dark:text-neutral-600" />
+                  <WalletIcon className="mr-2 w-4 h-4 md:w-5 md:h-5 text-muted-foreground" />
                   {isFetchingBalance1 && (
                     <div className="w-24 h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse"></div>
                   )}
                   {!isFetchingBalance1 && (
-                    <div className="flex space-x-1 text-neutral-500 hover:dark:text-neutral-700">
+                    <div className="flex space-x-1 text-muted-foreground hover:text-foreground/80">
                       <p className="text-sm">
                         {tokenName1 !== "WEOS" && balance1.formatted}
                         {tokenName1 === "WEOS" &&
@@ -639,6 +664,7 @@ export default function Home() {
                   {!isFetchingToken1Price && (
                     <input
                       className="w-full text-2xl bg-transparent focus:outline-none"
+                      disabled={!uniswapFactory}
                       placeholder="0.0"
                       value={tokenAmount1}
                       onChange={handleToken1Change}
@@ -673,18 +699,20 @@ export default function Home() {
               </div>
             </div>
 
-
-            {((!!tokenAmount1 && !isFetchingBalance0 && !isFetchingBalance1) && calcPriceImpact > 2) && (
-              <div
-                className={classNames(
-                  "flex mt-4 text-sm border border-red-500 p-2 justify-between animate-pulse rounded-lg",
-                  "text-red-500 font-medium"
-                )}
-              >
-                <span>Price impact warning </span>
-                <span>-{calcPriceImpact.toFixed(2)}%</span>
-              </div>
-            )}
+            {!!tokenAmount1 &&
+              !isFetchingBalance0 &&
+              !isFetchingBalance1 &&
+              calcPriceImpact > 2 && (
+                <div
+                  className={classNames(
+                    "flex mt-4 text-sm border border-red-500 p-2 justify-between animate-pulse rounded-lg",
+                    "text-red-500 font-medium"
+                  )}
+                >
+                  <span>Price impact warning </span>
+                  <span>-{calcPriceImpact.toFixed(2)}%</span>
+                </div>
+              )}
 
             <div className="flex mt-3 justify-center">
               {!isConnected && <ConnectButton />}
@@ -695,12 +723,16 @@ export default function Home() {
                     <Button
                       className={classNames(
                         "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                        "text-white dark:text-amber-600",
-                        "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                         "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-                        "disabled:opacity-50",
+                        "disabled:opacity-50"
                       )}
-                      disabled={isInsufficientLiquidity}
+                      disabled={
+                        isInsufficientLiquidity ||
+                        !tokenAmount0 ||
+                        !tokenAmount1
+                      }
                     >
                       {isInsufficientLiquidity && "Insufficient Liquidity"}
                       {!isInsufficientLiquidity && "Swap"}
@@ -709,25 +741,33 @@ export default function Home() {
                   <ModalContents>
                     {({ close }) => (
                       <div>
-                        <button className="w-full flex items-center space-x-2 mb-5 group" onClick={close}>
-                          <ArrowSmallLeftIcon
-                            className="h-4 cursor-pointer text-black hover:text-amber-600 dark:text-white dark:hover:text-amber-500 group-hover:-translate-x-0.5 transition"
-                          />
-                          <p className="m-0 text-neutral-600 dark:text-neutral-400">Back</p>
+                        <button
+                          className="w-full flex items-center space-x-1 group text-foreground hover:text-primary"
+                          onClick={close}
+                        >
+                          <ArrowSmallLeftIcon className="h-4 cursor-pointer group-hover:-translate-x-0.5 transition" />
+                          <p className="m-0 text-neutral-600 dark:text-neutral-400">
+                            Back
+                          </p>
                         </button>
                         {!txHash && (
                           <>
                             <div className="text-left flex items-center justify-between ">
                               <div className="flex flex-col ">
-                                <div className="text-2xl mb-1 font-medium text-black dark:text-white">
+                                <div className="text-2xl mb-1 font-medium text-foreground">
                                   Buy{" "}
-                                  {parseFloat(tokenAmount1)
-                                    .toFixed(3)
-                                    .toString()}{" "}
+                                  <span className="text-primary">
+                                    {parseFloat(tokenAmount1)
+                                      .toFixed(3)
+                                      .toString()}{" "}
+                                  </span>
                                   {tokenName1 === "WEOS" ? "EOS" : tokenName1}
                                 </div>
-                                <div className="text-lg text-black/60 dark:text-neutral-400 font-medium">
-                                  Sell {tokenAmount0}{" "}
+                                <div className="text-lg text-muted-foreground font-medium">
+                                  Sell{" "}
+                                  <span className="text-primary">
+                                    {tokenAmount0}{" "}
+                                  </span>
                                   {tokenName0 === "WEOS" ? "EOS" : tokenName0}
                                 </div>
                               </div>
@@ -740,28 +780,28 @@ export default function Home() {
                             <div className="text-left p-3 my-5 flex flex-col bg-neutral-100/75 dark:bg-neutral-900/75 rounded-lg">
                               <div className="flex items-center justify-between mb-3">
                                 <div className="flex flex-col max-w-xs">
-                                  <div className="font-medium text-black dark:text-neutral-300">
+                                  <div className="font-medium text-foreground">
                                     Slippage
                                   </div>
-                                  <div className="font-light text-sm text-black/60 dark:text-neutral-400">
+                                  <div className="font-light text-sm text-muted-foreground">
                                     The slippage you set for the trade
                                   </div>
                                 </div>
-                                <div className="text-black dark:text-neutral-300">
+                                <div className="text-foreground">
                                   {slippage}%
                                 </div>
                               </div>
                               <div className="flex items-center justify-between">
                                 <div className="flex flex-col max-w-xs">
-                                  <div className="font-medium text-black dark:text-neutral-300">
+                                  <div className="font-medium text-foreground">
                                     Minimal received
                                   </div>
-                                  <div className="font-light text-sm text-black/60 dark:text-neutral-400">
+                                  <div className="font-light text-sm text-muted-foreground">
                                     The minimum amount you are <br />{" "}
                                     guaranteeed to receive
                                   </div>
                                 </div>
-                                <div className="text-black dark:text-neutral-300">
+                                <div className="text-foreground">
                                   {parseFloat(tokenMin1).toFixed(3).toString()}{" "}
                                   ${tokenName1}
                                 </div>
@@ -769,16 +809,17 @@ export default function Home() {
                             </div>
                             <div className="p-3 my-5 flex bg-neutral-100/75 dark:bg-neutral-900/75 rounded-lg items-center justify-between">
                               <div className="flex flex-col max-w-xs">
-                                <div className="font-medium text-black dark:text-neutral-300">
+                                <div className="font-medium text-foreground">
                                   Recipient
                                 </div>
                               </div>
                               <Link
-                                href={`https://explorer.evm.eosnetwork.com/address/${address as string
-                                  }`}
+                                href={`https://explorer.evm.eosnetwork.com/address/${
+                                  address as string
+                                }`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-sm"
+                                className="text-sm active:text-blue-600"
                               >
                                 {truncateEthAddress(address as string)}
                               </Link>
@@ -791,9 +832,10 @@ export default function Home() {
                                     disabled={!tokenAmount0 || !isConnected}
                                     className={classNames(
                                       "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                                      "text-white dark:text-amber-600",
-                                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                      "text-white dark:text-primary",
+                                      "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                                      "disabled:opacity-50"
                                     )}
                                     loading={isLoading}
                                   >
@@ -806,9 +848,10 @@ export default function Home() {
                                     disabled={!tokenAmount0 || !isConnected}
                                     className={classNames(
                                       "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                                      "text-white dark:text-amber-600",
-                                      "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                      "text-white dark:text-primary",
+                                      "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                                      "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                                      "disabled:opacity-50"
                                     )}
                                     loading={isLoading}
                                   >
@@ -821,32 +864,39 @@ export default function Home() {
                         )}
                         {txHash && (
                           <>
-                            <div className="flex justify-center items-center py-20 mb-5 ">
-                              <div className="mr-2 text-black dark:text-white">
-                                You sold {tokenAmount0}{" "}
-                                {tokenName0 === "WEOS" ? "EOS" : tokenName0} for{" "}
-                                {parseFloat(tokenAmount1).toFixed(3).toString()}{" "}
-                                {tokenName1 === "WEOS" ? "EOS" : tokenName1}
+                            <div className="flex flex-col justify-center items-center py-10 ">
+                              <CheckCircleIcon className=" h-40 text-green-500" />
+
+                              <div className="flex mb-5">
+                                <div className="mr-2 text-black dark:text-white">
+                                  You sold {tokenAmount0}{" "}
+                                  {tokenName0 === "WEOS" ? "EOS" : tokenName0}{" "}
+                                  for{" "}
+                                  {parseFloat(tokenAmount1)
+                                    .toFixed(3)
+                                    .toString()}{" "}
+                                  {tokenName1 === "WEOS" ? "EOS" : tokenName1}
+                                </div>
+                                <Link
+                                  href={`https://explorer.evm.eosnetwork.com/tx/${txHash}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
+                                </Link>
                               </div>
-                              <Link
-                                href={`https://explorer.evm.eosnetwork.com/tx/${txHash}`}
-                                target="_blank"
-                                rel="noreferrer"
+                              <Button
+                                onClick={resetAllSwapField}
+                                className={classNames(
+                                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
+                                  "text-white dark:text-amber-600",
+                                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                                  "!border !border-orange-600/50 dark:border-orange-400/[.12]"
+                                )}
                               >
-                                <ArrowTopRightOnSquareIcon className="h-5 text-blue-500 justify-center" />
-                              </Link>
+                                Swap again
+                              </Button>
                             </div>
-                            <Button
-                              onClick={resetAllSwapField}
-                              className={classNames(
-                                "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm !text-base",
-                                "text-white dark:text-amber-600",
-                                "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
-                                "!border !border-orange-600/50 dark:border-orange-400/[.12]"
-                              )}
-                            >
-                              Swap again
-                            </Button>
                           </>
                         )}
                       </div>
