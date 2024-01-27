@@ -193,8 +193,8 @@ function SPNFTPool() {
                 onClick={() => window.location.reload()}
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]"
                 )}
               >
@@ -478,8 +478,8 @@ function LiquidityPool() {
                 onClick={() => window.location.reload()}
                 className={classNames(
                   "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm",
-                  "text-white dark:text-amber-600",
-                  "!bg-amber-500 hover:bg-amber-600 dark:bg-opacity-[.08]",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
                   "!border !border-orange-600/50 dark:border-orange-400/[.12]"
                 )}
               >
