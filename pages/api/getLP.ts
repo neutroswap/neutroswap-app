@@ -88,7 +88,6 @@ export async function getLPInfo(
 
     let [balance, totalSupply, reserves, token0, token1, devFee, swapFee] =
       callValues;
-    //   console.log("balanceeeeeeee ", balance.returnValues[0])
     let balanceBN = BigNumber.from(balance.returnValues[0].hex);
     let totalSupplyBN = BigNumber.from(totalSupply.returnValues[0].hex);
     const poolShare = balanceBN

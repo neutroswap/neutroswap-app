@@ -204,8 +204,6 @@ export async function cachingNeutroPrice() {
     CACHED_NEUTRO_PRICE = newPrice["neutroswap"].usd;
     LAST_FETCHED_NEUTRO_PRICE = currentTime;
   }
-
-  console.log("Fetched $NEUTRO effective price", CACHED_NEUTRO_PRICE)
 }
 
 export default async function handler(

@@ -179,8 +179,6 @@ export default function Pool() {
     fetchData();
   }, []);
 
-  console.log(dataWithApr);
-
   return (
     <div className="py-16">
       <div className="mb-8">

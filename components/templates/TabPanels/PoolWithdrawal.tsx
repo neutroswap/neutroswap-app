@@ -49,13 +49,13 @@ type PoolWithdrawalPanelProps = {
   token1: Token;
   totalLPSupply: bigint;
   userLPBalance: Currency;
-  poolBalances: Currency[];
+  reserves: readonly [bigint, bigint, number] | undefined;
   refetchAllBalance: (options?: any) => Promise<any>;
   refetchUserBalances: (options?: any) => Promise<any>;
 };
 
 // TODO: move slippage to state or store
-const SLIPPAGE = 50;
+const SLIPPAGE = 50; //0.005;
 
 const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
   const {
@@ -63,7 +63,7 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
     token1,
     totalLPSupply,
     userLPBalance,
-    poolBalances,
+    reserves,
     refetchAllBalance,
     refetchUserBalances,
   } = props;
@@ -187,10 +187,16 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
       address!, // address
       BigInt(dayjs().add(5, "minutes").unix()), // deadline
     ],
+    onError(err) {
+      console.log(err);
+    },
   });
   const { isLoading: isRemovingLiquidityETH, write: removeLiquidityETH } =
     useContractWrite({
       ...removeLiquidityETHConfig,
+      onError(error, variables, context) {
+        console.log(error, variables, context);
+      },
       onSuccess: async (tx) => {
         await waitForTransaction({ hash: tx.hash, confirmations: 8 });
         await refetchAllBalance();
@@ -198,23 +204,34 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
       },
     });
 
-  useEffect(() => {
-    if (amount !== BigInt(0) || totalLPSupply !== BigInt(0)) return;
-    const token0Value =
-      (amount * poolBalances[0].raw * BigInt(10000 - SLIPPAGE)) /
-      BigInt(10000) /
-      totalLPSupply;
-    const token1Value =
-      (amount * poolBalances[1].raw * BigInt(10000 - SLIPPAGE)) /
-      BigInt(10000) /
-      totalLPSupply;
-    setToken0Amount(formatUnits(token0Value, token0.decimal));
-    setToken1Amount(formatUnits(token1Value, token1.decimal));
-  }, [token0, token1, amount, poolBalances, totalLPSupply]);
+  // useEffect(() => {
+  //   if (amount !== BigInt(0) || totalLPSupply !== BigInt(0)) return;
+  //   const token0Value =
+  //     (amount *
+  //       totalLPSupply *
+  //       poolBalances[0].raw *
+  //       BigInt(10000 - SLIPPAGE)) /
+  //     BigInt(10000);
+  //   const token1Value =
+  //     (amount *
+  //       totalLPSupply *
+  //       poolBalances[1].raw *
+  //       BigInt(10000 - SLIPPAGE)) /
+  //     BigInt(10000);
+  //   setToken0Amount(formatUnits(token0Value, token0.decimal));
+  //   setToken1Amount(formatUnits(token1Value, token1.decimal));
+  // }, [token0, token1, amount, poolBalances, totalLPSupply, SLIPPAGE]);
 
-  const updateExpectedAmounts = (withdrawAmount: any) => {
-    const token0Value = (withdrawAmount * poolBalances[0].raw) / totalLPSupply;
-    const token1Value = (withdrawAmount * poolBalances[1].raw) / totalLPSupply;
+  const updateExpectedAmounts = (withdrawAmount: bigint) => {
+    const token0Value =
+      (((withdrawAmount * reserves![0]) / totalLPSupply) *
+        BigInt(10000 - SLIPPAGE)) /
+      BigInt(10000);
+    const token1Value =
+      (((withdrawAmount * reserves![1]) / totalLPSupply) *
+        BigInt(10000 - SLIPPAGE)) /
+      BigInt(10000);
+
     setAmount(withdrawAmount);
     setToken0Amount(formatUnits(token0Value, token0.decimal));
     setToken1Amount(formatUnits(token1Value, token1.decimal));
@@ -279,7 +296,9 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 setPercentage(value[0]);
               }}
               onValueCommit={(value) => {
-                setAmount((userLPBalance.raw * BigInt(value[0])) / BigInt(100));
+                const withdrawAmount =
+                  (userLPBalance.raw * BigInt(value[0])) / BigInt(100);
+                updateExpectedAmounts(withdrawAmount);
               }}
             />
             <div className="grid grid-cols-4 gap-4 mt-4">
@@ -296,7 +315,6 @@ const PoolWithdrawalPanel: React.FC<PoolWithdrawalPanelProps> = (props) => {
                 onClick={() => {
                   const percentage = 25;
                   setPercentage(percentage);
-
                   const withdrawAmount =
                     (userLPBalance.raw * BigInt(percentage)) / BigInt(100);
                   updateExpectedAmounts(withdrawAmount);

@@ -343,7 +343,7 @@ export default function PoolDetails() {
                   token1={token1}
                   totalLPSupply={totalLPSupply}
                   userLPBalance={userLPBalance}
-                  poolBalances={poolBalances}
+                  reserves={reserves}
                   refetchAllBalance={refetchAllBalance}
                   refetchUserBalances={refetchUserBalances}
                 />
