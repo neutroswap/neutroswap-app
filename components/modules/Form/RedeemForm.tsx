@@ -204,7 +204,7 @@ export default function RedeemForm() {
                         onClick={() =>
                           form.setValue(
                             "redeemXneutroToNeutro",
-                            availableXneutro
+                            formatEther(xneutroBalance)
                           )
                         }
                       >

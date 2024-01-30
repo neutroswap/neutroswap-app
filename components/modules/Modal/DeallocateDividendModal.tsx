@@ -137,7 +137,7 @@ export default function AllocateDividendModal() {
                             onClick={() =>
                               form.setValue(
                                 "deallocateXneutro",
-                                availableAllocatedXneutro
+                                allocatedBalance
                               )
                             }
                           >

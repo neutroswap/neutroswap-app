@@ -190,7 +190,7 @@ export default function AllocateDividendModal() {
                           <div
                             className="mr-3 text-sm text-primary cursor-pointer font-semibold"
                             onClick={() =>
-                              form.setValue("allocateXneutro", availableXneutro)
+                              form.setValue("allocateXneutro", xneutroBalance)
                             }
                           >
                             MAX

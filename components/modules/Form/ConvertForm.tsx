@@ -167,7 +167,7 @@ export default function ConvertForm() {
                         onClick={() =>
                           form.setValue(
                             "convertNeutroToXneutro",
-                            availableNeutro
+                            formatEther(neutroBalance)
                           )
                         }
                       >

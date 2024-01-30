@@ -151,7 +151,7 @@ export async function composeData(
 
       vault.totalDeposit = parseFloat(
         formatEther(BigNumber.from(totalStaked.hex))
-      ).toFixed(2);
+      ).toString();
       vault.totalDepositInUsd = (
         parseFloat(vault.totalDeposit) * parseFloat(CACHED_NEUTRO_PRICE)
       )
