@@ -88,11 +88,10 @@ export default function Pool() {
       untrackedVolumeUSD: any;
       token0Price: any;
       token1Price: any;
-      volumeUSD: any;
-      dailyVolume: string;
       txCount: any;
       pairDayData: any[];
       apr: number;
+      volume7Days: any;
     }[]
   >([]);
   const [totalLiquidityUSD, setTotalLiquidityUSD] = useState<number>(0);
@@ -131,19 +130,34 @@ export default function Pool() {
         let pools = res.data;
         if (!pools) throw new Error("Failed to fetch data");
 
+        // const dataWithApr = pools.pairs.map((item) => {
+        //   // Aggregate daily volume for each day
+        //   const dailyVolume = item.pairDayData.reduce((total, day) => {
+        //     return total + parseFloat(day.dailyVolumeUSD);
+        //   }, 0);
+
+        //   const fees = dailyVolume * 0.003;
+        //   const sevenDaysFeeUsd = fees * 7;
+
+        //   return {
+        //     ...item,
+        //     apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
+        //     dailyVolume: dailyVolume.toFixed(2), // Format the total daily volume
+        //   };
+        // });
+
+        console.log("pools", pools);
+
         const dataWithApr = pools.pairs.map((item) => {
-          // Aggregate daily volume for each day
-          const dailyVolume = item.pairDayData.reduce((total, day) => {
-            return total + parseFloat(day.dailyVolumeUSD);
+          const sevenDaysVolume = item.pairDayData.reduce((prev, curr) => {
+            return prev + parseFloat(curr.dailyVolumeUSD);
           }, 0);
 
-          const fees = dailyVolume * 0.003;
-          const sevenDaysFeeUsd = fees * 7;
-
+          const sevenDaysFeeUsd = sevenDaysVolume * 0.003;
           return {
             ...item,
+            volume7Days: currencyFormat(sevenDaysVolume),
             apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
-            dailyVolume: dailyVolume.toFixed(2), // Format the total daily volume
           };
         });
 
@@ -237,7 +251,7 @@ export default function Pool() {
             <TableRow className="hover:bg-transparent">
               <TableHead className="w-60">Asset</TableHead>
               <TableHead className="text-right">Liquidity</TableHead>
-              <TableHead className="text-right">Volume 24H</TableHead>
+              <TableHead className="text-right">Volume (7d)</TableHead>
               <TableHead className="text-right">APR</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -276,7 +290,8 @@ export default function Pool() {
                   ${currencyCompactFormat(pool.reserveUSD)}
                 </TableCell>
                 <TableCell className="text-right">
-                  ${pool.dailyVolume}
+                  {/* ${currencyFormat(pool.pairDayData[5].dailyVolumeUSD)} */}$
+                  {pool.volume7Days}
                 </TableCell>
                 <TableCell className="text-right">
                   {pool.apr.toFixed(2)}%
