@@ -130,24 +130,6 @@ export default function Pool() {
         let pools = res.data;
         if (!pools) throw new Error("Failed to fetch data");
 
-        // const dataWithApr = pools.pairs.map((item) => {
-        //   // Aggregate daily volume for each day
-        //   const dailyVolume = item.pairDayData.reduce((total, day) => {
-        //     return total + parseFloat(day.dailyVolumeUSD);
-        //   }, 0);
-
-        //   const fees = dailyVolume * 0.003;
-        //   const sevenDaysFeeUsd = fees * 7;
-
-        //   return {
-        //     ...item,
-        //     apr: ((sevenDaysFeeUsd * 54) / +item.reserveUSD) * 100,
-        //     dailyVolume: dailyVolume.toFixed(2), // Format the total daily volume
-        //   };
-        // });
-
-        console.log("pools", pools);
-
         const dataWithApr = pools.pairs.map((item) => {
           const sevenDaysVolume = item.pairDayData.reduce((prev, curr) => {
             return prev + parseFloat(curr.dailyVolumeUSD);
