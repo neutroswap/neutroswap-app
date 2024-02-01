@@ -120,16 +120,13 @@ export default function YieldBooster() {
                   <div className="flex justify-between">
                     <div className="flex flex-col">
                       <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                        Total Allocation
+                        Allocated <span className="normal-case">xNEUTRO</span>
                       </span>
                       <div className="flex space-x-1">
                         <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                          {Number(formatEther(data?.[0] ?? BigInt(0))).toFixed(
-                            2
-                          )}
-                        </span>
-                        <span className="text-sm text-neutral-500 mt-3">
-                          xNEUTRO
+                          {Number(
+                            formatEther(data?.[0] ?? BigInt(0))
+                          ).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -149,10 +146,7 @@ export default function YieldBooster() {
                       </span>
                       <div className="flex space-x-1">
                         <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                          {formattedUserAllocation}
-                        </span>
-                        <span className="text-sm text-neutral-500 mt-3">
-                          xNEUTRO
+                          {Number(formattedUserAllocation).toLocaleString()}
                         </span>
                       </div>
                     </div>

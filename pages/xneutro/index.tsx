@@ -162,7 +162,7 @@ export default function Xneutro() {
                       </span>
                       <div className="flex space-x-1">
                         <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                          {totalXneutro}
+                          {Number(totalXneutro).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -178,11 +178,11 @@ export default function Xneutro() {
                   <div className="flex justify-between">
                     <div className="flex flex-col">
                       <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                        Available <span className="normal-case">xNEUTRO</span>
+                        <span className="normal-case">xNEUTRO</span> Balance
                       </span>
                       <div className="flex space-x-1">
                         <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                          {availableXneutro}
+                          {Number(availableXneutro).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -201,7 +201,7 @@ export default function Xneutro() {
                         Allocated <span className="normal-case">xNEUTRO</span>
                       </span>
                       <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                        {allocatedAmount}
+                        {Number(allocatedAmount).toLocaleString()}
                       </span>
                     </div>
                     <LockedLogo className="w-7 h-7 text-primary rounded-full mt-3" />
@@ -220,7 +220,7 @@ export default function Xneutro() {
                       </span>
                       <div className="flex space-x-1">
                         <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                          {redeemingAmount}
+                          {Number(redeemingAmount).toLocaleString()}
                         </span>
                       </div>
                     </div>

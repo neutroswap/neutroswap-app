@@ -2,7 +2,7 @@ import EpochLogo from "@/public/logo/epoch.svg";
 import DeallocationLogo from "@/public/logo/deallocation.svg";
 import APRLogo from "@/public/logo/apy.svg";
 import AllocationLogo from "@/public/logo/allocation.svg";
-import { useContractReads, useNetwork } from "wagmi";
+import { useAccount, useContractReads, useNetwork } from "wagmi";
 import { DIVIDENDS_ABI, NEUTRO_HELPER_ABI } from "@/shared/abi";
 import { formatEther } from "viem";
 import { currencyFormat } from "@/shared/utils";
@@ -25,8 +25,10 @@ interface Reward extends Omit<Token, "logo"> {
 
 export default function Dividend() {
   const { chain } = useNetwork();
+  const { isConnected } = useAccount();
 
   const { data } = useContractReads({
+    enabled: isConnected,
     cacheOnBlock: true,
     allowFailure: false,
     contracts: [
@@ -148,14 +150,11 @@ export default function Dividend() {
                   <div className="flex justify-between">
                     <div className="flex flex-col">
                       <span className="text-xs font-bold uppercase text-left text-neutral-500 whitespace-nowrap">
-                        Total <span className="normal-case">xNEUTRO</span>
+                        Allocated <span className="normal-case">xNEUTRO</span>
                       </span>
                       <div className="flex space-x-1">
                         <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                          {Number(totalAllocation).toFixed(2)}
-                        </span>
-                        <span className="text-sm text-neutral-500 mt-3">
-                          xNEUTRO
+                          {Number(totalAllocation).toLocaleString()}
                         </span>
                       </div>
                     </div>
@@ -197,7 +196,7 @@ export default function Dividend() {
                         Total APR
                       </span>
                       <span className="text-4xl md:text-3xl text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70 font-semibold">
-                        {totalAPR.toFixed(2)}%
+                        {!!totalAPR ? totalAPR.toFixed(2) : "0"}%
                       </span>
                     </div>
                     <APRLogo className="w-7 h-7 text-primary rounded-full mt-3" />
@@ -231,82 +230,84 @@ export default function Dividend() {
 
       <div className="grid grid-cols-1 sm:grid-cols-12 w-full box-border sm:space-x-3">
         <div className="sm:col-span-7 w-full mt-8">
-          <div className="flex flex-col rounded">
-            <div className="border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg">
-              <div className="flex flex-col">
-                <div className="flex flex-row justify-between items-start md:p-8 -mb-7">
-                  <span className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
-                    Current Epoch Details
-                  </span>
-                </div>
+          {!!data && (
+            <div className="flex flex-col rounded">
+              <div className="border border-neutral-200 dark:border-neutral-800/50 md:shadow-dark-sm md:dark:shadow-dark-lg">
+                <div className="flex flex-col">
+                  <div className="flex flex-row justify-between items-start md:p-8 -mb-7">
+                    <span className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
+                      Current Epoch Details
+                    </span>
+                  </div>
 
-                <div className="flex flex-wrap">
-                  {!!data &&
-                    data[4].map((reward, index) => {
-                      const info = getRewardInfo(reward.token);
-                      const currentDistributionAmount = BigInt(
-                        reward.currentDistributionAmount ?? 0
-                      );
-                      const formattedDistributedAmount = parseFloat(
-                        formatEther(currentDistributionAmount)
-                      ).toFixed(5);
-                      if (!info) return null;
-                      return (
-                        <div
-                          className="flex w-full sm:w-1/2 items-center mt-4 sm:mt-0 pl-0 sm:pl-8 m-4 sm:m-0"
-                          key={index}
-                        >
-                          <div className="flex items-center">
-                            <div className="flex">
-                              {info.logo.map((logo) => (
-                                <TokenLogo
-                                  className="w-8 h-8"
-                                  src={logo}
-                                  key={logo}
-                                />
-                              ))}
-                            </div>
-                            <div className="ml-2">
-                              <span className="text-sm text-neutral-500">
-                                {info.symbol}
-                              </span>
-                              <div className="mt-0 text-sm">
-                                <span className="text-neutral-500 text-xs">
-                                  {formattedDistributedAmount} {info.symbol}
+                  <div className="flex flex-wrap">
+                    {!!data &&
+                      data[4].map((reward, index) => {
+                        const info = getRewardInfo(reward.token);
+                        const currentDistributionAmount = BigInt(
+                          reward.currentDistributionAmount ?? 0
+                        );
+                        const formattedDistributedAmount = parseFloat(
+                          formatEther(currentDistributionAmount)
+                        ).toFixed(5);
+                        if (!info) return null;
+                        return (
+                          <div
+                            className="flex w-full sm:w-1/2 items-center mt-4 sm:mt-0 pl-0 sm:pl-8 m-4 sm:m-0"
+                            key={index}
+                          >
+                            <div className="flex items-center">
+                              <div className="flex">
+                                {info.logo.map((logo) => (
+                                  <TokenLogo
+                                    className="w-8 h-8"
+                                    src={logo}
+                                    key={logo}
+                                  />
+                                ))}
+                              </div>
+                              <div className="ml-2">
+                                <span className="text-sm text-neutral-500">
+                                  {info.symbol}
                                 </span>
-                                &nbsp;$
-                                {currencyFormat(
-                                  parseFloat(
-                                    formatEther(
-                                      BigInt(
-                                        reward.currentDistributionAmountInUsd
+                                <div className="mt-0 text-sm">
+                                  <span className="text-neutral-500 text-xs">
+                                    {formattedDistributedAmount} {info.symbol}
+                                  </span>
+                                  &nbsp;$
+                                  {currencyFormat(
+                                    parseFloat(
+                                      formatEther(
+                                        BigInt(
+                                          reward.currentDistributionAmountInUsd
+                                        )
                                       )
-                                    )
-                                  ),
-                                  2,
-                                  0.01
-                                )}
+                                    ),
+                                    2,
+                                    0.01
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })}
+                  </div>
+                </div>
+
+                <hr className="my-4 w-full border-neutral-200/80 dark:border-neutral-800/80" />
+
+                <div className="flex flex-col justify-between items-start p-2 m-5 py-0">
+                  <p className="m-0 text-left whitespace-nowrap text-sm text-muted-foreground">
+                    Next distribution is scheduled at:{" "}
+                    <span className="inline-block">
+                      <Countdown targetEpochTime={protocolEarningsTime} />
+                    </span>
+                  </p>
                 </div>
               </div>
-
-              <hr className="my-4 w-full border-neutral-200/80 dark:border-neutral-800/80" />
-
-              <div className="flex flex-col justify-between items-start p-2 m-5 py-0">
-                <p className="m-0 text-left whitespace-nowrap text-sm text-muted-foreground">
-                  Next distribution is scheduled at:{" "}
-                  <span className="inline-block">
-                    <Countdown targetEpochTime={protocolEarningsTime} />
-                  </span>
-                </p>
-              </div>
             </div>
-          </div>
+          )}
         </div>
         <UserDividends />
       </div>
