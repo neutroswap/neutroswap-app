@@ -17,7 +17,7 @@ import {
 } from "@/shared/helpers/contract";
 import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";
-import { SupportedChainID } from "@/shared/types/chain.types";
+import { DEFAULT_CHAIN_ID, SupportedChainID } from "@/shared/types/chain.types";
 import getPairInfo from "@/shared/getters/getPairInfo";
 import TokenLogo from "@/components/modules/TokenLogo";
 import { classNames } from "@/shared/helpers/classNamer";
@@ -41,12 +41,15 @@ export default function PendingDividends() {
         functionName: "userPendingRewardsInDividendsPlugin",
         args: [address!],
       } as const,
-      {
-        address: NEUTRO_HELPER_CONTRACT,
-        abi: NEUTRO_HELPER_ABI,
-        functionName: "dividendsDistributedTokensRewards",
-      } as const,
+      // {
+      //   address: NEUTRO_HELPER_CONTRACT,
+      //   abi: NEUTRO_HELPER_ABI,
+      //   functionName: "dividendsDistributedTokensRewards",
+      // } as const,
     ],
+    onError(err) {
+      console.log(err);
+    },
   });
 
   //Claim all button function
@@ -104,43 +107,46 @@ export default function PendingDividends() {
   }
 
   return (
-    <div className="-space-y-12">
-      <div className="flex flex-row items-center justify-between w-full md:p-8 md:pt-0 mb-8">
-        <p className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
-          Your dividends
-        </p>
-        <div className="flex space-x-4">
-          <Button
-            className={classNames(
-              "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm",
-              "text-white dark:text-primary",
-              "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
-              "!border !border-orange-600/50 dark:border-orange-400/[.12]",
-              "disabled:opacity-50"
-            )}
-            onClick={() => harvestAll?.()}
-            loading={isLoadingHarvestAll}
-            disabled={!harvestAll}
-          >
-            Claim all
-          </Button>
+    <>
+      {data !== undefined && (
+        <div className="-space-y-12">
+          <div className="flex flex-row items-center justify-between w-full md:p-8 md:pt-0 mb-8">
+            <p className="m-4 sm:m-0 text-left font-semibold whitespace-nowrap">
+              Your dividends
+            </p>
+            <div className="flex space-x-4">
+              <Button
+                className={classNames(
+                  "!flex !items-center !py-5 !transition-all !rounded-lg !cursor-pointer !w-full !justify-center !font-semibold !shadow-dark-sm",
+                  "text-white dark:text-primary",
+                  "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                  "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                  "disabled:opacity-50"
+                )}
+                onClick={() => harvestAll?.()}
+                loading={isLoadingHarvestAll}
+                disabled={!harvestAll}
+              >
+                Claim all
+              </Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 sm:flex flex-col">
+            {data[0].map((reward, index) => {
+              const info = getRewardInfo(reward.token);
+              if (!info) return;
+              return (
+                <AllocationReward
+                  key={index}
+                  props={reward}
+                  info={reward.token}
+                />
+              );
+            })}
+          </div>
         </div>
-      </div>
-      <div className="grid grid-cols-2 sm:flex flex-col">
-        {!!data &&
-          data[0].map((reward, index) => {
-            const info = getRewardInfo(reward.token);
-            if (!info) return;
-            return (
-              <AllocationReward
-                key={index}
-                props={reward}
-                info={reward.token}
-              />
-            );
-          })}
-      </div>
-    </div>
+      )}
+    </>
   );
 }
 
@@ -190,12 +196,12 @@ const AllocationReward = ({ props, info }: { props: Props; info: any }) => {
   });
 
   const addressToTokenInfo = useMemo(() => {
-    if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
+    if (!chain || chain.unsupported)
+      return new Map(
+        tokens[DEFAULT_CHAIN_ID.id].map((item) => [item.address, item])
+      );
     return new Map(
-      tokens[chain.id as unknown as SupportedChainID].map((item) => [
-        item.address,
-        item,
-      ])
+      tokens[chain.id as SupportedChainID].map((item) => [item.address, item])
     );
   }, [chain]);
 

@@ -15,7 +15,7 @@ import {
 import { useMemo } from "react";
 import { Token } from "@/shared/types/tokens.types";
 import { tokens } from "@/shared/statics/tokenList";
-import { SupportedChainID } from "@/shared/types/chain.types";
+import { DEFAULT_CHAIN_ID, SupportedChainID } from "@/shared/types/chain.types";
 import getPairInfo from "@/shared/getters/getPairInfo";
 import TokenLogo from "@/components/modules/TokenLogo";
 
@@ -25,10 +25,8 @@ interface Reward extends Omit<Token, "logo"> {
 
 export default function Dividend() {
   const { chain } = useNetwork();
-  const { isConnected } = useAccount();
 
   const { data } = useContractReads({
-    enabled: isConnected,
     cacheOnBlock: true,
     allowFailure: false,
     contracts: [
@@ -79,7 +77,10 @@ export default function Dividend() {
   // const nextCycleDate = dayjs.unix(Number(data?.[2])).format("MMMM D, YYYY");
 
   const addressToTokenInfo = useMemo(() => {
-    if (!chain || chain.unsupported) return new Map<`0x${string}`, Token>();
+    if (!chain || chain.unsupported)
+      return new Map(
+        tokens[DEFAULT_CHAIN_ID.id].map((item) => [item.address, item])
+      );
     return new Map(
       tokens[chain.id as SupportedChainID].map((item) => [item.address, item])
     );
