@@ -37,3 +37,8 @@ if (!process.env.NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT)
   throw new Error("Missing env.NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT");
 export const NEUTRO_HELPER_CONTRACT = process.env
   .NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`;
+
+  if (!process.env.NEXT_PUBLIC_WEOS_ADDRESS)
+  throw new Error("Missing env.NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT");
+export const WEOS_ADDRESS = process.env
+  .NEXT_PUBLIC_WEOS_ADDRESS as `0x${string}`;
