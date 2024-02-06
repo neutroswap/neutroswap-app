@@ -27,8 +27,14 @@ import {
   useNetwork,
   useWalletClient,
   useBalance,
+  usePrepareContractWrite,
 } from "wagmi";
-import { ERC20_ABI, NEUTRO_FACTORY_ABI, NEUTRO_POOL_ABI } from "@/shared/abi";
+import {
+  ERC20_ABI,
+  NEUTRO_FACTORY_ABI,
+  NEUTRO_POOL_ABI,
+  WEOS_ABI,
+} from "@/shared/abi";
 import { useContractRead } from "wagmi";
 import { classNames } from "@/shared/helpers/classNamer";
 import truncateEthAddress from "truncate-eth-address";
@@ -65,6 +71,9 @@ import {
 import ConnectButton from "@/components/modules/ConnectButton";
 import useUniswapPairFactory from "@/shared/hooks/useUniswapPairFactory";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
+import { WEOS_ADDRESS } from "@/shared/helpers/contract";
+import WrapUnwrapModal from "@/components/modules/Modal/WrapUnwrapModal";
+import { ResponsiveDialog } from "@/components/modules/ResponsiveDialog";
 
 const TABS = ["0.1", "0.5", "1.0"];
 
@@ -440,74 +449,96 @@ export default function Home() {
                 {" "}
                 Swap{" "}
               </span>
-              <Popover className="relative flex items-center">
-                <>
-                  <Popover.Button>
-                    <AdjustmentsHorizontalIcon className="h-5 cursor-pointer text-muted-foreground hover:text-primary transition" />
-                  </Popover.Button>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-200"
-                    enterFrom="opacity-0 translate-y-1"
-                    enterTo="opacity-100 translate-y-0"
-                    leave="transition ease-in duration-150"
-                    leaveFrom="opacity-100 translate-y-0"
-                    leaveTo="opacity-0 translate-y-1"
-                  >
-                    <Popover.Panel className="absolute top-10 right-0 z-50 -mr-2.5 min-w-20 md:m-w-22 md:-mr-5 rounded-lg w-72 shadow-dark-sm dark:shadow-dark-lg">
-                      <div
-                        className={classNames(
-                          "py-4 px-3 rounded-lg space-y-3",
-                          "bg-neutral-50 dark:bg-[#0C0C0C]",
-                          "border border-neutral-200 dark:border-neutral-800/50"
-                        )}
-                      >
-                        <div className="flex justify-between text-sm">
-                          <span className="text-neutral-500 dark:text-neutral-400">
-                            Slippage
-                          </span>
-                          <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
-                            {slippage}%
-                          </span>
-                        </div>
-                        <RadioGroup onChange={setSlippage}>
-                          <div className="items-center relative bg-neutral-200/50 dark:bg-white/[0.04] rounded-lg overflow-hidden flex p-1 space-x-1">
-                            <>
-                              {TABS.map((tab, i) => (
-                                <RadioGroup.Option
-                                  as={Fragment}
-                                  key={i}
-                                  value={tab}
-                                >
-                                  {({ checked }) => (
-                                    <div
-                                      className={classNames(
-                                        checked
-                                          ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 shadow"
-                                          : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 hover:dark:bg-white/[0.04]",
-                                        "z-[1] relative rounded-lg text-xs h-8 font-medium flex flex-grow items-center justify-center cursor-pointer"
-                                      )}
-                                    >
-                                      {tab}%
-                                    </div>
-                                  )}
-                                </RadioGroup.Option>
-                              ))}
+              <div className="flex space-x-2">
+                <ResponsiveDialog.Root shouldScaleBackground>
+                  <ResponsiveDialog.Trigger>
+                    <Button
+                      scale={0.25}
+                      className={classNames(
+                        "!flex !items-center !transition-all !rounded-lg !cursor-pointer !justify-center !font-semibold !shadow-dark-sm !text-sm",
+                        "text-white dark:text-primary",
+                        "!bg-primary hover:bg-primary/90 dark:bg-primary/10 dark:hover:bg-primary/[0.15]",
+                        "!border !border-orange-600/50 dark:border-orange-400/[.12]",
+                        "disabled:opacity-50"
+                      )}
+                    >
+                      EOS / WEOS
+                    </Button>
+                  </ResponsiveDialog.Trigger>
+                  <ResponsiveDialog.Content>
+                    <WrapUnwrapModal />
+                  </ResponsiveDialog.Content>
+                </ResponsiveDialog.Root>
 
-                              <NumberInput
-                                className="focus:bg-neutral-200 focus:dark:bg-black dark:placeholder:text-neutral-400 focus:dark:text-white rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px] transition"
-                                placeholder="Custom"
-                                value={slippage}
-                                onChange={setSlippage}
-                              />
-                            </>
+                <Popover className="relative flex items-center">
+                  <>
+                    <Popover.Button>
+                      <AdjustmentsHorizontalIcon className="h-5 cursor-pointer text-muted-foreground hover:text-primary transition" />
+                    </Popover.Button>
+                    <Transition
+                      as={Fragment}
+                      enter="transition ease-out duration-200"
+                      enterFrom="opacity-0 translate-y-1"
+                      enterTo="opacity-100 translate-y-0"
+                      leave="transition ease-in duration-150"
+                      leaveFrom="opacity-100 translate-y-0"
+                      leaveTo="opacity-0 translate-y-1"
+                    >
+                      <Popover.Panel className="absolute top-10 right-0 z-50 -mr-2.5 min-w-20 md:m-w-22 md:-mr-5 rounded-lg w-72 shadow-dark-sm dark:shadow-dark-lg">
+                        <div
+                          className={classNames(
+                            "py-4 px-3 rounded-lg space-y-3",
+                            "bg-neutral-50 dark:bg-[#0C0C0C]",
+                            "border border-neutral-200 dark:border-neutral-800/50"
+                          )}
+                        >
+                          <div className="flex justify-between text-sm">
+                            <span className="text-neutral-500 dark:text-neutral-400">
+                              Slippage
+                            </span>
+                            <span className="text-neutral-800 dark:text-neutral-200 font-semibold">
+                              {slippage}%
+                            </span>
                           </div>
-                        </RadioGroup>
-                      </div>
-                    </Popover.Panel>
-                  </Transition>
-                </>
-              </Popover>
+                          <RadioGroup onChange={setSlippage}>
+                            <div className="items-center relative bg-neutral-200/50 dark:bg-white/[0.04] rounded-lg overflow-hidden flex p-1 space-x-1">
+                              <>
+                                {TABS.map((tab, i) => (
+                                  <RadioGroup.Option
+                                    as={Fragment}
+                                    key={i}
+                                    value={tab}
+                                  >
+                                    {({ checked }) => (
+                                      <div
+                                        className={classNames(
+                                          checked
+                                            ? "text-neutral-900 dark:text-white bg-white dark:bg-neutral-800 shadow"
+                                            : "text-neutral-500 dark:text-neutral-400 hover:bg-neutral-100 hover:dark:bg-white/[0.04]",
+                                          "z-[1] relative rounded-lg text-xs h-8 font-medium flex flex-grow items-center justify-center cursor-pointer"
+                                        )}
+                                      >
+                                        {tab}%
+                                      </div>
+                                    )}
+                                  </RadioGroup.Option>
+                                ))}
+
+                                <NumberInput
+                                  className="focus:bg-neutral-200 focus:dark:bg-black dark:placeholder:text-neutral-400 focus:dark:text-white rounded-lg text-sm h-8 font-medium bg-transparent text-center w-[100px] transition"
+                                  placeholder="Custom"
+                                  value={slippage}
+                                  onChange={setSlippage}
+                                />
+                              </>
+                            </div>
+                          </RadioGroup>
+                        </div>
+                      </Popover.Panel>
+                    </Transition>
+                  </>
+                </Popover>
+              </div>
             </div>
 
             <div
