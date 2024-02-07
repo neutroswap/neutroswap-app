@@ -12,7 +12,11 @@ import {
   ModalOpenButton,
 } from "@/components/elements/Modal";
 import { TokenPicker } from "@/components/modules/swap/TokenPicker";
-import { NEUTRO_FACTORY_ABI } from "@/shared/abi";
+import {
+  NEUTRO_FACTORY_ABI,
+  NEUTRO_HELPER_ABI,
+  NFTPOOLFACTORY_ABI,
+} from "@/shared/abi";
 import {
   useContractRead,
   useContractWrite,
@@ -31,7 +35,7 @@ import {
 
 import PoolIcon from "@/public/icons/pool.svg";
 import { waitForTransaction } from "@wagmi/core";
-import { decodeAbiParameters, parseAbiParameters } from "viem";
+import { decodeAbiParameters, formatEther, parseAbiParameters } from "viem";
 import { urls } from "@/shared/config/urls";
 import { Client, cacheExchange, fetchExchange } from "urql";
 import { getPoolListQuery } from "@/shared/gql/queries/factory";
@@ -52,6 +56,10 @@ import {
 import { getTokenImageUrl } from "@/shared/getters/getTokenInfo";
 import TokenLogo from "@/components/modules/TokenLogo";
 import { ChevronRight } from "lucide-react";
+import {
+  NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT,
+  NEXT_PUBLIC_NFT_POOL_FACTORY_CONTRACT,
+} from "@/shared/helpers/constants";
 
 type PositionsResponse = {
   network_id: string;
@@ -276,7 +284,7 @@ export default function Pool() {
                   {pool.volume7Days}
                 </TableCell>
                 <TableCell className="text-right">
-                  {pool.apr.toFixed(2)}%
+                  <AprTable pool={pool.id} />
                 </TableCell>
                 <TableCell className="flex justify-end text-right">
                   <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:translate-x-2 transition" />
@@ -470,4 +478,28 @@ const AddLiquidityModal: React.FC<{ handleClose: () => void }> = ({
       )}
     </div>
   );
+};
+
+type AprTableProps = {
+  pool: string;
+};
+
+const AprTable = (props: AprTableProps) => {
+  const { data: nftPool } = useContractRead({
+    address: NEXT_PUBLIC_NFT_POOL_FACTORY_CONTRACT as `0x${string}`,
+    abi: NFTPOOLFACTORY_ABI,
+    functionName: "getPool",
+    args: [props.pool as `0x${string}`],
+  });
+
+  const { data: apr } = useContractRead({
+    address: NEXT_PUBLIC_NEUTRO_HELPER_CONTRACT as `0x${string}`,
+    abi: NEUTRO_HELPER_ABI,
+    functionName: "nftPoolApr",
+    args: [nftPool!],
+  });
+
+  const formattedApr = apr ? parseFloat(formatEther(apr)) : 0;
+
+  return <div> {currencyFormat(formattedApr, 2, 0.01)}%</div>;
 };
