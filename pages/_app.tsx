@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from "react";
 import { PrefersContext, themes, ThemeType } from "@/shared/hooks/usePrefers";
 
 import {
+  connectorsForWallets,
   getDefaultWallets,
   lightTheme,
   midnightTheme,
@@ -24,6 +25,17 @@ import { configureChains, createConfig, WagmiConfig } from "wagmi";
 // import {arbitrum} from 'wagmi/chains'
 import Footer from "@/components/modules/Footer";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
+import {
+  argentWallet,
+  injectedWallet,
+  ledgerWallet,
+  okxWallet,
+  phantomWallet,
+  rabbyWallet,
+  trustWallet,
+  uniswapWallet,
+  zerionWallet,
+} from "@rainbow-me/rainbowkit/wallets";
 
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
@@ -84,11 +96,29 @@ const { chains, publicClient } = configureChains(
   ]
 );
 
-const { connectors } = getDefaultWallets({
+const projectId = "7ae5586a4ce03c8281f3c346214fa7b1";
+
+const { wallets } = getDefaultWallets({
   appName: "Neutroswap",
-  projectId: "7ae5586a4ce03c8281f3c346214fa7b1",
+  projectId,
   chains,
 });
+
+const connectors = connectorsForWallets([
+  ...wallets,
+  {
+    groupName: "Others",
+    wallets: [
+      ledgerWallet({ projectId, chains }),
+      okxWallet({ projectId, chains }),
+      trustWallet({ projectId, chains }),
+      uniswapWallet({ projectId, chains }),
+      zerionWallet({ projectId, chains }),
+      phantomWallet({ chains }),
+      rabbyWallet({ chains }),
+    ],
+  },
+]);
 
 const wagmiClient = createConfig({
   autoConnect: true,
